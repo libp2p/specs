@@ -8,11 +8,13 @@
 libp2p, the top module that interfaces all the other modules that make a libp2p instance, must offer an interface for dialing to a peer and plugging in all of the modules (e.g. which transports) we want to support.
 
 
+
 ## 6.2 Peer Routing
 
 ![](https://raw.githubusercontent.com/diasdavid/abstract-peer-routing/master/img/badge.png)
 
-https://github.com/diasdavid/abstract-peer-routing
+A Peer Routing service offers a way for libp2p Node to find the PeerInfo of another Node, so that it can dial to that node. In it is most pure form, a Peer Routing module should have a interface that given a 'key', a set of PeerInfos are returned.
+See https://github.com/diasdavid/abstract-peer-routing for the interface and tests.
 
 ## 6.3 Swarm
 
