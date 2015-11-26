@@ -42,6 +42,10 @@ https://github.com/diasdavid/abstract-stream-muxer
 
 ## 6.4 Distributed Record Store
 
+![](https://raw.githubusercontent.com/diasdavid/abstract-record-store/master/img/badge.png)
+
+https://github.com/diasdavid/abstract-record-store
+
 
 ## 6.5 Peer Discovery
 
