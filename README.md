@@ -26,7 +26,7 @@ This document defines the spec implemented in libp2p.
 
 # Organization of this document
 
-This RFC is organized by chapters described on the `Table of Contents` section. Each of the chapters can be found in each own file.
+This RFC is organized by chapters described on the `Table of Contents` section. Each of the chapters can be found in its own file.
 
 # Table of Contents
 
