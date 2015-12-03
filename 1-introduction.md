@@ -15,16 +15,16 @@ In essence, a peer using `libp2p` should be able to communicate with another pee
 
 Our goals for `libp2p` specification and its implementations are:
 
-- Enable the use of various:
-  - transports: TCP, UDP, SCTP, UDT, uTP, QUIC, SSH, etc.
-  - authenticated transports: TLS, DTLS, CurveCP, SSH
-- Efficient use of sockets (connection reuse)
-- Enable communications between peers to be multiplexed over one socket (avoiding handshake overhead)
-- Enable multiprotocols and respective versions to be used between peers, using a negotiation process
-- Be backwards compatible
-- Work in current systems
-- Use the current network technologies to its best capability
-- Have NAT traversal
-- Enable connections to be relayed
-- Enable encrypted channels
-- Efficient use of underlying transport (e.g. native stream muxing, native auth, etc.)
+  - Enable the use of various:
+    - transports: TCP, UDP, SCTP, UDT, uTP, QUIC, SSH, etc.
+    - authenticated transports: TLS, DTLS, CurveCP, SSH
+  - Efficient use of sockets (connection reuse)
+  - Enable communications between peers to be multiplexed over one socket (avoiding handshake overhead)
+  - Enable multiprotocols and respective versions to be used between peers, using a negotiation process
+  - Be backwards compatible
+  - Work in current systems
+  - Use the current network technologies to its best capability
+  - Have NAT traversal
+  - Enable connections to be relayed
+  - Enable encrypted channels
+  - Efficient use of underlying transport (e.g. native stream muxing, native auth, etc.)
