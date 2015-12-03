@@ -50,6 +50,7 @@ This RFC is organized by chapters described on the *Table of contents* section. 
     - [4.1 Peer Routing](4-architecture.md#41-peer-routing)
     - [4.2 Swarm](4-architecture.md#42-swarm)
     - [4.3 Distributed Record Store](4-architecture.md#43-distributed-record-store)
+    - [4.4 Discovery](4-architecture.md#44-discovery)
   - [5 Datastructures](5-datastructures.md)
   - [6 Interfaces](6-interfaces.md)
     - [6.1 libp2p](6-interfaces.md#61-libp2p)
