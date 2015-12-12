@@ -1,7 +1,7 @@
 6 Interfaces
 ============
 
-`libp2p` is a conglomerate of several protocols working together to offer a common solid interface with talking with any other network addressable process. This is made possible by shimming current exist protocols and implementations through a set of explicit interfaces, from Peer Routing, Discovery, Stream Muxing, Transports, Connections and so on.
+`libp2p` is a collection of several protocols working together to offer a common solid interface with talking with any other network addressable process. This is made possible by shimming current exist protocols and implementations through a set of explicit interfaces, from Peer Routing, Discovery, Stream Muxing, Transports, Connections and so on.
 
 ## 6.1 libp2p
 
