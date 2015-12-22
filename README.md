@@ -70,5 +70,6 @@ This RFC is organized by chapters described on the *Table of contents* section. 
       - [7.5.3 multistream-selector - self-describing protocol stream selector](7-properties.md#753-multistream-selector---self-describing-protocol-stream-selector)
       - [7.5.4 Stream Multiplexing](7-properties.md#754-stream-multiplexing)
       - [7.5.5 Portable Encodings](7-properties.md#755-portable-encodings)
+      - [7.5.6 Secure Communications](7-properties.md#756-secure-communications)
   - [8 Implementations](8-implementations.md)
   - [9 References](9-references.md)
