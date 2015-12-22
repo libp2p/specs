@@ -5,7 +5,7 @@
 
 The Network layer handles all the problems of connecting to a peer, and exposes
 simple bidirectional streams. Users can both open a new stream
-(`NewStream()`) and register a stream handler (`SetStreamHandler`). The user
+(`NewStream`) and register a stream handler (`SetStreamHandler`). The user
 is then free to implement whatever wire messaging protocol she desires. This
 makes it easy to build peer-to-peer protocols, as the complexities of
 connectivity, multi-transport support, flow control, and so on, are handled.
@@ -37,25 +37,25 @@ fmt.Println(buf2)   // print what was sent back
 
 ## 7.2 Ports - Constrained Entrypoints
 
-In the internet of 2015, we have a processing model where a program may be
+In the Internet of 2015, we have a processing model where a program may be
 running without the ability to open multiple -- or even single -- network
 ports. Most hosts are behind NAT, whether of household ISP variety or new
 containerized data-center type. And some programs may even be running in
 browsers, with no ability to open sockets directly (sort of). This presents
-challenges to completely peer-to-peer networks who aspire to connect _any_
+challenges to completely peer-to-peer networks that aspire to connect _any_
 hosts together -- whether they're running on a page in the browser, or in
 a container within a container.
 
 IPFS only needs a single channel of communication with the rest of the
 network. This may be a single TCP or UDP port, or a single connection
-through Websockets or WebRTC. In a sense, the role of the TCP/UDP network
+through WebSockets or WebRTC. In a sense, the role of the TCP/UDP network
 stack -- i.e. multiplexing applications and connections -- may now be forced
 to happen at the application level.
 
 ## 7.3 Transport Protocols
 
-IPFS is transport agnostic. It can run on any transport protocol. The
-`ipfs-addr` format (which is an ipfs-specific
+IPFS is transport-agnostic. It can run on any transport protocol. The
+`ipfs-addr` format (which is an IPFS-specific
 [multiaddr](https://github.com/jbenet/multiaddr)) describes the transport.
 For example:
 
@@ -73,7 +73,7 @@ For example:
 /ip4/104.131.67.168/udp/1038/utp/ipfs/QmU184wLPg7afQjBjwUUFkeJ98Fp81GhHGurWvMqwvWEQN
 ```
 
-IPFS delegtes the transport dialing to a multiaddr-based network pkg, such
+IPFS delegtes the transport dialing to a multiaddr-based network package, such
 as [go-multiaddr-net](https://github.com/jbenet/go-multiaddr-net). It is
 advisable to build modules like this in other languages, and scope the
 implementation of other transport protocols.
@@ -84,16 +84,16 @@ Some of the transport protocols we will be using:
 - UDT
 - SCTP
 - WebRTC (SCTP, etc)
-- Websockets
+- WebSockets
 - TCP Remy
 
 ## 7.4 Non-IP Networks
 
 Efforts like [NDN](http://named-data.net) and
-[XIA](http://www.cs.cmu.edu/~xia/) are new architectures for the internet,
+[XIA](http://www.cs.cmu.edu/~xia/) are new architectures for the Internet,
 which are closer to the model IPFS uses than what IP provides today. IPFS
 will be able to operate on top of these architectures trivially, as there
-is no assumptions made about the network stack in the protocol. Implementations
+are no assumptions made about the network stack in the protocol. Implementations
 will likley need to change, but changing implementations is vastly easier than
 changing protocols.
 
@@ -103,20 +103,20 @@ We have the **hard constraint** of making IPFS work across _any_ duplex stream (
 
 To make this work, IPFS has to solve a few problems:
 
-- [Protocol Multiplexing](#protocol-multiplexing) - running multiple protocols over the same stream
-  - [multistream](#multistream) - self-describing protocol streams
-  - [multistream-select](#multistream-select) - a self-describing protocol selector
-  - [Stream Multiplexing](#stream-multiplexing) - running many independent streams over the same wire.
-- [Portable Encodings](#portable-encodings) - using portable serialization formats
-- [Secure Communications](#secure-communication) - using ciphersuites to establish security and privacy (like TLS).
+- [Protocol Multiplexing](#751-protocol-multiplexing) - running multiple protocols over the same stream
+  - [multistream](#752-multistream-self-describing-protocol-stream) - self-describing protocol streams
+  - [multistream-select](#753-multistream-selector-self-describing-protocol-stream-selector) - a self-describing protocol selector
+  - [Stream Multiplexing](#754-stream-multiplexing) - running many independent streams over the same wire
+- [Portable Encodings](#755-portable-encodings) - using portable serialization formats
+- [Secure Communications](#756-secure-communication) - using ciphersuites to establish security and privacy (like TLS)
 
 ### 7.5.1 Protocol-Multiplexing
 
 Protocol Multiplexing means running multiple different protocols over the same stream. This could happen sequentially (one after the other), or concurrently (at the same time, with their messages interleaved). We achieve protocol multiplexing using three pieces:
 
-- [multistream](#multistream) - self-describing protocol streams
-- [multistream-select](#multistream-select) - a self-describing protocol selector
-- [Stream Multiplexing](#stream-multiplexing) - running many independent streams over the same wire.
+- [multistream](#752-multistream-self-describing-protocol-stream) - self-describing protocol streams
+- [multistream-select](#753-multistream-selector-self-describing-protocol-stream-selector) - a self-describing protocol selector
+- [Stream Multiplexing](#754-stream-multiplexing) - running many independent streams over the same wire
 
 ### 7.5.2 multistream - self-describing protocol stream
 
@@ -133,7 +133,7 @@ For example:
 
 ### 7.5.3 multistream-selector - self-describing protocol stream selector
 
-[multistream-select](https://github.com/jbenet/multistream/tree/master/multistream-select) is a simple [multistream](https://github.com/jbenet/multistream) protocol that allows listing and selecting other protocols. This means that Protomux has a list of registered protocols, listens for one, and then _nests_ (or upgrades) the connection to speak the registered protocol. This takes direct advantage of multistream: it enables interleaving multiple protocols, as well as inspecting what protocols might be spoken by the remote endpoint.
+[multistream-select](https://github.com/jbenet/multistream/tree/master/multistream) is a simple [multistream](https://github.com/jbenet/multistream) protocol that allows listing and selecting other protocols. This means that Protomux has a list of registered protocols, listens for one, and then _nests_ (or upgrades) the connection to speak the registered protocol. This takes direct advantage of multistream: it enables interleaving multiple protocols, as well as inspecting what protocols might be spoken by the remote endpoint.
 
 For example:
 
@@ -147,7 +147,7 @@ For example:
 
 ### 7.5.4 Stream Multiplexing
 
-Stream Multiplexing is the process of multiplexing (or combining) many different streams into a single one. This is a complicated subject because it enables protocols to run concurrently over the same wire. And all sorts of notions regarding fairness, flow control, head-of-line blocking, etc. start affecting the protocols. In practice, stream multiplexing is well understood and there are many stream multiplexing protocols. To name a few:
+Stream Multiplexing is the process of multiplexing (or combining) many different streams into a single one. This is a complicated subject because it enables protocols to run concurrently over the same wire, and all sorts of notions regarding fairness, flow control, head-of-line blocking, etc. start affecting the protocols. In practice, stream multiplexing is well understood and there are many stream multiplexing protocols. To name a few:
 
 - HTTP/2
 - SPDY
@@ -185,7 +185,7 @@ For example:
 ### 7.5.5 Portable Encodings
 
 In order to be ubiquitous, we _must_ use hyper-portable format encodings, those that are easy to use in various other platforms. Ideally these encodings are well-tested in the wild, and widely used. There may be cases where multiple encodings have to be supported (and hence we may need a [multicodec](https://github.com/jbenet/multicodec) self-describing encoding), but this has so far not been needed.
-For now, we use [protobuf](https://github.com/google/protobuf) for all protocol messages exclusively, but other good candidates are [capnp](https://capnproto.org), [bson](http://bsonspec.org/), [ubjson](http://ubjson.org/).
+For now, we use [protobuf](https://github.com/google/protobuf) for all protocol messages exclusively, but other good candidates are [capnp](https://capnproto.org/), [bson](http://bsonspec.org/), and [ubjson](http://ubjson.org/).
 
 ### 7.5.6 Secure Communications
 
