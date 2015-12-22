@@ -120,7 +120,7 @@ mDNS-discovery can be configured per-service (i.e. discover only peers participa
 
 We are exploring ways to make mDNS-discovery beacons encrypted (so that other nodes in the local network cannot discern what service is being used), though the nature of mDNS will always reveal local IP addresses.
 
-Privacy Note: mDNS advertises in local area networks, which reveals IP addresses to listeners in the same local network. It is not recommended to use this with privacy-sensitive applications or oblivious routing protocols.
+**Privacy note:** mDNS advertises in local area networks, which reveals IP addresses to listeners in the same local network. It is not recommended to use this with privacy-sensitive applications or oblivious routing protocols.
 
 #### 4.4.2 random-walk
 
