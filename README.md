@@ -57,6 +57,8 @@ This RFC is organized by chapters described on the *Table of contents* section. 
     - [6.2 Peer Routing](6-interfaces.md#62-peer-routing)
     - [6.3 Swarm](6-interfaces.md#63-swarm)
     - [6.4 Distributed Record Store](6-interfaces.md#64-distributed-record-store)
+    - [6.5 Peer Discovery](6-interfaces.md#65-peer-discovery)
+    - [6.6 libp2p interface and UX](6-interfaces.md#66-libp2p-interface-and-ux)
   - [7 Properties](7-properties.md)
     - [7.1 Communication Model - Streams](7-properties.md#71-communication-model---streams)
     - [7.2 Ports - Constrained Entrypoints](7-properties.md#72-ports---constrained-entrypoints)
