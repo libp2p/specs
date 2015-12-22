@@ -56,7 +56,7 @@ mDNS-routing uses mDNS probes to identify if local area network peers have a giv
 
 ### 4.2.1 Stream Muxer
 
-The stream muxer must implement the interface offered by [abstract-stream-muxer](https://github.com/diasdavid/abstract-stream-muxer).
+The stream muxer must implement the interface offered by [interface-stream-muxer](https://github.com/diasdavid/interface-stream-muxer).
 
 ### 4.2.2 Protocol Muxer
 

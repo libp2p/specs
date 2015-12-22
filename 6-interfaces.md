@@ -9,7 +9,7 @@
 
 ## 6.2 Peer Routing
 
-![](https://raw.githubusercontent.com/diasdavid/abstract-peer-routing/master/img/badge.png)
+![](https://raw.githubusercontent.com/diasdavid/interface-peer-routing/master/img/badge.png)
 
 A Peer Routing service offers a way for a `libp2p` Node to find the PeerInfo of another Node, so that it can dial to that node. In its most pure form, a Peer Routing module should have an interface that given a 'key', a set of PeerInfos are returned.
 See https://github.com/diasdavid/interface-peer-routing for the interface and tests.
@@ -22,25 +22,25 @@ https://github.com/diasdavid/js-libp2p-swarm#usage
 
 ### 6.3.1 Transport
 
-![](https://raw.githubusercontent.com/diasdavid/abstract-transport/master/img/badge.png)
+![](https://raw.githubusercontent.com/diasdavid/interface-transport/master/img/badge.png)
 
 https://github.com/diasdavid/interface-transport
 
 ### 6.3.2 Connection
 
-![](https://raw.githubusercontent.com/diasdavid/abstract-connection/master/img/badge.png)
+![](https://raw.githubusercontent.com/diasdavid/interface-connection/master/img/badge.png)
 
 https://github.com/diasdavid/interface-connection
 
 ### 6.3.3 Stream Muxing
 
-![](https://github.com/diasdavid/abstract-stream-muxer/raw/master/img/badge.png)
+![](https://github.com/diasdavid/interface-stream-muxer/raw/master/img/badge.png)
 
 https://github.com/diasdavid/interface-stream-muxer
 
 ## 6.4 Distributed Record Store
 
-![](https://raw.githubusercontent.com/diasdavid/abstract-record-store/master/img/badge.png)
+![](https://raw.githubusercontent.com/diasdavid/interface-record-store/master/img/badge.png)
 
 https://github.com/diasdavid/interface-record-store
 
