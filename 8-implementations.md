@@ -51,7 +51,7 @@ This is the list of current modules available for `libp2p`:
 Current known implementations (or WIP) are:
 
   - JavaScript - <https://github.com/diasdavid/js-libp2p>
-  - Go - <https://github.com/ipfs/go-ipfs>
+  - Go - <https://github.com/ipfs/go-libp2p>
   - Python - <https://github.com/candeira/py-ipfs/blob/readme-roadmap/README.md>
   - Rust - <https://github.com/diasdavid/rust-libp2p>
 
