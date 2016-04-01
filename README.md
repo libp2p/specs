@@ -23,7 +23,7 @@ This document defines the spec implemented in `libp2p`.
 
 # Status of this spec
 
-> **This spec is a Work In Progress (WIP).**
+![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
 
 # Organization of this document
 
