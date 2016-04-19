@@ -55,3 +55,66 @@ Current known implementations (or WIP) are:
   - Python - <https://github.com/candeira/py-ipfs/blob/readme-roadmap/README.md>
   - Rust - <https://github.com/diasdavid/rust-libp2p>
 
+## 8.1 Swarm
+
+### 8.1.1 Swarm Dialer
+
+The swarm dialer manages making a successful connection to a target peer, given a stream of addresses as inputs, and making sure to respect any and all rate limits imposed. To this end, we have designed the following logic for dialing:
+
+DialPeer(peerID) {
+	if PeerIsBeingDialed(peerID) {
+		waitForDialToComplete(peerID)
+		return BestConnToPeer(peerID)
+	}
+	
+	StartDial(peerID)
+
+	waitForDialToComplete(peerID)
+	return BestConnToPeer(peerID)
+}
+
+	
+StartDial(peerID) {
+	addrs = getAddressStream(peerID)
+
+	addrs.onNewAddr(function(addr) {
+		if rateLimitCanDial(peerID, addr) {
+			doDialAsync(peerID, addr)
+		} else {
+			rateLimitScheduleDial(peerID, addr)
+		}
+	})
+}
+
+// doDialAsync starts dialing to a specific address without blocking.
+// when the dial returns, it releases rate limit tokens, and if it
+// succeeded, will finalize the dial process.
+doDialAsync(peerID, addr) {
+	go transportDial(addr, function(conn, err) {
+		rateLimitReleaseTokens(peerID, addr)
+
+		if err != null {
+			// handle error
+		}
+
+		dialSuccess(conn)
+	})
+}
+
+// rateLimitReleaseTokens checks for any tokens the given dial
+// took, and then for each of them, checks if any other dial is waiting
+// for any of those tokens. If waiting dials are found, those dials are started
+// immediately. Otherwise, the tokens are released to their pools.
+rateLimitReleaseTokens(peerID, addr) {
+	tokens = tokensForDial(peerID, addr)
+
+	for token in tokens {
+		dial = dialWaitingForToken(token)
+		if dial != null {
+			doDialAsync(dial.peer, dial.addr)
+		} else {
+			token.release()
+		}
+	}
+	
+}
