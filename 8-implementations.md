@@ -61,6 +61,7 @@ Current known implementations (or WIP) are:
 
 The swarm dialer manages making a successful connection to a target peer, given a stream of addresses as inputs, and making sure to respect any and all rate limits imposed. To this end, we have designed the following logic for dialing:
 
+```
 DialPeer(peerID) {
 	if PeerIsBeingDialed(peerID) {
 		waitForDialToComplete(peerID)
@@ -118,3 +119,4 @@ rateLimitReleaseTokens(peerID, addr) {
 	}
 	
 }
+```
