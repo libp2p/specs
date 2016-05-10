@@ -190,3 +190,22 @@ For now, we use [protobuf](https://github.com/google/protobuf) for all protocol 
 ### 7.5.6 Secure Communications
 
 The wire protocol is -- of course -- wrapped with encryption. We use cyphersuites similar to TLS. This is explained further in the [network spec](./#encryption).
+
+### 7.5.7 Protocol Multicodecs
+
+Here, we present a table with the multicodecs defined for each IPFS protocol that has a wire componenent. This list may change overtime and currently exists as a guide for implementation
+
+protocol | multicodec
+:---- | :----
+secio | /secio/1.0.0
+TLS | /tls/1.3.0
+plaintext | /plaintext/1.0.0 
+spdy | /spdy/3.1.0
+yamux | /yamux/1.0.0
+multiplex | /multiplex/6.7.0
+identify | /ipfs/id/1.0.0
+ping | /ipfs/ping/1.0.0
+relay | /ipfs/relay/line/1.0.0
+diagnostics | /ipfs/diag/net/1.0.0
+Kademlia DHT | /ipfs/kad/1.0.0
+bitswap | /ipfs/bitswap/1.0.0
