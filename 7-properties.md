@@ -73,7 +73,7 @@ For example:
 /ip4/104.131.67.168/udp/1038/utp/ipfs/QmU184wLPg7afQjBjwUUFkeJ98Fp81GhHGurWvMqwvWEQN
 ```
 
-IPFS delegtes the transport dialing to a multiaddr-based network package, such
+IPFS delegates the transport dialing to a multiaddr-based network package, such
 as [go-multiaddr-net](https://github.com/jbenet/go-multiaddr-net). It is
 advisable to build modules like this in other languages, and scope the
 implementation of other transport protocols.
