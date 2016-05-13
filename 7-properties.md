@@ -94,7 +94,7 @@ Efforts like [NDN](http://named-data.net) and
 which are closer to the model IPFS uses than what IP provides today. IPFS
 will be able to operate on top of these architectures trivially, as there
 are no assumptions made about the network stack in the protocol. Implementations
-will likley need to change, but changing implementations is vastly easier than
+will likely need to change, but changing implementations is vastly easier than
 changing protocols.
 
 ## 7.5 On the wire
