@@ -6,7 +6,7 @@ The network protocol deals with these data structures:
 - a `PrivateKey`, the private key of a node.
 - a `PublicKey`, the public key of a node.
 - a `PeerId`, a hash of a node's public key.
-- a `PeerInfo`, an object with `PeerId` and known multiaddrs from another node.
+- a `PeerInfo`, an object containing a node's `PeerId` and its known multiaddrs.
 - a `Transport`, a transport used to establish connections to other peers. See <https://github.com/diasdavid/interface-transport>.
 - a `Connection`, a point-to-point link between two nodes. Must implement <https://github.com/diasdavid/interface-connection>.
 - a `Muxed-Stream`, a duplex message channel.

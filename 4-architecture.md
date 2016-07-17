@@ -1,14 +1,14 @@
 4 Architecture
 ==============
 
-`libp2p` was designed around the Unix Philosophy, creating smaller components, easier to understand and to test. These components should also be able to be swapped in order to accomodate different technologies or scenarios and also make it that it is upgradable over time.
+`libp2p` was designed around the Unix Philosophy of creating small components that are easy to understand and test. These components should also be able to be swapped in order to accomodate different technologies or scenarios and also make it feasible to upgrade them over time.
 
 Although different peers can support different protocols depending on their capabilities, any peer can act as a dialer and/or a listener for connections from other peers, connections that once established can be reused from both ends, removing the distinction between clients and servers.
 
-`libp2p` interface acts as a thin veneer to a multitude of subsystems that are required in order for peers to be able to communicate. These subsystems are allowed to be built on top of other subsystems as long as they respect the standardized interface. The main areas where these subsystems fit are:
+The `libp2p` interface acts as a thin veneer over a multitude of subsystems that are required in order for peers to be able to communicate. These subsystems are allowed to be built on top of other subsystems as long as they respect the standardized interface. The main areas where these subsystems fit are:
 
-- Peer Routing - Mechanism to find a peer in a network. This routing can be done recursively, iteratively or even in a broadcast/multicast mode.
-- Swarm - Handles everything that touches the 'opening a stream' part of `libp2p`, from protocol muxing, stream muxing, NAT traversal and connection relaying, while being multitransport.
+- Peer Routing - Mechanism to decide which peers to use for routing particular messages. This routing can be done recursively, iteratively or even in a broadcast/multicast mode.
+- Swarm - Handles everything that touches the 'opening a stream' part of `libp2p`, from protocol muxing, stream muxing, NAT traversal and connection relaying, while being multi-transport.
 - Distributed Record Store - A system to store and distribute records. Records are small entries used by other systems for signaling, establishing links, announcing peers or content, and so on. They have a similar role to DNS in the broader Internet.
 - Discovery - Finding or identifying other peers in the network.
 
@@ -19,13 +19,13 @@ Each of these subsystems exposes a well known interface (see [chapter 6](6-inter
 │                                  libp2p                                         │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ┌─────────────────┐┌─────────────────┐┌──────────────────────────┐┌───────────────┐
-│   Peer Routing  ││   Swarm         ││ Distributed Record Store ││  Discovery    │
+│   Peer Routing  ││      Swarm      ││ Distributed Record Store ││  Discovery    │
 └─────────────────┘└─────────────────┘└──────────────────────────┘└───────────────┘
 ```
 
 ## 4.1 Peer Routing
 
-A Peer Routing subsystem exposes an interface to identify which peers should a message be routed to in the DHT. It receives a key and must return one or more `PeerInfo` objects.
+A Peer Routing subsystem exposes an interface to identify which peers a message should be routed to in the DHT. It receives a key and must return one or more `PeerInfo` objects.
 
 We present two examples of possible Peer Routing subsystems, the first based on a the Kademlia DHT and the second based on mDNS. Nevertheless, other Peer Routing mechanisms can be implemented, as long as they fulfil the same expectation and interface.
 
@@ -43,14 +43,11 @@ We present two examples of possible Peer Routing subsystems, the first based on 
 
 ### 4.1.1 kad-routing
 
-kad-routing implements the Kademlia Routing table, where each peer holds a set of k-buckets, each of them containing several `PeerInfo` from other peers in the network.
+kad-routing implements the Kademlia Routing table, where each peer holds a set of k-buckets, each of them containing several `PeerInfo` objects from other peers in the network.
 
 ### 4.1.2 mDNS-routing
 
 mDNS-routing uses mDNS probes to identify if local area network peers have a given key or they are simply present.
-
-
-
 
 ## 4.2 Swarm
 
@@ -74,17 +71,6 @@ Protocol multiplexing is done through [`multistream`](https://github.com/jbenet/
 
 ### 4.2.6 Relay
 
-
-
-
-
-
-
-
-
-
-
-
 ## 4.3 Distributed Record Store
 
 ### 4.3.1 Record
@@ -99,22 +85,13 @@ Follows [IPRS](../records).
 
 ### 4.3.5 s3-record-store
 
-
-
-
-
-
-
-
-
-
 ## 4.4 Discovery
 
 ### 4.4.1 mDNS-discovery
 
 mDNS-discovery is a Discovery Protocol that uses [mDNS](https://en.wikipedia.org/wiki/Multicast_DNS) over local area networks. It emits mDNS beacons to find if there are more peers available. Local area network peers are very useful to peer-to-peer protocols, because of their low latency links.
 
-mDNS-discovery is a standalone protocol and does not depend on any other `libp2p` protocol. mDNS-discovery can yield peers available in the local area network, without relying on other infrastructure. This is particularly useful in intranets, networks disconnected from the Internet backbone, and networks which temporarily loose links.
+mDNS-discovery is a standalone protocol and does not depend on any other `libp2p` protocol. mDNS-discovery can yield peers available in the local area network, without relying on other infrastructure. This is particularly useful in intranets, networks disconnected from the Internet backbone, and networks which temporarily lose links.
 
 mDNS-discovery can be configured per-service (i.e. discover only peers participating in a specific protocol, like IPFS), and with private networks (discover peers belonging to a private network).
 
@@ -124,7 +101,7 @@ We are exploring ways to make mDNS-discovery beacons encrypted (so that other no
 
 #### 4.4.2 random-walk
 
-Random-Walk is a Discovery Protocol for DHTs (and other protocols with routing tables). It makes random DHT queries in order to learn about a large number of peers quickly. This causes the DHT (or other protocol) to converge much faster, at the expense of a small load at the very beginning.
+Random-Walk is a Discovery Protocol for DHTs (and other protocols with routing tables). It makes random DHT queries in order to learn about a large number of peers quickly. This causes the DHT (or other protocols) to converge much faster, at the expense of a small load at the very beginning.
 
 #### 4.4.3 bootstrap-list
 

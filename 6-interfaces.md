@@ -1,17 +1,17 @@
 6 Interfaces
 ============
 
-`libp2p` is a collection of several protocols working together to offer a common solid interface with talking with any other network addressable process. This is made possible by shimming current exist protocols and implementations through a set of explicit interfaces, from Peer Routing, Discovery, Stream Muxing, Transports, Connections and so on.
+`libp2p` is a collection of several protocols working together to offer a common solid interface that can talk with any other network addressable process. This is made possible by shimming currently existing protocols and implementations into a set of explicit interfaces: Peer Routing, Discovery, Stream Muxing, Transports, Connections and so on.
 
 ## 6.1 libp2p
 
-`libp2p`, the top module that interfaces all the other modules that make a `libp2p` instance, must offer an interface for dialing to a peer and plugging in all of the modules (e.g. which transports) we want to support. We present `libp2p` interface and UX on [section 6.6](#66-libp2p-interface-and-ux), after presenting every other module interface.
+`libp2p`, the top module that provides an interface to all the other modules that make a `libp2p` instance, must offer an interface for dialing to a peer and plugging in all of the modules (e.g. which transports) we want to support. We present the `libp2p` interface and UX in [section 6.6](#66-libp2p-interface-and-ux), after presenting every other module interface.
 
 ## 6.2 Peer Routing
 
 ![](https://raw.githubusercontent.com/diasdavid/interface-peer-routing/master/img/badge.png)
 
-A Peer Routing service offers a way for a `libp2p` Node to find the PeerInfo of another Node, so that it can dial to that node. In its most pure form, a Peer Routing module should have an interface that given a 'key', a set of PeerInfos are returned.
+A Peer Routing module offers a way for a `libp2p` `Node` to find the `PeerInfo` of another `Node`, so that it can dial that node. In its most pure form, a Peer Routing module should have an interface that takes a 'key', and returns a set of `PeerInfo`s.
 See https://github.com/diasdavid/interface-peer-routing for the interface and tests.
 
 ## 6.3 Swarm
@@ -46,11 +46,11 @@ https://github.com/diasdavid/interface-record-store
 
 ## 6.5 Peer Discovery
 
-A Peer Discovery system interface should return PeerInfo objects, as it finds new peers to be considered by our Peer Routing schemes.
+A Peer Discovery module interface should return `PeerInfo` objects, as it finds new peers to be considered by our Peer Routing modules.
 
 ## 6.6 libp2p interface and UX
 
-`libp2p` implementations should enable for it to be instantiated programatically, or to use a previous compiled library with some of the protocol decisions already made, so that the user can reuse or expand.
+`libp2p` implementations should enable it to be instantiated programatically, or to use a previous compiled library with some of the protocol decisions already made, so that the user can reuse or expand.
 
 ### Constructing a libp2p instance programatically
 

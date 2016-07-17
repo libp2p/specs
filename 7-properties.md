@@ -39,7 +39,7 @@ fmt.Println(buf2)   // print what was sent back
 
 In the Internet of 2015, we have a processing model where a program may be
 running without the ability to open multiple -- or even single -- network
-ports. Most hosts are behind NAT, whether of household ISP variety or new
+ports. Most hosts are behind NAT, whether of the household ISP variety or the new
 containerized data-center type. And some programs may even be running in
 browsers, with no ability to open sockets directly (sort of). This presents
 challenges to completely peer-to-peer networks that aspire to connect _any_
@@ -120,7 +120,7 @@ Protocol Multiplexing means running multiple different protocols over the same s
 
 ### 7.5.2 multistream - self-describing protocol stream
 
-[multistream](https://github.com/jbenet/multistream) is a self-describing protocol stream format. It is extremely simple. Its goal is to define a way to add headers to protocols that describe the protocol itself. It is sort of like adding versions to a protocol, but being extremely explicit.
+[multistream](https://github.com/jbenet/multistream) is a self-describing protocol stream format. It is extremely simple. Its goal is to define a way to add headers to protocols that describe the protocol itself. It is sort of like adding versions to a protocol, but extremely explicit.
 
 For example:
 
@@ -193,7 +193,7 @@ The wire protocol is -- of course -- wrapped with encryption. We use cyphersuite
 
 ### 7.5.7 Protocol Multicodecs
 
-Here, we present a table with the multicodecs defined for each IPFS protocol that has a wire componenent. This list may change overtime and currently exists as a guide for implementation
+Here, we present a table with the multicodecs defined for each IPFS protocol that has a wire componenent. This list may change over time and currently exists as a guide for implementation.
 
 protocol | multicodec
 :---- | :----
