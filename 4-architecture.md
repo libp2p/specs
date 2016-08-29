@@ -75,7 +75,7 @@ Protocol multiplexing is done through [`multistream`](https://github.com/jbenet/
 
 ### 4.3.1 Record
 
-Follows [IPRS](../records).
+Follows [IPRS](../iprs-interplanetary-record-system).
 
 ### 4.3.2 abstract-record-store
 
