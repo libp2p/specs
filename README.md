@@ -1,4 +1,4 @@
-# spec
+# specs
 
 ![banner](https://raw.githubusercontent.com/diasdavid/specs/libp2p-spec/protocol/network/figs/logo.png)
 
@@ -6,7 +6,7 @@
 [![](https://img.shields.io/badge/project-libp2p-blue.svg?style=flat-square)](http://github.com/libp2p/libp2p)
 [![](https://img.shields.io/badge/freenode-%23ipfs-blue.svg?style=flat-square)](http://webchat.freenode.net/?channels=%23ipfs)
 
-> The spec for libp2p and associated submodules.
+> The specs for libp2p and associated submodules.
 
 Authors:
 
