@@ -83,3 +83,7 @@ This RFC is organized by chapters described on the *Table of contents* section. 
 Please contribute! [Dive into the issues](https://github.com/libp2p/spec/issues)!
 
 Please be aware that all interactions related to multiformats are subject to the IPFS [Code of Conduct](https://github.com/ipfs/community/blob/master/code-of-conduct.md).
+
+## License
+
+[CC-BY-SA 3.0 License](https://creativecommons.org/licenses/by-sa/3.0/us/) © Protocol Labs Inc.
