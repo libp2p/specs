@@ -1,7 +1,12 @@
-RFC - libp2p
-============
+# spec
 
-![](https://raw.githubusercontent.com/diasdavid/specs/libp2p-spec/protocol/network/figs/logo.png)
+![banner](https://raw.githubusercontent.com/diasdavid/specs/libp2p-spec/protocol/network/figs/logo.png)
+
+[![](https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square)](http://ipn.io)
+[![](https://img.shields.io/badge/project-libp2p-blue.svg?style=flat-square)](http://github.com/libp2p/libp2p)
+[![](https://img.shields.io/badge/freenode-%23ipfs-blue.svg?style=flat-square)](http://webchat.freenode.net/?channels=%23ipfs)
+
+> The spec for libp2p and associated submodules.
 
 Authors:
 
@@ -73,3 +78,9 @@ This RFC is organized by chapters described on the *Table of contents* section. 
       - [7.5.6 Secure Communications](7-properties.md#756-secure-communications)
   - [8 Implementations](8-implementations.md)
   - [9 References](9-references.md)
+
+## Contribute
+
+Please contribute! [Dive into the issues](https://github.com/libp2p/spec/issues)!
+
+Please be aware that all interactions related to multiformats are subject to the IPFS [Code of Conduct](https://github.com/ipfs/community/blob/master/code-of-conduct.md).
