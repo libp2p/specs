@@ -18,23 +18,22 @@ Reviewers:
 
 > tl;dr; This document presents `libp2p`, a modularized and extensible network stack to overcome the networking challenges faced when doing peer-to-peer applications. `libp2p` is used by IPFS as its networking library.
 
-* * *
 
-# Abstract
+## Abstract
 
 This describes the [IPFS](https://ipfs.io/) network protocol. The network layer provides point-to-point transports (reliable and unreliable) between any two IPFS nodes in the network.
 
 This document defines the spec implemented in `libp2p`.
 
-# Status of this spec
+## Status of this spec
 
 ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
 
-# Organization of this document
+## Organization of this document
 
 This RFC is organized by chapters described on the *Table of contents* section. Each of the chapters can be found in its own file.
 
-# Table of contents
+## Table of contents
 
   - [1 Introduction](1-introduction.md)
     - [1.1 Motivation](1-introduction.md#11-motivation)
