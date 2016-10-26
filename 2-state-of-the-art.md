@@ -50,6 +50,7 @@ Additionally, it's worth noting that the traditional 7-layer OSI model character
 
 - RIP(1, 2)
 - OSPF
+- BGP
 - PPP
 - Tor
 - I2P
