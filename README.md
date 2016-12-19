@@ -1,4 +1,4 @@
-# specs
+# specs (work in progress!)
 
 ![banner](https://raw.githubusercontent.com/diasdavid/specs/libp2p-spec/protocol/network/figs/logo.png)
 
