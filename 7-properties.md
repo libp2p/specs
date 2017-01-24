@@ -202,7 +202,7 @@ TLS | /tls/1.3.0
 plaintext | /plaintext/1.0.0 
 spdy | /spdy/3.1.0
 yamux | /yamux/1.0.0
-multiplex | /multiplex/6.7.0
+multiplex | /mplex/6.7.0
 identify | /ipfs/id/1.0.0
 ping | /ipfs/ping/1.0.0
 relay | /ipfs/relay/line/1.0.0
