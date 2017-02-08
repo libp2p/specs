@@ -196,7 +196,7 @@ The wire protocol is -- of course -- wrapped with encryption. We use cyphersuite
 Here, we present a table with the multicodecs defined for each IPFS protocol that has a wire componenent. This list may change over time and currently exists as a guide for implementation.
 
 protocol | multicodec | comment
-:---- | :----
+:---- | :---- | :----
 secio | /secio/1.0.0 |
 TLS | /tls/1.3.0 | not implemented
 plaintext | /plaintext/1.0.0 |
