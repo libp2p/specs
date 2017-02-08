@@ -71,6 +71,8 @@ Protocol multiplexing is done through [`multistream`](https://github.com/jbenet/
 
 ### 4.2.6 Relay
 
+See [/ipfs/relay/circuit transport](transports/circuit-relay.md).
+
 ## 4.3 Distributed Record Store
 
 ### 4.3.1 Record

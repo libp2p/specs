@@ -13,6 +13,10 @@ It is recommended that implementations use one of the many NAT traversal librari
 
 Unfortunately, due to symmetric NATs, container and VM NATs, and other impossible-to-bypass NATs, `libp2p` MUST fallback to relaying communication to establish a full connectivity graph. To be complete, implementations MUST support relay, though it SHOULD be optional and able to be turned off by end users.
 
+Connection relaying SHOULD be implemented as a transport, in order to be transparent to upper layers.
+
+For an instantiation of relaying, see the [/ipfs/relay/circuit transport](transports/circuit-relay.md).
+
 ## 3.3 Encryption
 
 Communications on `libp2p` may be:
