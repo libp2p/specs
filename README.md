@@ -85,6 +85,11 @@ This RFC is organized by chapters described on the *Table of contents* section. 
 - [8 Implementations](8-implementations.md)
 - [9 References](9-references.md)
 
+## Other specs that haven't made to the main document
+
+- [Relay](/relay)
+- [PubSub](/pubsub)
+
 ## Contribute
 
 Please contribute! [Dive into the issues](https://github.com/libp2p/specs/issues)!
