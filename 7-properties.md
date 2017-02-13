@@ -205,8 +205,7 @@ yamux | /yamux/1.0.0 |
 multiplex | /mplex/6.7.0 |
 identify | /ipfs/id/1.0.0 |
 ping | /ipfs/ping/1.0.0 |
-relay | /ipfs/relay/line/0.1.0 | discontinued
-circuit-relay | /ipfs/relay/circuit/0.1.0 | [spec](transports/circuit-relay.md)
+circuit-relay | /libp2p/relay/circuit/0.1.0 | [spec](/relay)
 diagnostics | /ipfs/diag/net/1.0.0 |
 Kademlia DHT | /ipfs/kad/1.0.0 |
 bitswap | /ipfs/bitswap/1.0.0 |
