@@ -77,7 +77,7 @@ See [/ipfs/relay/circuit transport](transports/circuit-relay.md).
 
 ### 4.3.1 Record
 
-Follows [IPRS](../iprs-interplanetary-record-system).
+Follows [IPRS spec](../iprs).
 
 ### 4.3.2 abstract-record-store
 
@@ -112,3 +112,11 @@ Bootstrap-List is a Discovery Protocol that uses local storage to cache the addr
   - The list should be stored in long-term local storage, whatever that means to the local node (e.g. to disk).
   - Protocols can ship a default list hardcoded or along with the standard code distribution (like DNS).
   - In most cases (and certainly in the case of IPFS) the bootstrap list should be user configurable, as users may wish to establish separate networks, or place their reliance and trust in specific nodes.
+
+## 4.5 Messaging
+
+#### 4.5.1 PubSub
+
+## 4.6 Naming
+
+#### 4.5.2 IPNS
