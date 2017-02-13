@@ -195,17 +195,17 @@ The wire protocol is -- of course -- wrapped with encryption. We use cyphersuite
 
 Here, we present a table with the multicodecs defined for each IPFS protocol that has a wire componenent. This list may change over time and currently exists as a guide for implementation.
 
-protocol | multicodec
-:---- | :----
-secio | /secio/1.0.0
-TLS | /tls/1.3.0
-plaintext | /plaintext/1.0.0 
-spdy | /spdy/3.1.0
-yamux | /yamux/1.0.0
-multiplex | /mplex/6.7.0
-identify | /ipfs/id/1.0.0
-ping | /ipfs/ping/1.0.0
-relay | /ipfs/relay/line/1.0.0
-diagnostics | /ipfs/diag/net/1.0.0
-Kademlia DHT | /ipfs/kad/1.0.0
-bitswap | /ipfs/bitswap/1.0.0
+protocol | multicodec | comment
+:---- | :---- | :----
+secio | /secio/1.0.0 |
+TLS | /tls/1.3.0 | not implemented
+plaintext | /plaintext/1.0.0 |
+spdy | /spdy/3.1.0 |
+yamux | /yamux/1.0.0 |
+multiplex | /mplex/6.7.0 |
+identify | /ipfs/id/1.0.0 |
+ping | /ipfs/ping/1.0.0 |
+circuit-relay | /libp2p/relay/circuit/0.1.0 | [spec](/relay)
+diagnostics | /ipfs/diag/net/1.0.0 |
+Kademlia DHT | /ipfs/kad/1.0.0 |
+bitswap | /ipfs/bitswap/1.0.0 |
