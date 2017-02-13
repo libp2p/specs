@@ -1,39 +1,7 @@
 3 Requirements and considerations
 =================================
 
-## 3.1 NAT traversal
-
-Network Address Translation is ubiquitous in the Internet. Not only are most consumer devices behind many layers of NAT, but most data center nodes are often behind NAT for security or virtualization reasons. As we move into containerized deployments, this is getting worse. IPFS implementations SHOULD provide a way to traverse NATs, otherwise it is likely that operation will be affected. Even nodes meant to run with real IP addresses must implement NAT traversal techniques, as they may need to establish connections to peers behind NAT.
-
-`libp2p` accomplishes full NAT traversal using an ICE-like protocol. It is not exactly ICE, as IPFS networks provide the possibility of relaying communications over the IPFS protocol itself, for coordinating hole-punching or even relaying communication.
-
-It is recommended that implementations use one of the many NAT traversal libraries available, such as `libnice`, `libwebrtc`, or `natty`. However, NAT traversal must be interoperable.
-
-## 3.2 Relay
-
-Unfortunately, due to symmetric NATs, container and VM NATs, and other impossible-to-bypass NATs, `libp2p` MUST fallback to relaying communication to establish a full connectivity graph. To be complete, implementations MUST support relay, though it SHOULD be optional and able to be turned off by end users.
-
-## 3.3 Encryption
-
-Communications on `libp2p` may be:
-
-- **encrypted**
-- **signed** (not encrypted)
-- **clear** (not encrypted, not signed)
-
-We take both security and performance seriously. We recognize that encryption is not viable for some in-datacenter high performance use cases.
-
-We recommend that:
-
-- implementations encrypt all communications by default
-- implementations are audited
-- unless absolutely necessary, users normally operate with encrypted communications only.
-
-`libp2p` uses cyphersuites like TLS.
-
-**Note:** We do not use TLS directly, because we do not want the CA system baggage. Most TLS implementations are very big. Since the `libp2p` model begins with keys, `libp2p` only needs to apply ciphers. This is a minimal portion of the whole TLS standard.
-
-## 3.4 Transport agnostic
+## 3.1 Transport agnostic
 
 `libp2p` is transport agnostic, so it can run over any transport protocol. It does not even depend on IP; it may run on top of NDN, XIA, and other new Internet architectures.
 
@@ -60,7 +28,7 @@ In order to reason about possible transports, `libp2p` uses [multiaddr](https://
 
 **TODO:** Define how unreliable transport would work. Base it on WebRTC.
 
-## 3.5 Multi-multiplexing
+## 3.2 Multi-multiplexing
 
 The `libp2p` protocol is a collection of multiple protocols. In order to conserve resources, and to make connectivity easier, `libp2p` can perform all its operations through a single port, such as a TCP or UDP port, depending on the transports used. `libp2p` can multiplex its many protocols through point-to-point connections. This multiplexing is for both reliable streams and unreliable datagrams.
 
@@ -90,7 +58,39 @@ To give an example, imagine a single IPFS node that:
 
 Not providing this level of flexbility makes it impossible to use `libp2p` in various platforms, use cases, or network setups. It is not important that all implementations support all choices; what is critical is that the spec is flexible enough to allow implementations to use precisely what they need. This ensures that complex user or application constraints do not rule out `libp2p` as an option.
 
-## 3.6 Enable several network topologies
+## 3.3 Encryption
+
+Communications on `libp2p` may be:
+
+- **encrypted**
+- **signed** (not encrypted)
+- **clear** (not encrypted, not signed)
+
+We take both security and performance seriously. We recognize that encryption is not viable for some in-datacenter high performance use cases.
+
+We recommend that:
+
+- implementations encrypt all communications by default
+- implementations are audited
+- unless absolutely necessary, users normally operate with encrypted communications only.
+
+`libp2p` uses cyphersuites like TLS.
+
+**Note:** We do not use TLS directly, because we do not want the CA system baggage. Most TLS implementations are very big. Since the `libp2p` model begins with keys, `libp2p` only needs to apply ciphers. This is a minimal portion of the whole TLS standard.
+
+## 3.4 NAT traversal
+
+Network Address Translation is ubiquitous in the Internet. Not only are most consumer devices behind many layers of NAT, but most data center nodes are often behind NAT for security or virtualization reasons. As we move into containerized deployments, this is getting worse. IPFS implementations SHOULD provide a way to traverse NATs, otherwise it is likely that operation will be affected. Even nodes meant to run with real IP addresses must implement NAT traversal techniques, as they may need to establish connections to peers behind NAT.
+
+`libp2p` accomplishes full NAT traversal using an ICE-like protocol. It is not exactly ICE, as IPFS networks provide the possibility of relaying communications over the IPFS protocol itself, for coordinating hole-punching or even relaying communication.
+
+It is recommended that implementations use one of the many NAT traversal libraries available, such as `libnice`, `libwebrtc`, or `natty`. However, NAT traversal must be interoperable.
+
+## 3.5 Relay
+
+Unfortunately, due to symmetric NATs, container and VM NATs, and other impossible-to-bypass NATs, `libp2p` MUST fallback to relaying communication to establish a full connectivity graph. To be complete, implementations MUST support relay, though it SHOULD be optional and able to be turned off by end users.
+
+# 3.6 Enable several network topologies
 
 Different systems have different requirements and with that comes different topologies. In the P2P literature we can find these topologies being enumerated as: unstructured, structured, hybrid and centralized.
 
@@ -103,3 +103,11 @@ With this in consideration, `libp2p` must be ready to perform different routing 
 `libp2p` also solves the problem with discoverability of resources inside of a network through *records*.  A record is a unit of data that can be digitally signed, timestamped and/or used with other methods to give it an ephemeral validity. These records hold pieces of information such as location or availability of resources present in the network. These resources can be data, storage, CPU cycles and other types of services.
 
 `libp2p` must not put a constraint on the location of resources, but instead offer ways to find them easily in the network or use a side channel.
+
+## 3.8 Messaging
+
+Efficient messaging protocols offer ways to deliver content with minimum latency and/or support large and complex topologies for distribution. `libp2p` seeks to incorporate the developments made in Multicast and PubSub to fulfil these needs.
+
+## 3.9 Naming
+
+Networks change and applications need to have a way to use the network in such a way that it is agnostic to its topology, naming appears to solve this issues.
