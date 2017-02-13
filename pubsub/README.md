@@ -11,6 +11,11 @@ that each peer is certain of the identity of each peer is it communicating
 with.  It does not assume that messages between peers are encrypted, however
 encryption defaults to being enabled on libp2p streams.
 
+You can find information about the PubSub research and notes in the following repos:
+
+- https://github.com/libp2p/research-pubsub
+- https://github.com/libp2p/pubsub-notes
+
 ## The RPC
 
 All communication between peers happens in the form of exchanging protobuf RPC
