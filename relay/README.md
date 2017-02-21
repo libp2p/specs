@@ -40,16 +40,14 @@ The transport is the means of *establishing* and *accepting* connections,
 and the swarm protocol is the means to *relaying* connections.
 
 ```
-+-------+    /ip4/.../tcp/.../ws/ipfs/QmRelay    +---------+    /ip4/.../tcp/.../ipfs/QmTwo        +-------+
++-------+    /ip4/.../tcp/.../ws/p2p/QmRelay     +---------+     /ip4/.../tcp/.../p2p/QmTwo        +-------+
 | QmOne | <------------------------------------> | QmRelay | <-----------------------------------> | QmTwo |
-+-------+    (/ipfs/relay/circuit multistream)   +---------+   (/ipfs/relay/circuit multistream)   +-------+
++-------+   (/libp2p/relay/circuit multistream)  +---------+  (/libp2p/relay/circuit multistream)  +-------+
       ^                                            +-----+                                           ^
       |                                            |     |                                           |
       |            /p2p-circuit/QmTwo              |     |                                           |
       +--------------------------------------------+     +-------------------------------------------+
 ```
-
-TODO: the stream codec should be called `/libp2p/relay/circuit` instead.
 
 Note: we're using the `/p2p` multiaddr protocol instead of `/ipfs` in this document.
 `/ipfs` is currently the canonical way of addressing a libp2p or IPFS node,
