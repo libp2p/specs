@@ -2,6 +2,10 @@
 
 > Circuit Switching in libp2p
 
+Implementations
+- [js-libp2p-circuit](https://github.com/libp2p/js-libp2p-circuit) -- status: started
+- [go-libp2p-circuit](https://github.com/libp2p/go-libp2p-circuit) -- status: ready-to-start
+
 Table of Contents
 - [Overview](#overview)
 - [Dramatization](#dramatization)
@@ -10,8 +14,6 @@ Table of Contents
 - [Interfaces](#interfaces)
 - [Removing existing relay protocol](#removing-existing-relay-protocol)
 
-Note: as of 8-Feb-2017, this protocol isn't implemented yet, neither in go-libp2p nor js-libp2p.
-We aim to implement and ship it [during the "ipfs in web browsers" sprint](https://github.com/ipfs/pm/issues/351) starting 12-Feb-2017.
 
 ## Overview
 
