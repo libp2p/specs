@@ -68,47 +68,66 @@ Scene 2:
 
 ## Addressing
 
-`/p2p-circuit` multiaddrs don't carry any meaning of their own.
-They need to encapsulate a `/p2p` address, or
-be encapsulated in a `/p2p` address, or both.
+`/p2p-circuit` multiaddrs don't carry any meaning of their own. They need to encapsulate a `/p2p` address, or be encapsulated in a `/p2p` address, or both.
 
-As with all other multiaddrs, encapsulation of different protocols
-determines which metaphorical tubes to connect to each other.
+As with all other multiaddrs, encapsulation of different protocols determines which metaphorical tubes to connect to each other.
+
+A `/p2p-circuit` circuit address, is formated following:
+
+`/p2p-circuit[<relay peer multiaddr>]<destination peer multiaddr>`
+
+This opens the room for multiple hop relay, where the first relay is encapsulated in the seconf relay multiaddr, such as:
+
+`/p2p-circuit/p2p-circuit/<first relay>/<first hop multiaddr>/<destination peer multiaddr>`
 
 A few examples:
 
+Using any relay available:
+
 - `/p2p-circuit/p2p/QmTwo`
-  - Dial QmTwo, through any available relay node.
-  - The relay node will use peer routing to find an address for QmTwo.
-- `/p2p/QmRelay/p2p-circuit/p2p/QmTwo`
-  - Dial QmTwo, through QmRelay.
-  - Use peer routing to find an address for QmRelay.
-  - The relay node will also use peer routing, to find an address for QmTwo.
+  - Dial QmTwo, through any available relay node (or find one node that can relay).
+  - The relay node will use peer routing to find an address for QmTwo if it doesn't have a direct connection.
 - `/p2p-circuit/ip4/../tcp/../p2p/QmTwo`
   - Dial QmTwo, through any available relay node,
     but force the relay node to use the encapsulated `/ip4` multiaddr for connecting to QmTwo.
   - We'll probably not support forced addresses for now, just because it's complicated.
+
+Specify a relay:
+
+- `/p2p-circuit/p2p/QmRelay/p2p/QmTwo`
+  - Dial QmTwo, through QmRelay.
+  - Use peer routing to find an address for QmRelay.
+  - The relay node will also use peer routing, to find an address for QmTwo.
+- `/p2p-circuit/ip4/../tcp/../p2p/QmRelay/p2p/QmTwo`
+  - Dial QmTwo, through QmRelay.
+  - Includes info for connecting to QmRelay.
+  - The relay node will use peer routing to find an address for QmTwo.
+
+Double relay:
+
+- `/p2p-circuit/p2p/QmTwo/p2p-circuit/p2p/QmThree`
+  - Dial QmThree, through a relayed connection to QmTwo.
+  - The relay nodes will use peer routing to find an address for QmTwo and QmThree.
+  - We'll probably not support nested relayed connections for now, there are edge cases to think of.
+
+--
+
+?? I don't understand the usage of the following:
+
 - `/ip4/../tcp/../p2p/QmRelay/p2p-circuit`
   - Listen for connections relayed through QmRelay.
   - Includes info for connecting to QmRelay.
   - Also makes QmRelay available for relayed dialing, based on how listeners currently relate to dialers.
 - `/p2p/QmRelay/p2p-circuit`
   - Same as previous example, but use peer routing to find an address for QmRelay.
-- `/p2p-circuit/p2p/QmTwo/p2p-circuit/p2p/QmThree`
-  - Dial QmThree, through a relayed connection to QmTwo.
-  - The relay nodes will use peer routing to find an address for QmTwo and QmThree.
-  - We'll probably not support nested relayed connections for now, there are edge cases to think of.
-- `/ip4/../tcp/../p2p/QmRelay/p2p-circuit/p2p/QmTwo`
-  - Dial QmTwo, through QmRelay.
-  - Includes info for connecting to QmRelay.
-  - The relay node will use peer routing to find an address for QmTwo.
+
+?? I believe we don't need this one:
 - `/p2p-circuit`
   - Use relay discovery to find a suitable relay node. (Neither specified nor implemented.)
   - Listen for relayed connections.
   - Dial through the discovered relay node for any `/p2p-circuit` multiaddr.
 
-TODO: figure out forced addresses.
-TODO: figure out nested relayed connections.
+TODO: figure out forced addresses. -> what is forced addresses?
 
 ## Wire format
 
