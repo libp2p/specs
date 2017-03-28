@@ -26,18 +26,24 @@ libp2p already has modules for NAT ([go-libp2p-nat](https://github.com/libp2p/go
 but these don't always do the job, just because NAT traversal is complicated.
 That's why it's useful to have a simple relay protocol.
 
-One node asks a relay node to connect to another node on its behalf.
-The relay node shortcircuits its streams to the two nodes,
+Unlike a transparent **tunnel**, where a libp2p peer would just proxy a
+communication stream to a destination (the destination being unaware of the
+original source), a circuit-relay makes the destination aware of the original
+source and the circuit followed to establish communication between the two.
+This provides the destination side with full knowledge of the circuit which,
+if needed, could be rebuilt in the opposite direction.
+
+Apart from that, this relayed connection behaves just like a regular
+connection would, but over an existing swarm stream with another peer
+(instead of e.g. TCP.): One node asks a relay node to connect to another node
+on its behalf. The relay node shortcircuits its streams to the two nodes,
 and they are then connected through the relay.
-This relayed connection behaves just like a regular connection would,
-because it is in fact just that,
-but over an existing swarm stream with another peer, instead of e.g. TCP.
 
 Relayed connections are end-to-end encrypted just like regular connections.
 
 The circuit relay is both a tunneled transport and a mounted swarm protocol.
-The transport is the means of *establishing* and *accepting* connections,
-and the swarm protocol is the means to *relaying* connections.
+The transport is the means of ***establishing*** and ***accepting*** connections,
+and the swarm protocol is the means to ***relaying*** connections.
 
 ```
 +-------+    /ip4/.../tcp/.../ws/p2p/QmRelay     +---------+     /ip4/.../tcp/.../p2p/QmTwo        +-------+
