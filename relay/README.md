@@ -130,35 +130,99 @@ TODO: figure out forced addresses. -> what is forced addresses?
 
 ## Wire format
 
-> out of date
+### Overview
 
-The multicodec for the circuit relay protocol is: `/libp2p/relay/circuit`.
+#### Setup
 
-A variable-length header consisting of two length-prefixed multiaddrs is followed by a bidirectional stream of arbitrary data, and the eventual closing of the stream.
+Peers involved:
+- A, B, R
+- A wants to connect to B, but needs to relay through R
 
+#### Assumptions
+
+A has connection to R, R has connection to B
+
+#### Process
+
+- A opens new stream `sAR` to R using protocol RELAY
+- A writes Bs multiaddr `/ipfs/QmB` on `sAR`
+- R receives stream `sAR` and reads `/ipfs/QmB` from it.
+- R opens a new stream `sRB` to B using protocol RELAY
+- R writes `/ipfs/QmB` on `sRB`
+- B receives stream `sRB` and reads `/ipfs/QmB` from it.
+- B sees that the multiaddr it read is its own and chooses to handle this stream as an endpoint instead of attempting to relay further
+- TODO: step for R to send back status code to A
+- R now pipes `sAR` and `sRB` together
+- TODO: step for B to send back status code to A
+- B passes stream to `NewConnHandler` to be handled like any other new incoming connection
+
+### Under the microscope
+
+Peer A wants to connect to peer B through peer R.
+
+`maddrA` is peer A's multiaddr
+`maddrR` is peer R's multiaddr
+`maddrB` is peer B's multiaddr
+`maxAddrLen` is arbitrarily 1024
+
+#### Function definitions
+##### Process for reading a multiaddr
+We define `readLpMaddr` to be the following:
+
+Read a Uvarint `V` from the stream. If the value is higher
+than `maxAddrLen`, (write an error message back?) close the 
+stream and halt the relay attempt.
+
+Then read `V` bytes from the stream and checks if its a valid multiaddr.
+If it is not a valid multiaddr (write an error back?) close the stream and return.
+
+#### Opening a relay
+Peer A opens a new stream to R on the 'hop' protocol and writes:
 ```
-<src><dst><data>
- ^    ^    ^
- |    |    |
- |    |    +-- bidirectional data stream
- |    |         (usually /multistream-select in the case of /p2p multiaddrs)
- |    |
- |    +------- multiaddr of the listening node
- |
- +------------ multiaddr of the dialing node
+<uvarint len(maddrA)><madddrA><uvarint len(maddrB)><madddrB>
 ```
 
-After getting a stream to the relay node from its libp2p swarm, the dialing transport writes the header to the stream.
+It then waits for a response in the form of:
+```
+<uvarint error code><uvarint msglength><message>
+```
 
-The relaying node reads the header, gets a stream to the destination node, then writes the header to the destination stream and shortcircuits the two streams.
+Once it receives that, it checks if the status code is `OK`. If it is, it passes the new connection to its `NewConnHandler`.
+Otherwise, it returns the error message to the caller.
 
-Each relayed connection corresponds to two multistreams, one between QmOne and QmRelay, the other between QmRelay and QmTwo.
+### 'hop' protocol handler
 
-Implementation details:
-- The relay node has the `Swarm.EnableRelaying` config option enabled
-- The relay node allows only one relayed connection between any two nodes.
-- The relay node validates the `src` header field.
-- The listening node validates the `dst` header field.
+Peer R receives a new stream on the 'hop' protocol.
+It then calls `readLpMaddr` twice. The first value is `<src>` and the second is `<dst>`.
+Peer R checks to make sure that `<src>` matches the remote peer of the stream its reading
+from. If it does not match, it (writes an error back?) closes the stream and halts the relay attempt.
+
+Peer R checks if `<dst>` refers to itself, if it does, it (writes an error back?) closes the stream and halts the relay attempt.
+Peer R then checks if it has an open connection to the peer specified by `<dst>`.
+If it does not, and the relay is not an "active" relay it (writes an error back) closes the stream, and halts the relay attempt.
+If R does not have a connection to `<dst>`, and it *is* an "active" relay, it attempts to connect to `<dst>`.
+If this connection succeeds it continues, otherwise it (writes back an error) closes the stream, and halts the relay attempt.
+R now opens a new stream to B with the 'stop' relay protocol ID, and writes:
+```
+<uvarint len(maddrA)><madddrA><uvarint len(maddrB)><madddrB>
+```
+
+After this, R simply pipes the stream from A and the stream it opened to B together. R's job is complete.
+
+### 'stop' protocol handler
+
+Peer B receives a new stream on the 'stop' protocol. It then calls `readLpMaddr` twice on this stream.
+The first value is `<src>` and the second value is `<dst>`. Any error from those calls should be written back accordingly.
+
+B now verifies that `<dst>` matches its peer ID. It then also checks that `<src>` is valid. It uses src as the
+'remote addr' of the new 'incoming relay connection' it will create.
+
+Peer B now writes back a message of the form:
+```
+<uvarint 'OK'><uvarint len(msg)><string "OK">
+```
+
+And passes the relayed connection into its `NewConnHandler`.
 
 ### Error table
 
