@@ -2,18 +2,19 @@
 
 > Circuit Switching in libp2p
 
-Implementations
-- [js-libp2p-circuit](https://github.com/libp2p/js-libp2p-circuit) -- status: started
-- [go-libp2p-circuit](https://github.com/libp2p/go-libp2p-circuit) -- status: ready-to-start
+## Implementations
 
-Table of Contents
+- [js-libp2p-circuit](https://github.com/libp2p/js-libp2p-circuit)
+- [go-libp2p-circuit](https://github.com/libp2p/go-libp2p-circuit)
+
+## Table of Contents
+
 - [Overview](#overview)
 - [Dramatization](#dramatization)
 - [Addressing](#addressing)
 - [Wire protocol](#wire-protocol)
 - [Interfaces](#interfaces)
 - [Implementation Details](#implementation-details)
-
 
 ## Overview
 
@@ -28,16 +29,15 @@ Apart from that, this relayed connection behaves just like a regular connection 
 Relayed connections are end-to-end encrypted just like regular connections.
 
 The circuit relay is both a tunneled transport and a mounted swarm protocol.
-The transport is the means of ***establishing*** and ***accepting*** connections,
-and the swarm protocol is the means to ***relaying*** connections.
+The transport is the means of ***establishing*** and ***accepting*** connections, and the swarm protocol is the means to ***relaying*** connections.
 
 ```
-+-------+    /ip4/.../tcp/.../ws/p2p/QmRelay     +---------+     /ip4/.../tcp/.../p2p/QmTwo        +-------+
-| QmOne | <------------------------------------> | QmRelay | <-----------------------------------> | QmTwo |
-+-------+   (/libp2p/relay/circuit multistream)  +---------+  (/libp2p/relay/circuit multistream)  +-------+
-      ^                                            +-----+                                           ^
-      |            /p2p-circuit/QmTwo              |     |                                           |
-      +--------------------------------------------+     +-------------------------------------------+
++-----+    /ip4/.../tcp/.../ws/p2p/QmRelay    +-------+    /ip4/.../tcp/.../p2p/QmTwo       +-----+
+|QmOne| <------------------------------------>|QmRelay|<----------------------------------->|QmTwo|
++-----+   (/libp2p/relay/circuit multistream) +-------+ (/libp2p/relay/circuit multistream) +-----+
+     ^                                         +-----+                                         ^
+     |           /p2p-circuit/QmTwo            |     |                                         |
+     +-----------------------------------------+     +-----------------------------------------+
 ```
 
 Note: we're using the `/p2p` multiaddr protocol instead of `/ipfs` in this document. `/ipfs` is currently the canonical way of addressing a libp2p or IPFS node, but given the growing non-IPFS usage of libp2p, we'll migrate to using `/p2p`.
@@ -64,7 +64,6 @@ Scene 2:
 - QmOne automatically added `/p2p-circuit/ipfs/QmTwo` to its set of QmTwo addresses.
 - QmOne tries to connect via relaying, because it shares this transport with QmTwo.
 - A lively and prolonged dialogue ensues.
-
 
 ## Addressing
 
@@ -131,13 +130,14 @@ TODO: figure out forced addresses. -> what is forced addresses?
 
 ## Wire format
 
+> out of date
+
 The multicodec for the circuit relay protocol is: `/libp2p/relay/circuit`.
 
 A variable-length header consisting of two length-prefixed multiaddrs is followed by a bidirectional stream of arbitrary data, and the eventual closing of the stream.
 
 ```
 <src><dst><data>
-
  ^    ^    ^
  |    |    |
  |    |    +-- bidirectional data stream
@@ -160,6 +160,26 @@ Implementation details:
 - The relay node validates the `src` header field.
 - The listening node validates the `dst` header field.
 
+### Error table
+
+This is a table of error codes and sample messages that may occur during a relay setup. Codes in the 200 range are returned by the relay node. Codes in the 300 range are returned by the destination node.
+
+
+| Code  | Message           | Meaning    |
+| ----- |:-----------------:|:----------:|
+| 100   | OK                      | Relay was setup correctly    |
+| 220   | "src address too long"  | |
+| 221   | "dst address too long"  | |
+| 250   | "failed to parse src addr: no such protocol ipfs" | The `<src>` multiaddr in the header was invalid |
+| 251   | "failed to parse dst addr: no such protocol ipfs" | The `<dst>` multiaddr in the header was invalid |
+| 260   | "passive relay has no connection to dst" | |
+| 261   | "active relay could not connect to dst: connection refused" | relay could not form new connection to target peer |
+| 262   | "could not open new stream to dst: BAD ERROR" | relay has connection to dst, but failed to open a new stream |
+| 270   | "<dst> does not support relay" | |
+| 320   | "src address too long" | |
+| 321   | "dst address too long" | |
+| 350   | "failed to parse src addr: no such protocol ifps" | The `<src>` multiaddr in the header was invalid |
+| 351   | "failed to parse dst addr: no such protocol ifps" | The `<dst>` multiaddr in the header was invalid |
 
 ## Interfaces
 
@@ -186,7 +206,6 @@ type CircuitRelay interface {
 
 fund NewCircuitRelay(h p2phost.Host)
 ```
-
 
 ## Implementation details
 
