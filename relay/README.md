@@ -12,32 +12,18 @@ Table of Contents
 - [Addressing](#addressing)
 - [Wire protocol](#wire-protocol)
 - [Interfaces](#interfaces)
-- [Removing existing relay protocol](#removing-existing-relay-protocol)
+- [Implementation Details](#implementation-details)
 
 
 ## Overview
 
-The circuit relay is a means of establishing connectivity between
-libp2p nodes (such as IPFS) that wouldn't otherwise be able to connect to each other.
+The circuit relay is a means of establishing connectivity between libp2p nodes (such as IPFS) that wouldn't otherwise be able to connect to each other.
 
-This helps in situations where nodes are behind NAT or reverse proxies,
-or simply don't support the same transports (e.g. go-ipfs vs. browser-ipfs).
-libp2p already has modules for NAT ([go-libp2p-nat](https://github.com/libp2p/go-libp2p-nat)),
-but these don't always do the job, just because NAT traversal is complicated.
-That's why it's useful to have a simple relay protocol.
+This helps in situations where nodes are behind NAT or reverse proxies, or simply don't support the same transports (e.g. go-ipfs vs. browser-ipfs). libp2p already has modules for NAT ([go-libp2p-nat](https://github.com/libp2p/go-libp2p-nat)), but these don't always do the job, just because NAT traversal is complicated. That's why it's useful to have a simple relay protocol.
 
-Unlike a transparent **tunnel**, where a libp2p peer would just proxy a
-communication stream to a destination (the destination being unaware of the
-original source), a circuit-relay makes the destination aware of the original
-source and the circuit followed to establish communication between the two.
-This provides the destination side with full knowledge of the circuit which,
-if needed, could be rebuilt in the opposite direction.
+Unlike a transparent **tunnel**, where a libp2p peer would just proxy a communication stream to a destination (the destination being unaware of the original source), a circuit-relay makes the destination aware of the original source and the circuit followed to establish communication between the two. This provides the destination side with full knowledge of the circuit which, if needed, could be rebuilt in the opposite direction.
 
-Apart from that, this relayed connection behaves just like a regular
-connection would, but over an existing swarm stream with another peer
-(instead of e.g. TCP.): One node asks a relay node to connect to another node
-on its behalf. The relay node shortcircuits its streams to the two nodes,
-and they are then connected through the relay.
+Apart from that, this relayed connection behaves just like a regular connection would, but over an existing swarm stream with another peer (instead of e.g. TCP.): One node asks a relay node to connect to another node on its behalf. The relay node shortcircuits its streams to the two nodes, and they are then connected through the relay.
 
 Relayed connections are end-to-end encrypted just like regular connections.
 
@@ -50,18 +36,13 @@ and the swarm protocol is the means to ***relaying*** connections.
 | QmOne | <------------------------------------> | QmRelay | <-----------------------------------> | QmTwo |
 +-------+   (/libp2p/relay/circuit multistream)  +---------+  (/libp2p/relay/circuit multistream)  +-------+
       ^                                            +-----+                                           ^
-      |                                            |     |                                           |
       |            /p2p-circuit/QmTwo              |     |                                           |
       +--------------------------------------------+     +-------------------------------------------+
 ```
 
-Note: we're using the `/p2p` multiaddr protocol instead of `/ipfs` in this document.
-`/ipfs` is currently the canonical way of addressing a libp2p or IPFS node,
-but given the growing non-IPFS usage of libp2p, we'll migrate to using `/p2p`.
+Note: we're using the `/p2p` multiaddr protocol instead of `/ipfs` in this document. `/ipfs` is currently the canonical way of addressing a libp2p or IPFS node, but given the growing non-IPFS usage of libp2p, we'll migrate to using `/p2p`.
 
-Note: at the moment we're not including a mechanism for discovering relay nodes.
-For the time being, they should be configured statically.
-
+Note: at the moment we're not including a mechanism for discovering relay nodes. For the time being, they should be configured statically.
 
 ## Dramatization
 
@@ -131,10 +112,9 @@ TODO: figure out nested relayed connections.
 
 ## Wire format
 
-The wire format (or codec) is named `/ipfs/relay/circuit` and is simple.
-A variable-length header consisting of two length-prefixed multiaddrs
-is followed by a bidirectional stream of arbitrary data,
-and the eventual closing of the stream.
+The multicodec for the circuit relay protocol is: `/libp2p/relay/circuit`.
+
+A variable-length header consisting of two length-prefixed multiaddrs is followed by a bidirectional stream of arbitrary data, and the eventual closing of the stream.
 
 ```
 <src><dst><data>
@@ -149,13 +129,11 @@ and the eventual closing of the stream.
  +------------ multiaddr of the dialing node
 ```
 
-After getting a stream to the relay node from its libp2p swarm,
-the dialing transport writes the header to the stream.
-The relaying node reads the header, gets a stream to the destination node,
-then writes the header to the destination stream and shortcircuits the two streams.
+After getting a stream to the relay node from its libp2p swarm, the dialing transport writes the header to the stream.
 
-Each relayed connection corresponds to two multistreams,
-one between QmOne and QmRelay, the other between QmRelay and QmTwo.
+The relaying node reads the header, gets a stream to the destination node, then writes the header to the destination stream and shortcircuits the two streams.
+
+Each relayed connection corresponds to two multistreams, one between QmOne and QmRelay, the other between QmRelay and QmTwo.
 
 Implementation details:
 - The relay node has the `Swarm.EnableRelaying` config option enabled
@@ -166,9 +144,7 @@ Implementation details:
 
 ## Interfaces
 
-As explained above, the relay is both a transport (`tpt.Transport`)
-and a mounted stream protocol (`p2pnet.StreamHandler`).
-In addition it provides a means of specifying relay nodes to listen/dial through.
+As explained above, the relay is both a transport (`tpt.Transport`) and a mounted stream protocol (`p2pnet.StreamHandler`). In addition it provides a means of specifying relay nodes to listen/dial through.
 
 TODO: the usage of p2pnet.StreamHandler is a little bit off, but it gets the point across.
 
@@ -193,7 +169,9 @@ fund NewCircuitRelay(h p2phost.Host)
 ```
 
 
-### Removing existing relay protocol
+## Implementation details
+
+### Removing existing relay protocol in Go
 
 Note that there is an existing swarm protocol colloqiually called relay.
 It lives in the go-libp2p package and is named `/ipfs/relay/line/0.1.0`.
@@ -208,5 +186,4 @@ It lives in the go-libp2p package and is named `/ipfs/relay/line/0.1.0`.
 - Capable of *accepting* connections, and *relaying* connections.
 - Not capable of *connecting* via relaying.
 
-Since the existing protocol is incomplete, insecure, and certainly not used,
-we can safely remove it.
+Since the existing protocol is incomplete, insecure, and certainly not used, we can safely remove it.
