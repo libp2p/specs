@@ -240,7 +240,7 @@ This is a table of error codes and sample messages that may occur during a relay
 | 261   | "active relay could not connect to dst: connection refused" | relay could not form new connection to target peer |
 | 262   | "could not open new stream to dst: BAD ERROR" | relay has connection to dst, but failed to open a new stream |
 | 270   | "<dst> does not support relay" | |
-| 280   | "can't relay to itself" | The relay got its own address destination|
+| 280   | "can't relay to itself" | The relay got its own address as destination|
 | 320   | "src address too long" | |
 | 321   | "dst address too long" | |
 | 350   | "failed to parse src addr: no such protocol ifps" | The `<src>` multiaddr in the header was invalid |
