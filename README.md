@@ -1,6 +1,8 @@
 # libp2p specification
 
-![banner](https://raw.githubusercontent.com/diasdavid/specs/libp2p-spec/protocol/network/figs/logo.png)
+<center>
+  <img src="https://raw.githubusercontent.com/libp2p/libp2p/master/logo/libp2p-logo.png" alt="libp2p logo"/>
+</center>
 
 [![](https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square)](http://ipn.io)
 [![](https://img.shields.io/badge/project-libp2p-blue.svg?style=flat-square)](http://github.com/libp2p/libp2p)
