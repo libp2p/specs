@@ -1,6 +1,6 @@
 # Circuit Relay
 
-> Circuit Switching in libp2p
+> Circuit Switching for libp2p, also known as TURN or Relay in Networking literature.
 
 ## Implementations
 
@@ -18,9 +18,9 @@
 
 ## Overview
 
-The circuit relay is a means of establishing connectivity between libp2p nodes (such as IPFS) that wouldn't otherwise be able to connect to each other.
+The circuit relay is a means of establishing connectivity between libp2p nodes (such as IPFS) that wouldn't otherwise be able to establish a direct connection to each other.
 
-This helps in situations where nodes are behind NAT or reverse proxies, or simply don't support the same transports (e.g. go-ipfs vs. browser-ipfs). libp2p already has modules for NAT ([go-libp2p-nat](https://github.com/libp2p/go-libp2p-nat)), but these don't always do the job, just because NAT traversal is complicated. That's why it's useful to have a simple relay protocol.
+This helps in situations where nodes are behind NAT or reverse proxies, or simply don't support the same transports (e.g. go-ipfs vs. browser-ipfs). libp2p already has modules for NAT ([go-libp2p-nat](https://github.com/libp2p/go-libp2p-nat)), however piercing through NATs is not always a option due to their implementation differences. The circuit relay protocol exist to overcome those scenarios.
 
 Unlike a transparent **tunnel**, where a libp2p peer would just proxy a communication stream to a destination (the destination being unaware of the original source), a circuit-relay makes the destination aware of the original source and the circuit followed to establish communication between the two. This provides the destination side with full knowledge of the circuit which, if needed, could be rebuilt in the opposite direction.
 
@@ -40,9 +40,9 @@ The transport is the means of ***establishing*** and ***accepting*** connections
      +-----------------------------------------+     +-----------------------------------------+
 ```
 
-Note: we're using the `/p2p` multiaddr protocol instead of `/ipfs` in this document. `/ipfs` is currently the canonical way of addressing a libp2p or IPFS node, but given the growing non-IPFS usage of libp2p, we'll migrate to using `/p2p`.
+## Notes for the reader
 
-Note: at the moment we're not including a mechanism for discovering relay nodes. For the time being, they should be configured statically.
+1. We're using the `/p2p` multiaddr protocol instead of `/ipfs` in this document. `/ipfs` is currently the canonical way of addressing a libp2p or IPFS node, but given the growing non-IPFS usage of libp2p, we'll migrate to using `/p2p`.
 
 ## Dramatization
 
@@ -73,11 +73,16 @@ As with all other multiaddrs, encapsulation of different protocols determines wh
 
 A `/p2p-circuit` circuit address, is formated following:
 
-`/p2p-circuit[<relay peer multiaddr>]<destination peer multiaddr>`
+`[<relay peer multiaddr>]/p2p-circuit/<destination peer multiaddr>`
 
-This opens the room for multiple hop relay, where the first relay is encapsulated in the seconf relay multiaddr, such as:
+Examples:
 
-`/p2p-circuit/p2p-circuit/<first relay>/<first hop multiaddr>/<destination peer multiaddr>`
+- `/p2p-circuit/p2p/QmVT6GYwjeeAF5TR485Yc58S3xRF5EFsZ5YAF4VcP3URHt` - No known relay
+- `/ip4/127.0.0.1/tcp/5002/ipfs/QmdPU7PfRyKehdrP5A3WqmjyD6bhVpU1mLGKppa2FjGDjZ/p2p-circuit/p2p/QmVT6GYwjeeAF5TR485Yc58S3xRF5EFsZ5YAF4VcP3URHt` - Known relay
+
+This opens the room for multiple hop relay, where the first relay is encapsulated in the second relay multiaddr, such as:
+
+`<1st relay>/p2p-circuit/<2nd relay>/p2p-circuit/<dst multiaddr>`
 
 A few examples:
 
@@ -87,17 +92,15 @@ Using any relay available:
   - Dial QmTwo, through any available relay node (or find one node that can relay).
   - The relay node will use peer routing to find an address for QmTwo if it doesn't have a direct connection.
 - `/p2p-circuit/ip4/../tcp/../p2p/QmTwo`
-  - Dial QmTwo, through any available relay node,
-    but force the relay node to use the encapsulated `/ip4` multiaddr for connecting to QmTwo.
-  - We'll probably not support forced addresses for now, just because it's complicated.
+  - Dial QmTwo, through any available relay node, but force the relay node to use the encapsulated `/ip4` multiaddr for connecting to QmTwo.
 
 Specify a relay:
 
-- `/p2p-circuit/p2p/QmRelay/p2p/QmTwo`
+- `/p2p/QmRelay/p2p-circuit/p2p/QmTwo`
   - Dial QmTwo, through QmRelay.
   - Use peer routing to find an address for QmRelay.
   - The relay node will also use peer routing, to find an address for QmTwo.
-- `/p2p-circuit/ip4/../tcp/../p2p/QmRelay/p2p/QmTwo`
+- `/ip4/../tcp/../p2p/QmRelay/p2p-circuit/p2p/QmTwo`
   - Dial QmTwo, through QmRelay.
   - Includes info for connecting to QmRelay.
   - The relay node will use peer routing to find an address for QmTwo.
@@ -108,25 +111,6 @@ Double relay:
   - Dial QmThree, through a relayed connection to QmTwo.
   - The relay nodes will use peer routing to find an address for QmTwo and QmThree.
   - We'll probably not support nested relayed connections for now, there are edge cases to think of.
-
---
-
-?? I don't understand the usage of the following:
-
-- `/ip4/../tcp/../p2p/QmRelay/p2p-circuit`
-  - Listen for connections relayed through QmRelay.
-  - Includes info for connecting to QmRelay.
-  - Also makes QmRelay available for relayed dialing, based on how listeners currently relate to dialers.
-- `/p2p/QmRelay/p2p-circuit`
-  - Same as previous example, but use peer routing to find an address for QmRelay.
-
-?? I believe we don't need this one:
-- `/p2p-circuit`
-  - Use relay discovery to find a suitable relay node. (Neither specified nor implemented.)
-  - Listen for relayed connections.
-  - Dial through the discovered relay node for any `/p2p-circuit` multiaddr.
-
-TODO: figure out forced addresses. -> what is forced addresses?
 
 ## Wire format
 
@@ -142,14 +126,14 @@ Peers involved:
 
 A has connection to R, R has connection to B
 
-#### Process
+#### Sequence of events
 
 - A opens new stream `sAR` to R using protocol RELAY
-- A writes Bs multiaddr `/ipfs/QmB` on `sAR`
-- R receives stream `sAR` and reads `/ipfs/QmB` from it.
+- A writes Bs multiaddr `/p2p/QmB` on `sAR`
+- R receives stream `sAR` and reads `/p2p/QmB` from it.
 - R opens a new stream `sRB` to B using protocol RELAY
-- R writes `/ipfs/QmB` on `sRB`
-- B receives stream `sRB` and reads `/ipfs/QmB` from it.
+- R writes `/p2p/QmB` on `sRB`
+- B receives stream `sRB` and reads `/p2p/QmB` from it.
 - B sees that the multiaddr it read is its own and chooses to handle this stream as an endpoint instead of attempting to relay further
 - TODO: step for R to send back status code to A
 - R now pipes `sAR` and `sRB` together
@@ -290,3 +274,8 @@ It lives in the go-libp2p package and is named `/ipfs/relay/line/0.1.0`.
 - Not capable of *connecting* via relaying.
 
 Since the existing protocol is incomplete, insecure, and certainly not used, we can safely remove it.
+
+## Future work
+
+- Multihop relay - With this specification, we are only enabling single hop relays to exist. Multihop relay will come at a later stage as Packet Switching.
+- Relay discovery mechanism - At the moment we're not including a mechanism for discovering relay nodes. For the time being, they should be configured statically.
