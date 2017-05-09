@@ -20,7 +20,7 @@
 
 The circuit relay is a means of establishing connectivity between libp2p nodes (such as IPFS) that wouldn't otherwise be able to establish a direct connection to each other.
 
-This helps in situations where nodes are behind NAT or reverse proxies, or simply don't support the same transports (e.g. go-ipfs vs. browser-ipfs). libp2p already has modules for NAT ([go-libp2p-nat](https://github.com/libp2p/go-libp2p-nat)), however piercing through NATs is not always a option due to their implementation differences. The circuit relay protocol exist to overcome those scenarios.
+This helps in situations where nodes are behind NAT or reverse proxies, or simply don't support the same transports (e.g. go-ipfs vs. browser-ipfs). libp2p already has modules for NAT ([go-libp2p-nat](https://github.com/libp2p/go-libp2p-nat)), however piercing through NATs is not always an option due to their implementation differences. The circuit relay protocol exists to overcome those scenarios.
 
 Unlike a transparent **tunnel**, where a libp2p peer would just proxy a communication stream to a destination (the destination being unaware of the original source), a circuit-relay makes the destination aware of the original source and the circuit followed to establish communication between the two. This provides the destination side with full knowledge of the circuit which, if needed, could be rebuilt in the opposite direction.
 
@@ -77,10 +77,10 @@ A `/p2p-circuit` circuit address, is formated following:
 
 Examples:
 
-- `/p2p-circuit/p2p/QmVT6GYwjeeAF5TR485Yc58S3xRF5EFsZ5YAF4VcP3URHt` - No known relay
-- `/ip4/127.0.0.1/tcp/5002/ipfs/QmdPU7PfRyKehdrP5A3WqmjyD6bhVpU1mLGKppa2FjGDjZ/p2p-circuit/p2p/QmVT6GYwjeeAF5TR485Yc58S3xRF5EFsZ5YAF4VcP3URHt` - Known relay
+- `/p2p-circuit/p2p/QmVT6GYwjeeAF5TR485Yc58S3xRF5EFsZ5YAF4VcP3URHt` - Arbitrary relay node
+- `/ip4/127.0.0.1/tcp/5002/ipfs/QmdPU7PfRyKehdrP5A3WqmjyD6bhVpU1mLGKppa2FjGDjZ/p2p-circuit/p2p/QmVT6GYwjeeAF5TR485Yc58S3xRF5EFsZ5YAF4VcP3URHt` - Specific relay node
 
-This opens the room for multiple hop relay, where the first relay is encapsulated in the second relay multiaddr, such as:
+This opens the room for multiple hop relay, where the second relay is encapsulated in the first relay multiaddr, such as:
 
 `<1st relay>/p2p-circuit/<2nd relay>/p2p-circuit/<dst multiaddr>`
 
