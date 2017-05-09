@@ -114,54 +114,46 @@ Double relay:
 
 ## Wire format
 
-### Overview
+We start the description of the Wire format by illustrating a possible flow scenario and then describing them in detail by phases.
 
-#### Setup
+### High level overview of establishing a relayed connection
 
-Peers involved:
-- A, B, R
+Setup:
+- Peers involved, A, B, R
 - A wants to connect to B, but needs to relay through R
 
-#### Assumptions
+Assumptions:
+- A has connection to R, R has connection to B
 
-A has connection to R, R has connection to B
-
-#### Sequence of events
-
-- A opens new stream `sAR` to R using protocol RELAY
-- A writes Bs multiaddr `/p2p/QmB` on `sAR`
-- R receives stream `sAR` and reads `/p2p/QmB` from it.
-- R opens a new stream `sRB` to B using protocol RELAY
-- R writes `/p2p/QmB` on `sRB`
-- B receives stream `sRB` and reads `/p2p/QmB` from it.
-- B sees that the multiaddr it read is its own and chooses to handle this stream as an endpoint instead of attempting to relay further
-- TODO: step for R to send back status code to A
-- R now pipes `sAR` and `sRB` together
-- TODO: step for B to send back status code to A
-- B passes stream to `NewConnHandler` to be handled like any other new incoming connection
+Events:
+- phase I: Open a request for a relayed stream (A to R)
+  - A dials a new stream `sAR` to R using protocol `/libp2p/relay/hop` 
+  - A writes Bs multiaddr `/p2p/QmB` on `sAR`
+  - R receives stream `sAR` and reads `/p2p/QmB` from it.
+- phase II: Open a stream to be relayed (R to B)
+  - R opens a new stream `sRB` to B using protocol `/libp2p/relay/stop`
+  - R writes `/p2p/QmA` on `sRB`
+  - R writes OK to `sAR`
+- phase III: Streams are piped together, establishing a circuit
+  - B receives stream `sRB` and reads `/p2p/QmA` from it.
+  - B writes OK to `sRB`
+  - B passes stream to `NewConnHandler` to be handled like any other new incoming connection
 
 ### Under the microscope
 
-Peer A wants to connect to peer B through peer R.
+Notes for the reader:
+- `maddrA` is peer A's multiaddr
+- `maddrR` is peer R's multiaddr
+- `maddrB` is peer B's multiaddr
+- `maxAddrLen` is arbitrarily 1024
+- `readLpMaddr` is a function that does the following:
 
-`maddrA` is peer A's multiaddr
-`maddrR` is peer R's multiaddr
-`maddrB` is peer B's multiaddr
-`maxAddrLen` is arbitrarily 1024
+Read a Uvarint `V` from the stream. If the value is higher than `maxAddrLen`, writes an error code back, closes the stream and halts the relay attempt. If not, then reads `V` bytes from the stream and checks if its a valid multiaddr. Check for multiaddr validity and error back if not a valid formated multiaddr.
 
-#### Function definitions
-##### Process for reading a multiaddr
-We define `readLpMaddr` to be the following:
+#### Phase I
 
-Read a Uvarint `V` from the stream. If the value is higher
-than `maxAddrLen`, (write an error message back?) close the 
-stream and halt the relay attempt.
+Peer A opens a new stream to R on the '/libp2p/relay/hop' protocol and writes:
 
-Then read `V` bytes from the stream and checks if its a valid multiaddr.
-If it is not a valid multiaddr (write an error back?) close the stream and return.
-
-#### Opening a relay
-Peer A opens a new stream to R on the 'hop' protocol and writes:
 ```
 <uvarint len(maddrA)><madddrA><uvarint len(maddrB)><madddrB>
 ```
@@ -171,31 +163,38 @@ It then waits for a response in the form of:
 <uvarint error code><uvarint msglength><message>
 ```
 
-Once it receives that, it checks if the status code is `OK`. If it is, it passes the new connection to its `NewConnHandler`.
-Otherwise, it returns the error message to the caller.
+Once it receives that, it checks if the status code is `OK`. If it is, it passes the new connection to its `NewConnHandler`. Otherwise, it returns the error message to the caller.
 
-### 'hop' protocol handler
+Peer R receives a new stream on the '/libp2p/relay/hop' protocol.
 
-Peer R receives a new stream on the 'hop' protocol.
 It then calls `readLpMaddr` twice. The first value is `<src>` and the second is `<dst>`.
-Peer R checks to make sure that `<src>` matches the remote peer of the stream its reading
-from. If it does not match, it (writes an error back?) closes the stream and halts the relay attempt.
+
+Peer R checks to make sure that `<src>` matches the remote peer of the stream its reading from. If it does not match, it writes an Error message, closes the stream and halts the relay attempt.
 
 Peer R checks if `<dst>` refers to itself, if it does, it (writes an error back?) closes the stream and halts the relay attempt.
+
 Peer R then checks if it has an open connection to the peer specified by `<dst>`.
 If it does not, and the relay is not an "active" relay it (writes an error back) closes the stream, and halts the relay attempt.
+
 If R does not have a connection to `<dst>`, and it *is* an "active" relay, it attempts to connect to `<dst>`.
+
 If this connection succeeds it continues, otherwise it (writes back an error) closes the stream, and halts the relay attempt.
-R now opens a new stream to B with the 'stop' relay protocol ID, and writes:
+
+
+#### Phase II
+
+R now opens a new stream to B with the '/libp2p/relay/stop' relay protocol multicodec and writes:
+
 ```
 <uvarint len(maddrA)><madddrA><uvarint len(maddrB)><madddrB>
 ```
 
-After this, R simply pipes the stream from A and the stream it opened to B together. R's job is complete.
+After this, R pipes the stream from A and the stream it opened to B together. R also writes OK back to A. R's job is complete.
 
-### 'stop' protocol handler
+#### Phase III
 
-Peer B receives a new stream on the 'stop' protocol. It then calls `readLpMaddr` twice on this stream.
+Peer B receives a new stream on the '/libp2p/relay/stop' protocol. It then calls `readLpMaddr` twice on this stream.
+
 The first value is `<src>` and the second value is `<dst>`. Any error from those calls should be written back accordingly.
 
 B now verifies that `<dst>` matches its peer ID. It then also checks that `<src>` is valid. It uses src as the
@@ -208,25 +207,25 @@ Peer B now writes back a message of the form:
 
 And passes the relayed connection into its `NewConnHandler`.
 
-### Error table
+### Status codes table
 
-This is a table of error codes and sample messages that may occur during a relay setup. Codes in the 200 range are returned by the relay node. Codes in the 300 range are returned by the destination node.
+This is a table of status codes and sample messages that may occur during a relay setup. Codes in the 200 range are returned by the relay node. Codes in the 300 range are returned by the destination node.
 
 
-| Code  | Message           | Meaning    |
-| ----- |:-----------------:|:----------:|
-| 100   | OK                      | Relay was setup correctly    |
-| 220   | "src address too long"  | |
-| 221   | "dst address too long"  | |
+| Code  | Message                                           | Meaning    |
+| ----- |:--------------------------------------------------|:----------:|
+| 100   | OK                                                | Relay was setup correctly    |
+| 220   | "src address too long"                            | |
+| 221   | "dst address too long"                            | |
 | 250   | "failed to parse src addr: no such protocol ipfs" | The `<src>` multiaddr in the header was invalid |
 | 251   | "failed to parse dst addr: no such protocol ipfs" | The `<dst>` multiaddr in the header was invalid |
-| 260   | "passive relay has no connection to dst" | |
+| 260   | "passive relay has no connection to dst"          | |
 | 261   | "active relay could not connect to dst: connection refused" | relay could not form new connection to target peer |
-| 262   | "could not open new stream to dst: BAD ERROR" | relay has connection to dst, but failed to open a new stream |
-| 270   | "<dst> does not support relay" | |
-| 280   | "can't relay to itself" | The relay got its own address as destination|
-| 320   | "src address too long" | |
-| 321   | "dst address too long" | |
+| 262   | "could not open new stream to dst: BAD ERROR"     | relay has connection to dst, but failed to open a new stream |
+| 270   | "<dst> does not support relay"                    | |
+| 280   | "can't relay to itself"                           | The relay got its own address as destination |
+| 320   | "src address too long"                            | |
+| 321   | "dst address too long"                            | |
 | 350   | "failed to parse src addr: no such protocol ifps" | The `<src>` multiaddr in the header was invalid |
 | 351   | "failed to parse dst addr: no such protocol ifps" | The `<dst>` multiaddr in the header was invalid |
 
