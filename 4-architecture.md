@@ -77,7 +77,7 @@ See [Circuit Relay](/relay).
 
 ### 4.3.1 Record
 
-Follows [IPRS spec](/iprs).
+Follows [IPRS spec](https://github.com/ipfs/specs/tree/master/iprs).
 
 ### 4.3.2 abstract-record-store
 
