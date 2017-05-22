@@ -14,6 +14,8 @@ Table of Contents
 - [Interfaces](#interfaces)
 - [Removing existing relay protocol](#removing-existing-relay-protocol)
 
+Note: this document is currently in the process of being double-checked and updated. Please see [libp2p/specs#15 (comment)](https://github.com/libp2p/specs/pull/15#issuecomment-299949023) before using it as the basis for an implementation.
+
 
 ## Overview
 
