@@ -351,7 +351,7 @@ ticks have elapsed to consider the message lost.
 ### Multicast Tree Optimization
 
 The multicast tree is constructed lazily, following the path of the
-first published message from some source. Therefore, the tree does not
+first published message from some source. Therefore, the tree may not
 directly take advantage of new paths that may appear in the overlay as
 a result of new nodes/links. The overlay may also be suboptimal for
 all by the first source.
