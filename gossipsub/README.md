@@ -4,6 +4,11 @@
 
 - [Introduction](#introduction)
 - [Membership Management Protocol](#membership-management-protocol)
+  * [Design Parameters for View Sizes](#design-parameters-for-view-sizes)
+  * [Joining the Overlay](#joining-the-overlay)
+  * [Leaving the Overlay](#leaving-the-overlay)
+  * [Active View Management](#active-view-management)
+  * [Passive View Management](#passive-view-management)
 - [Broadcast Protocol](#broadcast-protocol)
 - [Protocol Messages](#protocol-messages)
 
@@ -131,8 +136,8 @@ evaluates it with the following criteria:
 - If the size of its active list is less than `A`, it accepts the join, adds
   P to its active list and sends to it `NEIGHBOR` message.
 - If the RTT to P is smaller by some factor alpha (design parameter, set to 2 in [3])
-  than any of its near nodes then it evicts a near node by sending a `DISCONNECT`
-  message and accepts P as a near neighbor.
+  than any of its near nodes then it evicts a near neighbor if it has enough active
+  links by sending a `DISCONNECT`  message and accepts P as a near neighbor.
 - If the TTL of the request is 0, then it  accepts the P as a new random neighbor.
 
 When Q accepts P as a new neighbor, it also sends a `FORWARDJOIN`
@@ -153,13 +158,12 @@ Upon receiving a `NEIGHBOR` request a node Q evaluates it with the
 followin criteria:
 - If the size of P's active list is less than A, it accepts the new
   node.
-- If it's a new random neighbor, and P has no other random neighbors
-  (as specified in the message), it accepts P as a random neighbor.
-- If it's a new near neighbor, and P has no other near neighbors
-  (as specified in the message), it accepts P as a near neighbor.
-- If it's a new near neighbor, then Q takes an RTT measurement to P.
+- If P has no other neighbors  (as specified in the message),
+  it accepts P as a random neighbor.
+- Otherwise Q takes an RTT measurement to P.
   If it's closer than any near neighbors by a factor of alpha, then
-  it evicts a near neighbor and accepts P as a new near neighbor.
+  it evicts the near neighbor if it has enough active links and accepts
+  P as a new near neighbor.
 - Otherwise the request is rejected.
 
 Note that during joins, the size of the active list for some nodes may
