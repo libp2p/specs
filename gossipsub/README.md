@@ -1,5 +1,7 @@
 # RFC: Proximity Aware Epidemic PubSub
 
+author: vyzo
+
 <!-- toc -->
 
 - [Introduction](#introduction)
