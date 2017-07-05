@@ -495,7 +495,7 @@ Membership Management protocol:
   messages play a dual role in the proposed protocol implementation, as they can be used to
   retrieve membership lists. As a matter of fact, HyParView doesn't replace nodes for proximity
   optimization purposes either.
-- There is no connectivity check in either HyParView, but this is incredibly
+- There is no connectivity check in HyParView, but this is incredibly
   important in world  full of NAT.
 - There is no `LEAVE` provision in HyParView.
 
