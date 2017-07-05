@@ -16,6 +16,7 @@
   * [Multicast Tree Optimization](#multicast-tree-optimization)
   * [Active View Changes](#active-view-changes)
 - [Protocol Messages](#protocol-messages)
+- [Differences from Plumtree/HyParView](#differences-from-plumtreehyparview)
 
 <!-- tocstop -->
 
@@ -395,3 +396,109 @@ that value latency minimization which is the case for many IPFS
 applications.
 
 ## Protocol Messages
+
+A quick summary of referenced protocol messages and their payload.
+All messages are assumed to be enclosed in a suitable envelope and have
+a source and monotonic sequence id.
+
+```
+;; Initial node discovery
+GETNODES {}
+
+NODES {
+ peers []peer.ID
+ ttl int
+}
+
+;; Topic querying (membership check for passive view management)
+GETTOPICS {}
+
+TOPICS {
+ topics []topic.ID
+}
+
+;; Membership Management protocol
+JOIN {
+ peer peer.ID
+ ttl int
+}
+
+FORWARDJOIN {
+ peer peer.ID
+ ttl int
+}
+
+NEIGHBOR {
+ peers []peer.ID
+}
+
+DISCONNECT {}
+
+LEAVE {
+ source peer.ID
+}
+
+SHUFFLE {
+ peer peer.ID
+ peers []peer.ID
+ ttl int
+}
+
+SHUFFLEREPLY {
+ peers []peer.ID
+}
+
+;; Broadcast protocol
+GOSSIP {
+ source peer.ID
+ hops int
+ msg []bytes
+}
+
+IHAVE {
+ summary []MessageSummary
+}
+
+MessageSummary {
+ id message.ID
+ hops int
+}
+
+PRUNE {}
+
+GRAFT {
+ msgs []message.ID
+}
+
+```
+
+## Differences from Plumtree/HyParView
+
+There are some noteworthy differences in the protocol described and
+the published Plumtree/HyParView protocols. There might be some more
+differences in minor details, but this document is written from a
+practical implementer's point of view.
+
+Membership Management protocol:
+- The node views are managed with proximity awareness. The HyParView protocol
+  has no provisions for proximity, these come from GoCast's implementation
+  of proximity aware overlays; but note that we don't use UDP for RTT measurements
+  and the increased `C_rand` to increase fault-tolerance at the price of some optimization.
+- Joining nodes don't get to get all A connections by kicking out extant nodes,
+  as this would result in overlay instability in periods of high churn. Instead, nodes
+  ensure that the first few links are created even if they oversubscribe their fanout, but they
+  don't go out of their way to create remaining links beyond the necessary `C_rand` links.
+  Nodes later bring the active list to balance with a stabilization protocol
+- There is no connectivity check in either HyParView, but this is incredibly
+  important in world  full of NAT.
+- There is no `LEAVE` provision in HyParView.
+
+Broadcast protocol:
+- `IHAVE` messages are aggregated and lazily pushed via a background timer. Plumtree eagerly
+  pushes `IHAVE` messages, which is wasteful and loses the opportunity for aggregation.
+  The authors do suggest lazy aggregation as a possible optimization nonetheless.
+- `GRAFT` messages similarly aggregate multiple message requests.
+- Missing messages and overlay repair are managed by a single background timer instead of
+  of creating timers left and right for every missing message; that's impractical from an
+  implementation point of view, at least in Go.
+- There is no provision for eager overlay repair on `NeighborDown` messages in Plumtree.
