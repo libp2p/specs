@@ -488,7 +488,13 @@ Membership Management protocol:
   as this would result in overlay instability in periods of high churn. Instead, nodes
   ensure that the first few links are created even if they oversubscribe their fanout, but they
   don't go out of their way to create remaining links beyond the necessary `C_rand` links.
-  Nodes later bring the active list to balance with a stabilization protocol
+  Nodes later bring the active list to balance with a stabilization protocol.
+  Also noteworthy is that only a single `JOIN` message is propagated with a random walk, the
+  remaining joins are handled with normal `NEIGHBOR` requests.
+- There is no current active list check in HyParView when deciding to drop nodes; `NEIGHBOR`
+  messages play a dual role in the proposed protocol implementation, as they can be used to
+  retrieve membership lists. As a matter of fact, HyParView doesn't replace nodes for proximity
+  optimization purposes either.
 - There is no connectivity check in either HyParView, but this is incredibly
   important in world  full of NAT.
 - There is no `LEAVE` provision in HyParView.
