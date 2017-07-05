@@ -152,19 +152,21 @@ propagates with a random walk until its TTL is 0, while being added to
 the passive list of the receiving node.
 
 If P fails to join because of connectivity issues, it decrements the
-TTL and tries another starting node.  Once the first link has been
-established, P then needs to increase its active list size to `A` by
-connecting to more nodes.  This is accomplished by ordering the
-subscriber list by RTT and picking the nearest nodes and
-some nodes at random and sending `NEIGHBOR` requests.  The
-neighbor requests may be accepted by `NEIGHBOR` message and rejected
-by a `DISCONNECT` message.
+TTL and tries another starting node. This is repeated until a ttl of zero
+reuses the connection in the case of NATed hosts.
+
+Once the first link has been established, P then needs to increase its
+active list size to `A` by connecting to more nodes.  This is
+accomplished by ordering the subscriber list by RTT and picking the
+nearest nodes and some nodes at random and sending `NEIGHBOR`
+requests.  The neighbor requests may be accepted by `NEIGHBOR` message
+and rejected by a `DISCONNECT` message.
 
 Upon receiving a `NEIGHBOR` request a node Q evaluates it with the
 followin criteria:
-- If the size of P's active list is less than A, it accepts the new
+- If the size of Q's active list is less than A, it accepts the new
   node.
-- If P has not enough neighbors  (as specified in the message),
+- If P does not have enough active links (less than `C_rand`, as specified in the message),
   it accepts P as a random neighbor.
 - Otherwise Q takes an RTT measurement to P.
   If it's closer than any near neighbors by a factor of alpha, then
@@ -187,14 +189,15 @@ will be lazily pruned over time by the passive view management
 component of the protocol.
 
 In order to facilitate fast clean up of departing nodes, we can also
-introduce a `LEAVE` message that eagerly propagates across the network.  A
-node that wants to unsubscribe from the topic, emits a `LEAVE` to its
-active list neighbors in place of `DISCONNECT`.  Upon receiving a
-`LEAVE`, a node removes the node from its active list _and_ passive
-lists. If the node was removed from one of the lists, then the `LEAVE`
-is propagated further across the active list links. This will ensure a
-random diffusion through the network that would clean most of the
-active lists eagerly, at the cost of some bandwidth.
+introduce a `LEAVE` message that eagerly propagates across the
+network.  A node that wants to unsubscribe from the topic, emits a
+`LEAVE` to its active list neighbors in place of `DISCONNECT`.  Upon
+receiving a `LEAVE`, a node removes the node from its active list
+_and_ passive lists. If the node was removed from one of the lists or
+if the ttl is greater than zero, then the `LEAVE` is propagated
+further across the active list links. This will ensure a random
+diffusion through the network that would clean most of the active
+lists eagerly, at the cost of some bandwidth.
 
 ### Active View Management
 
@@ -247,10 +250,17 @@ active list and `k_p` peers from its passive list, where `k_a` and
 random walk with an associated TTL.  If the TTL is greater than 0 and
 the number of nodes in the receiver's active list is greater than 1,
 then it propagates the request further. Otherwise, it selects nodes
-from its passive list at random, replaces them with the shuffle
-contents, and sends back a `SHUFFLEREPLY`. The originating node
+from its passive list at random, sends back a `SHUFFLEREPLY` and
+replaces them with the shuffle contents. The originating node
 receiving the `SHUFFLEREPLY` also replaces nodes in its passive list
-with the contents of the message.
+with the contents of the message. Care
+
+should be taken for issues with transitive connectivity due to NAT. If
+a node cannot connect to the originating node for a `SHUFFLEREPLY`,
+then it should not perform the shuffle. Similarly, the originating
+node could time out waiting for a shuffle reply and try with again
+with a lower ttl, until a ttl of zero reuses the connection in the
+case of NATed hosts.
 
 In addition to shuffling, proximity awareness and leave cleanup
 requires that we compute RTT samples and check connectivity to nodes
@@ -434,6 +444,7 @@ DISCONNECT {}
 
 LEAVE {
  source peer.ID
+ ttl int
 }
 
 SHUFFLE {
@@ -489,12 +500,14 @@ Membership Management protocol:
   Nodes later bring the active list to balance with a stabilization protocol.
   Also noteworthy is that only a single `JOIN` message is propagated with a random walk, the
   remaining joins are handled with normal `NEIGHBOR` requests.
-- There is no current active list check in HyParView when deciding to drop nodes; `NEIGHBOR`
-  messages play a dual role in the proposed protocol implementation, as they can be used to
-  retrieve membership lists. As a matter of fact, HyParView doesn't replace nodes for proximity
-  optimization purposes either.
-- There is no connectivity check in HyParView, but this is incredibly
-  important in world  full of NAT.
+  In short, the Join protocol is very much reworked, with the influence of GoCast.
+- There is no active view stabilization/optimization protocol in HyParView. This is very
+  much influenced from GoCast, where the protocol allows oversubscribing and later drops
+  extraneous connections and replaces nodes for proximity optimization.
+- `NEIGHBOR` messages play a dual role in the proposed protocol implementation, as they can
+  be used to retrieve membership lists. 
+- There is no connectivity check in HyParView and retires with reduced TTLs, but this
+  is incredibly important in world  full of NAT.
 - There is no `LEAVE` provision in HyParView.
 
 Broadcast protocol:
