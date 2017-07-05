@@ -194,16 +194,15 @@ active lists eagerly, at the cost of some bandwidth.
 
 The active list is generally managed reactively: failures are detected
 by TCP, either when a message is sent or when the connection is detected
-as closed. If that's not sufficient (eg: because no message has been
-exchanged in a while) then heartbeats can be introduced with some randomized
-timer.
+as closed. 
 
 In addition to the reactive management strategy, the active list has
-stabilization and optimization components that run periodically
-with a randomized timer. The stabilization component attempts to
-prune active lists that are larger than A, say because of a slew of recent
-joins, and grow active lists that are smaller than A because of some failures
-or previous inability to neighbor with enough nodes. 
+stabilization and optimization components that run periodically with a
+randomized timer, and also serve as failure detectors. The
+stabilization component attempts to prune active lists that are larger
+than A, say because of a slew of recent joins, and grow active lists
+that are smaller than A because of some failures or previous inability
+to neighbor with enough nodes.
 
 When a node detects that its active list is too large, it queries the neighbors
 for their active lists.
