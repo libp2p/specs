@@ -158,7 +158,7 @@ Upon receiving a `NEIGHBOR` request a node Q evaluates it with the
 followin criteria:
 - If the size of P's active list is less than A, it accepts the new
   node.
-- If P has no other neighbors  (as specified in the message),
+- If P has not enough neighbors  (as specified in the message),
   it accepts P as a random neighbor.
 - Otherwise Q takes an RTT measurement to P.
   If it's closer than any near neighbors by a factor of alpha, then
