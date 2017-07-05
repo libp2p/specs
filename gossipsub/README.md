@@ -505,7 +505,7 @@ Membership Management protocol:
   much influenced from GoCast, where the protocol allows oversubscribing and later drops
   extraneous connections and replaces nodes for proximity optimization.
 - `NEIGHBOR` messages play a dual role in the proposed protocol implementation, as they can
-  be used to retrieve membership lists. 
+  be used for establishing active links and retrieving membership lists.
 - There is no connectivity check in HyParView and retires with reduced TTLs, but this
   is incredibly important in world  full of NAT.
 - There is no `LEAVE` provision in HyParView.
