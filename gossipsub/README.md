@@ -270,7 +270,7 @@ it from the passive list for cleanup.
 
 Once it has joined the overlay, the node starts its main broadcast logic
 loop. The loop receives messages to publish from the application, messages
-published from other nodes, together with notifications from the management
+published from other nodes, and with notifications from the management
 protocol about new active neighbors and disconnections.
 
 The state of the broadcast loop consists of two sets of peers, the eager
@@ -384,12 +384,14 @@ however, the loss of that edge may result in a disconnected tree.
 
 There are two strategies in reaction to the loss of an eager peer. The
 first one is to do nothing, and wait for lazy push to repair the tree
-naturally with `IHAVE` messages in the next message broadcast. This might
-result in delays propagating the next few messages and is advocated by the
-authors in [1]. An alternative is to eagerly repair the tree by promoting
-lazy peers to eager and let the protocol prune duplicate paths naturally
-with `PRUNE` messages in the next message transmission. This may have a bit
-of bandwidth cost, but it is perhaps more appropriate for applications that
-value latency minimization which is the case for many IPFS applications.
+naturally with `IHAVE` messages in the next message broadcast. This
+might result in delays propagating the next few messages but is
+advocated by the authors in [1]. An alternative is to eagerly repair
+the tree by promoting lazy peers to eager with empty `GRAFT` messages
+and let the protocol prune duplicate paths naturally with `PRUNE`
+messages in the next message transmission. This may have a bit of
+bandwidth cost, but it is perhaps more appropriate for applications
+that value latency minimization which is the case for many IPFS
+applications.
 
 ## Protocol Messages
