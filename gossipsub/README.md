@@ -217,8 +217,6 @@ for their active lists.
 - If the list is still too large, then it checks the active lists for neighbors that
   are connected with each other. In this case, one of the links can be dropped
   with a `DISCONNECT` message.
-- If the list is still too large, then it picks nodes with at least 2 random links
-  and drops the ones with the highest `D_rand`.
 - If the list is still too large, then we cannot safely drop connections and it will
   remain that large until the next stabilization period.
 
