@@ -140,11 +140,10 @@ evaluates it with the following criteria:
   then it checks the TTL of the message.
   If it is 0, the request is dropped, otherwise Q decrements the TTL and forwards
   the message to a random node in its active list.
-- If the size of Q's active list is less than `A`, it accepts the join, adds
-  P to its active list and sends to it `NEIGHBOR` message.
-- If the TTL of the request is 0, then it  accepts the P as a new random neighbor.
+- If the TTL of the request is 0 or if the size of Q's active list is less than `A`,
+  it accepts the join, adds P to its active list and sends a `NEIGHBOR` message.
 - Otherwise it decrements the TTL and forwards the message to a random node
-  to its active list.
+  in its active list.
 
 When Q accepts P as a new neighbor, it also sends a `FORWARDJOIN`
 message to a random node in its active list. The `FORWARDJOIN`
