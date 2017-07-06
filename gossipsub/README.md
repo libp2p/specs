@@ -130,9 +130,8 @@ an up-to-date view of the overlay from the passive list of a subscribed node
 regardless of age of Provider records. Once an up-to-date passive view of
 the overlay has been obtained, the node proceeds to join.
 
-In order to join, it picks a subscribed node at random and sends
-`JOIN` a message to it with some initial TTL set as a design
-parameter.
+In order to join, it picks `C_rand` nodes at random and sends
+`JOIN` messages to them with some initial TTL set as a design parameter.
 
 The `JOIN` message propagates with a random walk until a node is willing
 to accept it or the TTL expires. Upon receiving a `JOIN` message, a node Q
@@ -151,13 +150,13 @@ evaluates it with the following criteria:
 When Q accepts P as a new neighbor, it also sends a `FORWARDJOIN`
 message to a random node in its active list. The `FORWARDJOIN`
 propagates with a random walk until its TTL is 0, while being added to
-the passive list of the receiving node.
+the passive list of the receiving nodes.
 
 If P fails to join because of connectivity issues, it decrements the
 TTL and tries another starting node. This is repeated until a ttl of zero
 reuses the connection in the case of NATed hosts.
 
-Once the first link has been established, P then needs to increase its
+Once the first links have been established, P then needs to increase its
 active list size to `A` by connecting to more nodes.  This is
 accomplished by ordering the subscriber list by RTT and picking the
 nearest nodes and some nodes at random and sending `NEIGHBOR`
