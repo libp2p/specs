@@ -156,12 +156,12 @@ If P fails to join because of connectivity issues, it decrements the
 TTL and tries another starting node. This is repeated until a ttl of zero
 reuses the connection in the case of NATed hosts.
 
-Once the first links have been established, P then needs to increase its
-active list size to `A` by connecting to more nodes.  This is
+Once the first links have been established, P then needs to increase
+its active list size to `A` by connecting to more nodes.  This is
 accomplished by ordering the subscriber list by RTT and picking the
-nearest nodes and some nodes at random and sending `NEIGHBOR`
-requests.  The neighbor requests may be accepted by `NEIGHBOR` message
-and rejected by a `DISCONNECT` message.
+nearest nodes and sending `NEIGHBOR` requests.  The neighbor requests
+may be accepted by `NEIGHBOR` message and rejected by a `DISCONNECT`
+message.
 
 Upon receiving a `NEIGHBOR` request a node Q evaluates it with the
 followin criteria:
