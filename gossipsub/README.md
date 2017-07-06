@@ -136,16 +136,15 @@ In order to join, it picks `C_rand` nodes at random and sends
 The `JOIN` message propagates with a random walk until a node is willing
 to accept it or the TTL expires. Upon receiving a `JOIN` message, a node Q
 evaluates it with the following criteria:
-- Q tries to open a connection to P and take an RTT measurement. If the connection
-  cannot be opened (eg because of NAT), then it checks the TTL of the message.
-  If it is 0, the request is dropped, otherwise Q decrements the TTL and fowards
+- Q tries to open a connection to P. If the connection cannot be opened (eg because of NAT),
+  then it checks the TTL of the message.
+  If it is 0, the request is dropped, otherwise Q decrements the TTL and forwards
   the message to a random node in its active list.
-- If the size of its active list is less than `A`, it accepts the join, adds
+- If the size of Q's active list is less than `A`, it accepts the join, adds
   P to its active list and sends to it `NEIGHBOR` message.
-- If the RTT to P is smaller by some factor alpha (design parameter, set to 2 in [3])
-  than any of its near nodes then it evicts a near neighbor if it has enough active
-  links by sending a `DISCONNECT`  message and accepts P as a near neighbor.
 - If the TTL of the request is 0, then it  accepts the P as a new random neighbor.
+- Otherwise it decrements the TTL and forwards the message to a random node
+  to its active list.
 
 When Q accepts P as a new neighbor, it also sends a `FORWARDJOIN`
 message to a random node in its active list. The `FORWARDJOIN`
@@ -499,9 +498,9 @@ Membership Management protocol:
   ensure that the first few links are created even if they oversubscribe their fanout, but they
   don't go out of their way to create remaining links beyond the necessary `C_rand` links.
   Nodes later bring the active list to balance with a stabilization protocol.
-  Also noteworthy is that only a single `JOIN` message is propagated with a random walk, the
-  remaining joins are handled with normal `NEIGHBOR` requests.
-  In short, the Join protocol is very much reworked, with the influence of GoCast.
+  Also noteworthy is that only C_rand `JOIN` message are propagated with a random walk, the
+  remaining joins are considered near joins and handled with normal `NEIGHBOR` requests.
+  In short, the Join protocol is reworked, with the influence of GoCast.
 - There is no active view stabilization/optimization protocol in HyParView. This is very
   much influenced from GoCast, where the protocol allows oversubscribing and later drops
   extraneous connections and replaces nodes for proximity optimization.
