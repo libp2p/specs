@@ -15,6 +15,9 @@
 - [Wire protocol](#wire-protocol)
 - [Interfaces](#interfaces)
 - [Implementation Details](#implementation-details)
+- [Removing existing relay protocol](#removing-existing-relay-protocol)
+
+Note: this document is currently in the process of being double-checked and updated. Please see [libp2p/specs#15 (comment)](https://github.com/libp2p/specs/pull/15) before using it as the basis for an implementation.
 
 ## Overview
 
