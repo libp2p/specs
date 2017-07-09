@@ -1,4 +1,4 @@
-# Circuit Relay
+# Circuit Relay v0.1.0
 
 > Circuit Switching for libp2p, also known as TURN or Relay in Networking literature.
 
@@ -19,7 +19,7 @@
 
 ## Overview
 
-The circuit relay is a mean to establish connectivity between libp2p nodes (e.g IPFS) that wouldn't otherwise be able to establish a direct connection to each other.
+The circuit relay is a means to establish connectivity between libp2p nodes (e.g IPFS) that wouldn't otherwise be able to establish a direct connection to each other.
 
 Relay is needed in situations where nodes are behind NAT, reverse proxies, firewalls and/or simply don't support the same transports (e.g. go-ipfs vs. browser-ipfs). Even though libp2p has modules for NAT traversal ([go-libp2p-nat](https://github.com/libp2p/go-libp2p-nat)), piercing through NATs isn't always an option. The circuit relay protocol exists to overcome those scenarios.
 
@@ -60,7 +60,7 @@ Scene 2:
 - All three nodes have learned to speak the `/ipfs/relay/circuit` protocol.
 - QmRelay is configured to allow relaying connections between other nodes.
 - QmOne is configured to use QmRelay for relaying.
-- QmOne automatically added `/p2p-circuit/ipfs/QmTwo` to its set of QmTwo addresses.
+- QmOne automatically added `/p2p-circuit/p2p/QmTwo` to its set of QmTwo addresses.
 - QmOne tries to connect via relaying, because it shares this transport with QmTwo.
 - A lively and prolonged dialogue ensues.
 
@@ -77,7 +77,7 @@ A `/p2p-circuit` circuit address, is formated following:
 Examples:
 
 - `/p2p-circuit/p2p/QmVT6GYwjeeAF5TR485Yc58S3xRF5EFsZ5YAF4VcP3URHt` - Arbitrary relay node
-- `/ip4/127.0.0.1/tcp/5002/ipfs/QmdPU7PfRyKehdrP5A3WqmjyD6bhVpU1mLGKppa2FjGDjZ/p2p-circuit/p2p/QmVT6GYwjeeAF5TR485Yc58S3xRF5EFsZ5YAF4VcP3URHt` - Specific relay node
+- `/ip4/127.0.0.1/tcp/5002/p2p/QmdPU7PfRyKehdrP5A3WqmjyD6bhVpU1mLGKppa2FjGDjZ/p2p-circuit/p2p/QmVT6GYwjeeAF5TR485Yc58S3xRF5EFsZ5YAF4VcP3URHt` - Specific relay node
 
 This opens the room for multiple hop relay, where the second relay is encapsulated in the first relay multiaddr, such as:
 
@@ -184,8 +184,8 @@ This is a table of status codes and sample messages that may occur during a rela
 | 250   | "failed to parse src addr: no such protocol ipfs" | The `<src>` multiaddr in the header was invalid |
 | 251   | "failed to parse dst addr: no such protocol ipfs" | The `<dst>` multiaddr in the header was invalid |
 | 260   | "passive relay has no connection to dst"          | |
-| 261   | "active relay could'nt dial to dst: conn refused" | relay could not form new connection to target peer |
-| 262   | "could'nd dial to dst: BAD ERROR"                 | relay has conn to dst, but failed to open a stream |
+| 261   | "active relay couldn't dial to dst: conn refused" | relay could not form new connection to target peer |
+| 262   | "couldn't' dial to dst"                           | relay has conn to dst, but failed to open a stream |
 | 270   | "dst does not support relay"                      | |
 | 280   | "can't relay to itself"                           | The relay got its own address as destination |
 | 320   | "src address too long"                            | |
