@@ -121,12 +121,30 @@ Every message in the relay protocol uses the following protobuf:
 
 ```
 message CircuitRelay {
+
+  enum Status {
+    SUCCESS = 100;
+    SRC_ADDR_TOO_LONG= 220;
+    DST_ADDR_TOO_LONG= 221;
+    SRC_MULTIADDR_INVALID= 250;
+    DST_MULTIADDR_INVALID= 251;
+    NO_CONN_TO_DST = 260;
+    CANT_DIAL_DST = 261;
+    CANT_OPEN_DST_STREAM = 262;
+    CANT_SPEAK_RELAY = 270;
+    CANT_REALAY_TO_SELF = 280;
+    SRC_ADDR_TOO_LONG = 320;
+    DST_ADDR_TOO_LONG = 321;
+    SRC_MULTIADDR_INVALID = 350;
+    DST_MULTIADDR_INVALID = 351;
+  }
+
   enum Type { // RPC identifier, either HOP, STOP or STATUS
-    HOP = 1; 
-    STOP = 2; 
+    HOP = 1;
+    STOP = 2;
     STATUS = 3;
   }
-  
+
   message Peer {
     required bytes id = 1;    // peer id
     repeated bytes addrs = 2; // peer's known addresses
@@ -137,7 +155,7 @@ message CircuitRelay {
   optional Peer srcPeer = 2;  // srcPeer and dstPeer are used when Type is HOP or STATUS
   optional Peer dstPeer = 3;
 
-  optional String code = 4;   // Status code, used when Type is STATUS
+  optional Status code = 4;   // Status code, used when Type is STATUS
 }
 ```
 
