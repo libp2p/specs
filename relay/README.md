@@ -19,13 +19,13 @@
 
 ## Overview
 
-The circuit relay is a means to establish connectivity between libp2p nodes (e.g IPFS) that wouldn't otherwise be able to establish a direct connection to each other.
+The circuit relay is a means to establish connectivity between libp2p nodes (e.g. IPFS nodes) that wouldn't otherwise be able to establish a direct connection to each other.
 
 Relay is needed in situations where nodes are behind NAT, reverse proxies, firewalls and/or simply don't support the same transports (e.g. go-ipfs vs. browser-ipfs). Even though libp2p has modules for NAT traversal ([go-libp2p-nat](https://github.com/libp2p/go-libp2p-nat)), piercing through NATs isn't always an option. The circuit relay protocol exists to overcome those scenarios.
 
 Unlike a transparent **tunnel**, where a libp2p peer would just proxy a communication stream to a destination (the destination being unaware of the original source), a circuit relay makes the destination aware of the original source and the circuit followed to establish communication between the two. This provides the destination side with full knowledge of the circuit which, if needed, could be rebuilt in the opposite direction.
 
-Apart from that, this relayed connection behaves just like a regular connection would, but over an existing swarm stream with another peer (instead of e.g. TCP.). A node asks a relay node to connect to another node on its behalf. The relay node short-circuits streams between the two nodes, enabling them to reach each other.
+Apart from that, this relayed connection behaves just like a regular connection would, but over an existing swarm stream with another peer (instead of e.g. TCP). A node asks a relay node to connect to another node on its behalf. The relay node short-circuits streams between the two nodes, enabling them to reach each other.
 
 Relayed connections are end-to-end encrypted just like regular connections.
 
