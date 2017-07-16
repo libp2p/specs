@@ -152,7 +152,7 @@ message CircuitRelay {
 
   optional Type type = 1;     // Type of the message
 
-  optional Peer srcPeer = 2;  // srcPeer and dstPeer are used when Type is HOP or STATUS
+  optional Peer srcPeer = 2;  // srcPeer and dstPeer are used when Type is HOP or STOP
   optional Peer dstPeer = 3;
 
   optional Status code = 4;   // Status code, used when Type is STATUS
