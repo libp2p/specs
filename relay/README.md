@@ -137,6 +137,8 @@ message CircuitRelay {
     STOP_DST_ADDR_TOO_LONG = 321;
     STOP_SRC_MULTIADDR_INVALID = 350;
     STOP_DST_MULTIADDR_INVALID = 351;
+    STOP_RELAY_REFUSED         = 390;
+    MALFORMED_MESSAGE          = 400;
   }
 
   enum Type { // RPC identifier, either HOP, STOP or STATUS
