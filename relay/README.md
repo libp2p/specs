@@ -212,6 +212,8 @@ This is a table of status codes and sample messages that may occur during a rela
 | 321   | "dst address too long"                            | |
 | 350   | "failed to parse src addr"                        | src multiaddr in the header was invalid |
 | 351   | "failed to parse dst addr"                        | dst multiaddr in the header was invalid |
+| 390   | "connection refused by stop endpoint"             | The stop endpoint couldn't accept the connection |
+| 400   | "malformed message"                               | A malformed or too long message was received |
 
 ## Implementation details
 
