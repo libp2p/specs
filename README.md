@@ -8,7 +8,7 @@
 [![](https://img.shields.io/badge/project-libp2p-blue.svg?style=flat-square)](http://github.com/libp2p/libp2p)
 [![](https://img.shields.io/badge/freenode-%23ipfs-blue.svg?style=flat-square)](http://webchat.freenode.net/?channels=%23ipfs)
 
-> tl;dr; This document presents `libp2p`, a modularized and extensible network stack to overcome the networking challenges faced when doing peer-to-peer applications. `libp2p` is used by IPFS as its networking library.
+> This document presents `libp2p`, a modularized and extensible network stack to overcome the networking challenges faced when doing peer-to-peer applications. `libp2p` is used by IPFS as its networking library.
 
 Authors:
 
