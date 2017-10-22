@@ -143,6 +143,7 @@ message CircuitRelay {
     HOP = 1;
     STOP = 2;
     STATUS = 3;
+    CAN_HOP = 4; // is peer a relay?
   }
 
   message Peer {
