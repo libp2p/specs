@@ -124,19 +124,21 @@ message CircuitRelay {
 
   enum Status {
     SUCCESS = 100;
-    SRC_ADDR_TOO_LONG= 220;
-    DST_ADDR_TOO_LONG= 221;
-    SRC_MULTIADDR_INVALID= 250;
-    DST_MULTIADDR_INVALID= 251;
-    NO_CONN_TO_DST = 260;
-    CANT_DIAL_DST = 261;
-    CANT_OPEN_DST_STREAM = 262;
-    CANT_SPEAK_RELAY = 270;
-    CANT_REALAY_TO_SELF = 280;
-    SRC_ADDR_TOO_LONG = 320;
-    DST_ADDR_TOO_LONG = 321;
-    SRC_MULTIADDR_INVALID = 350;
-    DST_MULTIADDR_INVALID = 351;
+    HOP_SRC_ADDR_TOO_LONG= 220;
+    HOP_DST_ADDR_TOO_LONG= 221;
+    HOP_SRC_MULTIADDR_INVALID= 250;
+    HOP_DST_MULTIADDR_INVALID= 251;
+    HOP_NO_CONN_TO_DST = 260;
+    HOP_CANT_DIAL_DST = 261;
+    HOP_CANT_OPEN_DST_STREAM = 262;
+    HOP_CANT_SPEAK_RELAY = 270;
+    HOP_CANT_RELAY_TO_SELF = 280;
+    STOP_SRC_ADDR_TOO_LONG = 320;
+    STOP_DST_ADDR_TOO_LONG = 321;
+    STOP_SRC_MULTIADDR_INVALID = 350;
+    STOP_DST_MULTIADDR_INVALID = 351;
+    STOP_RELAY_REFUSED         = 390;
+    MALFORMED_MESSAGE          = 400;
   }
 
   enum Type { // RPC identifier, either HOP, STOP or STATUS
@@ -153,7 +155,7 @@ message CircuitRelay {
 
   optional Type type = 1;     // Type of the message
 
-  optional Peer srcPeer = 2;  // srcPeer and dstPeer are used when Type is HOP or STATUS
+  optional Peer srcPeer = 2;  // srcPeer and dstPeer are used when Type is HOP or STOP
   optional Peer dstPeer = 3;
 
   optional Status code = 4;   // Status code, used when Type is STATUS
@@ -211,6 +213,8 @@ This is a table of status codes and sample messages that may occur during a rela
 | 321   | "dst address too long"                            | |
 | 350   | "failed to parse src addr"                        | src multiaddr in the header was invalid |
 | 351   | "failed to parse dst addr"                        | dst multiaddr in the header was invalid |
+| 390   | "connection refused by stop endpoint"             | The stop endpoint couldn't accept the connection |
+| 400   | "malformed message"                               | A malformed or too long message was received |
 
 ## Implementation details
 
