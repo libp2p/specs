@@ -12,7 +12,7 @@ Building client-server applications has been the natural tendency for a number o
 - The bandwidth inside a data center is considerably higher than that available for clients to connect to each other.
 - Data center resources are considerably cheaper, due to efficient usage and bulk stocking.
 - It makes it easier for the developer and system admin to have fine grained control over the application.
-- It reduces the number of heteregeneus systems to be handled (although the number is still considerable).
+- It reduces the number of heterogeneous systems to be handled (although the number is still considerable).
 - Systems like NAT make it really hard for client machines to find and talk with each other, forcing a developer to perform very clever hacks to traverse these obstacles.
 - Protocols started to be designed with the assumption that a developer will create a client-server application from the start.
 
