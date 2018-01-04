@@ -92,7 +92,7 @@ Unfortunately, due to symmetric NATs, container and VM NATs, and other impossibl
 
 Connection relaying SHOULD be implemented as a transport, in order to be transparent to upper layers.
 
-For an instantiation of relaying, see the [/ipfs/relay/circuit transport](transports/circuit-relay.md).
+For an instantiation of relaying, see the [p2p-circuit transport](relay).
 
 
 ## 3.6 Enable several network topologies
