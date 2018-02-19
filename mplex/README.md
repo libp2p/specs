@@ -28,6 +28,7 @@ id = flag >> 3
 
 ### Flag Values
 
+```
 | NewStream        | 0 |
 | MessageReceiver  | 1 |
 | MessageInitiator | 2 |
@@ -35,11 +36,14 @@ id = flag >> 3
 | CloseInitiator   | 4 |
 | ResetReceiver    | 5 |
 | ResetInitiator   | 6 |
+```
 
 The data segment is length prefixed by another unsigned varint. This results in one message looking like:
 
+``` 
 | header  | length  | data           |
 | uvarint | uvarint | 'length' bytes |
+```
 
 ## Protocol
 
