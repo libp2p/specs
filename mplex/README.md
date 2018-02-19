@@ -22,8 +22,8 @@ The header is an unsigned base128 varint, as defined in the [protocol buffers sp
 
 ```
 header = readUvarint()
-flag = head & 0x07
-id = flag >> 3
+flag = header & 0x07
+id = header >> 3
 ```
 
 ### Flag Values
