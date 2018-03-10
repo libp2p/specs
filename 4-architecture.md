@@ -1,7 +1,7 @@
 4 Architecture
 ==============
 
-`libp2p` was designed around the Unix Philosophy of creating small components that are easy to understand and test. These components should also be able to be swapped in order to accomodate different technologies or scenarios and also make it feasible to upgrade them over time.
+`libp2p` was designed around the Unix Philosophy of creating small components that are easy to understand and test. These components should also be able to be swapped in order to accommodate different technologies or scenarios and also make it feasible to upgrade them over time.
 
 Although different peers can support different protocols depending on their capabilities, any peer can act as a dialer and/or a listener for connections from other peers, connections that once established can be reused from both ends, removing the distinction between clients and servers.
 
@@ -12,7 +12,7 @@ The `libp2p` interface acts as a thin veneer over a multitude of subsystems that
 - Distributed Record Store - A system to store and distribute records. Records are small entries used by other systems for signaling, establishing links, announcing peers or content, and so on. They have a similar role to DNS in the broader Internet.
 - Discovery - Finding or identifying other peers in the network.
 
-Each of these subsystems exposes a well known interface (see [chapter 6](6-interfaces.md) for Interfaces) and may use each other in order to fulfil their goal. A global overview of the system is:
+Each of these subsystems exposes a well known interface (see [chapter 6](6-interfaces.md) for Interfaces) and may use each other in order to fulfill their goal. A global overview of the system is:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐

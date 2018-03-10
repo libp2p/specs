@@ -50,7 +50,7 @@ A Peer Discovery module interface should return `PeerInfo` objects, as it finds 
 
 ## 6.6 libp2p interface and UX
 
-`libp2p` implementations should enable it to be instantiated programatically, or to use a previous compiled library with some of the protocol decisions already made, so that the user can reuse or expand.
+`libp2p` implementations should enable it to be instantiated programmatically, or to use a previous compiled library with some of the protocol decisions already made, so that the user can reuse or expand.
 
 ### Constructing a libp2p instance programatically
 
