@@ -71,7 +71,7 @@ Additionally, it's worth noting that the traditional 7-layer OSI model character
 - RPC
 - HTTP
 
-## 2.3 Current shortcommings
+## 2.3 Current shortcomings
 
 Although we currently have a panoply of protocols available for our services to communicate, the abundance and variety of solutions creates its own problems. It is currently difficult for an application to be able to support and be available through several transports (e.g. the lack of TCP/UDP stack in browser applications).
 
