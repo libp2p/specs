@@ -2,16 +2,20 @@
 
 Scope:
 - real-time applications that require rendezvous
-- replace ws-star-rendezvous in conjunction with p2p-circuit relays.
+- replace ws-star-rendezvous with a rendezvous service daemon and a fleet
+  of p2p-circuit relays.
 
 ## Rendezvous Protocol
 
 The rendezvous protocol provides facilities for real-time peer discovery within
 application specific namespaces. Peers connect to the rendezvous service and register
-their presence in one or more namespaces; they can subsequently enter rendezvous
-and receive announcements about peer registrations and unregistrations within their
-namespaces of interest. Registrations persist until the peer disconnects or explicitly
-unregisters.
+their presence in one or more namespaces. Registrations persist until the peer
+disconnects or explicitly unregisters.
+
+Peers can enter rendezvous and dynamically receive announcements about peer
+registrations and unregistrations within their namespaces of interest.
+For purposes of discovery (eg bootstrap), peers can also ask the service for
+a oneof list of peers within a namespace.
 
 ### Interaction
 
@@ -43,9 +47,18 @@ C -> R: REGISTER{my-app, {QmC, AddressC}}
 C -> R: RENDEZVOUS{my-app}
 
 R -> C: REGISTER{my-app, {QmA, AddressA}}
-R -> C: REGISTER{my-app, {QmB, AddressB}}
+        REGISTER{my-app, {QmB, AddressB}}
 R -> A: REGISTER{my-app, {QmC, AddressC}}
 R -> B: REGISTER{my-app, {QmC, AddressC}}
+```
+
+A client can discover peers in the namespace by sending a `DISCOVER` message; the
+service responds with the list of current peer reigstrations.
+```
+D -> R: DISCOVER{my-app}
+R -> D: REGISTER{my-app, {QmA, AddressA}}
+        REGISTER{my-app, {QmB, AddressB}}
+        REGISTER{my-app, {QmC, AddressC}}
 ```
 
 ### Protobuf
@@ -57,6 +70,7 @@ message Message {
     REGISTER = 0;
     UNREGISTER = 1;
     RENDEZVOUS = 2;
+    DISCOVER = 3;
   }
 
   message Peer {
@@ -78,9 +92,14 @@ message Message {
     optional string ns = 1;
   }
 
+  message Discover {
+    optional string namespace = 1;
+  }
+
   optional MessageType type = 1;
   repeated Register register = 2;
   repeated Unregister unregister = 3;
   repeated Rendezvous rendezvous = 4;
+  repeated Discover discovery = 5;
 }
 ```
