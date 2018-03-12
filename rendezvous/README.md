@@ -1,8 +1,8 @@
 # Rendezvous Service
 
 Scope:
-- real-time applications that require rendezvous; replace ws-star-rendezvous
-  in conjunction with p2p-circuit relays.
+- real-time applications that require rendezvous
+- replace ws-star-rendezvous in conjunction with p2p-circuit relays.
 
 ## Rendezvous Protocol
 
