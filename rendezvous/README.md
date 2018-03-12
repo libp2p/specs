@@ -93,7 +93,7 @@ message Message {
   }
 
   message Discover {
-    optional string namespace = 1;
+    optional string ns = 1;
   }
 
   optional MessageType type = 1;
