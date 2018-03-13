@@ -14,8 +14,8 @@ disconnects or explicitly unregisters.
 
 Peers can enter rendezvous and dynamically receive announcements about peer
 registrations and unregistrations within their namespaces of interest.
-For purposes of discovery (eg bootstrap), peers can also ask the service for
-a oneof list of peers within a namespace.
+For purposes of oneof discovery (eg bootstrap), peers can also ask the service
+for a list of peers within a namespace.
 
 ### Interaction
 
@@ -94,6 +94,7 @@ message Message {
 
   message Discover {
     optional string ns = 1;
+    optional int limit = 2;
   }
 
   optional MessageType type = 1;
