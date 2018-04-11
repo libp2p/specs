@@ -129,8 +129,8 @@ message Message {
   }
 
   optional MessageType type = 1;
-  repeated Register register = 2;
-  repeated Unregister unregister = 3;
-  repeated Discover discover = 4;
-  repeated DiscoverResponse discoverResponse = 5;
+  optional Register register = 2;
+  optional Unregister unregister = 3;
+  optional Discover discover = 4;
+  optional DiscoverResponse discoverResponse = 5;
 }
