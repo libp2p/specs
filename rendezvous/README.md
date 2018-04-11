@@ -1,94 +1,121 @@
-# Rendezvous Service
+# Rendezvous Protocol
 
-Scope:
-- real-time applications that require rendezvous
-- replace ws-star-rendezvous with a rendezvous service daemon and a fleet
-  of p2p-circuit relays.
+The protocol described in this specification is intended to provide a
+lightweight mechanism for generalized peer discovery. It can be used
+for bootstrap purposes, real time peer discovery, application specific
+routing, and so on.  Any node implementing the rendezvous protocol can
+act as a rendezvous point, allowing the discovery of relevant peers in
+a decentralized fashion.
 
-## Rendezvous Protocol
+## Use Cases
 
-The rendezvous protocol provides facilities for real-time peer discovery within
-application specific namespaces. Peers connect to the rendezvous service and register
-their presence in one or more namespaces. Registrations persist until the peer
-disconnects or explicitly unregisters.
+Depending on the application, the protocol could be used in the
+following context:
+- During bootstrap, a node can use known rendezvous points to discover
+  peers that provide critical services. For instance, rendezvous can
+  be used to discover circuit relays for connectivity restricted
+  nodes.
+- During initialization, a node can use rendezvous to discover
+  peers to connect with the rest of the application. For instance,
+  rendezvous can be used to discover pubsub peers within a topic.
+- In a real time setting, applications can poll rendezvous points in
+  order to discover new peers in a timely fashion.
+- In an application specific routing setting, rendezvous points can be
+  used to progressively discover peers that can answer specific queries
+  or host shards of content.
 
-Peers can enter rendezvous and dynamically receive announcements about peer
-registrations and unregistrations within their namespaces of interest.
-For purposes of oneof discovery (eg bootstrap), peers can also ask the service
-for a list of peers within a namespace.
+### Replacing ws-star-rendezvous
+
+We intend to replace ws-star-rendezvous with a few rendezvous daemons
+and a fleet of p2p-circuit relays.  Real-time applications will
+utilize rendezvous both for bootstrap and in a real-time setting.
+During bootstrap, rendezvous will be used to discover circuit relays
+that provide connectivity for browser nodes.  Subsequently, rendezvous
+will be utilized throughout the lifetime of the application for real
+time peer discovery by registering and polling rendezvous points.
+This allows us to replace a fragile centralized component with a
+horizontally scalable ensemble of daemons.
+
+### Rendezvous and pubsub
+
+Rendezvous can be naturally combined with pubsub for effective
+real-time discovery.  At a basic level, rendezvous can be used to
+bootstrap pubsub: nodes can utilize rendezvous in order to discover
+their peers within a topic.  Contrariwise, pubsub can also be used as
+a mechanism for building rendezvous services. In this scenerio, a
+number of rendezvous points can federate using pubsub for internal
+real-time distribution, while still providing a simple interface to
+clients.
+
+
+## The Protocol
+
+The rendezvous protocol provides facilities for real-time peer
+discovery within application specific namespaces. Peers connect to the
+rendezvous point and register their presence in one or more
+namespaces. Registrations persist until the peer disconnects or
+explicitly unregisters.
+
+Peers registered with the rendezvous point can be discovered by other
+nodes by querying the rendezvous point. The query specifies the
+namespace for limiting application scope and optionally a maximum
+number of peers to return. The namespace can be omitted in the query,
+which asks for all peers registered to the rendezvous point.
 
 ### Interaction
 
-Client peer `A` connects to the rendezvous service `R` and registers for namespace
-`my-app` with a `REGISTER` message. It subsequently enters rendezvous with
-a `RENDEZVOUS` message and waits for `REGISTER`/`UNREGISTER` announcements from
-the service.
+Clients `A` and `B` connect to the rendezvous point `R` and register for namespace
+`my-app` with a `REGISTER` message:
 
 ```
-A -> R: REGISTER{my-app, {QmA, AddressA}}
-A -> R: RENDEZVOUS{my-app}
+A -> R: REGISTER{my-app, {QmA, AddrA}}
+B -> R: REGISTER{my-app, {QmB, AddrB}}
 ```
 
-Client peer `B` connects, registers and enters rendezvous.
-The rendezvous service immediately notifies `B` about the current namespace registrations
-and emits a register notification to `A`:
-
+Client `C` connects and registers for namespace `another-app`:
 ```
-B -> R: REGISTER{my-app, {QmB, AddressB}}
-B -> R: RENDEZVOUS{my-app}
-
-R -> B: REGISTER{my-app, {QmA, AddressA}}
-R -> A: REGISTER{my-app, {QmB, AddressB}}
+C -> R: REGISTER{another-app, {QmC, AddrC}}
 ```
 
-A third client `C` connections and registers:
-```
-C -> R: REGISTER{my-app, {QmC, AddressC}}
-C -> R: RENDEZVOUS{my-app}
-
-R -> C: REGISTER{my-app, {QmA, AddressA}}
-        REGISTER{my-app, {QmB, AddressB}}
-R -> A: REGISTER{my-app, {QmC, AddressC}}
-R -> B: REGISTER{my-app, {QmC, AddressC}}
-```
-
-A client can discover peers in the namespace by sending a `DISCOVER` message; the
-service responds with the list of current peer reigstrations.
+Another client `D` can discover peers in `my-app` by sending a `DISCOVER` message; the
+rendezvous point responds with the list of current peer reigstrations.
 ```
 D -> R: DISCOVER{my-app}
-R -> D: REGISTER{my-app, {QmA, AddressA}}
-        REGISTER{my-app, {QmB, AddressB}}
-        REGISTER{my-app, {QmC, AddressC}}
+R -> D: [REGISTER{my-app, {QmA, Addr}}
+         REGISTER{my-app, {QmB, Addr}}]
+```
+
+If `D` wants to discover all peers registered with `R`, then it can omit the namespace
+in the query:
+```
+D -> R: DISCOVER{}
+R -> D: [REGISTER{my-app, {QmA, Addr}}
+         REGISTER{my-app, {QmB, Addr}}
+         REGISTER{another-app, {QmC, AddrC}}]
 ```
 
 ### Protobuf
-
 
 ```protobuf
 message Message {
   enum MessageType {
     REGISTER = 0;
     UNREGISTER = 1;
-    RENDEZVOUS = 2;
-    DISCOVER = 3;
+    DISCOVER = 2;
+    DISCOVER_RESPONSE = 3;
   }
 
-  message Peer {
+  message PeerInfo {
     optional string id = 1;
     repeated bytes addrs = 2;
   }
 
   message Register {
     optional string ns = 1;
-    optional Peer peer = 2;
+    optional PeerInfo peer = 2;
   }
 
   message Unregister {
-    optional string ns = 1;
-    optional Peer peer = 2;
-  }
-
-  message Rendezvous {
     optional string ns = 1;
   }
 
@@ -97,10 +124,13 @@ message Message {
     optional int limit = 2;
   }
 
+  message DiscoverResponse {
+    repeated Register registrations = 1;
+  }
+
   optional MessageType type = 1;
   repeated Register register = 2;
   repeated Unregister unregister = 3;
-  repeated Rendezvous rendezvous = 4;
-  repeated Discover discovery = 5;
+  repeated Discover discover = 4;
+  repeated DiscoverResponse discoverResponse = 5;
 }
-```
