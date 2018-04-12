@@ -53,14 +53,26 @@ clients.
 The rendezvous protocol provides facilities for real-time peer
 discovery within application specific namespaces. Peers connect to the
 rendezvous point and register their presence in one or more
-namespaces. Registrations persist until the peer disconnects or
-explicitly unregisters.
+namespaces.
 
 Peers registered with the rendezvous point can be discovered by other
 nodes by querying the rendezvous point. The query specifies the
 namespace for limiting application scope and optionally a maximum
 number of peers to return. The namespace can be omitted in the query,
 which asks for all peers registered to the rendezvous point.
+
+### Registration Lifetime
+
+Registration lifetime is controlled by an optional TTL parameter in
+the `REGISTER` message.  If a TTL is specified, then the registration
+persists until the TTL expires.  If no TTL was specified, then the
+registration persists while the issuing peer is still connected to the
+rendezvous point.
+
+Peers can refresh their registrations at any time with a new
+`REGISTER` message; the TTL of the new message supersedes previous
+registrations. Peers can also cancel existing registrations at any
+time with an explicit `UNREGISTER` message.
 
 ### Interaction
 
@@ -113,6 +125,7 @@ message Message {
   message Register {
     optional string ns = 1;
     optional PeerInfo peer = 2;
+    optional uint ttl = 3;
   }
 
   message Unregister {
