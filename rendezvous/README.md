@@ -61,6 +61,12 @@ namespace for limiting application scope and optionally a maximum
 number of peers to return. The namespace can be omitted in the query,
 which asks for all peers registered to the rendezvous point.
 
+The query can also specify a timestamp, obtained from the response to
+a previous query, such that only peers registered since the timestamp
+will be returned. This allows peers to progressively refresh their
+network view without overhead, which greatly simplifies real time
+discovery.
+
 ### Registration Lifetime
 
 Registration lifetime is controlled by an optional TTL parameter in
@@ -92,18 +98,34 @@ C -> R: REGISTER{another-app, {QmC, AddrC}}
 Another client `D` can discover peers in `my-app` by sending a `DISCOVER` message; the
 rendezvous point responds with the list of current peer reigstrations.
 ```
-D -> R: DISCOVER{my-app}
-R -> D: [REGISTER{my-app, {QmA, Addr}}
-         REGISTER{my-app, {QmB, Addr}}]
+D -> R: DISCOVER{ns: my-app}
+R -> D: {[REGISTER{my-app, {QmA, Addr}}
+          REGISTER{my-app, {QmB, Addr}}],
+         t1}
 ```
 
 If `D` wants to discover all peers registered with `R`, then it can omit the namespace
 in the query:
 ```
 D -> R: DISCOVER{}
-R -> D: [REGISTER{my-app, {QmA, Addr}}
-         REGISTER{my-app, {QmB, Addr}}
-         REGISTER{another-app, {QmC, AddrC}}]
+R -> D: {[REGISTER{my-app, {QmA, Addr}}
+          REGISTER{my-app, {QmB, Addr}}
+          REGISTER{another-app, {QmC, AddrC}}],
+         t2}
+```
+
+If `D` wants to progressively poll for real time discovery, it can use
+the timestamp obtained from a previous response in order to only ask
+for new registrations.
+
+So here we consider a new client `E` registering after `t1`, and a subsequent
+query that discovers just that peer by including the timestamp:
+
+```
+E -> R: REGISTER{my-app, {QmE, AddrE}}
+D -> R: DISCOVER{ns: my-app, since: t1}
+R -> D: {[REGISTER{my-app, {QmE, AddrE}}],
+         t3}
 ```
 
 ### Protobuf
@@ -135,10 +157,12 @@ message Message {
   message Discover {
     optional string ns = 1;
     optional int limit = 2;
+    optional uint64 since = 3;
   }
 
   message DiscoverResponse {
     repeated Register registrations = 1;
+    optional uint64 timestamp = 2;
   }
 
   optional MessageType type = 1;
