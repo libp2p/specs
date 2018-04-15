@@ -61,11 +61,13 @@ namespace for limiting application scope and optionally a maximum
 number of peers to return. The namespace can be omitted in the query,
 which asks for all peers registered to the rendezvous point.
 
-The query can also specify a timestamp, obtained from the response to
-a previous query, such that only peers registered since the timestamp
-will be returned. This allows peers to progressively refresh their
-network view without overhead, which greatly simplifies real time
-discovery.
+The query can also include a cookie, obtained from the response to a
+previous query, such that only registrations that weren't included in
+the previous response will be returned. This allows peers to
+progressively refresh their network view without overhead, which
+greatly simplifies real time discovery. It also allows for pagination
+of query responses, so that large numbers of peer registrations can be
+managed.
 
 ### Registration Lifetime
 
@@ -99,12 +101,12 @@ R -> C: {OK}
 ```
 
 Another client `D` can discover peers in `my-app` by sending a `DISCOVER` message; the
-rendezvous point responds with the list of current peer reigstrations.
+rendezvous point responds with the list of current peer reigstrations and a cookie.
 ```
 D -> R: DISCOVER{ns: my-app}
 R -> D: {[REGISTER{my-app, {QmA, Addr}}
           REGISTER{my-app, {QmB, Addr}}],
-         t1}
+         c1}
 ```
 
 If `D` wants to discover all peers registered with `R`, then it can omit the namespace
@@ -114,22 +116,21 @@ D -> R: DISCOVER{}
 R -> D: {[REGISTER{my-app, {QmA, Addr}}
           REGISTER{my-app, {QmB, Addr}}
           REGISTER{another-app, {QmC, AddrC}}],
-         t2}
+         c2}
 ```
 
 If `D` wants to progressively poll for real time discovery, it can use
-the timestamp obtained from a previous response in order to only ask
-for new registrations.
+the cookie obtained from a previous response in order to only ask for
+new registrations.
 
-So here we consider a new client `E` registering after `t1`, and a subsequent
-query that discovers just that peer by including the timestamp:
-
+So here we consider a new client `E` registering after the first query,
+and a subsequent query that discovers just that peer by including the cookie:
 ```
 E -> R: REGISTER{my-app, {QmE, AddrE}}
 R -> E: {OK}
-D -> R: DISCOVER{ns: my-app, since: t1}
+D -> R: DISCOVER{ns: my-app, cookie: c1}
 R -> D: {[REGISTER{my-app, {QmE, AddrE}}],
-         t3}
+         c3}
 ```
 
 ### Protobuf
@@ -174,12 +175,12 @@ message Message {
   message Discover {
     optional string ns = 1;
     optional int64 limit = 2;
-    optional int64 since = 3;
+    optional bytes cookie = 3;
   }
 
   message DiscoverResponse {
     repeated Register registrations = 1;
-    optional int64 timestamp = 2;
+    optional bytes cookie = 2;
   }
 
   optional MessageType type = 1;
