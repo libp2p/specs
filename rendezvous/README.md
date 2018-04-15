@@ -87,12 +87,15 @@ Clients `A` and `B` connect to the rendezvous point `R` and register for namespa
 
 ```
 A -> R: REGISTER{my-app, {QmA, AddrA}}
+R -> A: {OK}
 B -> R: REGISTER{my-app, {QmB, AddrB}}
+R -> B: {OK}
 ```
 
 Client `C` connects and registers for namespace `another-app`:
 ```
 C -> R: REGISTER{another-app, {QmC, AddrC}}
+R -> C: {OK}
 ```
 
 Another client `D` can discover peers in `my-app` by sending a `DISCOVER` message; the
@@ -123,6 +126,7 @@ query that discovers just that peer by including the timestamp:
 
 ```
 E -> R: REGISTER{my-app, {QmE, AddrE}}
+R -> E: {OK}
 D -> R: DISCOVER{ns: my-app, since: t1}
 R -> D: {[REGISTER{my-app, {QmE, AddrE}}],
          t3}
@@ -134,40 +138,54 @@ R -> D: {[REGISTER{my-app, {QmE, AddrE}}],
 message Message {
   enum MessageType {
     REGISTER = 0;
-    UNREGISTER = 1;
-    DISCOVER = 2;
-    DISCOVER_RESPONSE = 3;
+    REGISTER_RESPONSE = 1;
+    UNREGISTER = 2;
+    DISCOVER = 3;
+    DISCOVER_RESPONSE = 4;
   }
 
   message PeerInfo {
-    optional string id = 1;
+    optional bytes id = 1;
     repeated bytes addrs = 2;
   }
 
   message Register {
     optional string ns = 1;
     optional PeerInfo peer = 2;
-    optional uint ttl = 3;
+    optional int64 ttl = 3; // in seconds
+  }
+
+  enum RegisterStatus {
+    OK = 0;
+    E_INVALID_NAMESPACE = 100;
+    E_INVALID_PEER_INFO = 101;
+    E_NOT_AUTHORIZED    = 200;
+  }
+
+  message RegisterReponse {
+    optional RegisterStatus code = 1;
   }
 
   message Unregister {
     optional string ns = 1;
+    optional bytes id = 2;
   }
 
   message Discover {
     optional string ns = 1;
     optional int limit = 2;
-    optional uint64 since = 3;
+    optional int64 since = 3;
   }
 
   message DiscoverResponse {
     repeated Register registrations = 1;
-    optional uint64 timestamp = 2;
+    optional int64 timestamp = 2;
   }
 
   optional MessageType type = 1;
   optional Register register = 2;
-  optional Unregister unregister = 3;
-  optional Discover discover = 4;
-  optional DiscoverResponse discoverResponse = 5;
+  optional RegisterResponse registerResponse = 3;
+  optional Unregister unregister = 4;
+  optional Discover discover = 5;
+  optional DiscoverResponse discoverResponse = 6;
 }
