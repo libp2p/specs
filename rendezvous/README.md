@@ -162,7 +162,7 @@ message Message {
     E_NOT_AUTHORIZED    = 200;
   }
 
-  message RegisterReponse {
+  message RegisterResponse {
     optional RegisterStatus code = 1;
   }
 
@@ -173,7 +173,7 @@ message Message {
 
   message Discover {
     optional string ns = 1;
-    optional int limit = 2;
+    optional int64 limit = 2;
     optional int64 since = 3;
   }
 
