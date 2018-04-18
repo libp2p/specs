@@ -164,7 +164,7 @@ message Message {
   }
 
   message RegisterResponse {
-    optional RegisterStatus code = 1;
+    optional RegisterStatus status = 1;
   }
 
   message Unregister {
