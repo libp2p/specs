@@ -73,9 +73,11 @@ managed.
 
 Registration lifetime is controlled by an optional TTL parameter in
 the `REGISTER` message.  If a TTL is specified, then the registration
-persists until the TTL expires.  If no TTL was specified, then the
-registration persists while the issuing peer is still connected to the
-rendezvous point.
+persists until the TTL expires.  If no TTL was specified, then a default
+of 2hrs is implied. There may be a rendezvous point-specific upper bound
+on TTL, with a minimum such value of 72hrs. If the TTL of a registration
+is inadmissible, the rendezvous point may reject the registration with
+an `E_INVALID_TTL` status.
 
 Peers can refresh their registrations at any time with a new
 `REGISTER` message; the TTL of the new message supersedes previous
@@ -160,6 +162,7 @@ message Message {
     OK = 0;
     E_INVALID_NAMESPACE = 100;
     E_INVALID_PEER_INFO = 101;
+    E_INVALID_TTL       = 102;
     E_NOT_AUTHORIZED    = 200;
   }
 
