@@ -147,6 +147,16 @@ message Message {
     DISCOVER_RESPONSE = 4;
   }
 
+  enum ResponseStatus {
+    OK                  = 0;
+    E_INVALID_NAMESPACE = 100;
+    E_INVALID_PEER_INFO = 101;
+    E_INVALID_TTL       = 102;
+    E_INVALID_COOKIE    = 103;
+    E_NOT_AUTHORIZED    = 200;
+    E_INTERNAL_ERROR    = 300;
+  }
+
   message PeerInfo {
     optional bytes id = 1;
     repeated bytes addrs = 2;
@@ -156,16 +166,6 @@ message Message {
     optional string ns = 1;
     optional PeerInfo peer = 2;
     optional int64 ttl = 3; // in seconds
-  }
-
-  enum ResponseStatus {
-    OK                  = 0;
-    E_INVALID_NAMESPACE = 100;
-    E_INVALID_PEER_INFO = 101;
-    E_INVALID_TTL       = 102;
-    E_INVALID_COOKIE    = 103;
-    E_NOT_AUTHORIZED    = 200;
-    E_INTERNAL_ERROR    = 300;
   }
 
   message RegisterResponse {
