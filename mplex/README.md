@@ -52,13 +52,13 @@ necessarily send the first packet, this distinction is just made to make the all
 
 ### Opening a new stream
 
-To open a new stream, first allocate a new unique stream ID; the session initiator allocates even IDs and the session receiver allocates odd IDs. Then, send a message with the flag set to `NewStream`, the ID set to the newly
+To open a new stream, first allocate a new unique stream ID. Then, send a message with the flag set to `NewStream`, the ID set to the newly
 allocated stream ID, and the data of the message set to the name of the stream.
 
 Stream names are purely for interfaces and are not otherwise considered by the protocol. An empty string may also be used for the stream name, and they may also be repeated (using the same stream name for every stream is valid). Reusing
 a stream ID after closing a stream may result in undefined behaviour.
 
-The party that opens a stream is called the stream initiator. This is used for numbering the streams.
+The party that opens a stream is called the stream initiator. This is used for numbering the streams as well as identifying whether the message comes from a channel opened locally or remotely. Thus, the stream initiator always uses even flags and stream receivers uses odd flags.
 
 ### Writing to a stream
 
