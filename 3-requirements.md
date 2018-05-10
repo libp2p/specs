@@ -24,7 +24,7 @@ In order to reason about possible transports, `libp2p` uses [multiaddr](https://
 /ether/ac:fd:ec:0b:7c:fe/ipfs/QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
 ```
 
-**Note:** At this time, no unreliable implementations exist. The protocol's interface for defining and using unreliable transport has not been defined. For more information on unreliable vs reliable transport, see [here](http://www.inetdaemon.com/tutorials/basic_concepts/communication/reliable_vs_unreliable.shtml). In the context of WebRTC, see [here](https://www.html5rocks.com/en/tutorials/webrtc/basics/#signaling).
+**Note:** At this time, no unreliable implementations exist. The protocol's interface for defining and using unreliable transport has not been defined. For more information on unreliable vs reliable transport, see [here](http://www.inetdaemon.com/tutorials/basic_concepts/communication/reliable_vs_unreliable.shtml). In the context of WebRTC, CTRL+F "reliable" [here](https://www.html5rocks.com/en/tutorials/webrtc/basics/#signaling).
 
 ## 3.2 Multi-multiplexing
 
