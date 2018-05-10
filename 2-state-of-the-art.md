@@ -1,4 +1,4 @@
-2 An analysis the state of the art in network stacks
+2 An analysis of the state of the art in network stacks
 ====================================================
 
 This section presents to the reader an analysis of the available protocols and architectures for network stacks. The goal is to provide the foundations from which to infer the conclusions and understand why `libp2p` has the requirements and architecture that it has.
