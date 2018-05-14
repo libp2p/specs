@@ -5,7 +5,7 @@
 
 `libp2p` is transport agnostic, so it can run over any transport protocol. It does not even depend on IP; it may run on top of NDN, XIA, and other new Internet architectures.
 
-In order to reason about possible transports, `libp2p` uses [multiaddr](https://github.com/jbenet/multiaddr), a self-describing addressing format. This makes it possible for `libp2p` to treat addresses opaquely everywhere in the system, and have support for various transport protocols in the network layer. The actual format of addresses in `libp2p` is `ipfs-addr`, a multiaddr that ends with an IPFS node id. For example, these are all valid `ipfs-addrs`:
+In order to reason about possible transports, `libp2p` uses [multiaddr](https://github.com/multiformats/multiaddr), a self-describing addressing format. This makes it possible for `libp2p` to treat addresses opaquely everywhere in the system, and have support for various transport protocols in the network layer. The actual format of addresses in `libp2p` is `ipfs-addr`, a multiaddr that ends with an IPFS node id. For example, these are all valid `ipfs-addrs`:
 
 ```
 # IPFS over TCP over IPv6 (typical TCP)
