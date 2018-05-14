@@ -117,6 +117,8 @@ Bootstrap-List is a Discovery Protocol that uses local storage to cache the addr
 
 #### 4.5.1 PubSub
 
+See https://github.com/libp2p/specs/tree/master/pubsub.
+
 ## 4.6 Naming
 
 #### 4.5.2 IPNS
