@@ -1,0 +1,201 @@
+# Rendezvous Protocol
+
+The protocol described in this specification is intended to provide a
+lightweight mechanism for generalized peer discovery. It can be used
+for bootstrap purposes, real time peer discovery, application specific
+routing, and so on.  Any node implementing the rendezvous protocol can
+act as a rendezvous point, allowing the discovery of relevant peers in
+a decentralized fashion.
+
+## Use Cases
+
+Depending on the application, the protocol could be used in the
+following context:
+- During bootstrap, a node can use known rendezvous points to discover
+  peers that provide critical services. For instance, rendezvous can
+  be used to discover circuit relays for connectivity restricted
+  nodes.
+- During initialization, a node can use rendezvous to discover
+  peers to connect with the rest of the application. For instance,
+  rendezvous can be used to discover pubsub peers within a topic.
+- In a real time setting, applications can poll rendezvous points in
+  order to discover new peers in a timely fashion.
+- In an application specific routing setting, rendezvous points can be
+  used to progressively discover peers that can answer specific queries
+  or host shards of content.
+
+### Replacing ws-star-rendezvous
+
+We intend to replace ws-star-rendezvous with a few rendezvous daemons
+and a fleet of p2p-circuit relays.  Real-time applications will
+utilize rendezvous both for bootstrap and in a real-time setting.
+During bootstrap, rendezvous will be used to discover circuit relays
+that provide connectivity for browser nodes.  Subsequently, rendezvous
+will be utilized throughout the lifetime of the application for real
+time peer discovery by registering and polling rendezvous points.
+This allows us to replace a fragile centralized component with a
+horizontally scalable ensemble of daemons.
+
+### Rendezvous and pubsub
+
+Rendezvous can be naturally combined with pubsub for effective
+real-time discovery.  At a basic level, rendezvous can be used to
+bootstrap pubsub: nodes can utilize rendezvous in order to discover
+their peers within a topic.  Contrariwise, pubsub can also be used as
+a mechanism for building rendezvous services. In this scenerio, a
+number of rendezvous points can federate using pubsub for internal
+real-time distribution, while still providing a simple interface to
+clients.
+
+
+## The Protocol
+
+The rendezvous protocol provides facilities for real-time peer
+discovery within application specific namespaces. Peers connect to the
+rendezvous point and register their presence in one or more
+namespaces.
+
+Peers registered with the rendezvous point can be discovered by other
+nodes by querying the rendezvous point. The query specifies the
+namespace for limiting application scope and optionally a maximum
+number of peers to return. The namespace can be omitted in the query,
+which asks for all peers registered to the rendezvous point.
+
+The query can also include a cookie, obtained from the response to a
+previous query, such that only registrations that weren't included in
+the previous response will be returned. This allows peers to
+progressively refresh their network view without overhead, which
+greatly simplifies real time discovery. It also allows for pagination
+of query responses, so that large numbers of peer registrations can be
+managed.
+
+### Registration Lifetime
+
+Registration lifetime is controlled by an optional TTL parameter in
+the `REGISTER` message.  If a TTL is specified, then the registration
+persists until the TTL expires.  If no TTL was specified, then a default
+of 2hrs is implied. There may be a rendezvous point-specific upper bound
+on TTL, with a minimum such value of 72hrs. If the TTL of a registration
+is inadmissible, the rendezvous point may reject the registration with
+an `E_INVALID_TTL` status.
+
+Peers can refresh their registrations at any time with a new
+`REGISTER` message; the TTL of the new message supersedes previous
+registrations. Peers can also cancel existing registrations at any
+time with an explicit `UNREGISTER` message.
+
+### Interaction
+
+Clients `A` and `B` connect to the rendezvous point `R` and register for namespace
+`my-app` with a `REGISTER` message:
+
+```
+A -> R: REGISTER{my-app, {QmA, AddrA}}
+R -> A: {OK}
+B -> R: REGISTER{my-app, {QmB, AddrB}}
+R -> B: {OK}
+```
+
+Client `C` connects and registers for namespace `another-app`:
+```
+C -> R: REGISTER{another-app, {QmC, AddrC}}
+R -> C: {OK}
+```
+
+Another client `D` can discover peers in `my-app` by sending a `DISCOVER` message; the
+rendezvous point responds with the list of current peer reigstrations and a cookie.
+```
+D -> R: DISCOVER{ns: my-app}
+R -> D: {[REGISTER{my-app, {QmA, Addr}}
+          REGISTER{my-app, {QmB, Addr}}],
+         c1}
+```
+
+If `D` wants to discover all peers registered with `R`, then it can omit the namespace
+in the query:
+```
+D -> R: DISCOVER{}
+R -> D: {[REGISTER{my-app, {QmA, Addr}}
+          REGISTER{my-app, {QmB, Addr}}
+          REGISTER{another-app, {QmC, AddrC}}],
+         c2}
+```
+
+If `D` wants to progressively poll for real time discovery, it can use
+the cookie obtained from a previous response in order to only ask for
+new registrations.
+
+So here we consider a new client `E` registering after the first query,
+and a subsequent query that discovers just that peer by including the cookie:
+```
+E -> R: REGISTER{my-app, {QmE, AddrE}}
+R -> E: {OK}
+D -> R: DISCOVER{ns: my-app, cookie: c1}
+R -> D: {[REGISTER{my-app, {QmE, AddrE}}],
+         c3}
+```
+
+### Protobuf
+
+```protobuf
+message Message {
+  enum MessageType {
+    REGISTER = 0;
+    REGISTER_RESPONSE = 1;
+    UNREGISTER = 2;
+    DISCOVER = 3;
+    DISCOVER_RESPONSE = 4;
+  }
+
+  enum ResponseStatus {
+    OK                  = 0;
+    E_INVALID_NAMESPACE = 100;
+    E_INVALID_PEER_INFO = 101;
+    E_INVALID_TTL       = 102;
+    E_INVALID_COOKIE    = 103;
+    E_NOT_AUTHORIZED    = 200;
+    E_INTERNAL_ERROR    = 300;
+  }
+
+  message PeerInfo {
+    optional bytes id = 1;
+    repeated bytes addrs = 2;
+  }
+
+  message Register {
+    optional string ns = 1;
+    optional PeerInfo peer = 2;
+    optional int64 ttl = 3; // in seconds
+  }
+
+  message RegisterResponse {
+    optional ResponseStatus status = 1;
+    optional string statusText = 2;
+  }
+
+  message Unregister {
+    optional string ns = 1;
+    optional bytes id = 2;
+  }
+
+  message Discover {
+    optional string ns = 1;
+    optional int64 limit = 2;
+    optional bytes cookie = 3;
+  }
+
+  message DiscoverResponse {
+    repeated Register registrations = 1;
+    optional bytes cookie = 2;
+    optional ResponseStatus status = 3;
+    optional string statusText = 4;
+  }
+
+  optional MessageType type = 1;
+  optional Register register = 2;
+  optional RegisterResponse registerResponse = 3;
+  optional Unregister unregister = 4;
+  optional Discover discover = 5;
+  optional DiscoverResponse discoverResponse = 6;
+}
+```
