@@ -7,7 +7,7 @@ algorithms, it merely describes the common wire format that implementations
 will use.
 
 libp2p pubsub currently uses reliable ordered streams between peers. It assumes
-that each peer is certain of the identity of each peer is it communicating
+that each peer is certain of the identity of each peer it is communicating
 with.  It does not assume that messages between peers are encrypted, however
 encryption defaults to being enabled on libp2p streams.
 
@@ -21,7 +21,7 @@ You can find information about the PubSub research and notes in the following re
 All communication between peers happens in the form of exchanging protobuf RPC
 messages between participating peers.
 
-The RPC protobuf is as follows:
+The `RPC` protobuf is as follows:
 
 ```protobuf
 message RPC {
@@ -62,13 +62,13 @@ done to allow content to be routed through a swarm of pubsubbing peers.
 The `data` field is an opaque blob of data, it can contain any data that the
 publisher wants it to. 
 
-The `seqno` field is a linearly increasing, number unique among messages
+The `seqno` field is a linearly increasing number that is unique among messages
 originating from each given peer. No two messages on a pubsub topic from the
-same peer should have the same seqno value, however messages from different
+same peer should have the same `seqno` value, however messages from different
 peers may have the same sequence number, so this number alone cannot be used to
 address messages. (Notably the 'timecache' in use by the floodsub
-implementation uses the concatenation of the seqno and the 'from' field) 
-
+implementation uses the concatenation of the `seqno` and the `from` field.) 
+	
 The `topicIDs` field specifies a set of topics that this message is being
 published to. 
 
@@ -78,10 +78,10 @@ future.
 ## The Topic Descriptor
 
 The topic descriptor message is used to define various options and parameters
-of a topic. It currently specifies the topics human readable name, its
+of a topic. It currently specifies the topic's human readable name, its
 authentication options, and its encryption options. 
 
-The TopicDescriptor protobuf is as follows:
+The `TopicDescriptor` protobuf is as follows:
 
 ```protobuf
 message TopicDescriptor {
@@ -114,7 +114,7 @@ message TopicDescriptor {
 ```
 
 The `name` field is a string used to identify or mark the topic, It can be
-descriptive or random or anything the creator chooses. 
+descriptive or random or anything that the creator chooses. 
 
 The `auth` field specifies how authentication will work for this topic. Only
 authenticated peers may publish to a given topic. See 'AuthOpts' below for
@@ -139,7 +139,7 @@ Only peers whose peerIDs are listed in the `keys` array may publish to this
 topic, messages from any other peer should be dropped.
 
 #### AuthMode 'WOT'
-Web Of Trust, Any trusted peer may publish to the topic. A trusted peer is one
+Web Of Trust: any trusted peer may publish to the topic. A trusted peer is one
 whose peerID is listed in the `keys` array, or any peer who is 'trusted' by
 another trusted peer. The mechanism of signifying trust in another peer is yet
 to be defined.
@@ -164,6 +164,6 @@ sharing the keys and salts is undefined.
 
 #### EncMode 'WOT'
 Web Of Trust publishing. Messages are encrypted with some certificate or
-certificate chain shared amongst trusted peers. (Spec writers note: this is the
+certificate chain shared amongst trusted peers. (Spec writer's note: this is the
 least clearly defined option and my description here may be wildly incorrect,
 needs checking).
