@@ -133,6 +133,7 @@ message CircuitRelay {
     HOP_CANT_OPEN_DST_STREAM   = 262;
     HOP_CANT_SPEAK_RELAY       = 270;
     HOP_CANT_RELAY_TO_SELF     = 280;
+    HOP_BACKOFF                = 290;
     STOP_SRC_ADDR_TOO_LONG     = 320;
     STOP_DST_ADDR_TOO_LONG     = 321;
     STOP_SRC_MULTIADDR_INVALID = 350;
@@ -209,6 +210,7 @@ This is a table of status codes and sample messages that may occur during a rela
 | 262   | "couldn't' dial to dst"                           | relay has conn to dst, but failed to open a stream |
 | 270   | "dst does not support relay"                      | |
 | 280   | "can't relay to itself"                           | The relay got its own address as destination |
+| 290   | "temporary backoff"                               | The relay wants us to backoff and try again later |
 | 320   | "src address too long"                            | |
 | 321   | "dst address too long"                            | |
 | 350   | "failed to parse src addr"                        | src multiaddr in the header was invalid |
