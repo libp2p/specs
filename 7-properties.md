@@ -189,7 +189,7 @@ For now, we use [protobuf](https://github.com/google/protobuf) for all protocol 
 
 ### 7.5.6 Secure Communications
 
-The wire protocol is -- of course -- wrapped with encryption. We use cyphersuites similar to TLS. This is explained further in the [network spec](./#encryption).
+The wire protocol is -- of course -- wrapped with encryption. We use cyphersuites similar to TLS. This is explained further in [requirements and considerations: encryption](3-requirements.md#33-encryption).
 
 ### 7.5.7 Protocol Multicodecs
 
