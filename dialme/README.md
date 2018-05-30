@@ -30,7 +30,7 @@ This is a rather simple protocol that communicates a multiaddress to perform the
 message DialMe {
   message Peer {
     required bytes id = 1;    // peer id
-    repeated bytes addrs = 2; // array of multiadrs
+    repeated string addrs = 2; // a multiaddr to dial the the peer over
   }
 
   optional Peer peer = 1;
