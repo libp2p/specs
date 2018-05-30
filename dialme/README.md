@@ -6,10 +6,7 @@ In certain scenarios, it might be desirable for a peer to ask another peer to di
 
 #### Requirements
 
-- Should be transports agnostic
-- Should be connection agnostic
-- Can work with or without connection upgrades
-  - this implies that the `dialme` protocol assumes nothing about the network stack implementation and is only concerned with requesting dial backs.
+The `dialme` protocol is a libp2p protocol.
 
 In order for dial back to happen a prior connection is required. This prior connection could be established over a circuit (the most likely scenario) or any other preexisting connection. The prior connection is only required to request the dial back, and the `dialme` protocol assumes nothing about it at all.
 
