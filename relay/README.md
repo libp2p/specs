@@ -6,6 +6,7 @@
 
 - [js-libp2p-circuit](https://github.com/libp2p/js-libp2p-circuit)
 - [go-libp2p-circuit](https://github.com/libp2p/go-libp2p-circuit)
+- [rust-libp2p](https://github.com/libp2p/rust-libp2p/tree/master/relay)
 
 ## Table of Contents
 
