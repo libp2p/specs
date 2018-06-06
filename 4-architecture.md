@@ -119,7 +119,7 @@ Bootstrap-List is a Discovery Protocol that uses local storage to cache the addr
 
 ##### 4.5.1.1 Implementations
 
-> PubSub is a work in progress, with floodsub as an initial protocol, followed by gossipsub, which is an alpha release as of May 2018.
+[PubSub](https://github.com/libp2p/specs/tree/master/pubsub) is a work in progress, with floodsub as an initial protocol, followed by gossipsub, which is an alpha release as of May 2018.
 
 Implementations of floodsub include:
 
