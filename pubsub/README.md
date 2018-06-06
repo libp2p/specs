@@ -16,6 +16,8 @@ You can find information about the PubSub research and notes in the following re
 - https://github.com/libp2p/research-pubsub
 - https://github.com/libp2p/pubsub-notes
 
+Floodsub is a preliminary version of pubsub, and involves a host (a peer that can send and receive messages) flooding or broadcasting a message to all peers in the network, while gossipsub is a later version that involves broadcasting a message to a list of peers, and receiving messages of a subscribed topic from a list of peers. Implementations are listed below.
+
 ## The RPC
 
 All communication between peers happens in the form of exchanging protobuf RPC
@@ -167,3 +169,11 @@ Web Of Trust publishing. Messages are encrypted with some certificate or
 certificate chain shared amongst trusted peers. (Spec writer's note: this is the
 least clearly defined option and my description here may be wildly incorrect,
 needs checking).
+
+## Implementations
+
+Implementations of pubsub as floodsub and gossipsub include:
+
+- [go-libp2p-floodsub](https://github.com/libp2p/go-floodsub/); also see [this issue](https://github.com/libp2p/go-floodsub/issues/77) for context; and [this PR](https://github.com/libp2p/go-floodsub/pull/67) for gossipsub;
+- [rust-libp2p-floodsub](https://github.com/libp2p/rust-libp2p/tree/master/floodsub); research and work is in progress on gossipsub by @jamesray1 with Drops of Diamond; and
+- [js-libp2p-floodsub](http://github.com/libp2p/js-libp2p-floodsub).
