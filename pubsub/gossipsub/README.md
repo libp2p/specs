@@ -1,6 +1,15 @@
-# RFC: Proximity Aware Epidemic PubSub
+# GossipSub: Proximity Aware Epidemic PubSub for libp2p
 
-author: vyzo
+Revision: draft 1, 2018-06-28
+
+Authors:
+- vyzo (vyzo@hackzen.org)
+
+Implementation status:
+- Go: [libp2p/go-floodsub#67](https://github.com/libp2p/go-floodsub/pull/67) (experimental)
+- JS: not yet started
+- Rust: not yet started
+- Gerbil: [vyzo/gerbil-simsub](https://github.com/vyzo/gerbil-simsub) (very first implementation)
 
 <!-- toc -->
 
@@ -24,10 +33,11 @@ author: vyzo
 
 ## Introduction
 
-This RFC proposes a topic pubsub protocol based on the following papers:
-1. [Epidemic Broadcast Trees](http://www.gsd.inesc-id.pt/~ler/docencia/rcs1617/papers/srds07.pdf)
-2. [HyParView: a membership protocol for reliable gossip-based broadcast](http://asc.di.fct.unl.pt/~jleitao/pdf/dsn07-leitao.pdf)
-3. [GoCast: Gossip-enhanced Overlay Multicast for Fast and Dependable Group Communication](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.75.4811)
+This document proposes a successor to the FloodSub protocol.
+It proposes a topic pubsub protocol based on the following papers:
+1. Epidemic Broadcast Trees, 2007 ([PDF](http://www.gsd.inesc-id.pt/~ler/docencia/rcs1617/papers/srds07.pdf), DOI: [10.1109/SRDS.2007.27](https://doi.org/10.1109/SRDS.2007.27))
+2. HyParView: a membership protocol for reliable gossip-based broadcast, 2007 ([PDF](http://asc.di.fct.unl.pt/~jleitao/pdf/dsn07-leitao.pdf), DOI: [10.1109/DSN.2007.56](http://doi.org/10.1109/DSN.2007.56))
+3. GoCast: Gossip-enhanced Overlay Multicast for Fast and Dependable Group Communication, 2005 ([PDF](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.75.4811&rep=rep1&type=pdf))
 
 The protocol implements the Plumtree algorithm from [1], with
 membership managed using HyParView[2] and proximity-aware overlay
@@ -202,7 +212,7 @@ lists eagerly, at the cost of some bandwidth.
 
 The active list is generally managed reactively: failures are detected
 by TCP, either when a message is sent or when the connection is detected
-as closed. 
+as closed.
 
 In addition to the reactive management strategy, the active list has
 stabilization and optimization components that run periodically with a
@@ -285,7 +295,7 @@ The state of the broadcast loop consists of two sets of peers, the eager
 and lazy lists, with the eager list initialized to the initial neighbors
 and the lazy list empty. The loop also maintains a time-based cache of
 recent messages, together with a queue of lazy message notifications.
-In addition to the cache, it maintains a list of missing messages 
+In addition to the cache, it maintains a list of missing messages
 known by lazy gossip but not yet received through the multicast tree.
 
 ### Message Propagation and Multicast Tree Construction
