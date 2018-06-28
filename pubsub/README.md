@@ -175,5 +175,6 @@ needs checking).
 Implementations of pubsub as floodsub and gossipsub include:
 
 - [go-libp2p-floodsub](https://github.com/libp2p/go-floodsub/); also see [this issue](https://github.com/libp2p/go-floodsub/issues/77) for context; and [this PR](https://github.com/libp2p/go-floodsub/pull/67) for gossipsub;
+- [gerbil-gossipsub](https://github.com/vyzo/gerbil-simsub): the first implementation of gossipsub;
 - [rust-libp2p-floodsub](https://github.com/libp2p/rust-libp2p/tree/master/floodsub); research and work is in progress on gossipsub by @jamesray1 with Drops of Diamond; and
 - [js-libp2p-floodsub](http://github.com/libp2p/js-libp2p-floodsub).
