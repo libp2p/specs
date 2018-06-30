@@ -1,4 +1,9 @@
-# libp2p pubsub specification
+# PubSub interface for libp2p
+
+Revision: draft 1, 2017-02-17
+
+Authors:
+- whyrusleeping (why@ipfs.io)
 
 This is the specification for generalized pubsub over libp2p. Pubsub in libp2p
 is currently still experimental and this specification is subject to change.
@@ -15,6 +20,13 @@ You can find information about the PubSub research and notes in the following re
 
 - https://github.com/libp2p/research-pubsub
 - https://github.com/libp2p/pubsub-notes
+
+Implementations:
+- FloodSub, simple flooding pubsub (2017)
+  - [libp2p/go-floodsub](https://github.com/libp2p/go-floodsub/pull/67), [libp2p/js-libp2p-floodsub](http://github.com/libp2p/js-libp2p-floodsub), [libp2p/rust-libp2p/floodsub](https://github.com/libp2p/rust-libp2p/tree/master/floodsub)
+- GossipSub, proximity-aware epidemic pubsub (2018)
+  - [`./gossipsub`](./gossipsub)
+
 
 ## The RPC
 
@@ -39,7 +51,7 @@ This is a relatively simple message containing zero or more subscription
 messages, and zero or more content messages. The subscription messages contain
 a topicid string that specifies the topic, and a boolean signifying whether to
 subscribe or unsubscribe to the given topic. True signifies 'subscribe' and
-false signifies 'unsubscribe'. 
+false signifies 'unsubscribe'.
 
 ## The Message
 
@@ -57,20 +69,20 @@ message Message {
 
 The `from` field denotes the author of the message, note that this is not
 necessarily the peer who sent the RPC this message is contained in. This is
-done to allow content to be routed through a swarm of pubsubbing peers. 
+done to allow content to be routed through a swarm of pubsubbing peers.
 
 The `data` field is an opaque blob of data, it can contain any data that the
-publisher wants it to. 
+publisher wants it to.
 
 The `seqno` field is a linearly increasing number that is unique among messages
 originating from each given peer. No two messages on a pubsub topic from the
 same peer should have the same `seqno` value, however messages from different
 peers may have the same sequence number, so this number alone cannot be used to
 address messages. (Notably the 'timecache' in use by the floodsub
-implementation uses the concatenation of the `seqno` and the `from` field.) 
-	
+implementation uses the concatenation of the `seqno` and the `from` field.)
+
 The `topicIDs` field specifies a set of topics that this message is being
-published to. 
+published to.
 
 Note that messages are currently *not* signed. This will come in the near
 future.
@@ -79,7 +91,7 @@ future.
 
 The topic descriptor message is used to define various options and parameters
 of a topic. It currently specifies the topic's human readable name, its
-authentication options, and its encryption options. 
+authentication options, and its encryption options.
 
 The `TopicDescriptor` protobuf is as follows:
 
@@ -114,7 +126,7 @@ message TopicDescriptor {
 ```
 
 The `name` field is a string used to identify or mark the topic, It can be
-descriptive or random or anything that the creator chooses. 
+descriptive or random or anything that the creator chooses.
 
 The `auth` field specifies how authentication will work for this topic. Only
 authenticated peers may publish to a given topic. See 'AuthOpts' below for
