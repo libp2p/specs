@@ -251,7 +251,7 @@ passive list as a neighbor.
 The passive list is managed cyclically, as per [2]. Periodically, with
 a randomized timer, each node performs a passive list shuffle with one
 of its active neighbors. The purpose of the shuffle is to update the
-passive lists of the nodes involved. The node that iniates the shuffle
+passive lists of the nodes involved. The node that initiates the shuffle
 creates an exchange list that contains its id, `k_a` peers from its
 active list and `k_p` peers from its passive list, where `k_a` and
 `k_p` are protocol parameters (unspecified in [2]). It then sends a
@@ -375,7 +375,7 @@ eager link can be replaced by the lazy link and result to a shorter
 tree.
 
 To promote stability in the tree, the authors in [1] suggest that this
-optimization be peformed only if the difference in hopcount is greater
+optimization be performed only if the difference in hopcount is greater
 than a threshold value. This value is a design parameter that affects
 the overall stability of the tree: the lower the value, the more
 easier the protocol will try to optimize the tree by exchanging
