@@ -39,7 +39,7 @@ This RFC is organized by chapters described on the *Table of contents* section. 
 - [2 An analysis the state of the art in network stacks](2-state-of-the-art.md)
   - [2.1 The client-server model](2-state-of-the-art.md#21-the-client-server-model)
   - [2.2 Categorizing the network stack protocols by solutions](2-state-of-the-art.md#22-categorizing-the-network-stack-protocols-by-solutions)
-  - [2.3 Current shortcommings](2-state-of-the-art.md#23-current-shortcommings)
+  - [2.3 Current shortcomings](2-state-of-the-art.md#23-current-shortcomings)
 - [3 Requirements](3-requirements.md)
   - [3.1 Transport agnostic](3-requirements.md#34-transport-agnostic)
   - [3.2 Multi-multiplexing](3-requirements.md#35-multi-multiplexing)
