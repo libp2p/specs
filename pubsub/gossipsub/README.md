@@ -111,7 +111,7 @@ overlay, at least in bimodal distributions, while overlays without any
 random links may fail to connect at all.  Nonetheless, the random link
 parameter is directly related to the connectivity of the overlay. A
 higher `C_rand` ensures connectivity with high probability and fault
-tolerance.  The fault-tolerance and connectivity properpties
+tolerance.  The fault-tolerance and connectivity properties
 of HyParView stem from the random overlay structure, so in order to
 preserve them and still optimize for proximity, we need to set
 ```
