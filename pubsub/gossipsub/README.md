@@ -69,7 +69,7 @@ pull missing messages.  Initially, all peers in the active list are
 eager forming a connected mesh.  As messages propagate, peers _prune_
 eager links when receiving duplicate messages, thus constructing a
 multicast tree. The tree is repaired when peers receive lazy messages
-that were not propagated via eager links by _grafting_ an eagler link
+that were not propagated via eager links by _grafting_ an eager link
 on top of a lazy one.
 
 In steady state, the protocol optimizes the multicast tree in two
@@ -111,7 +111,7 @@ overlay, at least in bimodal distributions, while overlays without any
 random links may fail to connect at all.  Nonetheless, the random link
 parameter is directly related to the connectivity of the overlay. A
 higher `C_rand` ensures connectivity with high probability and fault
-tolerance.  The fault-tolerance and connectivity properpties
+tolerance.  The fault-tolerance and connectivity properties
 of HyParView stem from the random overlay structure, so in order to
 preserve them and still optimize for proximity, we need to set
 ```
