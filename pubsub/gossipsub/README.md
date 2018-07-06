@@ -146,7 +146,7 @@ In order to join, it picks `C_rand` nodes at random and sends
 The `JOIN` message propagates with a random walk until a node is willing
 to accept it or the TTL expires. Upon receiving a `JOIN` message, a node Q
 evaluates it with the following criteria:
-- Q tries to open a connection to P. If the connection cannot be opened (eg because of NAT),
+- Q tries to open a connection to P. If the connection cannot be opened (e.g. because of NAT),
   then it checks the TTL of the message.
   If it is 0, the request is dropped, otherwise Q decrements the TTL and forwards
   the message to a random node in its active list.
@@ -161,7 +161,7 @@ propagates with a random walk until its TTL is 0, while being added to
 the passive list of the receiving nodes.
 
 If P fails to join because of connectivity issues, it decrements the
-TTL and tries another starting node. This is repeated until a ttl of zero
+TTL and tries another starting node. This is repeated until a TTL of zero
 reuses the connection in the case of NATed hosts.
 
 Once the first links have been established, P then needs to increase
@@ -172,7 +172,7 @@ may be accepted by `NEIGHBOR` message and rejected by a `DISCONNECT`
 message.
 
 Upon receiving a `NEIGHBOR` request a node Q evaluates it with the
-followin criteria:
+following criteria:
 - If the size of Q's active list is less than A, it accepts the new
   node.
 - If P does not have enough active links (less than `C_rand`, as specified in the message),
@@ -203,7 +203,7 @@ network.  A node that wants to unsubscribe from the topic, emits a
 `LEAVE` to its active list neighbors in place of `DISCONNECT`.  Upon
 receiving a `LEAVE`, a node removes the node from its active list
 _and_ passive lists. If the node was removed from one of the lists or
-if the ttl is greater than zero, then the `LEAVE` is propagated
+if the TTL is greater than zero, then the `LEAVE` is propagated
 further across the active list links. This will ensure a random
 diffusion through the network that would clean most of the active
 lists eagerly, at the cost of some bandwidth.
@@ -262,13 +262,12 @@ then it propagates the request further. Otherwise, it selects nodes
 from its passive list at random, sends back a `SHUFFLEREPLY` and
 replaces them with the shuffle contents. The originating node
 receiving the `SHUFFLEREPLY` also replaces nodes in its passive list
-with the contents of the message. Care
-
-should be taken for issues with transitive connectivity due to NAT. If
+with the contents of the message. Care should be taken for issues 
+with transitive connectivity due to NAT. If
 a node cannot connect to the originating node for a `SHUFFLEREPLY`,
 then it should not perform the shuffle. Similarly, the originating
 node could time out waiting for a shuffle reply and try with again
-with a lower ttl, until a ttl of zero reuses the connection in the
+with a lower TTL, until a TTL of zero reuses the connection in the
 case of NATed hosts.
 
 In addition to shuffling, proximity awareness and leave cleanup
@@ -344,7 +343,7 @@ When a message is detected as missing, the node selects the first
 `IHAVE` announcement it has seen for the missing message and sends a
 `GRAFT` message to the peer, piggybacking other missing messages. The
 `GRAFT` message serves a dual purpose: it triggers the transmission of
-the missing messages and on the same time adds the link to the
+the missing messages and at the same time adds the link to the
 multicast tree, healing it.
 
 Upon receiving a `GRAFT` message, a node adds the peer to the eager
@@ -361,7 +360,7 @@ The multicast tree is constructed lazily, following the path of the
 first published message from some source. Therefore, the tree may not
 directly take advantage of new paths that may appear in the overlay as
 a result of new nodes/links. The overlay may also be suboptimal for
-all by the first source.
+all but the first source.
 
 To overcome these limitations and adapt the overlay to multiple
 sources, the authors in [1] propose an optimization: every time a
@@ -507,7 +506,7 @@ Membership Management protocol:
   ensure that the first few links are created even if they oversubscribe their fanout, but they
   don't go out of their way to create remaining links beyond the necessary `C_rand` links.
   Nodes later bring the active list to balance with a stabilization protocol.
-  Also noteworthy is that only C_rand `JOIN` message are propagated with a random walk, the
+  Also noteworthy is that only `C_rand` `JOIN` messages are propagated with a random walk; the
   remaining joins are considered near joins and handled with normal `NEIGHBOR` requests.
   In short, the Join protocol is reworked, with the influence of GoCast.
 - There is no active view stabilization/optimization protocol in HyParView. This is very
@@ -516,7 +515,7 @@ Membership Management protocol:
 - `NEIGHBOR` messages play a dual role in the proposed protocol implementation, as they can
   be used for establishing active links and retrieving membership lists.
 - There is no connectivity check in HyParView and retires with reduced TTLs, but this
-  is incredibly important in world  full of NAT.
+  is incredibly important in a world full of NAT.
 - There is no `LEAVE` provision in HyParView.
 
 Broadcast protocol:
