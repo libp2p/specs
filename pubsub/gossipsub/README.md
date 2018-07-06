@@ -141,7 +141,7 @@ regardless of age of Provider records. Once an up-to-date passive view of
 the overlay has been obtained, the node proceeds to join.
 
 In order to join, it picks `C_rand` nodes at random and sends
-`JOIN` messages to them with some initial TTL set as a design parameter.
+`JOIN` messages to them with some initial ttl set as a design parameter.
 
 The `JOIN` message propagates with a random walk until a node is willing
 to accept it or the TTL expires. Upon receiving a `JOIN` message, a node Q
@@ -423,7 +423,7 @@ GETNODES {}
 
 NODES {
  peers []peer.ID
- TTL int
+ ttl int
 }
 
 ;; Topic querying (membership check for passive view management)
@@ -436,12 +436,12 @@ TOPICS {
 ;; Membership Management protocol
 JOIN {
  peer peer.ID
- TTL int
+ ttl int
 }
 
 FORWARDJOIN {
  peer peer.ID
- TTL int
+ ttl int
 }
 
 NEIGHBOR {
@@ -452,13 +452,13 @@ DISCONNECT {}
 
 LEAVE {
  source peer.ID
- TTL int
+ ttl int
 }
 
 SHUFFLE {
  peer peer.ID
  peers []peer.ID
- TTL int
+ ttl int
 }
 
 SHUFFLEREPLY {
