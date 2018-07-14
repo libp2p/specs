@@ -122,4 +122,8 @@ See [`pubsub/`](pubsub/) and [`pubsub/gossipsub/`](pubsub/gossipsub/).
 
 ## 4.6 Naming
 
-#### 4.5.2 IPNS
+#### 4.6.1 IPRS
+
+[IPRS spec](/IPRS.md)
+
+#### 4.6.2 IPNS
