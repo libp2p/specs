@@ -392,9 +392,9 @@ Management protocol communicates these changes to the broadcast loop via
 `NeighborUp` and `NeighborDown` notifications.
 
 When a new node is added to the active list, the broadcast loop receives
-a `NeighborUp` notifications, it simply adds the node to the eager peer
+a `NeighborUp` notifications; it simply adds the node to the eager peer
 list. On the other hand, when a node is removed with a `NeighborDown`
-notificaiton, the loop has to consider if the node was an eager or lazy
+notification, the loop has to consider if the node was an eager or lazy
 peer. If the node was a lazy peer, it doesn't need to do anything as the
 departure does not affect the multicast tree. If the node was an eager peer
 however, the loss of that edge may result in a disconnected tree.
