@@ -35,14 +35,14 @@ Note that a peer must respond to it's own query.  Thus allows other peers to pas
 On receipt of a `find all peers` query, a peer sends a DNS response message (QR = 1) that contains
 the **answer**
 
-    <serice-name> PTR <peer-id>.<service-name>
+    <service-name> PTR <peer-id>.<service-name>
     
 The **additional records** of the response contain the peer's discovery details
 
-    <peer-id>.<serice-name> SRV ... <port> <host-name>
-    <peer-id>.<serice-name> TXT ...
-    <host-name>             A <ipv4 address>
-    <host-name>             AAAA <ipv6 address>
+    <peer-id>.<service-name> SRV ... <port> <host-name>
+    <peer-id>.<service-name> TXT ...
+    <host-name>              A <ipv4 address>
+    <host-name>              AAAA <ipv6 address>
    
 
 Multiple A and AAAA records are expected. The `TXT` is not needed for IPFS peer discovery, but is required by DNS-SD.
@@ -78,8 +78,8 @@ A peer responds with the answer
 Many existing tools ignore the Additional Records and always send individual queries for the 
 peer's discovery details. To accomodate this, a peer should respond to the following queries:
 
-- `<peer-id>.<serice-name> SRV`
-- `<peer-id>.<serice-name> TXT`
+- `<peer-id>.<service-name> SRV`
+- `<peer-id>.<service-name> TXT`
 - `<host-name> A`
 - `<host-name> AAAA`
 
