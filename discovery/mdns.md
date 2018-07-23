@@ -14,12 +14,12 @@ As responses come in, the peer adds the other peers information into is local da
 
 `service-name` is the DNS-SD service name for all IPFS peers. It is defined as `_ipfs._udp.local`.
 
-`host-name` is the name of the peer.  It derived from the peer's ID and `ipfs.local`, for example 
+`host-name` is the name of the peer.  It is derived from the peer's ID and `ipfs.local`, for example 
 `Qmid.ipfs.local`.
 
 `peer-id` is the ID of the peer.  It normally is the base-58 enconding of the hash of the peer's public key.
 
-`port` is the port that the peer listens on. Normally 4001.
+`port` is a port that the peer listens on. Normally 4001.
 
 ## Peer Discovery
 
@@ -37,7 +37,7 @@ the **answer**
 
     <serice-name> PTR <peer-id>.<service-name>
     
-The **additional records** of the response contains the peer's discovery details
+The **additional records** of the response contain the peer's discovery details
 
     <peer-id>.<serice-name> SRV ... <port> <host-name>
     <peer-id>.<serice-name> TXT ...
@@ -50,7 +50,7 @@ Multiple A and AAAA records are expected. The `TXT` is not needed for IPFS peer 
 #### Multiported Peers
 
 If a peer is listening on multiple ports, it must respond with multiple `SRV` records for each 
-port is listening on. If the ports do not listen on the same IP addresses, then each 'SRV' record 
+port it is listening on. If the ports do not listen on the same IP addresses, then each 'SRV' record 
 must have a different `host-name`.
 
 #### Multiaddress 
