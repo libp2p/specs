@@ -55,9 +55,17 @@ must have a different `host-name`.
 
 #### Multiaddress 
 
-**TODO** from DNS records
+For this spec, a multiaddress has the form `/<ip>/<addr>/tcp/<port>/ipfs/<peer-id>`. A multiaddress is
+generated from the various Additional Records. 
 
-**TODO** to DNS records
+`peer-id` is the first label of the SRV name
+
+`port` is the the SRV port
+
+`ip` is "ip4" for an A record or "ip6" for an AAAA record.
+
+`addr` is the ip4/ip6 address from the A/AAAA record.
+
 
 ## DNS Service Discovery
 
