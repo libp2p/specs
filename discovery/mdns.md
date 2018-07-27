@@ -80,6 +80,12 @@ peer's discovery details. To accomodate this, a peer should respond to the follo
 - `<host-name> A`
 - `<host-name> AAAA`
 
+## Issues
+
+- like urls, dns names are case insensitive.  A `peer-id` is base58btc encoded and is case sensitive.
+- MDNS requires link local addresses.  Loopback and "nat busting" addresses should not sent and must
+ be ignored on receipt?
+ 
 ## References
 
 - [RFC 1035 - Domain Names (DNS)](https://tools.ietf.org/html/rfc1035)
