@@ -39,38 +39,16 @@ the **answer**
     
 The **additional records** of the response contain the peer's discovery details
 
-    <peer-id>.<service-name> SRV ... <port> <host-name>
-    <peer-id>.<service-name> TXT ...
-    <host-name>              A <ipv4 address>
-    <host-name>              AAAA <ipv6 address>
-   
-
-Multiple A and AAAA records are expected. The `TXT` is not needed for IPFS peer discovery, but is required by DNS-SD.
-
-#### Multiported Peers
-
-If a peer is listening on multiple ports, it must respond with multiple `SRV` records for each 
-port it is listening on. If the ports do not listen on the same IP addresses, then each 'SRV' record 
-must have a different `host-name`.
-
-#### Multiaddress 
-
-For this spec, a multiaddress has the form `/<ip>/<addr>/tcp/<port>/ipfs/<peer-id>`. A multiaddress is
-generated from the various Additional Records. 
-
-`peer-id` is the first label of the SRV name
-
-`port` is the the SRV port
-
-`ip` is "ip4" for an A record or "ip6" for an AAAA record.
-
-`addr` is the ip4/ip6 address from the A/AAAA record.
-
+    <peer-id>.<service-name> TXT "dnsaddr=..."
+    
+The TXT record contains the multiaddresses that the peer is listening on.  Each multiaddress 
+is a TXT attribute with the form `dnsaddr=/ip4/.../tcp/.../p2p/QmId`.  Multiple `dnsaddr` attributes 
+are expected.
 
 ## DNS Service Discovery
 
-DNS-SD support is not needed for IPFS peers to discover each other.  However, it is 
-extremely usefull for network admistrators to discover what is running on the 
+DNS-SD support is not needed for peers to discover each other.  However, it is 
+extremely usefull for network administrators to discover what is running on the 
 network.
 
 ### Meta Query
@@ -81,6 +59,17 @@ A peer responds with the answer
 
     _services._dns-sd._udp.local PTR <service-name>
     
+### Find All Response
+
+On receipt of a `find all peers` query, the following **additional records** should be included
+
+    <peer-id>.<service-name> SRV ... <port> <host-name>
+    <host-name>              A <ipv4 address>
+    <host-name>              AAAA <ipv6 address>
+   
+If a peer is listening on multiple ports, it should respond with multiple `SRV` records for each 
+port it is listening on. 
+
 ### Gotchas
 
 Many existing tools ignore the Additional Records and always send individual queries for the 
@@ -96,6 +85,7 @@ peer's discovery details. To accomodate this, a peer should respond to the follo
 - [RFC 1035 - Domain Names (DNS)](https://tools.ietf.org/html/rfc1035)
 - [RFC 6762 - Multicast DNS](https://tools.ietf.org/html/rfc6762)
 - [RFC 6763 - DNS-Based Service Discovery](https://tools.ietf.org/html/rfc6763)
+- [Multiaddr](https://github.com/multiformats/multiaddr)
 
 ## Worked Example
 
