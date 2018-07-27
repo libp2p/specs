@@ -12,10 +12,10 @@ As responses come in, the peer adds the other peers information into is local da
 
 ## Definitions
 
-`service-name` is the DNS-SD service name for all IPFS peers. It is defined as `_ipfs._udp.local`.
+`service-name` is the DNS-SD service name for all peers. It is defined as `_p2p._udp.local`.
 
-`host-name` is the name of the peer.  It is derived from the peer's ID and `ipfs.local`, for example 
-`Qmid.ipfs.local`.
+`host-name` is the name of the peer.  It is derived from the peer's ID and `p2p.local`, for example 
+`Qmid.p2p.local`.
 
 `peer-id` is the ID of the peer.  It normally is the base-58 enconding of the hash of the peer's public key.
 
@@ -25,7 +25,7 @@ As responses come in, the peer adds the other peers information into is local da
 
 ### Request
 
-To find all peers, a DNS message is sent with the question `_ipfs._udp.local PTR`. 
+To find all peers, a DNS message is sent with the question `_p2p._udp.local PTR`. 
 Peers will then start responding with their details.  
 
 Note that a peer must respond to it's own query.  Thus allows other peers to passively discover it.
