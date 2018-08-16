@@ -24,8 +24,8 @@ You can find information about the PubSub research and notes in the following re
 Implementations:
 - FloodSub, simple flooding pubsub (2017)
   - [libp2p/go-floodsub](https://github.com/libp2p/go-floodsub/pull/67), [libp2p/js-libp2p-floodsub](http://github.com/libp2p/js-libp2p-floodsub), [libp2p/rust-libp2p/floodsub](https://github.com/libp2p/rust-libp2p/tree/master/floodsub)
-- GossipSub, proximity-aware epidemic pubsub (2018)
-  - [`./gossipsub`](./gossipsub)
+- GossipSub, extensible baseline pubsub (2018)
+  - [gossipsub](./gossipsub)
 
 
 ## The RPC
