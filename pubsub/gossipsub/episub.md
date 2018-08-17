@@ -2,8 +2,8 @@
 
 Revision: draft 1, 2018-06-28
 
-Authors:
-- vyzo (vyzo@hackzen.org)
+Author: vyzo
+Editor: jamesray1
 
 Author's note:
 - This is based on an earlier research draft about an epidemic broadcast protocol
