@@ -40,7 +40,7 @@ of proximity awareness from GoCast with Plumtree was suggested by
 the original authors of Plumtree in [1].
 
 The protocol has two distinct components: the membership management
-protocol (subscribe) and the brodcast protocol (publish).
+protocol (subscribe) and the broadcast protocol (publish).
 
 The membership management protocol (Peer Sampling Service in [1])
 maintains two lists of peers that are subscribed to the topic.  The
