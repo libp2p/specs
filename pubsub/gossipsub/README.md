@@ -128,8 +128,12 @@ in the mesh of peer A.
 
 The overlay is initially constructed in a random fashion. Whenever a
 peer joins a topic, then it selects `D` peers (in the topic) at random
-and adds them to the mesh.  The mesh is maintained with the following
-periodic stabilization algorithm:
+and adds them to the mesh, notifying them with a control message. When
+it leaves the topic, it notifies its peers and forgets the mesh for
+the topic.
+
+The mesh is maintained with the following periodic stabilization
+algorithm:
 
 ```
 at each peer:
@@ -137,19 +141,19 @@ at each peer:
     if |peers| < D_low:
        select D - |peers| non-mesh peers at random and add them to the mesh
     if |peers| > D_high:
-       select |peers| - D mesh peers at random and drop them from the mesh
+       select |peers| - D mesh peers at random and remove them from the mesh
     sleep t
 ```
-The parameters of the algorithm are `D` which is the target degree, and
-two relaxed degree parameters `D_low` and `D_high` which represent
+The parameters of the algorithm are `D` which is the target degree,
+and two relaxed degree parameters `D_low` and `D_high` which represent
 admissible mesh degree bounds.
 
 In order to maintain consistency in the network, peers exchange
 control messages notifying their immediate peers in the mesh of state
 changes. These are `GRAFT` and `PRUNE` messages that indicate the
 addition or removal of a peer to the overlay mesh. The router reacts
-to these messages by adding and removing peers from the mesh
-respectively.
+to these messages by adding and removing peers from the local view of
+the mesh respectively.
 
 
 ## The gossipsub protocol
