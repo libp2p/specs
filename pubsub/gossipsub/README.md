@@ -20,8 +20,8 @@ profiles.
   * [Flood routing](#flood-routing)
   * [Retrospective](#retrospective)
 - [Controlling the flood](#controlling-the-flood)
-  * [A random mesh algorithm](#a-random-mesh-algorithm)
-  * [Gossip propagation](#gossip-propagation)
+  * [randomsub: A random message router](#randomsub-a-random-message-router)
+  * [meshsub: A randomized overlay mesh router](#meshsub-a-randomized-overlay-mesh-router)
 - [The gossipsub protocol](#the-gossipsub-protocol)
 - [Protobuf](#protobuf)
 
@@ -37,7 +37,7 @@ profiles.
 
 ## In the beginning was floodsub
 
-The initial pubsub experiment in libp2p was floodsub.
+The initial pubsub experiment in libp2p was `floodsub`.
 It implements pubsub in the most basic manner, with two defining aspects:
 - ambient peer discovery.
 - most basic routing; flooding.
@@ -97,9 +97,59 @@ connected overlays at large.
 
 ## Controlling the flood
 
-### A random mesh algorithm
+In order to scale pubsub without excessive bandwidth waste or peer
+overload, we need a router that bounds the degree of each peer and
+globally controls the amplification factor.
 
-### Gossip propagation
+### randomsub: A random message router
+
+Let's first consider the simplest bounded floodsub variant, which we
+call `randomsub`. In this construction, the router is still stateless
+apart from a list of known peers in the topic. But instead of
+forwarding messages to all peers, it forwards to a random subset up to
+`D` peers, where `D` is the desired degree of the network.
+
+The problem with this construction is that the message propagation
+patterns are non-deterministic. This results to extreme message route
+instability which is an undesirable property for many applications.
+
+### meshsub: A randomized overlay mesh router
+
+Nonetheless, the idea of limiting the flow of messages to a random
+subset of peers is solid. But instead of randomly selecting peers on a
+per message basis, we can form an overlay mesh where each peer
+forwards to a subset of its peers on a stable basis. We construct a
+router in this fashion, dubbed `meshsub`.
+
+Each peer maintains its own view of the mesh for each topic, which is
+a list of bidirectional links to other peers.  That is, in steady
+state, whenever a peer A is in the mesh of peer B, then peer B is also
+in the mesh of peer A.
+
+The overlay is initially constructed in a random fashion. Whenever a
+peer joins a topic, then it selects `D` peers (in the topic) at random
+and adds them to the mesh.  The mesh is maintained with the following
+periodic stabilization algorithm:
+
+```
+at each peer:
+  loop:
+    if |peers| < D_low:
+       select D - |peers| non-mesh peers at random and add them to the mesh
+    if |peers| > D_high:
+       select |peers| - D mesh peers at random and drop them from the mesh
+    sleep t
+```
+The parameters of the algorithm are `D` which is the target degree, and
+two relaxed degree parameters `D_low` and `D_high` which represent
+admissible mesh degree bounds.
+
+In order to maintain consistency in the network, peers exchange
+control messages notifying their immediate peers in the mesh of state
+changes. These are `GRAFT` and `PRUNE` messages that indicate the
+addition or removal of a peer to the overlay mesh. The router reacts
+to these messages by adding and removing peers from the mesh
+respectively.
 
 
 ## The gossipsub protocol
