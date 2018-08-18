@@ -15,7 +15,6 @@ profiles.
 <!-- toc -->
 
 - [Implementation status](#implementation-status)
-- [General purpose pubsub for libp2p](#general-purpose-pubsub-for-libp2p)
 - [In the beginning was floodsub](#in-the-beginning-was-floodsub)
   * [Ambient Peer Discovery](#ambient-peer-discovery)
   * [Flood routing](#flood-routing)
@@ -34,8 +33,6 @@ profiles.
 - JS: not yet started
 - Rust: not yet started
 - Gerbil: [vyzo/gerbil-simsub](https://github.com/vyzo/gerbil-simsub) (simulator)
-
-## General purpose pubsub for libp2p
 
 
 ## In the beginning was floodsub
