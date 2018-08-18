@@ -21,7 +21,7 @@ profiles.
   * [Retrospective](#retrospective)
 - [Controlling the flood](#controlling-the-flood)
   * [randomsub: A random message router](#randomsub-a-random-message-router)
-  * [meshsub: A randomized overlay mesh router](#meshsub-a-randomized-overlay-mesh-router)
+  * [meshsub: An overlay mesh router](#meshsub-an-overlay-mesh-router)
 - [The gossipsub protocol](#the-gossipsub-protocol)
 - [Protobuf](#protobuf)
 
@@ -113,7 +113,7 @@ The problem with this construction is that the message propagation
 patterns are non-deterministic. This results to extreme message route
 instability which is an undesirable property for many applications.
 
-### meshsub: A randomized overlay mesh router
+### meshsub: An overlay mesh router
 
 Nonetheless, the idea of limiting the flow of messages to a random
 subset of peers is solid. But instead of randomly selecting peers on a
