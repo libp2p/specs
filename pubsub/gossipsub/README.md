@@ -24,7 +24,13 @@ profiles.
   * [meshsub: An overlay mesh router](#meshsub-an-overlay-mesh-router)
   * [gossipsub: The gossiping mesh router](#gossipsub-the-gossiping-mesh-router)
 - [The gossipsub protocol](#the-gossipsub-protocol)
-- [Protobuf](#protobuf)
+  * [Control messages](#control-messages)
+  * [Router state](#router-state)
+  * [Topic membership](#topic-membership)
+  * [Message routing](#message-routing)
+  * [State maintenance](#state-maintenance)
+  * [Gossip piggybacking](#gossip-piggybacking)
+  * [Protobuf](#protobuf)
 
 <!-- tocstop -->
 
@@ -173,7 +179,77 @@ for mesh metadata. It provides bounded degree and amplification factor
 with the meshsub construction and augments it using gossip propagation
 of metadata with the randomsub technique.
 
+
 ## The gossipsub protocol
 
+We can now provide a specification of the pubsub protocol by sketching
+out the router implementation.  The router is backwards compatible
+with floodsub, as it accepts floodsub peers and behaves like floodsub
+towards them.
 
-## Protobuf
+### Control messages
+
+The protocol defines four control messages:
+- `GRAFT`: graft a mesh link; notifies the peer that it has been added to the local mesh view.
+- `PRUNE`: prune a mesh link; notifies the peer that it has been removed from the local mesh view.
+- `IHAVE`: gossip; notifies the peer that the following messages were recently seen and are available on request.
+- `IWANT`: requests the out of band transmission of messages announced in an `IHAVE` message.
+
+### Router state
+
+### Topic membership
+
+### Message routing
+
+### State maintenance
+
+### Gossip piggybacking
+
+Gossip and other control messages do not have to be transmitted on
+their own message.  Instead, they can be piggybacked on any other
+message in the regular flow, for any topic. This can lead to message
+rate reduction whenever there is some correlated flow between topics,
+and can be significant for densely connected peers.
+
+For piggyback implementation details, consult the go implementation.
+
+### Protobuf
+
+The protocol extends the existing `RPC` message structure with a new field,
+`control`. This is an instance of `ControlMessage` which may contain one or more
+control messages. The four control messages are `ControlIHave` for `IHAVE` messages,
+`ControlIWant` for `IWANT` messages, `ControlGraft` for `GRAFT` messages and
+`ControlPrune` for `PRUNE` messages.
+
+The protobuf is as follows:
+
+```protobuf
+message RPC {
+    // ...
+	optional ControlMessage control = 3;
+}
+
+message ControlMessage {
+	repeated ControlIHave ihave = 1;
+	repeated ControlIWant iwant = 2;
+	repeated ControlGraft graft = 3;
+	repeated ControlPrune prune = 4;
+}
+
+message ControlIHave {
+	optional string topicID = 1;
+	repeated string messageIDs = 2;
+}
+
+message ControlIWant {
+	repeated string messageIDs = 1;
+}
+
+message ControlGraft {
+	optional string topicID = 1;
+}
+
+message ControlPrune {
+	optional string topicID = 1;
+}
+```
