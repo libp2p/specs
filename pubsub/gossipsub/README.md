@@ -22,6 +22,7 @@ profiles.
 - [Controlling the flood](#controlling-the-flood)
   * [randomsub: A random message router](#randomsub-a-random-message-router)
   * [meshsub: An overlay mesh router](#meshsub-an-overlay-mesh-router)
+  * [gossipsub: The gossiping mesh router](#gossipsub-the-gossiping-mesh-router)
 - [The gossipsub protocol](#the-gossipsub-protocol)
 - [Protobuf](#protobuf)
 
@@ -148,6 +149,29 @@ The parameters of the algorithm are `D` which is the target degree,
 and two relaxed degree parameters `D_low` and `D_high` which represent
 admissible mesh degree bounds.
 
+### gossipsub: The gossiping mesh router
+
+The meshsub router offsers a baseline construction with good amplification
+control properties, which we augment with _gossip_ about message flow.
+The gossip is emited to random subsets of peers not in the mesh, similar
+to randomsub, and it allows us to propagate _metadata_ about message flow
+throughout the network. The metadata can be arbitrary, but as a baseline
+we include the message ids of seen messages in the last few seconds.
+The messages are cached, so that peers receiving the gossip can request
+them out of band.
+
+The router can use this metadata to improve the mesh, for instance an
+[episub](episub.md) router built on top of gossipsub can create
+epidemic broadcast trees.  Beyond that, the metadata can restart
+message transmission at different points in the overlay to rectify
+downstream message loss. Or it can simply jump hops oppurtunistically
+and accelerate message transmission for peers who are at some distance
+in the mesh.
+
+Essentially, gossipsub is a blend of meshsub for data and randomsub
+for mesh metadata. It provides bounded degree and amplification factor
+with the meshsub construction and augments it using gossip propagation
+of metadata with the randomsub technique.
 
 ## The gossipsub protocol
 
