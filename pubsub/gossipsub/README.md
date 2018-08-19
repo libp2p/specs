@@ -29,7 +29,7 @@ profiles.
   * [Topic membership](#topic-membership)
   * [Message processing](#message-processing)
   * [Heartbeat](#heartbeat)
-  * [Gossip piggybacking](#gossip-piggybacking)
+  * [Control message piggybacking](#control-message-piggybacking)
   * [Protobuf](#protobuf)
 
 <!-- tocstop -->
@@ -277,9 +277,51 @@ applicaiton layer), then it proceeds similar to the payload reaction:
 
 ### Heartbeat
 
+The router periodically runs a hearbeat procedure, which is
+responsible for maintaining the mesh, emitting gossip, and shifting
+the message cache.
 
+The `mesh` is maintained exactly as prescribed by `meshsub`:
+```
+for each topic in mesh:
+ if |mesh[topic]| < D_low:
+   select D - |mesh[topic]| peers from peers.gossipsub[topic] - mesh[topic]
+   for each new peer:
+     add peer to mesh[topic]
+     emit GRAFT(topic) control message to peer
 
-### Gossip piggybacking
+ if |mesh[topic]| > D_high:
+   select |mesh[topic]| - D peers from mesh[topic]
+   for each new peer:
+     remove peer from mesh[topic]
+     emit PRUNE(topic) control message to peer
+```
+
+The `fanout` map is maintained by keeping track of last published time
+for each topic:
+```
+for each topic in fanout:
+ if last published time > TTL
+   remove topic from fanout
+ else if |fanout[topic]| < D
+   select D - |fanout[topic]| peers from peers.gossipsub[topic] - fanout[topic]
+   add the peers to fanout[topic]
+```
+
+Gossip is emitted by selecting peers for each topic that are not already part
+of the mesh:
+```
+for each topic in mesh+fanout:
+  let mids be mcache.window[topic]
+  if mids is not empty:
+    select D peers from peers.gossipsub[topic]
+    for each peer not in mesh[topic]
+      emit IHAVE(mids)
+
+shift the mcache
+```
+
+### Control message piggybacking
 
 Gossip and other control messages do not have to be transmitted on
 their own message.  Instead, they can be coalesced and piggybacked on
