@@ -148,13 +148,6 @@ The parameters of the algorithm are `D` which is the target degree,
 and two relaxed degree parameters `D_low` and `D_high` which represent
 admissible mesh degree bounds.
 
-In order to maintain consistency in the network, peers exchange
-control messages notifying their immediate peers in the mesh of state
-changes. These are `GRAFT` and `PRUNE` messages that indicate the
-addition or removal of a peer to the overlay mesh. The router reacts
-to these messages by adding and removing peers from the local view of
-the mesh respectively.
-
 
 ## The gossipsub protocol
 
