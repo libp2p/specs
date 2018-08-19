@@ -71,7 +71,7 @@ for the discovery driver:
 
 With flooding, routing is almost trivial: for each incoming message,
 forward to all known peers in the topic. There is a bit of logic, as
-the router maintains a timed cache of known messages, so that seen
+the router maintains a timed cache of previous messages, so that seen
 messages are not further forwarded. It also never forwards a message
 back to the source or the peer that forwarded the message.
 
