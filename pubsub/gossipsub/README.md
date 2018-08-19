@@ -27,8 +27,8 @@ profiles.
   * [Control messages](#control-messages)
   * [Router state](#router-state)
   * [Topic membership](#topic-membership)
-  * [Message routing](#message-routing)
-  * [State maintenance](#state-maintenance)
+  * [Message processing](#message-processing)
+  * [Heartbeat](#heartbeat)
   * [Gossip piggybacking](#gossip-piggybacking)
   * [Protobuf](#protobuf)
 
@@ -197,19 +197,95 @@ The protocol defines four control messages:
 
 ### Router state
 
+The router maintains the following state:
+- `peers`: a set of all known peers; `peers.gossipsub` denotes the gossipsub peers
+   while `peers.floodsub` denotes the floodsub peers.
+- `mesh`: the overlay meshes as a map of topic to lists of peers.
+- `fanout`: the mesh peers to which we are publishing to without topic membership,
+   as a map of topic to list of peers.
+- `seen`: this is the timed message id cache, which tracks seen messages.
+- `mcache`: a message cache that contains the messages for the last few
+   heartbeat ticks.
+
+The message cache is a data structure that stores windows of message ids
+and the corresponding messages. It supports the following operations:
+- `mcache.put(m)`: adds a message to the current window and the cache.
+- `mcache.get(id)`: retrieves a message from the cache by its id, if it is still present.
+- `mcache.window()`: retrieves the message id for messages in the current histor window.
+- `mcache.shift()`: shifts the current window, discarding messages older than the
+   history length of the cache.
+
+The timed message id cache is the flow control mechanism. It tracks
+the message ids of seen message for the last couple of minutes. It is
+separate from `mcache` for implementation reasons in Go (the `seen`
+cache is inherited from the pubsub framework), but they could be the
+same data structure.
+
 ### Topic membership
 
-### Message routing
+Topic membership is controlled by two operations supported by the
+router, as part of the pubsub api:
+- On `JOIN(topic)` the router joins the topic. In order to do so, it
+  selects `D` peers from `peers.gossipsub[topic]`, adds them to `mesh[topic]`
+  and notifies them with a `GRAFT(topic)` control message. If it already has
+  `fanout` peers in the topic, then it selects those peers as the
+  initial mesh peers.
+- On `LEAVE(topic)` the router leaves the topic. It notifies the peers in
+  `mesh[topic]` with a `PRUNE(topic)` message and forgets `mesh[topic]`.
 
-### State maintenance
+Note that the router can publish messages without topic membership. In order
+to maintain stable routes in that case, it maintains a list of peers for each
+topic it has published in the `fanout` map. If the router does not publish any
+messages for some time, then the `fanout` peers for the topic are forgotten, so
+this is soft state.
+
+Also note that as part of the pubsub api, the peer emits `SUBSCRIBE`
+and `UNSUBSCRIBE` control messages to all its peers whenever it joins
+or leaves a topic. This is provided by the the ambient peer discovery
+mechanism and nominally not part of the router. A standalone
+implementation would have to implement those control messages.
+
+### Message processing
+
+Upon receiving a message, the router first processes the payload of the message.
+If it contains a valid message that has not been previously seen, then
+it publishes the message:
+- it forwards the message to every peer in `peers.floodsub[topic]`, provided it's not
+  the source of the message
+- It forwards the message to every peer in `mesh[topic]`, provided it's not the
+  source of the message.
+
+After processing the payload, it then processes the control messages in the envelope:
+- On `GRAFT(topic)` it adds the peer to `mesh[topic]` if it is
+  subscribed to the topic. If it is not subscribed, it responds with a `PRUNE(topic)`
+  control message.
+- On `PRUNE(topic)` it removes the peer from `mesh[topic]`.
+- On `IHAVE(ids)` it checks the `seen` set and requests uknown messages with an `IWANT`
+   message.
+- On `IWANT(ids)` it forwards all request messages that are present in `mcache` to the
+   requesting peer.
+
+When the router publishes a message that originates from the router itself (at the
+applicaiton layer), then it proceeds similar to the payload reaction:
+- it forwards the message to every peer in `peers.floodsub[topic]`.
+- if it is subscribed to the topic, then it must have a set of peers in `mesh[topic]`,
+  to which the message is forwarded.
+- if it is not subscribed to the topic, it then forwards the message to
+  the peers in `fanout[topic]`. If this set is empty, it chooses `D` peers from
+  `peers.gossipsub[topic]` to become the new `fanout[topic]` peers and forwards
+  to them.
+
+### Heartbeat
+
+
 
 ### Gossip piggybacking
 
 Gossip and other control messages do not have to be transmitted on
-their own message.  Instead, they can be piggybacked on any other
-message in the regular flow, for any topic. This can lead to message
-rate reduction whenever there is some correlated flow between topics,
-and can be significant for densely connected peers.
+their own message.  Instead, they can be coalesced and piggybacked on
+any other message in the regular flow, for any topic. This can lead to
+message rate reduction whenever there is some correlated flow between
+topics, and can be significant for densely connected peers.
 
 For piggyback implementation details, consult the go implementation.
 
