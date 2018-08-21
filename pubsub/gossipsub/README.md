@@ -211,7 +211,7 @@ The message cache is a data structure that stores windows of message ids
 and the corresponding messages. It supports the following operations:
 - `mcache.put(m)`: adds a message to the current window and the cache.
 - `mcache.get(id)`: retrieves a message from the cache by its id, if it is still present.
-- `mcache.window()`: retrieves the message id for messages in the current histor window.
+- `mcache.window()`: retrieves the message id for messages in the current history window.
 - `mcache.shift()`: shifts the current window, discarding messages older than the
    history length of the cache.
 
