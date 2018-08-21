@@ -119,7 +119,8 @@ forwarding messages to all peers, it forwards to a random subset up to
 
 The problem with this construction is that the message propagation
 patterns are non-deterministic. This results to extreme message route
-instability which is an undesirable property for many applications.
+instability, manifesting as message reordering and varying timing patterns,
+which is an undesirable property for many applications.
 
 ### meshsub: An overlay mesh router
 
