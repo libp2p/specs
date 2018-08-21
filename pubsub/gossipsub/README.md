@@ -160,7 +160,7 @@ admissible mesh degree bounds.
 
 The meshsub router offsers a baseline construction with good amplification
 control properties, which we augment with _gossip_ about message flow.
-The gossip is emited to random subsets of peers not in the mesh, similar
+The gossip is emitted to random subsets of peers not in the mesh, similar
 to randomsub, and it allows us to propagate _metadata_ about message flow
 throughout the network. The metadata can be arbitrary, but as a baseline
 we include the message ids of seen messages in the last few seconds.
@@ -267,7 +267,7 @@ After processing the payload, it then processes the control messages in the enve
    requesting peer.
 
 When the router publishes a message that originates from the router itself (at the
-applicaiton layer), then it proceeds similar to the payload reaction:
+application layer), then it proceeds similar to the payload reaction:
 - it forwards the message to every peer in `peers.floodsub[topic]`.
 - if it is subscribed to the topic, then it must have a set of peers in `mesh[topic]`,
   to which the message is forwarded.
