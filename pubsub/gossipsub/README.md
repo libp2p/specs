@@ -71,7 +71,8 @@ implementation.
 
 These are a couple of options we are exploring as canonical approaches
 for the discovery driver:
-- DHT lookups using provider records.
+- DHT rendezvous using provider records; peers in the topic announce
+  a provider record named after the topic.
 - Rendezvous through known or dynamically discovered rendezvous points.
 
 ### Flood routing
