@@ -94,13 +94,12 @@ highly desirable properties:
 
 The problem however is that messages don't just follow the minimum
 latency paths; they follow all edges, thus creating a flood. The
-outbound degree of the network is unbounded, restricted solely from
-connectivity. This creates a problem for individual densely connected
-nodes, as they may have a large number of connected peers and cannot
-afford the bandwidth to forward all these pubsub messages.  Similary,
-the amplification factor is only bounded by the sum of degrees of all
-nodes in the overlay, which creates a scaling problem for densely
-connected overlays at large.
+outbound degree of the network is unbounded. This creates a problem
+for individual densely connected nodes, as they may have a large
+number of connected peers and cannot afford the bandwidth to forward
+all these pubsub messages.  Similary, the amplification factor is only
+bounded by the sum of degrees of all nodes in the overlay, which
+creates a scaling problem for densely connected overlays at large.
 
 
 ## Controlling the flood
