@@ -322,6 +322,12 @@ for each topic in mesh+fanout:
 
 shift the mcache
 ```
+Note that we used the same parameter `D` as the target degree for
+gossip for simplicity, but this is not normative. A separate parameter
+`D_lazy` can be used to explicitly control the gossip propagation
+factor, which allows for tuning the tradeoff between eager and lazy
+transmission of messages.
+
 
 ### Control message piggybacking
 
