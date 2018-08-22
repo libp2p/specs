@@ -1,6 +1,27 @@
 7 Properties
 ============
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Contents**
+
+- [7 Properties](#7-properties)
+  - [7.1 Communication Model - Streams](#71-communication-model---streams)
+  - [7.2 Ports - Constrained Entrypoints](#72-ports---constrained-entrypoints)
+  - [7.3 Transport Protocols](#73-transport-protocols)
+  - [7.4 Non-IP Networks](#74-non-ip-networks)
+  - [7.5 On the wire](#75-on-the-wire)
+    - [7.5.1 Protocol-Multiplexing](#751-protocol-multiplexing)
+    - [7.5.2 multistream - self-describing protocol stream](#752-multistream---self-describing-protocol-stream)
+    - [7.5.3 multistream-selector - self-describing protocol stream selector](#753-multistream-selector---self-describing-protocol-stream-selector)
+    - [7.5.4 Stream Multiplexing](#754-stream-multiplexing)
+    - [7.5.5 Portable Encodings](#755-portable-encodings)
+    - [7.5.6 Secure Communications](#756-secure-communications)
+    - [7.5.7 Protocol Multicodecs](#757-protocol-multicodecs)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+
 ## 7.1 Communication Model - Streams
 
 The Network layer handles all the problems of connecting to a peer, and exposes

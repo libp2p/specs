@@ -13,25 +13,28 @@ Author's note:
   optimized for single source multicast and scenarios with a few fixed sources
   broadcasting to a large number of clients in a topic.
 
-<!-- toc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Contents**
 
-- [Introduction](#introduction)
-- [Membership Management Protocol](#membership-management-protocol)
-  * [Design Parameters for View Sizes](#design-parameters-for-view-sizes)
-  * [Joining the Overlay](#joining-the-overlay)
-  * [Leaving the Overlay](#leaving-the-overlay)
-  * [Active View Management](#active-view-management)
-  * [Passive View Management](#passive-view-management)
-- [Broadcast Protocol](#broadcast-protocol)
-  * [Broadcast State](#broadcast-state)
-  * [Message Propagation and Multicast Tree Construction](#message-propagation-and-multicast-tree-construction)
-  * [Multicast Tree Repair](#multicast-tree-repair)
-  * [Multicast Tree Optimization](#multicast-tree-optimization)
-  * [Active View Changes](#active-view-changes)
-- [Protocol Messages](#protocol-messages)
-- [Differences from Plumtree/HyParView](#differences-from-plumtreehyparview)
+- [Episub: Proximity Aware Epidemic PubSub for libp2p](#episub-proximity-aware-epidemic-pubsub-for-libp2p)
+  - [Introduction](#introduction)
+  - [Membership Management Protocol](#membership-management-protocol)
+    - [Design Parameters for View Sizes](#design-parameters-for-view-sizes)
+    - [Joining the Overlay](#joining-the-overlay)
+    - [Leaving the Overlay](#leaving-the-overlay)
+    - [Active View Management](#active-view-management)
+    - [Passive View Management](#passive-view-management)
+  - [Broadcast Protocol](#broadcast-protocol)
+    - [Broadcast State](#broadcast-state)
+    - [Message Propagation and Multicast Tree Construction](#message-propagation-and-multicast-tree-construction)
+    - [Multicast Tree Repair](#multicast-tree-repair)
+    - [Multicast Tree Optimization](#multicast-tree-optimization)
+    - [Active View Changes](#active-view-changes)
+  - [Protocol Messages](#protocol-messages)
+  - [Differences from Plumtree/HyParView](#differences-from-plumtreehyparview)
 
-<!-- tocstop -->
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Introduction
 

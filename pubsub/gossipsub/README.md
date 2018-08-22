@@ -12,27 +12,30 @@ specialized routers, which may add protocol messages and gossip in
 order to provide behaviour optimized for specific application
 profiles.
 
-<!-- toc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Contents**
 
-- [Implementation status](#implementation-status)
-- [In the beginning was floodsub](#in-the-beginning-was-floodsub)
-  * [Ambient Peer Discovery](#ambient-peer-discovery)
-  * [Flood routing](#flood-routing)
-  * [Retrospective](#retrospective)
-- [Controlling the flood](#controlling-the-flood)
-  * [randomsub: A random message router](#randomsub-a-random-message-router)
-  * [meshsub: An overlay mesh router](#meshsub-an-overlay-mesh-router)
-  * [gossipsub: The gossiping mesh router](#gossipsub-the-gossiping-mesh-router)
-- [The gossipsub protocol](#the-gossipsub-protocol)
-  * [Control messages](#control-messages)
-  * [Router state](#router-state)
-  * [Topic membership](#topic-membership)
-  * [Message processing](#message-processing)
-  * [Heartbeat](#heartbeat)
-  * [Control message piggybacking](#control-message-piggybacking)
-  * [Protobuf](#protobuf)
+- [gossipsub: An extensible baseline pubsub protocol](#gossipsub-an-extensible-baseline-pubsub-protocol)
+  - [Implementation status](#implementation-status)
+  - [In the beginning was floodsub](#in-the-beginning-was-floodsub)
+    - [Ambient Peer Discovery](#ambient-peer-discovery)
+    - [Flood routing](#flood-routing)
+    - [Retrospective](#retrospective)
+  - [Controlling the flood](#controlling-the-flood)
+    - [randomsub: A random message router](#randomsub-a-random-message-router)
+    - [meshsub: An overlay mesh router](#meshsub-an-overlay-mesh-router)
+    - [gossipsub: The gossiping mesh router](#gossipsub-the-gossiping-mesh-router)
+  - [The gossipsub protocol](#the-gossipsub-protocol)
+    - [Control messages](#control-messages)
+    - [Router state](#router-state)
+    - [Topic membership](#topic-membership)
+    - [Message processing](#message-processing)
+    - [Heartbeat](#heartbeat)
+    - [Control message piggybacking](#control-message-piggybacking)
+    - [Protobuf](#protobuf)
 
-<!-- tocstop -->
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Implementation status
 
@@ -46,8 +49,8 @@ profiles.
 
 The initial pubsub experiment in libp2p was `floodsub`.
 It implements pubsub in the most basic manner, with two defining aspects:
-- ambient peer discovery.
-- most basic routing; flooding.
+- ambient peer discovery; and
+- most basic routing: flooding.
 
 ### Ambient Peer Discovery
 
@@ -55,8 +58,8 @@ With ambient peer discovery, the function is pushed outside the scope
 of the protocol. Instead, it relies on ambient connection events to
 perform peer discovery via protocol identification. Whenever a new
 peer is connected, the protocol checks to see if the peer implements
-floodsub, and if so it sends a hello packet announcing the topics it
-is currently subscribing.
+floodsub, and if so it sends a hello packet that announces the topics 
+that it is currently subscribing to.
 
 This allows the peer to maintain soft overlays for all topics of
 interest. The overlay is maintained by exchanging subscription
@@ -69,7 +72,7 @@ Ambient peer discovery can be driven by arbitrary external means, which
 allows orthogonal development and no external dependencies for the protocol
 implementation.
 
-These are a couple of options we are exploring as canonical approaches
+There are a couple of options we are exploring as canonical approaches
 for the discovery driver:
 - DHT rendezvous using provider records; peers in the topic announce
   a provider record named after the topic.
@@ -89,14 +92,16 @@ Evaluating floodsub as a viable pubsub protocol reveals the following
 highly desirable properties:
 - it is straightforward to implement.
 - it minimizes latency; messages are delivered across minimum latency
-  paths, modulo overly connectivity.
+  paths, modulo overlay connectivity.
 - it is highly robust; there is very little maintenance logic or state.
 
 The problem however is that messages don't just follow the minimum
 latency paths; they follow all edges, thus creating a flood. The
-outbound degree of the network is unbounded, restricted solely from
-connectivity. This creates a problem for individual densely connected
-nodes, as they may have large number of connected peers and cannot
+outbound degree of the network is unbounded, whereas we want it to be
+bounded in order to reduce bandwidth requirements and increase 
+decentralization and scalability. In other words, this unbounded
+outbound degree creates a problem for individual densely connected 
+nodes, as they may have a large number of connected peers and cannot
 afford the bandwidth to forward all these pubsub messages.  Similary,
 the amplification factor is only bounded by the sum of degrees of all
 nodes in the overlay, which creates a scaling problem for densely
@@ -112,13 +117,13 @@ globally controls the amplification factor.
 ### randomsub: A random message router
 
 Let's first consider the simplest bounded floodsub variant, which we
-call `randomsub`. In this construction, the router is still stateless
+call `randomsub`. In this construction, the router is still stateless,
 apart from a list of known peers in the topic. But instead of
-forwarding messages to all peers, it forwards to a random subset up to
-`D` peers, where `D` is the desired degree of the network.
+forwarding messages to all peers, it forwards to a random subset of up 
+to `D` peers, where `D` is the desired degree of the network.
 
 The problem with this construction is that the message propagation
-patterns are non-deterministic. This results to extreme message route
+patterns are non-deterministic. This results in extreme message route
 instability, manifesting as message reordering and varying timing patterns,
 which is an undesirable property for many applications.
 
@@ -159,7 +164,7 @@ admissible mesh degree bounds.
 
 ### gossipsub: The gossiping mesh router
 
-The meshsub router offsers a baseline construction with good amplification
+The meshsub router offers a baseline construction with good amplification
 control properties, which we augment with _gossip_ about message flow.
 The gossip is emitted to random subsets of peers not in the mesh, similar
 to randomsub, and it allows us to propagate _metadata_ about message flow
@@ -172,7 +177,7 @@ The router can use this metadata to improve the mesh, for instance an
 [episub](episub.md) router built on top of gossipsub can create
 epidemic broadcast trees.  Beyond that, the metadata can restart
 message transmission at different points in the overlay to rectify
-downstream message loss. Or it can simply jump hops oppurtunistically
+downstream message loss. Or it can simply jump hops opportunistically
 and accelerate message transmission for peers who are at some distance
 in the mesh.
 
@@ -192,33 +197,33 @@ towards them.
 ### Control messages
 
 The protocol defines four control messages:
-- `GRAFT`: graft a mesh link; notifies the peer that it has been added to the local mesh view.
-- `PRUNE`: prune a mesh link; notifies the peer that it has been removed from the local mesh view.
-- `IHAVE`: gossip; notifies the peer that the following messages were recently seen and are available on request.
-- `IWANT`: requests the out of band transmission of messages announced in an `IHAVE` message.
+- `GRAFT`: graft a mesh link; this notifies the peer that it has been added to the local mesh view.
+- `PRUNE`: prune a mesh link; this notifies the peer that it has been removed from the local mesh view.
+- `IHAVE`: gossip; this notifies the peer that the following messages were recently seen and are available on request.
+- `IWANT`: request out of band transmission of messages announced in an `IHAVE` message. (Again, in-band transmission isn't specified; [peer routing](https://github.com/libp2p/specs/blob/master/) can be done by any protocol implementation such as kad or mDNS.)
 
 ### Router state
 
 The router maintains the following state:
 - `peers`: a set of all known peers; `peers.gossipsub` denotes the gossipsub peers
    while `peers.floodsub` denotes the floodsub peers.
-- `mesh`: the overlay meshes as a map of topic to lists of peers.
+- `mesh`: the overlay meshes as a map of topics to lists of peers.
 - `fanout`: the mesh peers to which we are publishing to without topic membership,
-   as a map of topic to list of peers.
-- `seen`: this is the timed message id cache, which tracks seen messages.
+   as a map of topics to lists of peers.
+- `seen`: this is the timed message `id` cache, which tracks seen messages.
 - `mcache`: a message cache that contains the messages for the last few
    heartbeat ticks.
 
-The message cache is a data structure that stores windows of message ids
+The message cache is a data structure that stores windows of message `id`s
 and the corresponding messages. It supports the following operations:
 - `mcache.put(m)`: adds a message to the current window and the cache.
-- `mcache.get(id)`: retrieves a message from the cache by its id, if it is still present.
-- `mcache.window()`: retrieves the message id for messages in the current history window.
+- `mcache.get(id)`: retrieves a message from the cache by its `id`, if it is still present.
+- `mcache.window()`: retrieves the message `id` for messages in the current history window.
 - `mcache.shift()`: shifts the current window, discarding messages older than the
    history length of the cache.
 
-The timed message id cache is the flow control mechanism. It tracks
-the message ids of seen message for the last couple of minutes. It is
+The timed message `id` cache is the flow control mechanism. It tracks
+the message `id`s of seen messages for the last couple of minutes. It is
 separate from `mcache` for implementation reasons in Go (the `seen`
 cache is inherited from the pubsub framework), but they could be the
 same data structure.
@@ -238,8 +243,8 @@ router, as part of the pubsub api:
 Note that the router can publish messages without topic membership. In order
 to maintain stable routes in that case, it maintains a list of peers for each
 topic it has published in the `fanout` map. If the router does not publish any
-messages for some time, then the `fanout` peers for the topic are forgotten, so
-this is soft state.
+messages of a topic for some time, then the `fanout` peers for that topic are 
+forgotten, so this is soft state.
 
 Also note that as part of the pubsub api, the peer emits `SUBSCRIBE`
 and `UNSUBSCRIBE` control messages to all its peers whenever it joins

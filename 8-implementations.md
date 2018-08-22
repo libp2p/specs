@@ -3,6 +3,17 @@
 
 A `libp2p` implementation should (recommended) follow a certain level of granularity when implementing different modules and functionalities, so that common interfaces are easy to expose, test and check for interoperability with other implementations.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Contents**
+
+- [8 Implementations](#8-implementations)
+  - [8.1 Swarm](#81-swarm)
+    - [8.1.1 Swarm Dialer](#811-swarm-dialer)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+
 This is the list of current modules available for `libp2p`:
 
   - libp2p (entry point)

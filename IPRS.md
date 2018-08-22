@@ -1,4 +1,28 @@
 # IPRS - InterPlanetary Record System spec
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Contents**
+
+- [IPRS - InterPlanetary Record System spec](#iprs---interplanetary-record-system-spec)
+  - [Definitions](#definitions)
+    - [Records](#records)
+    - [Record System](#record-system)
+    - [Validity Schemes](#validity-schemes)
+    - [Merkle DAG and IPFS Objects](#merkle-dag-and-ipfs-objects)
+  - [Constraints](#constraints)
+  - [Construction](#construction)
+    - [The Objects](#the-objects)
+    - [The Interface](#the-interface)
+    - [Interface Example](#interface-example)
+  - [Example Record Types](#example-record-types)
+    - [Signed, valid within a datetime range](#signed-valid-within-a-datetime-range)
+    - [Signed, expiring after a Time-To-Live](#signed-expiring-after-a-time-to-live)
+    - [Signed, based on ancestry (chain)](#signed-based-on-ancestry-chain)
+    - [Signed, with cryptographic freshness](#signed-with-cryptographic-freshness)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 Authors: [Juan Benet](github.com/jbenet)
 
 Reviewers:

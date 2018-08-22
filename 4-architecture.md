@@ -23,6 +23,39 @@ Each of these subsystems exposes a well known interface (see [chapter 6](6-inter
 └─────────────────┘└─────────────────┘└──────────────────────────┘└───────────────┘
 ```
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Contents**
+
+- [4 Architecture](#4-architecture)
+  - [4.1 Peer Routing](#41-peer-routing)
+    - [4.1.1 kad-routing](#411-kad-routing)
+    - [4.1.2 mDNS-routing](#412-mdns-routing)
+  - [4.2 Swarm](#42-swarm)
+    - [4.2.1 Stream Muxer](#421-stream-muxer)
+    - [4.2.2 Protocol Muxer](#422-protocol-muxer)
+    - [4.2.3 Transport](#423-transport)
+    - [4.2.4 Crypto](#424-crypto)
+    - [4.2.5 Identify](#425-identify)
+    - [4.2.6 Relay](#426-relay)
+  - [4.3 Distributed Record Store](#43-distributed-record-store)
+    - [4.3.1 Record](#431-record)
+    - [4.3.2 abstract-record-store](#432-abstract-record-store)
+    - [4.3.3 kad-record-store](#433-kad-record-store)
+    - [4.3.4 mDNS-record-store](#434-mdns-record-store)
+    - [4.3.5 s3-record-store](#435-s3-record-store)
+  - [4.4 Discovery](#44-discovery)
+    - [4.4.1 mDNS-discovery](#441-mdns-discovery)
+      - [4.4.2 random-walk](#442-random-walk)
+      - [4.4.3 bootstrap-list](#443-bootstrap-list)
+  - [4.5 Messaging](#45-messaging)
+      - [4.5.1 PubSub](#451-pubsub)
+  - [4.6 Naming](#46-naming)
+      - [4.6.1 IPRS](#461-iprs)
+      - [4.6.2 IPNS](#462-ipns)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## 4.1 Peer Routing
 
 A Peer Routing subsystem exposes an interface to identify which peers a message should be routed to in the DHT. It receives a key and must return one or more `PeerInfo` objects.

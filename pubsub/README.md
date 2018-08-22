@@ -1,5 +1,24 @@
 # PubSub interface for libp2p
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Contents**
+
+- [PubSub interface for libp2p](#pubsub-interface-for-libp2p)
+  - [The RPC](#the-rpc)
+  - [The Message](#the-message)
+  - [The Topic Descriptor](#the-topic-descriptor)
+    - [AuthOpts](#authopts)
+      - [AuthMode 'NONE'](#authmode-none)
+      - [AuthMode 'KEY'](#authmode-key)
+      - [AuthMode 'WOT'](#authmode-wot)
+    - [EncOpts](#encopts)
+      - [EncMode 'NONE'](#encmode-none)
+      - [EncMode 'SHAREDKEY'](#encmode-sharedkey)
+      - [EncMode 'WOT'](#encmode-wot)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 Revision: draft 1, 2017-02-17
 
 Authors:

@@ -1,7 +1,25 @@
+
 2 An analysis of the state of the art in network stacks
 ====================================================
 
 This section presents to the reader an analysis of the available protocols and architectures for network stacks. The goal is to provide the foundations from which to infer the conclusions and understand why `libp2p` has the requirements and architecture that it has.
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Contents**
+
+- [2 An analysis of the state of the art in network stacks](#2-an-analysis-of-the-state-of-the-art-in-network-stacks)
+  - [2.1 The client-server model](#21-the-client-server-model)
+  - [2.2 Categorizing the network stack protocols by solutions](#22-categorizing-the-network-stack-protocols-by-solutions)
+    - [2.2.1 Establishing the physical link](#221-establishing-the-physical-link)
+    - [2.2.2 Addressing a machine or process](#222-addressing-a-machine-or-process)
+    - [2.2.3 Discovering other peers or services](#223-discovering-other-peers-or-services)
+    - [2.2.4 Routing messages through the network](#224-routing-messages-through-the-network)
+    - [2.2.5 Transport](#225-transport)
+    - [2.2.6 Agreed semantics for applications to talk to each other](#226-agreed-semantics-for-applications-to-talk-to-each-other)
+  - [2.3 Current shortcomings](#23-current-shortcomings)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## 2.1 The client-server model
 
