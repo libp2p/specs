@@ -3,6 +3,27 @@
 
 `libp2p` is a collection of several protocols working together to offer a common solid interface that can talk with any other network addressable process. This is made possible by shimming currently existing protocols and implementations into a set of explicit interfaces: Peer Routing, Discovery, Stream Muxing, Transports, Connections and so on.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Contents**
+
+- [6 Interfaces](#6-interfaces)
+  - [6.1 libp2p](#61-libp2p)
+  - [6.2 Peer Routing](#62-peer-routing)
+  - [6.3 Swarm](#63-swarm)
+    - [6.3.1 Transport](#631-transport)
+    - [6.3.2 Connection](#632-connection)
+    - [6.3.3 Stream Muxing](#633-stream-muxing)
+  - [6.4 Distributed Record Store](#64-distributed-record-store)
+  - [6.5 Peer Discovery](#65-peer-discovery)
+  - [6.6 libp2p interface and UX](#66-libp2p-interface-and-ux)
+    - [Constructing a libp2p instance programatically](#constructing-a-libp2p-instance-programatically)
+    - [Dialing and Listening for connections to/from a peer](#dialing-and-listening-for-connections-tofrom-a-peer)
+    - [Finding a peer](#finding-a-peer)
+    - [Storing and Retrieving Records](#storing-and-retrieving-records)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## 6.1 libp2p
 
 `libp2p`, the top module that provides an interface to all the other modules that make a `libp2p` instance, must offer an interface for dialing to a peer and plugging in all of the modules (e.g. which transports) we want to support. We present the `libp2p` interface and UX in [section 6.6](#66-libp2p-interface-and-ux), after presenting every other module interface.

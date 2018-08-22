@@ -1,6 +1,23 @@
 3 Requirements and considerations
 =================================
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Contents**
+
+- [3 Requirements and considerations](#3-requirements-and-considerations)
+  - [3.1 Transport agnostic](#31-transport-agnostic)
+  - [3.2 Multi-multiplexing](#32-multi-multiplexing)
+  - [3.3 Encryption](#33-encryption)
+  - [3.4 NAT traversal](#34-nat-traversal)
+  - [3.5 Relay](#35-relay)
+  - [3.6 Enable several network topologies](#36-enable-several-network-topologies)
+  - [3.7 Resource discovery](#37-resource-discovery)
+  - [3.8 Messaging](#38-messaging)
+  - [3.9 Naming](#39-naming)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## 3.1 Transport agnostic
 
 `libp2p` is transport agnostic, so it can run over any transport protocol. It does not even depend on IP; it may run on top of NDN, XIA, and other new Internet architectures.

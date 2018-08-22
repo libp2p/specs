@@ -1,5 +1,24 @@
 # PubSub interface for libp2p
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Contents**
+
+- [PubSub interface for libp2p](#pubsub-interface-for-libp2p)
+  - [The RPC](#the-rpc)
+  - [The Message](#the-message)
+  - [The Topic Descriptor](#the-topic-descriptor)
+    - [AuthOpts](#authopts)
+      - [AuthMode 'NONE'](#authmode-none)
+      - [AuthMode 'KEY'](#authmode-key)
+      - [AuthMode 'WOT'](#authmode-wot)
+    - [EncOpts](#encopts)
+      - [EncMode 'NONE'](#encmode-none)
+      - [EncMode 'SHAREDKEY'](#encmode-sharedkey)
+      - [EncMode 'WOT'](#encmode-wot)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 Revision: draft 1, 2017-02-17
 
 Authors:
@@ -24,8 +43,8 @@ You can find information about the PubSub research and notes in the following re
 Implementations:
 - FloodSub, simple flooding pubsub (2017)
   - [libp2p/go-floodsub](https://github.com/libp2p/go-floodsub/pull/67), [libp2p/js-libp2p-floodsub](http://github.com/libp2p/js-libp2p-floodsub), [libp2p/rust-libp2p/floodsub](https://github.com/libp2p/rust-libp2p/tree/master/floodsub)
-- GossipSub, proximity-aware epidemic pubsub (2018)
-  - [`./gossipsub`](./gossipsub)
+- GossipSub, extensible baseline pubsub (2018)
+  - [gossipsub](./gossipsub)
 
 
 ## The RPC

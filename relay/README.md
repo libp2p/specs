@@ -2,21 +2,35 @@
 
 > Circuit Switching for libp2p, also known as TURN or Relay in Networking literature.
 
+
+
 ## Implementations
 
 - [js-libp2p-circuit](https://github.com/libp2p/js-libp2p-circuit)
 - [go-libp2p-circuit](https://github.com/libp2p/go-libp2p-circuit)
 - [rust-libp2p](https://github.com/libp2p/rust-libp2p/tree/master/relay)
 
-## Table of Contents
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Contents**
 
-- [Overview](#overview)
-- [Dramatization](#dramatization)
-- [Addressing](#addressing)
-- [Wire protocol](#wire-protocol)
-- [Interfaces](#interfaces)
-- [Implementation Details](#implementation-details)
-- [Removing existing relay protocol](#removing-existing-relay-protocol)
+- [Circuit Relay v0.1.0](#circuit-relay-v010)
+  - [Implementations](#implementations)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Dramatization](#dramatization)
+  - [Addressing](#addressing)
+  - [Wire format](#wire-format)
+    - [Relay Message](#relay-message)
+    - [High level overview of establishing a relayed connection](#high-level-overview-of-establishing-a-relayed-connection)
+    - [Under the microscope](#under-the-microscope)
+    - [Status codes table](#status-codes-table)
+  - [Implementation details](#implementation-details)
+    - [Interfaces](#interfaces)
+    - [Removing existing relay protocol in Go](#removing-existing-relay-protocol-in-go)
+  - [Future work](#future-work)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Overview
 

@@ -2,28 +2,39 @@
 
 Revision: draft 1, 2018-06-28
 
-Authors:
-- vyzo (vyzo@hackzen.org)
+Author: vyzo
 
-<!-- toc -->
+Editor: jamesray1
 
-- [Introduction](#introduction)
-- [Membership Management Protocol](#membership-management-protocol)
-  * [Design Parameters for View Sizes](#design-parameters-for-view-sizes)
-  * [Joining the Overlay](#joining-the-overlay)
-  * [Leaving the Overlay](#leaving-the-overlay)
-  * [Active View Management](#active-view-management)
-  * [Passive View Management](#passive-view-management)
-- [Broadcast Protocol](#broadcast-protocol)
-  * [Broadcast State](#broadcast-state)
-  * [Message Propagation and Multicast Tree Construction](#message-propagation-and-multicast-tree-construction)
-  * [Multicast Tree Repair](#multicast-tree-repair)
-  * [Multicast Tree Optimization](#multicast-tree-optimization)
-  * [Active View Changes](#active-view-changes)
-- [Protocol Messages](#protocol-messages)
-- [Differences from Plumtree/HyParView](#differences-from-plumtreehyparview)
+Author's note:
+- This is based on an earlier research draft about an epidemic broadcast protocol
+  for libp2p pubsub.
+  It serves as reference for the design of episub, an extended gossipsub router
+  optimized for single source multicast and scenarios with a few fixed sources
+  broadcasting to a large number of clients in a topic.
 
-<!-- tocstop -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Contents**
+
+- [Episub: Proximity Aware Epidemic PubSub for libp2p](#episub-proximity-aware-epidemic-pubsub-for-libp2p)
+  - [Introduction](#introduction)
+  - [Membership Management Protocol](#membership-management-protocol)
+    - [Design Parameters for View Sizes](#design-parameters-for-view-sizes)
+    - [Joining the Overlay](#joining-the-overlay)
+    - [Leaving the Overlay](#leaving-the-overlay)
+    - [Active View Management](#active-view-management)
+    - [Passive View Management](#passive-view-management)
+  - [Broadcast Protocol](#broadcast-protocol)
+    - [Broadcast State](#broadcast-state)
+    - [Message Propagation and Multicast Tree Construction](#message-propagation-and-multicast-tree-construction)
+    - [Multicast Tree Repair](#multicast-tree-repair)
+    - [Multicast Tree Optimization](#multicast-tree-optimization)
+    - [Active View Changes](#active-view-changes)
+  - [Protocol Messages](#protocol-messages)
+  - [Differences from Plumtree/HyParView](#differences-from-plumtreehyparview)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Introduction
 
