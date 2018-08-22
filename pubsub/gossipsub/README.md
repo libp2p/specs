@@ -248,7 +248,7 @@ forgotten, so this is soft state.
 
 Also note that as part of the pubsub api, the peer emits `SUBSCRIBE`
 and `UNSUBSCRIBE` control messages to all its peers whenever it joins
-or leaves a topic. This is provided by the the ambient peer discovery
+or leaves a topic. This is provided by the the ambient [peer discovery](https://github.com/libp2p/specs/blob/master/4-architecture.md#44-discovery)
 mechanism and nominally not part of the router. A standalone
 implementation would have to implement those control messages.
 
@@ -257,8 +257,8 @@ implementation would have to implement those control messages.
 Upon receiving a message, the router first processes the payload of the message.
 If it contains a valid message that has not been previously seen, then
 it publishes the message:
-- it forwards the message to every peer in `peers.floodsub[topic]`, provided it's not
-  the source of the message
+- It forwards the message to every peer in `peers.floodsub[topic]`, provided it's not
+  the source of the message.
 - It forwards the message to every peer in `mesh[topic]`, provided it's not the
   source of the message.
 
@@ -274,10 +274,10 @@ After processing the payload, it then processes the control messages in the enve
 
 When the router publishes a message that originates from the router itself (at the
 application layer), then it proceeds similar to the payload reaction:
-- it forwards the message to every peer in `peers.floodsub[topic]`.
-- if it is subscribed to the topic, then it must have a set of peers in `mesh[topic]`,
+- It forwards the message to every peer in `peers.floodsub[topic]`.
+- If it is subscribed to the topic, then it must have a set of peers in `mesh[topic]`,
   to which the message is forwarded.
-- if it is not subscribed to the topic, it then forwards the message to
+- If it is not subscribed to the topic, it then forwards the message to
   the peers in `fanout[topic]`. If this set is empty, it chooses `D` peers from
   `peers.gossipsub[topic]` to become the new `fanout[topic]` peers and forwards
   to them.
@@ -292,7 +292,8 @@ The `mesh` is maintained exactly as prescribed by `meshsub`:
 ```
 for each topic in mesh:
  if |mesh[topic]| < D_low:
-   select D - |mesh[topic]| peers from peers.gossipsub[topic] - mesh[topic]
+   select D - |mesh[topic]| peers from peers.gossipsub[topic] - mesh[topic] 
+    // i.e. not including those that are already in the topic mesh.
    for each new peer:
      add peer to mesh[topic]
      emit GRAFT(topic) control message to peer
@@ -304,26 +305,26 @@ for each topic in mesh:
      emit PRUNE(topic) control message to peer
 ```
 
-The `fanout` map is maintained by keeping track of last published time
-for each topic:
+The `fanout` map is maintained by keeping track of the length of time since a 
+topic was last published:
 ```
 for each topic in fanout:
- if last published time > TTL
-   remove topic from fanout
- else if |fanout[topic]| < D
-   select D - |fanout[topic]| peers from peers.gossipsub[topic] - fanout[topic]
-   add the peers to fanout[topic]
+  if time_since_last_published > ttl
+    remove topic from fanout
+  else if |fanout[topic]| < D
+    select D - |fanout[topic]| peers from peers.gossipsub[topic] - fanout[topic]
+    add the peers to fanout[topic]
 ```
 
 Gossip is emitted by selecting peers for each topic that are not already part
 of the mesh:
 ```
 for each topic in mesh+fanout:
-  let mids be mcache.window[topic]
-  if mids is not empty:
+  let m_ids be mcache.window[topic]
+  if m_ids is not empty:
     select D peers from peers.gossipsub[topic]
     for each peer not in mesh[topic]
-      emit IHAVE(mids)
+      emit IHAVE(m_ids)
 
 shift the mcache
 ```
@@ -336,7 +337,7 @@ any other message in the regular flow, for any topic. This can lead to
 message rate reduction whenever there is some correlated flow between
 topics, and can be significant for densely connected peers.
 
-For piggyback implementation details, consult the go implementation.
+For piggyback implementation details, consult the [Go implementation](https://github.com/libp2p/go-floodsub/search?q=piggyback&unscoped_q=piggyback).
 
 ### Protobuf
 
