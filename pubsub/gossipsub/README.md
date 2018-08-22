@@ -69,7 +69,7 @@ Ambient peer discovery can be driven by arbitrary external means, which
 allows orthogonal development and no external dependencies for the protocol
 implementation.
 
-These are a couple of options we are exploring as canonical approaches
+There are a couple of options we are exploring as canonical approaches
 for the discovery driver:
 - DHT rendezvous using provider records; peers in the topic announce
   a provider record named after the topic.
@@ -89,14 +89,14 @@ Evaluating floodsub as a viable pubsub protocol reveals the following
 highly desirable properties:
 - it is straightforward to implement.
 - it minimizes latency; messages are delivered across minimum latency
-  paths, modulo overly connectivity.
+  paths, modulo overlay connectivity.
 - it is highly robust; there is very little maintenance logic or state.
 
 The problem however is that messages don't just follow the minimum
 latency paths; they follow all edges, thus creating a flood. The
 outbound degree of the network is unbounded, restricted solely from
 connectivity. This creates a problem for individual densely connected
-nodes, as they may have large number of connected peers and cannot
+nodes, as they may have a large number of connected peers and cannot
 afford the bandwidth to forward all these pubsub messages.  Similary,
 the amplification factor is only bounded by the sum of degrees of all
 nodes in the overlay, which creates a scaling problem for densely
@@ -118,7 +118,7 @@ forwarding messages to all peers, it forwards to a random subset up to
 `D` peers, where `D` is the desired degree of the network.
 
 The problem with this construction is that the message propagation
-patterns are non-deterministic. This results to extreme message route
+patterns are non-deterministic. This results in extreme message route
 instability, manifesting as message reordering and varying timing patterns,
 which is an undesirable property for many applications.
 
@@ -166,7 +166,7 @@ to randomsub, and it allows us to propagate _metadata_ about message flow
 throughout the network. The metadata can be arbitrary, but as a baseline
 we include the message ids of seen messages in the last few seconds.
 The messages are cached, so that peers receiving the gossip can request
-them out of band.
+them for transmission with a control message.
 
 The router can use this metadata to improve the mesh, for instance an
 [episub](episub.md) router built on top of gossipsub can create
@@ -195,7 +195,7 @@ The protocol defines four control messages:
 - `GRAFT`: graft a mesh link; notifies the peer that it has been added to the local mesh view.
 - `PRUNE`: prune a mesh link; notifies the peer that it has been removed from the local mesh view.
 - `IHAVE`: gossip; notifies the peer that the following messages were recently seen and are available on request.
-- `IWANT`: requests the out of band transmission of messages announced in an `IHAVE` message.
+- `IWANT`: requests the transmission of messages announced in an `IHAVE` message.
 
 ### Router state
 
