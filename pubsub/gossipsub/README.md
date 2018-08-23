@@ -58,7 +58,7 @@ With ambient peer discovery, the function is pushed outside the scope
 of the protocol. Instead, it relies on ambient connection events to
 perform peer discovery via protocol identification. Whenever a new
 peer is connected, the protocol checks to see if the peer implements
-floodsub, and if so it sends a hello packet that announces the topics 
+floodsub, and if so it sends a hello packet that announces the topics
 that it is currently subscribing to.
 
 This allows the peer to maintain soft overlays for all topics of
@@ -98,9 +98,9 @@ highly desirable properties:
 The problem however is that messages don't just follow the minimum
 latency paths; they follow all edges, thus creating a flood. The
 outbound degree of the network is unbounded, whereas we want it to be
-bounded in order to reduce bandwidth requirements and increase 
+bounded in order to reduce bandwidth requirements and increase
 decentralization and scalability. In other words, this unbounded
-outbound degree creates a problem for individual densely connected 
+outbound degree creates a problem for individual densely connected
 nodes, as they may have a large number of connected peers and cannot
 afford the bandwidth to forward all these pubsub messages.  Similary,
 the amplification factor is only bounded by the sum of degrees of all
@@ -119,7 +119,7 @@ globally controls the amplification factor.
 Let's first consider the simplest bounded floodsub variant, which we
 call `randomsub`. In this construction, the router is still stateless,
 apart from a list of known peers in the topic. But instead of
-forwarding messages to all peers, it forwards to a random subset of up 
+forwarding messages to all peers, it forwards to a random subset of up
 to `D` peers, where `D` is the desired degree of the network.
 
 The problem with this construction is that the message propagation
@@ -243,7 +243,7 @@ router, as part of the pubsub api:
 Note that the router can publish messages without topic membership. In order
 to maintain stable routes in that case, it maintains a list of peers for each
 topic it has published in the `fanout` map. If the router does not publish any
-messages of a topic for some time, then the `fanout` peers for that topic are 
+messages of a topic for some time, then the `fanout` peers for that topic are
 forgotten, so this is soft state.
 
 Also note that as part of the pubsub api, the peer emits `SUBSCRIBE`
@@ -292,8 +292,8 @@ The `mesh` is maintained exactly as prescribed by `meshsub`:
 ```
 for each topic in mesh:
  if |mesh[topic]| < D_low:
-   select D - |mesh[topic]| peers from peers.gossipsub[topic] - mesh[topic] 
-    // i.e. not including those that are already in the topic mesh.
+   select D - |mesh[topic]| peers from peers.gossipsub[topic] - mesh[topic]
+    ; i.e. not including those peers that are already in the topic mesh.
    for each new peer:
      add peer to mesh[topic]
      emit GRAFT(topic) control message to peer
@@ -305,7 +305,7 @@ for each topic in mesh:
      emit PRUNE(topic) control message to peer
 ```
 
-The `fanout` map is maintained by keeping track of the last published time 
+The `fanout` map is maintained by keeping track of the last published time
 for each topic:
 ```
 for each topic in fanout:
