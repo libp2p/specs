@@ -218,12 +218,12 @@ The message cache is a data structure that stores windows of message IDs
 and the corresponding messages. It supports the following operations:
 - `mcache.put(m)`: adds a message to the current window and the cache.
 - `mcache.get(id)`: retrieves a message from the cache by its ID, if it is still present.
-- `mcache.window()`: retrieves the message ID for messages in the current history window.
+- `mcache.window()`: retrieves the message IDs for messages in the current history window.
 - `mcache.shift()`: shifts the current window, discarding messages older than the
    history length of the cache.
 
-The timed message ID cache is the flow control mechanism. It tracks
-the message IDs of seen messages for the last couple of minutes. It is
+The `seen` cache is the flow control mechanism. It tracks
+the message IDs of seen messages for the last two minutes. It is
 separate from `mcache` for implementation reasons in Go (the `seen`
 cache is inherited from the pubsub framework), but they could be the
 same data structure.
@@ -267,7 +267,7 @@ After processing the payload, it then processes the control messages in the enve
   subscribed to the topic. If it is not subscribed, it responds with a `PRUNE(topic)`
   control message.
 - On `PRUNE(topic)` it removes the peer from `mesh[topic]`.
-- On `IHAVE(ids)` it checks the `seen` set and requests uknown messages with an `IWANT`
+- On `IHAVE(ids)` it checks the `seen` set and requests unknown messages with an `IWANT`
    message.
 - On `IWANT(ids)` it forwards all request messages that are present in `mcache` to the
    requesting peer.
