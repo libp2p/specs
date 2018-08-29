@@ -226,7 +226,9 @@ The `seen` cache is the flow control mechanism. It tracks
 the message IDs of seen messages for the last two minutes. It is
 separate from `mcache` for implementation reasons in Go (the `seen`
 cache is inherited from the pubsub framework), but they could be the
-same data structure.
+same data structure. Note that two minutes cache interval is non-normative;
+a router could use a different value, chosen to approximate the propagation
+delay in the overlay with some healthy margin.
 
 ### Topic membership
 
