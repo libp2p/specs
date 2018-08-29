@@ -1,6 +1,6 @@
 # gossipsub: An extensible baseline pubsub protocol
 
-Revision:
+Revision: r1; 2018-08-29
 
 Author: vyzo
 
