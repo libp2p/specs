@@ -2,8 +2,16 @@
 
 Revision: draft 1, 2018-06-28
 
-Authors:
-- vyzo (vyzo@hackzen.org)
+Author: vyzo
+
+Editor: jamesray1
+
+Author's note:
+- This is based on an earlier research draft about an epidemic broadcast protocol
+  for libp2p pubsub.
+  It serves as reference for the design of episub, an extended gossipsub router
+  optimized for single source multicast and scenarios with a few fixed sources
+  broadcasting to a large number of clients in a topic.
 
 <!-- toc -->
 
