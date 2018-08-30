@@ -226,7 +226,7 @@ The `seen` cache is the flow control mechanism. It tracks
 the message IDs of seen messages for the last two minutes. It is
 separate from `mcache` for implementation reasons in Go (the `seen`
 cache is inherited from the pubsub framework), but they could be the
-same data structure. Note that two minutes cache interval is non-normative;
+same data structure. Note that the two minute cache interval is non-normative;
 a router could use a different value, chosen to approximate the propagation
 delay in the overlay with some healthy margin.
 
@@ -275,7 +275,7 @@ After processing the payload, it then processes the control messages in the enve
    requesting peer.
 
 When the router publishes a message that originates from the router itself (at the
-application layer), then it proceeds similar to the payload reaction:
+application layer), then it proceeds similarly to the payload reaction:
 - It forwards the message to every peer in `peers.floodsub[topic]`.
 - If it is subscribed to the topic, then it must have a set of peers in `mesh[topic]`,
   to which the message is forwarded.
