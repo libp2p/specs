@@ -14,12 +14,11 @@ As responses come in, the peer adds the other peers information into is local da
 
 `service-name` is the DNS-SD service name for all peers. It is defined as `_p2p._udp.local`.
 
-`host-name` is the name of the peer.  It is derived from the peer's ID and `p2p.local`, for example 
-`Qmid.p2p.local`.
+`host-name` is the fully qualified name of the peer.  It is derived from the peer's name and `p2p.local`.
 
-`peer-id` is the ID of the peer.  It normally is the base-58 enconding of the hash of the peer's public key.
+`peer-name` is the case-insenstive ID of the peer and less than 64 characters.  It is normally is the base-32 encoding of peer's ID.
 
-`port` is a port that the peer listens on. Normally 4001.
+Note that all names are case insensitive. 
 
 ## Peer Discovery
 
@@ -28,22 +27,22 @@ As responses come in, the peer adds the other peers information into is local da
 To find all peers, a DNS message is sent with the question `_p2p._udp.local PTR`. 
 Peers will then start responding with their details.  
 
-Note that a peer must respond to it's own query.  Thus allows other peers to passively discover it.
+Note that a peer must respond to it's own query.  This allows other peers to passively discover it.
 
 ### Response
 
 On receipt of a `find all peers` query, a peer sends a DNS response message (QR = 1) that contains
 the **answer**
 
-    <service-name> PTR <peer-id>.<service-name>
+    <service-name> PTR <peer-name>.<service-name>
     
 The **additional records** of the response contain the peer's discovery details
 
-    <peer-id>.<service-name> TXT "dnsaddr=..."
+    <peer-name>.<service-name> TXT "dnsaddr=..."
     
 The TXT record contains the multiaddresses that the peer is listening on.  Each multiaddress 
-is a TXT attribute with the form `dnsaddr=/ip4/.../tcp/.../p2p/QmId`.  Multiple `dnsaddr` attributes 
-are expected.
+is a TXT attribute with the form `dnsaddr=.../p2p/QmId`.  Multiple `dnsaddr` attributes 
+and/or TXT records are allowed.
 
 ## DNS Service Discovery
 
@@ -63,26 +62,22 @@ A peer responds with the answer
 
 On receipt of a `find all peers` query, the following **additional records** should be included
 
-    <peer-id>.<service-name> SRV ... <port> <host-name>
+    <peer-name>.<service-name> SRV ... <host-name>
     <host-name>              A <ipv4 address>
     <host-name>              AAAA <ipv6 address>
    
-If a peer is listening on multiple ports, it should respond with multiple `SRV` records for each 
-port it is listening on. 
-
 ### Gotchas
 
 Many existing tools ignore the Additional Records and always send individual queries for the 
 peer's discovery details. To accomodate this, a peer should respond to the following queries:
 
-- `<peer-id>.<service-name> SRV`
-- `<peer-id>.<service-name> TXT`
+- `<peer-name>.<service-name> SRV`
+- `<peer-name>.<service-name> TXT`
 - `<host-name> A`
 - `<host-name> AAAA`
 
 ## Issues
 
-- like urls, dns names are case insensitive.  A `peer-id` is base58btc encoded and is case sensitive.
 - MDNS requires link local addresses.  Loopback and "nat busting" addresses should not sent and must
  be ignored on receipt?
  
