@@ -6,7 +6,7 @@ mplex is a Stream Multiplexer protocol used by js-ipfs and go-ipfs in their impl
 
 This document will attempt to define a specification for the wire protocol and algorithm used in both implementations. 
 
-Multiplex is a very simple protocol that does not provide many features offered by other stream multiplexers. Notably, multiplex does not provide backpressure at the protocol level, or support half closed streams.
+Multiplex is a very simple protocol that does not provide many features offered by other stream multiplexers. Notably, multiplex does not provide backpressure at the protocol level.
 
 Implementations in:
 
