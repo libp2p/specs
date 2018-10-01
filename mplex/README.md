@@ -2,21 +2,21 @@
 
 > This repo contains the spec of mplex, the friendly Stream Multiplexer (that works in 3 languages!)
 
-mplex is a Stream Multiplexer protocol used by js-ipfs and go-ipfs in their implementations. The origins of this protocol are based in [multiplex](https://github.com/maxogden/multiplex), the JavaScript only Stream Multiplexer. After many battle field tests, we felt the need to improve and fix some of its bugs and mechanics, resulting on this new version used by libp2p.
+Mplex is a Stream Multiplexer protocol used by js-ipfs and go-ipfs in their implementations. The origins of this protocol are based in [multiplex](https://github.com/maxogden/multiplex), the JavaScript only Stream Multiplexer. After many battle field tests, we felt the need to improve and fix some of its bugs and mechanics, resulting on this new version used by libp2p.
 
 This document will attempt to define a specification for the wire protocol and algorithm used in both implementations. 
 
-Multiplex is a very simple protocol that does not provide many features offered by other stream multiplexers. Notably, multiplex does not provide backpressure at the protocol level, or support half closed streams.
+Mplex is a very simple protocol that does not provide many features offered by other stream multiplexers. Notably, mplex does not provide backpressure at the protocol level.
 
 Implementations in:
 
 - [JavaScript](https://github.com/libp2p/js-libp2p-mplex)
-- [Go](https://github.com/whyrusleeping/go-multiplex)
+- [Go](https://github.com/libp2p/go-mplex)
 - [Rust](https://github.com/libp2p/rust-libp2p/tree/master/multiplex-rs)
 
 ## Message format
 
-Every communication in multiplex consists of a header, and a length prefixed data segment.
+Every communication in mplex consists of a header, and a length prefixed data segment.
 
 The header is an unsigned base128 varint, as defined in the [protocol buffers spec](https://developers.google.com/protocol-buffers/docs/encoding#varints). The lower three bits are the message flags, and the rest of the bits (shifted down by three bits) are the stream ID this message pertains to:
 
@@ -47,8 +47,7 @@ The data segment is length prefixed by another unsigned varint. This results in 
 
 ## Protocol
 
-Multiplex operates over a reliable ordered pipe between two peers, such as a TCP socket, or a unix pipe. One peer is designated the session 'initiator' (or the dialer) and the other is the session 'receiver'. The session initiator does not
-necessarily send the first packet, this distinction is just made to make the allocation of stream ID's unambiguous.
+Mplex operates over a reliable ordered pipe between two peers, such as a TCP socket, or a unix pipe.
 
 ### Opening a new stream
 
@@ -60,11 +59,11 @@ The party that opens a stream is called the stream initiator. This is used to id
 
 ### Writing to a stream
 
-To write data to a stream, one must send a message with the flag `MessageReceiver` (1) or `MessageInitiator` (2) (depending on whether or not the writer is the receiver or sender). The data field should contain the data you wish to write to the stream, limited to a maximum size agreed upon out of band (For reference, the go-multiplex implementation sets this to 1MB).
+To write data to a stream, one must send a message with the flag `MessageReceiver` (1) or `MessageInitiator` (2) (depending on whether or not the writer is the receiver or sender). The data field should contain the data you wish to write to the stream, up to 1MiB per message.
 
 ### Closing a stream
 
-Multiplex supports half-closed streams. Closing a stream closes it for writing and closes the remote end for reading but allows writing in the other direction.
+Mplex supports half-closed streams. Closing a stream closes it for writing and closes the remote end for reading but allows writing in the other direction.
 
 To close a stream, send a message with a zero length body and a `CloseReceiver` (3) or `CloseInitiator` (4) flag (depending on whether or not the closer is the receiver or sender). Writing to a stream after it has been closed should result
 in an error. Reading from a remote-closed stream should return all data send before closing the stream and then EOF thereafter.
@@ -82,4 +81,4 @@ If a stream is being actively written to, the reader must take care to keep up w
 1. Blocking the entire connection until the offending stream is read.
 2. Resetting the offending stream.
 
-For example, the go-multiplex implementation blocks for a short period of time and then resets the stream if necessary.
+For example, the go-mplex implementation blocks for a short period of time and then resets the stream if necessary.
