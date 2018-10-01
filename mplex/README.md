@@ -47,8 +47,7 @@ The data segment is length prefixed by another unsigned varint. This results in 
 
 ## Protocol
 
-Mplex operates over a reliable ordered pipe between two peers, such as a TCP socket, or a unix pipe. One peer is designated the session 'initiator' (or the dialer) and the other is the session 'receiver'. The session initiator does not
-necessarily send the first packet, this distinction is just made to make the allocation of stream ID's unambiguous.
+Mplex operates over a reliable ordered pipe between two peers, such as a TCP socket, or a unix pipe.
 
 ### Opening a new stream
 
