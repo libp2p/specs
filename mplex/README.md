@@ -59,7 +59,7 @@ The party that opens a stream is called the stream initiator. This is used to id
 
 ### Writing to a stream
 
-To write data to a stream, one must send a message with the flag `MessageReceiver` (1) or `MessageInitiator` (2) (depending on whether or not the writer is the receiver or sender). The data field should contain the data you wish to write to the stream, limited to a maximum size agreed upon out of band (For reference, the go-mplex implementation sets this to 1MB).
+To write data to a stream, one must send a message with the flag `MessageReceiver` (1) or `MessageInitiator` (2) (depending on whether or not the writer is the receiver or sender). The data field should contain the data you wish to write to the stream, up to 1MiB per message.
 
 ### Closing a stream
 
