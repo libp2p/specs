@@ -89,7 +89,8 @@ future.
 
 ## The Topic Descriptor
 
-The topic descriptor message is used to define various options and parameters
+The topic descriptor message is not used in current implementations, but
+may be used in future to define various options and parameters
 of a topic. It currently specifies the topic's human readable name, its
 authentication options, and its encryption options.
 
