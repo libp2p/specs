@@ -89,10 +89,10 @@ future.
 
 ## The Topic Descriptor
 
-The topic descriptor message is not used in current implementations, but
-may be used in future to define various options and parameters
-of a topic. For clarity, it is recommended to not include the 
-`TopicDescriptor` in the `.proto` file until is is used.
+The `AuthOpts` and `EncOpts` of the topic descriptor message 
+are not used in current implementations, but
+may be used in future. For clarity, it is recommended to not include  
+them in the `.proto` file until is is used.
 It currently specifies the topic's human readable name, its
 authentication options, and its encryption options.
 
