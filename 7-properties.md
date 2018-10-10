@@ -118,11 +118,11 @@ The multiplexing protocols used at the moment are:
 
 - Mplex
 - [Yamux](https://github.com/hashicorp/yamux/blob/master/spec.md)
+- QUIC
 
 Other ideas:
 
 - HTTP/2
-- QUIC
 - SSH
 
 ### 7.5.2 multistream-select - self-describing protocol stream selector
