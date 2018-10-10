@@ -46,6 +46,11 @@ This is the connection source address of the stream initiating peer as observed 
 being identified; it is a multi-address. The initiator can use this address to infer
 the existence of a NAT and its public address.
 
+For example, in the case of a TCP/IP transport the observed addresses will be of the form
+`/ip4/x.x.x.x/tcp/xx`. In the case of a circuit relay connection, the observed address will
+be of the form `/p2p/QmRelay/p2p-circuit`. In the case of onion transport, there is no
+observable source address.
+
 ### protocols
 
 This is a list of protocols supported by the peer.
