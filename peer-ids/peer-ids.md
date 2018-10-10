@@ -3,7 +3,7 @@
 ## Keys
 
 
-Everything is based on a very simple protobuf in [libp2p/go-libp2p-crypto/pb/crypto.proto#L5](https://github.com/libp2p/go-libp2p-crypto/blob/master/pb/crypto.proto#L5):
+Our key pairs are transmitted on the wire using a simple protobuf defined in [libp2p/go-libp2p-crypto/pb/crypto.proto#L5](https://github.com/libp2p/go-libp2p-crypto/blob/master/pb/crypto.proto#L5):
 
 ```
 enum KeyType {
@@ -24,16 +24,16 @@ message PrivateKey {
 }
 ```
 
-As you can see, this proto simply transmits a public/private key pair along with an enum specifying the type of keypair.
+As should be apparent from the above code block, this proto simply encodes for transmission a public/private key pair along with an enum specifying the type of keypair.
 
 #### Where it's used?
 
-In libp2p for signing messages.  Categories of messages we sign:
+Keys are used in two places in libp2p.  The first is for signing messages.  Here are some examples of messages we sign:
  - IPNS records
  - PubSub messages (coming soon)
  - SECIO handshake
 
-We also use these protos for generating peer ids, as discussed in the section below.
+The second is for generating peer ids; this is discussed in the section below.
 
 ## Peer Ids
 
@@ -44,7 +44,7 @@ Here is the process by which we generate peer id's based on the public/private k
   3.  If the length of the serialized bytes <= 42, then we compute the "identity" multihash of the serialized bytes.  In other words, no hashing is performed, but the [multihash format is still followed](https://github.com/multiformats/multihash) (byte plus varint plus serialized bytes).  The idea here is that if the serialized byte array is short enough, we can fit it in a multihash proto without having to condense it using a hash function.
   4. If the length is >42, then we hash it using it using the SHA256 multihash.
 
-## How Keys are Encoded
+## How Keys are Encoded and Messages Signed
 
 Keys are passed around in code as byte arrays.  Keys are encoded within these arrays differently depending on the type of key.  
 
