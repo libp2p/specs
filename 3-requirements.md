@@ -14,6 +14,9 @@ In order to reason about possible transports, `libp2p` uses [multiaddr](https://
 # P2P over uTP over UDP over IPv4 (UDP-shimmed transport)
 /ip4/162.246.145.218/udp/4001/utp/p2p/QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
 
+# P2P over TCP over IPv6 with QUIC
+/ip6/fe80::8823:6dff:fee7:f172/tcp/4001/quic/p2p/QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
+
 # P2P over IPv6 (unreliable)
 /ip6/fe80::8823:6dff:fee7:f172/p2p/QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
 
@@ -71,7 +74,7 @@ We recommend that:
 - implementations are audited
 - unless absolutely necessary, users normally operate with encrypted communications only.
 
-`libp2p` uses TLS or TLS-like cyphersuites.
+`libp2p` uses TLS or TLS-like encryption protocols.
 
 **Note:** We do not use TLS directly, because we do not want the CA system baggage. Most TLS implementations are very big. Since the `libp2p` model begins with keys, `libp2p` only needs to apply ciphers. This is a minimal portion of the whole TLS standard.
 
