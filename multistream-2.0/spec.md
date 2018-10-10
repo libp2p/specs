@@ -1,106 +1,78 @@
-# Efficient and Sound Protocol Negotiation
+# Multistream 2.0
 
-This proposal lays out issues that we've encountered with multistream-select and
-proposes a replacement protocol. It also lays out an upgrade path from
-multistream-select to the new protocol.
-
-## Retrospective
-
-There are 5 concrete issues with multistream select.
-
-multistream-select:
-
-1. requires at least one round trip to be sound.
-2. negotiates protocols in series instead of in parallel. 
-3. doesn't provide any way to determine which side (possibly both) initiated the
-   connection/negotiation.
-4. is bandwidth inefficient.
-5. punishes long, descriptive, protocol names. 
-
-We ignore 1 and just accept that the protocol has some soundness issues as
-actually *waiting* for a response for a protocol negotiation we know will almost
-certainly succeed would kill performance.
-
-As for 2, we make sure to remember protocols known to be spoken by the remote
-endpoint so we can try to negotiate a known-good protocol first. However, this
-is still inefficient.
-
-Issue 3 gets us in trouble with TCP simultaneous connect. Basically, we need a
-protocol where both sides can propose a set of protocols to speak and then
-deterministically select the *same* protocol. Ideally, we'd also *expose* the
-fact that both sides are initiating to the user.
-
-By 4, I mean that we repeatedly send long strings (the protocol names) back and
-forth. While long strings *are* more user friendly than, e.g., port numbers,
-they're, well, long. This can introduce bandwidth overheads over 30%.
-
-Issue 5 is a corollary of issue 4. Because we send these protocol names *every*
-time we negotiate, we don't, e.g., send longer, better protocol names like:
-
-* /ai/protocol/p2p/bitswap/1.0
-* /ipfs/QmId.../bitswap/1.0
-
-However, multistream-select was *explicitly designed* with this use-case in
-mind.
+This proposal describes a replacement protocol for multistream-select.
 
 ## Protocols
 
-This document proposes 5 new, micro-protocols with two guiding principles:
+This document proposes 6 new, micro-protocols with two guiding principles:
 
 1. Composition over complexity.
 2. Every byte and round-trip counts.
 
-The protocols are:
+This document *does not*, in fact, propose a protocol *negotiation* protocol.
+Instead, it proposes a set of stream/protocol management protocols that can be
+composed to flexibly negotiate protocols.
 
-1. `multistream/use`: declares the protocol being used using a multicodec.
-2. `multistream/dynamic`: declares the protocol being used using a string.
-3. `multistream/contextual`: declares the protocol being used using an ephemeral
-   protocol ID defined by the *receiver* for the duration of some session (e.g.,
-   an underlying connection).
-4. `multistream/choose`: allows an initiator to optimistically initiate multiple
-   streams, discarding all but one.
-5. `multistream/hello`: inform the remote end about (a) which protocols we speak
-   and (b) which services we are running. This should replace both identify and
-   our current "try every protocol" service discovery system.
-   
-This document also proposes an auxiliary protocols that we'll need to complete
-the picture.
+First, this document proposes 4 protocol "negotiation" protocols. "Negotiation"
+is in quotes because none of these protocols actually involve negotiating
+anything.
 
-1. `serial-multiplex`: a simple stream "multiplexer" that can multiplex multiple
-   streams *in serial* over the same connection. That is, it allows us to return
-   to the stream to multistream once we're done with it. This allows us to *try*
-   a protocol, fail, and fallback on a slow protocol negotiation.
+1. `multistream/advertise`: Inform the remote end about which protocols we speak
+   and. This should partially replace the current identify protocol.
+2. `multistream/use`: Selects the stream's protocol using a multicodec.
+3. `multistream/dynamic`: Selects the stream's protocol using a string protocol name.
+4. `multistream/contextual`: Selects the stream's protocol using a protocol ID
+   defined by the *receiver*, valid for the duration of the "session"
+   (underlying connection). To use this, the *receiver* must have used the
+   `multistream/advertise` To inform the initiator of *it's* mapping between
+   protocols and contextual IDs.
+
+Second, this document proposes 2 auxiliary protocols that can be used with the 4
+multistream protocols to actually negotiate protocols. These are *primarily*
+useful (a) in packet-based protocols (without sessions) and (b) when initially
+negotiating a transport session (before protocols have been advertised and the
+stream multiplexer has been configured).
+
+1. `serial-stream`: A simple stream "multiplexer" that can multiplex multiple
+   streams *in serial* over the same connection. That is, it allows us to
+   negotiate a protocol, use it, and then return to multistream. It also allows
+   us to speculatively choose a single protocol and then drop back down to
+   multistream if that doesn't work.
+2. `speculative-stream`: A speculative stream "multiplexer" where the initiator
+   can speculatively initiate multiple streams and the receiver must select at
+   most one and discard the others.
    
 All peers *must* implement `multistream/use` and *should* implement
-`serial-multiplex`. This combination will allow us to apply a series of quick
+`serial-stream`. This combination will allow us to apply a series of quick
 connection upgrades (e.g., to multistream 3.0) with no round trips and no funny
 business (learn from past mistakes).
-
-These protocols were *also* designed to eventually support:
-
-1. Hardware. While we *do* use varints, we avoid using them for lengths in the
-   fast-path protocols (the non-negotiating ones).
-2. Packet protocols. All protocols described here are actually unidirectional
-   (at the protocol level, at least) and can work over packet protocols (where
-   the end of the packet is an "EOF").
 
 Notes:
 
 1. The "ls" feature of multistream has been removed. While useful, this really
-   should be a *protocol*. Given the `serial-multiplex` protocol, this shouldn't be
-   an issue.
-2. To reduce RTTs, all protocols are unidirectional. Even the negotiation
-   protocol, `multistream/choose` (see below for details).
+   should be a *protocol*. Given the `serial-stream` protocol, this shouldn't be
+   an issue as we can run as many sub-protocols over the same stream as we want.
+2. To reduce RTTs, all protocols are unidirectional.
+3. These protocols were *also* designed to eventually support packet protocols
+   (the other reason to be unidirectional and a strong motivator for the
+   `speculative-stream` and `serial-stream` protocols).
+
+### Multistream Advertise
+
+Unspeced (for now). Really, we just need to send a mapping of protocol
+names/codecs to contextual IDs (and may be some service discovery information).
+Basically, identify.
 
 ### Multistream Use
 
-The multistream/use protocol is simply two varint multicodecs: the
+The `multistream/use` protocol is simply two varint multicodecs: the
 multistream-use multicodec followed by the multicodec for the protocol to be
 used. This protocol is *unidirectional*. If the stream is bidirectional, the
-receiver will, by convention, respond the same way.
+receiver must acknowledge a successful protocol negotiation by responding with
+the same multistream-use protocol sequence.
 
 Every stream starts with multistream-use. Every other protocol defined here will
-be assigned a multicodec and selected with multistream/use.
+be assigned a multicodec and selected with `multistream/use.`
 
 This protocol should *also* be trivial to optimize in hardware simply by prefix
 matching (i.e., matching on the first N (usually 16-32) bits of the
@@ -113,44 +85,38 @@ stream/message).
 * [ ] Q: Should we somehow distinguish between initiator and receiver? Should we
       distinguish between bidirectional and unidirectional? We could even bit
       pack these options into a single byte and use this instead of the leading
-      multicodec... Note: distinguishing between bidirectional and
-      unidirectional may actually be necessary to be able to eagerly send a
-      unidirectional `multistream/hello` message.
+      multicodec...
 
 ### Multistream Dynamic
 
-The multistream/dynamic protocol is like the multistream/use protocol *except*
-that it uses a string to identify the protocol. To do so, the initiator simply
-sends a fixed-size 16bit length followed by the name of the protocol.
+The `multistream/dynamic` protocol is like the `multistream/use` protocol
+*except* that it uses a string to identify the protocol. To do so, the initiator
+simply sends a varint length followed by the name of the protocol.
 
-Including the multistream/use portion, the initiator would send:
+Including the `multistream/use` portion, the initiator would send:
 
 ```
-<multistream/use><multistream/dynamic><length(16 bits)><name(string)>
+<multistream/use><multistream/dynamic><length(varint)><name(string)>
 ```
 
-Design Note: We *could* use a varint and save a byte in many cases however:
-
-1. We'd either need to buffer the connection or read the varint byte-by-byte.
-   Neither of those are really optimal.
-2. The length of the name will be dwarf this extra byte.
-3. If anyone needs a 64byte name, they're using the *wrong protocol*. Really,
-   a single byte length should be sufficient for all reasonable protocol names
-   but we're being stupidly conservative here.
+Note: This used to use a fixed-width 16 bit number for a length. However, a
+varint *really* isn't going to cost us much, if anything, in terms of
+performance as most protocol names will be <= 128 bytes long. On the other hand,
+using different number formats everywhere *will* cost us in terms of complexity.
 
 ### Multistream Contextual
 
-The multistream/contextual protocol is used to select a protocol using a
+The `multistream/contextual` protocol is used to select a protocol using a
 *receiver specified*, session-ephemeral protocol ID. These IDs are analogues of
 ephemeral ports.
 
-In this protocol, the stream initiator sends a 16 bit ID specified by the
+In this protocol, the stream initiator sends a varint ID specified by the
 *receiver* to the receiver. This is a *unidirectional* protocol.
 
 Format:
 
 ```
-<multistream/use><multistream/contextual><id(16 bits)>
+<multistream/use><multistream/contextual><id(varint)>
 ```
 
 The ID 0 is reserved for saying "same protocol" on a bidirectional stream. The
@@ -166,16 +132,16 @@ This protocol has *also* been designed to be hardware friendly:
    IDs are chosen by the *receiver* means that the receiver can reuse the same
    IDs for all connected peers (reusing the same hardware routing table).
    
-* [ ] TODO: Just use a varint? Hardware can still do prefix matching and/or only
-support IDs that are at most two bytes long.
+Note: This *also* used to use 16 bit numbers. However, again, most peers will
+have <= 128 protocols. Worse, peers may want to use multistream as a more
+general-purpose stream router and may need to repeatedly allocate and then
+deallocate contextual IDs. At the end of the day, it's probably better to just
+be flexible.
 
-### Multistream Choose
+### Speculative Stream
 
-**WARNING:** this may be too complex/magical. However, it has some really nice
-properties. We could also go with a more standard I send you a list of protocols
-and you pick one approach but I'd like to consider this one.
 
-The multistream/choose protocol allows an initiator to start multiple streams in
+The `speculative-stream` protocol allows an initiator to start multiple streams in
 parallel while telling the receiver to only *act* on one of them. This:
 
 1. Allows us to "negotiate" each stream using the other multistream protocols.
@@ -216,19 +182,12 @@ appropriate protocol.
       way, one could jump to the correct section immediately.
     * Have a single list of "sections", no stream numbers. Stream numbers would be
       inferred by index. This is slightly smaller but not very flexible.
-* [ ] Q: Avoid varints?
 * [ ] Q: Just do something simpler?
 
-### Multistream Hello
+### Serial Stream
 
-Unspeced (for now). Really, we just need to send a mapping of protocol
-names/codecs to contextual IDs (and may be some service discovery information).
-Basically, identify.
-
-### Serial Multiplex
-
-The `serial-multiplex` protocol is the simplest possible stream multiplexer.
-Unlike other stream multiplexers, `serial-multiplex` can only multiplex streams
+The `serial-stream` protocol is the simplest possible stream multiplexer.
+Unlike other stream multiplexers, `serial-stream` can only multiplex streams
 in *serial*. That is, it has to close the current stream to open a new one. Also
 unlike most multiplexers, this multiplexer is *unidirectional*.
 
@@ -242,9 +201,9 @@ The protocol is:
 Where the header is:
 
 * -2 - Send a reset and return to multistream. All queued data (remote and
+  local) should be discarded.
 * -1 - Close: Send an EOF and return to multistream.
 *  0 - Rest: Ends the reuse protocol, transitioning to a direct stream.
-  local) should be discarded.
 * >0 - Data: The header indicates the length of the data.
 
 We could also use a varint but it's not really worth it. The 16 bit integer
@@ -252,11 +211,11 @@ makes implementing this protocol trivial, even in hardware.
 
 Why: This allows us to:
 
-1. Try protocols and fall back on others (we can also use `multistream/choose`
+1. Try protocols and fall back on others (we can also use `speculative-stream`
    for this).
 2. More importantly, it allows us to speak a bunch of protocols before setting
    up a stream multiplexer. Specifically, we can use this for
-   `multistream/hello` to send a hello as early as possible.
+   `multistream/advertise` to send an advertisement as early as possible.
 
 ## Upgrade Path
 
@@ -289,3 +248,156 @@ in which case it'll switch to multistream 2.0.
 Importantly: When we switch to multistream 2.0, we'll tag the connection (and
 any sub connections) with the multistream version. This way, we never have to do
 this again.
+
+## Example
+
+So, that was way too much how and not enough why or WTF? Let's try an example
+where,
+
+1. The initiator supports TLS1.3 and SECIO.
+2. The receiver only supports TLS1.3.
+3. They both support yamux.
+4. They both support DHT.
+5. secio and tls have multicodecs but yamux and dht don't.
+
+If we're still in the transition period, the initiator would start off by sending:
+
+```
+<len>/multistream/1.0\n
+<len>/multistream/2.0\n
+```
+
+If the receiver DOES NOT support multistream 2.0, it will reply with:
+
+```
+<len>/multistream/1.0\n
+<len>na\n
+```
+
+At this point, the client will fall back on multistream 1.0.
+
+Otherwise, the receiver will send back...
+
+```
+<len>/multistream/1.0\n
+<len>/multistream/2.0\n
+```
+
+...to complete the upgrade.
+
+We're now in multistream 2.0 land. Once we're done with the transition period,
+we'll start here to skip a round-trip.
+
+Now that we're using multistream 2.0, the initiator will send, in a single
+packet:
+
+```
+<multistream/use (multicodec)><speculative-stream (multicodec)>        // use multistream/use to select speculative-stream
+  <0 (stream number, varint)><len (varint)>                            // in alt stream 0
+    <multistream/use (multicodec)><secio (multicodec)>                 // select SECIO
+      <initial secio packet...>                                        // initiate SECIO
+  <1 (stream number, varint)><len (varint)>                            // in alt stream 1
+    <multistream/use (multicodec)><tls (multicodec)>                   // select TLS
+      <initial tls packet...>                                          // initiate TLS
+```
+
+The code to do this will likely look roughly like:
+
+```go
+streams := multistream.XOR(stream, ProtocolTLS, ProtocolSecIO)
+var wg sync.WaitGroup
+wg.Add(2)
+var (
+  secioConn, tlsConn net.Conn
+  secioErr,  tlsErr  error
+)
+go func() {
+  defer wg.Done()
+  secioConn, tlsErr = tls.Upgrade(streams[0])
+  ...
+}()
+
+go func() {
+  defer wg.Done()
+  tlsConn, tlsErr = secio.Upgrade(streams[1])
+  ...
+}()
+
+wg.Wait()
+
+switch {
+case tlsErr == nil:
+  return tlsConn
+case secioConn == nil:
+  return secioConn
+default:
+  return (some error)
+}
+```
+
+
+The receiver will respond with:
+
+```
+<multistream/use (multicodec)><speculative-stream (multicodec)>        // use multistream/use to select speculative-stream
+  <1 (stream number, varint)>0                                         // choose stream 1
+
+<multistream/use (multicodec)><tls (multicodec)>                       // respond to the "use tls" protocol
+<tls response...>                                                      // speak tls
+```
+
+The speculative stream handler will likely just try each stream in-order,
+selecting the first stream that ends up negotiating a known protocol. More
+advanced implementations may allow for speculative stream *handlers* to select
+from within multiple known protocols. However, this is unlikely to be necessary
+for a while.
+
+Finally, the initiator will finish the TLS negotiation, send a advertise packet,
+*optimistically* negotiate yamux (it could also use speculative-stream to
+negotiate both at the same time but let's not), and sends the DHT request.
+
+```
+  <1 (stream number)>0                                                     // choose stream 1
+
+<tls client auth...>                                                       // finish TLS
+
+<multistream/use (multicodec)><serial-stream (multicodec)>                 // use serial-stream to make the stream recoverable
+  <len>                                                                    // serial-stream message framing
+    <multistream/use (multicodec)><multistream/advertise (multicodec)>     // select advertise protocol
+      <advertise data>                                                     // comlete advertise information (protocols, etc.)
+  -1                                                                       // return to multistream (EOF)
+
+<multistream/use (multicodec)><serial-stream (multicodec)>                 // open a new serial-stream
+  <len>
+    <multistream/use (multicodec)><multistream/dynamic (multicodec)>       // select multistream/dynamic
+        <len>/yamux/1.0.0                                                  // select yamux
+      <new yamux stream>                                                   // create the stream
+        <multistream/use (multicodec)><multistream/dynamic (multicodec)>   // select multistream/dynamic
+            <len>/ipfs/kad/1.0.0                                           // select kad dht 1.0
+          <dht request...>                                                 // send the DHT request
+```
+
+And the receiver will send:
+
+```
+<multistream/use (multicodec)><serial-stream (multicodec)>             // use serial-stream to make the stream recoverable
+  <len>                                                                // serial-stream message framing
+    <multistream/use (multicodec)><multistream/advertise (multicodec)> // select advertise protocol
+      <advertise data>                                                 // comlete advertise information (protocols, etc.)
+  -1                                                                   // return to multistream (EOF)
+
+<multistream/use (multicodec)><serial-stream (multicodec)>             // open a new serial-stream
+  -1                                                                   // transition to that stream (we speak yamux)
+
+<multistream/use (multicodec)><multistream/dynamic (multicodec)>       // select multistream/dynamic
+    <len>/yamux/1.0.0                                                  // select yamux
+  <yamux stream 1>                                                     // respond to the new yamux stream
+    <multistream/use>                                                  // select multistream/dynamic
+      <multistream/dynamic>
+        <len>/ipfs/kad/1.0.0                                           // select kad dht
+      <dht response...>                                                // send the DHT response
+```
+
+Note: Ideally, we'd be able to avoid the optimistic yamux negotiation. However,
+to do that, some protocol information will have to be embedded in the TLS
+negotiation and exposed through a connection-level `Stat` method.
