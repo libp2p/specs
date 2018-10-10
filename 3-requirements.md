@@ -5,26 +5,26 @@
 
 `libp2p` is transport agnostic, so it can run over any transport protocol. It does not even depend on IP; it may run on top of NDN, XIA, and other new Internet architectures.
 
-In order to reason about possible transports, `libp2p` uses [multiaddr](https://github.com/multiformats/multiaddr), a self-describing addressing format. This makes it possible for `libp2p` to treat addresses opaquely everywhere in the system, and have support for various transport protocols in the network layer. The actual format of addresses in `libp2p` is `ipfs-addr`, a multiaddr that ends with an IPFS node id. For example, these are all valid `ipfs-addrs`:
+In order to reason about possible transports, `libp2p` uses [multiaddr](https://github.com/multiformats/multiaddr), a self-describing addressing format that describes the stack of protocols used to send packets to another peer. This makes it possible for `libp2p` to treat addresses opaquely everywhere in the system, and have support for various transport protocols in the network layer. The actual format of addresses in `libp2p` is `p2p-addr`, a multiaddr that ends with a peer id. For example, these are all valid `p2p-addrs`:
 
 ```
-# IPFS over TCP over IPv6 (typical TCP)
-/ip6/fe80::8823:6dff:fee7:f172/tcp/4001/ipfs/QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
+# P2P over TCP over IPv6 (typical TCP)
+/ip6/fe80::8823:6dff:fee7:f172/tcp/4001/p2p/QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
 
-# IPFS over uTP over UDP over IPv4 (UDP-shimmed transport)
-/ip4/162.246.145.218/udp/4001/utp/ipfs/QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
+# P2P over uTP over UDP over IPv4 (UDP-shimmed transport)
+/ip4/162.246.145.218/udp/4001/utp/p2p/QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
 
-# IPFS over IPv6 (unreliable)
-/ip6/fe80::8823:6dff:fee7:f172/ipfs/QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
+# P2P over IPv6 (unreliable)
+/ip6/fe80::8823:6dff:fee7:f172/p2p/QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
 
-# IPFS over TCP over IPv4 over TCP over IPv4 (proxy)
-/ip4/162.246.145.218/tcp/7650/ip4/192.168.0.1/tcp/4001/ipfs/QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
+# P2P over TCP over IPv4 over TCP over IPv4 (proxy)
+/ip4/162.246.145.218/tcp/7650/ip4/192.168.0.1/tcp/4001/p2p/QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
 
-# IPFS over Ethernet (no IP)
-/ether/ac:fd:ec:0b:7c:fe/ipfs/QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
+# P2P over Ethernet (no IP)
+/ether/ac:fd:ec:0b:7c:fe/p2p/QmYJyUMAcXEw1b5bFfbBbzYu5wyyjLMRHXGUkCXpag74Fu
 ```
 
-**Note:** At this time, no unreliable implementations exist. The protocol's interface for defining and using unreliable transport has not been defined. For more information on unreliable vs reliable transport, see [here](http://www.inetdaemon.com/tutorials/basic_concepts/communication/reliable_vs_unreliable.shtml). In the context of WebRTC, CTRL+F "reliable" [here](https://www.html5rocks.com/en/tutorials/webrtc/basics/#signaling).
+**Note:** At this time, no unreliable transport implementations exist. The protocol's interface for defining and using unreliable transport has not been defined. For more information on unreliable vs reliable transport, see [here](http://www.inetdaemon.com/tutorials/basic_concepts/communication/reliable_vs_unreliable.shtml). In the context of WebRTC, CTRL+F "reliable" [here](https://www.html5rocks.com/en/tutorials/webrtc/basics/#signaling).
 
 ## 3.2 Multi-multiplexing
 
@@ -40,7 +40,7 @@ The `libp2p` protocol is a collection of multiple protocols. In order to conserv
 - has flow control (backpressure, fairness)
 - encrypts each connection with a different ephemeral key
 
-To give an example, imagine a single IPFS node that:
+To give an example, imagine a single libp2p node that:
 
 - listens on a particular TCP/IP address
 - listens on a different TCP/IP address
@@ -61,7 +61,6 @@ Not providing this level of flexbility makes it impossible to use `libp2p` in va
 Communications on `libp2p` may be:
 
 - **encrypted**
-- **signed** (not encrypted)
 - **clear** (not encrypted, not signed)
 
 We take both security and performance seriously. We recognize that encryption is not viable for some in-datacenter high performance use cases.
@@ -72,15 +71,15 @@ We recommend that:
 - implementations are audited
 - unless absolutely necessary, users normally operate with encrypted communications only.
 
-`libp2p` uses cyphersuites like TLS.
+`libp2p` uses TLS or TLS-like cyphersuites.
 
 **Note:** We do not use TLS directly, because we do not want the CA system baggage. Most TLS implementations are very big. Since the `libp2p` model begins with keys, `libp2p` only needs to apply ciphers. This is a minimal portion of the whole TLS standard.
 
 ## 3.4 NAT traversal
 
-Network Address Translation is ubiquitous in the Internet. Not only are most consumer devices behind many layers of NAT, but most data center nodes are often behind NAT for security or virtualization reasons. As we move into containerized deployments, this is getting worse. IPFS implementations SHOULD provide a way to traverse NATs, otherwise it is likely that operation will be affected. Even nodes meant to run with real IP addresses must implement NAT traversal techniques, as they may need to establish connections to peers behind NAT.
+Network Address Translation is ubiquitous in the Internet. Not only are most consumer devices behind many layers of NAT, but most data center nodes are often behind NAT for security or virtualization reasons. As we move into containerized deployments, this is getting worse. Libp2p implementations SHOULD provide a way to traverse NATs, otherwise it is likely that operation will be affected. Even nodes meant to run with real IP addresses must implement NAT traversal techniques, as they may need to establish connections to peers behind NAT.
 
-`libp2p` accomplishes full NAT traversal using an ICE-like protocol. It is not exactly ICE, as IPFS networks provide the possibility of relaying communications over the IPFS protocol itself, for coordinating hole-punching or even relaying communication.
+`libp2p` accomplishes full NAT traversal using an ICE-like protocol. It is not exactly ICE, as libp2p networks provide the possibility of relaying communications over the libp2p protocol itself, for coordinating hole-punching or even relaying communication.
 
 It is recommended that implementations use one of the many NAT traversal libraries available, such as `libnice`, `libwebrtc`, or `natty`. However, NAT traversal must be interoperable.
 
@@ -91,7 +90,6 @@ Unfortunately, due to symmetric NATs, container and VM NATs, and other impossibl
 Connection relaying SHOULD be implemented as a transport, in order to be transparent to upper layers.
 
 For an instantiation of relaying, see the [p2p-circuit transport](relay).
-
 
 ## 3.6 Enable several network topologies
 

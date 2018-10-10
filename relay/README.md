@@ -6,7 +6,7 @@
 
 - [js-libp2p-circuit](https://github.com/libp2p/js-libp2p-circuit)
 - [go-libp2p-circuit](https://github.com/libp2p/go-libp2p-circuit)
-- [rust-libp2p](https://github.com/libp2p/rust-libp2p/tree/master/relay)
+- [rust-libp2p](https://github.com/libp2p/rust-libp2p/tree/master/transports/relay)
 
 ## Table of Contents
 
@@ -40,10 +40,6 @@ The circuit relay is both a tunneled transport and a mounted swarm protocol. The
      |           /p2p-circuit/QmTwo            |     |                                         |
      +-----------------------------------------+     +-----------------------------------------+
 ```
-
-**Notes for the reader:**
-
-- We're using the `/p2p` multiaddr protocol instead of `/ipfs` in this document. `/ipfs` is currently the canonical way of addressing a libp2p or IPFS node, but given the growing non-IPFS usage of libp2p, we'll migrate to using `/p2p`.
 
 ## Dramatization
 

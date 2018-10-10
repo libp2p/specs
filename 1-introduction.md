@@ -16,12 +16,12 @@ In essence, a peer using `libp2p` should be able to communicate with another pee
 Our goals for the `libp2p` specification and its implementations are:
 
   - Enable the use of various:
-    - transports: TCP, UDP, SCTP, UDT, uTP, QUIC, SSH, etc.
-    - authenticated transports: TLS, DTLS, CurveCP, SSH
+    - transports ; for example TCP, UDP, SCTP, UDT, uTP, QUIC, SSH, etc.
+    - authenticated transports ; for example TLS, DTLS, CurveCP, SSH
   - Make efficient use of sockets (connection reuse)
   - Enable communications between peers to be multiplexed over one socket (avoiding handshake overhead)
   - Enable multiprotocols and respective versions to be used between peers, using a negotiation process
-  - Be backwards compatible
+  - Stay backwards compatible when releasing updates
   - Work in current systems
   - Use the full capabilities of current network technologies
   - Have NAT traversal

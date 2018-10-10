@@ -21,7 +21,7 @@ Reviewers:
 
 ## Abstract
 
-This describes the [IPFS](https://ipfs.io/) network protocol. The network layer provides point-to-point transports (reliable and unreliable) between any two IPFS nodes in the network.
+This describes the [libp2p](https://libp2p.io/) network protocol. The network layer provides point-to-point transports (reliable and unreliable) between any two libp2p nodes in the network.
 
 This document defines the spec implemented in `libp2p`.
 

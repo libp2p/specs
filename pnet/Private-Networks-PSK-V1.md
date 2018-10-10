@@ -1,18 +1,18 @@
-## Pre-shared Key Based Private Networks in IPFS
+## Pre-shared Key Based Private Networks in libp2p
 
-This document describes the first version of private networks (PN) featured in IPFS.
+This document describes the first version of private networks (PN) featured in libp2p.
 
 For the first implementation, only pre-shared key (PSK) functionality is available, as the Public Key Infrastructure approach is much more complex and requires more technical preparation.
 
-It was implemented as an additional encryption layer before any IPFS traffic, and was designed to leak the absolute minimum of information on its own. All traffic leaving the node inside a PN is encrypted and there is no characteristic handshake.
+It was implemented as an additional encryption layer before any libp2p traffic, and was designed to leak the absolute minimum of information on its own. All traffic leaving the node inside a PN is encrypted and there is no characteristic handshake.
 
 ### Interface
 
-An IPFS node or libp2p swarm is either in a a public network, or it is a member of a private network.
+An libp2p node or libp2p swarm is either in a a public network, or it is a member of a private network.
 
 A private network is defined by the 256-bit secret key, which has to be known and used by all members inside the network.
 
-In the case of an IPFS node, this key is stored inside the IPFS repo in a file named `swarm.key`. The file uses a path-based multicodec where, for now, the codec that is defined and used is `/key/swarm/psk/1.0.0/`. The codec expects the next path-based multicodec to define the base encoding for the rest of the file (`/bin/`, `/base16/`, `/base64/`), which is the 256-bit PSK. The key has to be exactly 256-bits (32 bytes) long.
+In the case of an libp2p node, this key is stored inside the libp2p repo in a file named `swarm.key`. The file uses a path-based multicodec where, for now, the codec that is defined and used is `/key/swarm/psk/1.0.0/`. The codec expects the next path-based multicodec to define the base encoding for the rest of the file (`/bin/`, `/base16/`, `/base64/`), which is the 256-bit PSK. The key has to be exactly 256-bits (32 bytes) long.
 
 #### Security Guarantees
 
@@ -24,7 +24,7 @@ These guarnetee is only provided when knowledge of private key is limited to tru
 
 In the libp2p swarm there is a safeguard implemented that prevents it from dialing with no PSK set, which would mean the node would connect with the rest of the public network.
 
-It can be enabled by setting `LIBP2P_FORCE_PNET=1` in the environment before starting IPFS or any other libp2p based application. In the event that the node is trying to connect with no PSK, thus connecting to the public network, an error will be raised and the process will be aborted.
+It can be enabled by setting `LIBP2P_FORCE_PNET=1` in the environment before starting libp2p or any other libp2p based application. In the event that the node is trying to connect with no PSK, thus connecting to the public network, an error will be raised and the process will be aborted.
 
 ### Cryptography of Private Networks
 
