@@ -5,7 +5,7 @@
 
 Our key pairs are stored on disk using a simple protobuf defined in [libp2p/go-libp2p-crypto/pb/crypto.proto#L5](https://github.com/libp2p/go-libp2p-crypto/blob/master/pb/crypto.proto#L5):
 
-```
+```protobuf
 enum KeyType {
 	RSA = 0;
 	Ed25519 = 1;
