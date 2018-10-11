@@ -22,13 +22,15 @@ message Identify {
 ### protocolVersion
 
 The protocol version identifies the family of protocols used by the peer.
-The current protocol version is `ipfs/0.1.0`; if the protocol does not match
-the protocol used by the initiating peer, then the connection is considered
-unusable and the peer must close the connection.
+The current protocol version is `ipfs/0.1.0`; if the protocol major or minor
+version does not match the protocol used by the initiating peer, then the connection
+is considered unusable and the peer must close the connection.
 
 ### agentVersion
 
 This is a free-form string, identifying the implementation of the peer.
+The usual format is `agent-name/version`, where `agent-name` is
+the name of the program or library and `version` is its semantic version.
 
 ### publicKey
 
