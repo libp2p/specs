@@ -16,9 +16,11 @@ As responses come in, the peer adds the other peers information into is local da
 
 `host-name` is the fully qualified name of the peer.  It is derived from the peer's name and `p2p.local`.
 
-`peer-name` is the case-insenstive ID of the peer and less than 64 characters.  It is normally is the base-32 encoding of peer's ID.
+`peer-name` is the case-insenstive unique identifier of the peer and less than 64 characters.  
+It is normally the base-32 encoding of peer's ID. 
 
-Note that all names are case insensitive. 
+If the encoding of the peer's ID exceeds 63 characters, then the [Split at 63rd character](https://github.com/ipfs/in-web-browsers/issues/89#issue-341357014) 
+workaround can be used.
 
 ## Peer Discovery
 
