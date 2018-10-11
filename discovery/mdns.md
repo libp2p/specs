@@ -92,4 +92,36 @@ peer's discovery details. To accomodate this, a peer should respond to the follo
 
 ## Worked Example
 
-**TODO**
+Asumming that `peer-id` is `QmQusTXc1Z9C1mzxsqC9ZTFXCgSkpBRGgW4Jk2QYHxKE22`.  Then the `peer-name` is `ciqcmoputolsfsigvm7nx5fwkko2eq26h46qhbj6o4co7uyn2f2srdy`.
+
+To make the examples more readable `id` and `name` are used.
+
+
+### Meta Query
+
+Find all services on the local network.
+
+#### Question
+
+`_services._dns-sd._udp.local PTR`
+
+#### Answer
+
+_services._dns-sd._udp.local IN PTR _p2p._udp.local
+
+### Find All Peers
+
+Find all peers on the local network
+
+#### Question
+
+_p2p._udp.local PTR
+
+#### Answer
+
+_p2p._udp.local IN PTR `name`._p2p._udp.local
+
+#### Additional Records
+
+- `name`._p2p._udp.local IN TXT dnsaddr=/ip6/fe80::7573:b0a8:46b0:bfea/tcp/4001/ipfs/`id`
+- `name`._p2p._udp.local IN TXT dnsaddr=/ip4/192.168.178.21/tcp/4001/ipfs/'id'
