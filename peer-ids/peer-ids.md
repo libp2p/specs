@@ -46,6 +46,14 @@ Here is the process by which we generate peer id's based on the public/private k
 
 ## How Keys are Encoded and Messages Signed
 
+Four key types are supported:
+ - RSA
+ - Ed25519
+ - Secp256k1
+ - ECDSA
+
+Implementations SHOULD support RSA and Ed25519. Implementations MAY support Secp256k1 and ECDSA, but nodes using those keys may not be able to connect to all other nodes.
+
 Keys are passed around in code as byte arrays.  Keys are encoded within these arrays differently depending on the type of key.  
 
 The following sections describe each key type's encoding rules.
