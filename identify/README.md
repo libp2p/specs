@@ -1,6 +1,6 @@
 # Identify v1.0.0
 
-The identify protocol is used to identify a peer and its capabilities.
+The identify protocol is used to query a peer about basic information and its capabilities.
 
 The protocol works by opening a stream, using `/ipfs/id/1.0.0` as the protocol string.
 The peer being identified responds by returning an `Identify` message and closes the
