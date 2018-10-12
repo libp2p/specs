@@ -44,6 +44,20 @@ Here is the process by which we generate peer id's based on the public/private k
   3.  If the length of the serialized bytes <= 42, then we compute the "identity" multihash of the serialized bytes.  In other words, no hashing is performed, but the [multihash format is still followed](https://github.com/multiformats/multihash) (byte plus varint plus serialized bytes).  The idea here is that if the serialized byte array is short enough, we can fit it in a multihash proto without having to condense it using a hash function.
   4. If the length is >42, then we hash it using it using the SHA256 multihash.
 
+For more information, refer to this block in [libp2p/go-libp2p-peer/peer.go](https://github.com/libp2p/go-libp2p-peer/blob/master/peer.go):
+
+```
+// MaxInlineKeyLength is the maximum length a key can be for it to be inlined in
+// the peer ID.
+//
+// * When `len(pubKey.Bytes()) <= MaxInlineKeyLength`, the peer ID is the
+//   identity multihash hash of the public key.
+// * When `len(pubKey.Bytes()) > MaxInlineKeyLength`, the peer ID is the
+//   sha2-256 multihash of the public key.
+const MaxInlineKeyLength = 42
+```
+
+
 ## How Keys are Encoded and Messages Signed
 
 Four key types are supported:
