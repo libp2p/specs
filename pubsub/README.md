@@ -89,8 +89,11 @@ future.
 
 ## The Topic Descriptor
 
-The topic descriptor message is used to define various options and parameters
-of a topic. It currently specifies the topic's human readable name, its
+The `AuthOpts` and `EncOpts` of the topic descriptor message 
+are not used in current implementations, but
+may be used in future. For clarity, this is added as a comment in
+the file, and may be removed once used.
+It currently specifies the topic's human readable name, its
 authentication options, and its encryption options.
 
 The `TopicDescriptor` protobuf is as follows:
@@ -98,6 +101,8 @@ The `TopicDescriptor` protobuf is as follows:
 ```protobuf
 message TopicDescriptor {
 	optional string name = 1;
+	// AuthOpts and EncOpts are unused as of Oct 2018, but
+	// are planned to be used in future.
 	optional AuthOpts auth = 2;
 	optional EncOpts enc = 3;
 
