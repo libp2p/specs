@@ -41,7 +41,7 @@ profiles.
 
 - Go: [libp2p/go-floodsub#67](https://github.com/libp2p/go-floodsub/pull/67) (experimental)
 - JS: not yet started
-- Rust: not yet started
+- Rust: [libp2p/rust-libp2p#521](https://github.com/libp2p/rust-libp2p/pull/521) (WIP)
 - Gerbil: [vyzo/gerbil-simsub](https://github.com/vyzo/gerbil-simsub) (simulator)
 
 
