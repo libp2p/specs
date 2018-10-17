@@ -89,12 +89,12 @@ future.
 
 ## The Topic Descriptor
 
-The `AuthOpts` and `EncOpts` of the topic descriptor message 
-are not used in current implementations, but
-may be used in future. For clarity, this is added as a comment in
-the file, and may be removed once used.
-It currently specifies the topic's human readable name, its
-authentication options, and its encryption options.
+The topic descriptor message is used to define various options and parameters
+of a topic. It currently specifies the topic's human readable name, its
+authentication options, and its encryption options. The `AuthOpts` and `EncOpts`
+of the topic descriptor message are not used in current implementations, but
+may be used in future. For clarity, this is added as a comment in the file,
+and may be removed once used.
 
 The `TopicDescriptor` protobuf is as follows:
 
@@ -130,8 +130,16 @@ message TopicDescriptor {
 }
 ```
 
-The `name` field is a string used to identify or mark the topic, It can be
-descriptive or random or anything that the creator chooses.
+The `name` field is a string used to identify or mark the topic. It can be
+descriptive or random or anything that the creator chooses. 
+
+Note that instead of using `TopicDescriptor.name`, for privacy reasons the 
+`TopicDescriptor` struct may be hashed, and used as the topic ID. Another
+option is to use a CID as a topic ID. While a consensus has not been reached,
+for forwards and backwards compatibility, using an enum `TopicID` that allows 
+custom types in variants (i.e. `asPlainString`, `hashedTopicDescriptor`, `asCID`)
+may be the most suitable option if it is available within an implementation's 
+language (otherwise it would be implementation defined).
 
 The `auth` field specifies how authentication will work for this topic. Only
 authenticated peers may publish to a given topic. See 'AuthOpts' below for
