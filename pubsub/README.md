@@ -137,7 +137,7 @@ Note that instead of using `TopicDescriptor.name`, for privacy reasons the
 `TopicDescriptor` struct may be hashed, and used as the topic ID. Another
 option is to use a CID as a topic ID. While a consensus has not been reached,
 for forwards and backwards compatibility, using an enum `TopicID` that allows 
-custom types in variants (i.e. `asPlainString`, `hashedTopicDescriptor`, `asCID`)
+custom types in variants (i.e. `Name`, `hashedTopicDescriptor`, `CID`)
 may be the most suitable option if it is available within an implementation's 
 language (otherwise it would be implementation defined).
 
