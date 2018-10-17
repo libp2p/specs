@@ -1,7 +1,7 @@
 8 Implementations
 =================
 
-A `libp2p` implementation are recommended to follow a certain level of granularity when implementing different modules and functionalities, so that common interfaces are easy to expose, test and check for interoperability with other implementations.
+A `libp2p` implementation is recommended to follow a certain level of granularity when implementing different modules and functionalities, so that common interfaces are easy to expose, test and check for interoperability with other implementations.
 
 This is the list of current modules available for `libp2p`:
 
