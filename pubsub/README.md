@@ -27,7 +27,7 @@ You can find information about the PubSub research and notes in the following re
   - [libp2p/js-libp2p-floodsub](http://github.com/libp2p/js-libp2p-floodsub);
   - [libp2p/rust-libp2p/floodsub](https://github.com/libp2p/rust-libp2p/tree/master/floodsub)
 - GossipSub, extensible baseline pubsub (2018)
-  - [.gossipsub#implementation-status](https://github.com/libp2p/specs/tree/master/pubsub/gossipsub#implementation-status)
+  - [gossipsub](https://github.com/libp2p/specs/tree/master/pubsub/gossipsub#implementation-status)
 - [EpiSub](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/episub.md), an epidemic broadcast tree router (defined 2018, not yet started as of Oct 2018)
 
 ## The RPC
