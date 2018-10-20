@@ -39,7 +39,7 @@ profiles.
 
 ## Implementation status
 
-- Go: [libp2p/go-pubsub/gossipsub.go](https://github.com/libp2p/go-libp2p-pubsub/blob/master/gossipsub.go) (experimental)
+- Go: [libp2p/go-libp2p-pubsub/gossipsub.go](https://github.com/libp2p/go-libp2p-pubsub/blob/master/gossipsub.go) (experimental)
 - JS: not yet started
 - Rust: [libp2p/rust-libp2p#521](https://github.com/libp2p/rust-libp2p/pull/521) (WIP)
 - Gerbil: [vyzo/gerbil-simsub](https://github.com/vyzo/gerbil-simsub) (simulator)
