@@ -40,7 +40,8 @@ stream multiplexer has been configured).
    multistream if that doesn't work.
 2. `speculative-stream`: A speculative stream "multiplexer" where the initiator
    can speculatively initiate multiple streams and the receiver must select at
-   most one and discard the others.
+   most one and discard the others. On a bidirectional stream, the receiver will
+   inform the initiator of the selected sub-stream, collapsing the state.
    
 All peers *must* implement `multistream/use` and *should* implement
 `serial-stream`. This combination will allow us to apply a series of quick
@@ -61,7 +62,7 @@ Notes:
 
 Unspeced (for now). Really, we just need to send a mapping of protocol
 names/codecs to contextual IDs (and may be some service discovery information).
-Basically, identify.
+This is the subset of identify needed for protocol negotiation.
 
 ### Multistream Use
 
