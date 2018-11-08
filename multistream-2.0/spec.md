@@ -17,8 +17,8 @@ First, this document proposes 4 protocol "negotiation" protocols. "Negotiation"
 is in quotes because none of these protocols actually involve negotiating
 anything.
 
-1. `multistream/advertise`: Inform the remote end about which protocols we speak
-   and. This should partially replace the current identify protocol.
+1. `multistream/advertise`: Inform the remote end about which protocols we
+   speak. This should partially replace the current identify protocol.
 2. `multistream/use`: Selects the stream's protocol using a multicodec.
 3. `multistream/dynamic`: Selects the stream's protocol using a string protocol name.
 4. `multistream/contextual`: Selects the stream's protocol using a protocol ID
