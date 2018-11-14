@@ -68,9 +68,9 @@ This is the subset of identify needed for protocol negotiation.
 
 The `multistream/use` protocol is simply two varint multicodecs: the
 multistream-use multicodec followed by the multicodec for the protocol to be
-used. This protocol is *unidirectional*. If the stream is bidirectional, the
-receiver must acknowledge a successful protocol negotiation by responding with
-the same multistream-use protocol sequence.
+used. This protocol supports unidirectional streams. If the stream is
+bidirectional, the receiver must acknowledge a successful protocol negotiation
+by responding with the same multistream-use protocol sequence.
 
 Every stream starts with multistream-use. Every other protocol defined here will
 be assigned a multicodec and selected with `multistream/use.`
@@ -112,7 +112,7 @@ The `multistream/contextual` protocol is used to select a protocol using a
 ephemeral ports.
 
 In this protocol, the stream initiator sends a varint ID specified by the
-*receiver* to the receiver. This is a *unidirectional* protocol.
+*receiver* to the receiver.
 
 Format:
 
@@ -148,7 +148,8 @@ parallel while telling the receiver to only *act* on one of them. This:
 1. Allows us to "negotiate" each stream using the other multistream protocols.
    That is, each message/sub-stream recursively uses multistream.
 2. Pack data into the initial packet to shave off a RTT in many cases.
-3. Support packet transports out of the box.
+3. Support packet transports out of the box where round-trips may not be
+   possible.
 
 Each message in this protocol consists of:
 
@@ -157,24 +158,23 @@ Each message in this protocol consists of:
 <data length (varint)>
 ```
 
-The initiator can transition to a single one of these streams by sending:
+The where the receiver can transition to a single one of these streams by
+sending:
 
 ```
 <stream number>
 0
 ```
 
-This effectively aborts all the other streams, allowing the chosen stream to
-completely take over the channel.
+And the initiator responds the same way to finish off the transition.
 
-To actually *select* a protocol on a bidirectional channel, the receiver simply
-uses one of the other multistream protocols to pick a protocol.
+This aborts all the other streams, allowing the chosen stream to completely take
+over the channel.
 
 Note: A *simple* implementation of this protocol would simply send a sequence of
 protocols as `<stream number 1><length><multistream/use>...<stream number
 2><length><multistream/use>...` and then wait for the other side to select the
 appropriate protocol.
-
 
 * [ ] Q: The current framing system is dead simple but inefficient in some
       cases. Specifically, one can't just (a) read a *single* header and then
@@ -189,8 +189,7 @@ appropriate protocol.
 
 The `serial-stream` protocol is the simplest possible stream multiplexer.
 Unlike other stream multiplexers, `serial-stream` can only multiplex streams
-in *serial*. That is, it has to close the current stream to open a new one. Also
-unlike most multiplexers, this multiplexer is *unidirectional*.
+in *serial*. That is, it has to close the current stream to open a new one.
 
 The protocol is:
 
