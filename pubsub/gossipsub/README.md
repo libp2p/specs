@@ -286,7 +286,7 @@ application layer), then it proceeds similarly to the payload reaction:
 
 ### Heartbeat
 
-The router periodically runs a hearbeat procedure, which is
+The router periodically runs a heartbeat procedure, which is
 responsible for maintaining the mesh, emitting gossip, and shifting
 the message cache.
 
