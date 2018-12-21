@@ -55,9 +55,20 @@ than 3 inflight requests, at any given time.
 
 ## Record keys
 
-Records in the DHT are keyed by CID [4]. There are intentions to move to
-multihash [5] keys in the near future, as certain CID components like the
-multicodec are redundant.
+Records in the DHT are keyed by CID [4], roughly speaking. There are intentions
+to move to multihash [5] keys in the future, as certain CID components like the
+multicodec are redundant. This will be an incompatible change.
+
+The format of `key` varies depending on message type; however, in all cases
+`dXOR(sha256(key1), sha256(key2))` see [Distance function](#distance-function-dxor)
+is used as the distance between two keys.
+
+* For `GET_VALUE` and `PUT_VALUE`, `key` is an unstructured array of bytes, except
+if it is being used to look up a public key for a `PeerId`, in which case it is
+the ASCII string '/pk/' concatenated with the binary `PeerId`.
+* For `ADD_PROVIDER` and `GET_PROVIDERS`, `key` is interpreted and validated as
+a CID.
+* For `FIND_NODE`, `key` is a binary `PeerId`
 
 ## Interfaces
 
@@ -212,7 +223,17 @@ Nodes must keep track of which nodes advertise that they provide a given key
 These records are managed through the `ADD_PROVIDER` and `GET_PROVIDERS`
 messages.
 
-_WIP (jhiesey): explain what actually happens when `Provide()` is called._
+When `Provide(key)` is called, the DHT finds the closest peers to `key` using
+the `FIND_NODE` RPC, and then sends a `ADD_PROVIDER` RPC with its own
+`PeerInfo` to each of these peers.
+
+Each peer that receives the `ADD_PROVIDER` RPC should validate that the
+received `PeerInfo` matches the sender's `peerID`, and if it does, that peer
+must store a record in its datastore the received `PeerInfo` record.
+
+When a node receives a `GET_PROVIDERS` RPC, it must look up the requested
+key in its datastore, and respond with any corresponding records in its
+datastore, plus a list of closer peers in its routing table.
 
 For performance reasons, a node may prune expired advertisements only
 periodically, e.g. every hour.
@@ -236,33 +257,119 @@ This process is repeated as many times per run as configuration parameter
 
 ## RPC messages
 
-_WIP (jheisey): consider just dumping a nicely formatted and simplified
-protobuf._
-
 See [protobuf
 definition](https://github.com/libp2p/go-libp2p-kad-dht/blob/master/pb/dht.proto)
 
 On any error, the entire stream is reset. This is probably not the behavior we
 want.
 
-* `FIND_NODE(key bytes) -> (nodes PeerInfo[])` Finds the `ncp` (default:6) nodes
-closest to `key` from the routing table and returns an array of `PeerInfo`s. If
-a node with id equal to `key` is found, returns only the `PeerInfo` for that
-node.
-* `GET_VALUE(key bytes) -> (record Record, closerPeers PeerInfo[])` If `key` is
-a public key (begins with `/pk/`) and the key is known, returns a `Record`
-containing that key. Otherwise, returns the `Record` for the given key (if in
-the datastore) and an array of `PeerInfo`s for closer peers.
-* `PUT_VALUE(key bytes, value Record) -> ()` Validates `value` and, if it is
-valid, stores it in the datastore.
-* `GET_PROVIDERS(key bytes) -> (providerPeers PeerInfo[], closerPeers
-PeerInfo[])` Verifies `key` is a valid CID. Returns `providerPeers` if in the
-providers cache, and an array of closer peers.
-* `ADD_PROVIDER(key, providerPeers PeerInfo[]) -> ()` Verifies `key` is a valid
-CID. For each provider `PeerInfo` that matches the sender's id and contains one
-or more multiaddrs, that provider info is added to the peerbook and the peer is
-added as a provider for the CID.
-* `PING() -> ()` Tests connectivity to destination node. Currently never sent.
+All RPC messages conform to the following protobuf:
+```protobuf
+// Record represents a dht record that contains a value
+// for a key value pair
+message Record {
+	// The key that references this record
+	bytes key = 1;
+
+	// The actual value this record is storing
+	bytes value = 2;
+
+	// Note: These fields were removed from the Record message
+	// hash of the authors public key
+	//optional string author = 3;
+	// A PKI signature for the key+value+author
+	//optional bytes signature = 4;
+
+	// Time the record was received, set by receiver
+	string timeReceived = 5;
+};
+
+message Message {
+	enum MessageType {
+		PUT_VALUE = 0;
+		GET_VALUE = 1;
+		ADD_PROVIDER = 2;
+		GET_PROVIDERS = 3;
+		FIND_NODE = 4;
+		PING = 5;
+	}
+
+	enum ConnectionType {
+		// sender does not have a connection to peer, and no extra information (default)
+		NOT_CONNECTED = 0;
+
+		// sender has a live connection to peer
+		CONNECTED = 1;
+
+		// sender recently connected to peer
+		CAN_CONNECT = 2;
+
+		// sender recently tried to connect to peer repeatedly but failed to connect
+		// ("try" here is loose, but this should signal "made strong effort, failed")
+		CANNOT_CONNECT = 3;
+	}
+
+	message Peer {
+		// ID of a given peer.
+		bytes id = 1;
+
+		// multiaddrs for a given peer
+		repeated bytes addrs = 2;
+
+		// used to signal the sender's connection capabilities to the peer
+		ConnectionType connection = 3;
+	}
+
+	// defines what type of message it is.
+	MessageType type = 1;
+
+	// defines what coral cluster level this query/response belongs to.
+	// in case we want to implement coral's cluster rings in the future.
+	int32 clusterLevelRaw = 10; // NOT USED
+
+	// Used to specify the key associated with this message.
+	// PUT_VALUE, GET_VALUE, ADD_PROVIDER, GET_PROVIDERS
+	bytes key = 2;
+
+	// Used to return a value
+	// PUT_VALUE, GET_VALUE
+	Record record = 3;
+
+	// Used to return peers closer to a key in a query
+	// GET_VALUE, GET_PROVIDERS, FIND_NODE
+	repeated Peer closerPeers = 8;
+
+	// Used to return Providers
+	// GET_VALUE, ADD_PROVIDER, GET_PROVIDERS
+	repeated Peer providerPeers = 9;
+}
+```
+
+Any time a relevant `Peer` record is encountered, the associated multiaddrs
+are stored in the node's peerbook.
+
+These are the requirements for each `MessageType`:
+* `FIND_NODE`: `key` must be set in the request. `closerPeers` is set in the
+response; for an exact match exactly one `Peer` is returned; otherwise `ncp`
+(default: 6) closest `Peer`s are returned.
+
+* `GET_VALUE`: `key` must be set in the request.  If `key` is a public key
+(begins with `/pk/`) and the key is known, the response has `record` set to
+that key. Otherwise, `record` is set to the value for the given key (if found
+in the datastore) and `closerPeers` is set to indicate closer peers.
+
+* `PUT_VALUE`: `key` and `record` must be set in the request. The target
+node validates `record`, and if it is valid, it stores it in the datastore.
+
+* `GET_PROVIDERS`: `key` must be set in the request. The target node returns
+the closest known `providerPeers` (if any) and the closest known `closerPeers`.
+
+* `ADD_PROVIDER`: `key` and `providerPeers` must be set in the request. The
+target node verifies `key` is a valid CID, all `providerPeers` that
+match the RPC sender's PeerID are recorded as providers.
+
+* `PING`: Target node responds with `PING`. Nodes should respond to this
+message but it is currently never sent.
 
 # Appendix A: differences in implementations
 
