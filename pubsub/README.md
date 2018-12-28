@@ -74,7 +74,9 @@ necessarily the peer who sent the RPC this message is contained in. This is
 done to allow content to be routed through a swarm of pubsubbing peers.
 
 The `data` field is an opaque blob of data, it can contain any data that the
-publisher wants it to.
+publisher wants it to. However, the size of this field should be limited, say
+to 1 MiB, but could also be configurable, for more information see 
+[issue 118](https://github.com/libp2p/specs/issues/118).
 
 The `seqno` field is a linearly increasing number that is unique among messages
 originating from each given peer. No two messages on a pubsub topic from the
@@ -90,7 +92,10 @@ the peer won't be able to send identical messages (e.g. keepalives) within the
 timecache interval, as they will get rejected as duplicates."
 
 The `topicIDs` field specifies a set of topics that this message is being
-published to.
+published to. To prevent the size of this field from growing indefinitely,
+it is suggested that that the application using an implementation of this
+library spec should have some kind of storage economics (see e.g.
+[here](https://ethresear.ch/t/draft-position-paper-on-resource-pricing/2838).
 
 Note that messages are currently *not* signed. This will come in the near
 future.
