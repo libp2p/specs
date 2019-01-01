@@ -98,7 +98,7 @@ future.
 The size of the `Message` should be limited, say to 1 MiB, but could also
 be configurable, for more information see 
 [issue 118](https://github.com/libp2p/specs/issues/118), while messages should be
-rejected if they are over this size (this isn't done as of Dec 2018).
+rejected if they are over this size.
 Note that for applications where state such as messages is
 stored, such as blockchains, it is suggested to have some kind of storage
 economics (see e.g. 
