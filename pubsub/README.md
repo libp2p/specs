@@ -95,6 +95,18 @@ published to.
 Note that messages are currently *not* signed. This will come in the near
 future.
 
+The size of the `Message` should be limited, say to 1 MiB, but could also
+be configurable, for more information see 
+[issue 118](https://github.com/libp2p/specs/issues/118), while messages should be
+rejected if they are over this size.
+Note that for applications where state such as messages is
+stored, such as blockchains, it is suggested to have some kind of storage
+economics (see e.g. 
+[here](https://ethresear.ch/t/draft-position-paper-on-resource-pricing/2838),
+[here](https://ethresear.ch/t/ethereum-state-rent-for-eth-1-x-pre-eip-document/4378)
+and
+[here](https://ethresear.ch/t/improving-the-ux-of-rent-with-a-sleeping-waking-mechanism/1480)).
+
 ## The Topic Descriptor
 
 The topic descriptor message is used to define various options and parameters
@@ -139,14 +151,14 @@ message TopicDescriptor {
 ```
 
 The `name` field is a string used to identify or mark the topic. It can be
-descriptive or random or anything that the creator chooses. 
+descriptive or random or anything that the creator chooses.
 
-Note that instead of using `TopicDescriptor.name`, for privacy reasons the 
+Note that instead of using `TopicDescriptor.name`, for privacy reasons the
 `TopicDescriptor` struct may be hashed, and used as the topic ID. Another
 option is to use a CID as a topic ID. While a consensus has not been reached,
-for forwards and backwards compatibility, using an enum `TopicID` that allows 
+for forwards and backwards compatibility, using an enum `TopicID` that allows
 custom types in variants (i.e. `Name`, `hashedTopicDescriptor`, `CID`)
-may be the most suitable option if it is available within an implementation's 
+may be the most suitable option if it is available within an implementation's
 language (otherwise it would be implementation defined).
 
 The `auth` field specifies how authentication will work for this topic. Only
