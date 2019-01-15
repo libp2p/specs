@@ -4,7 +4,7 @@ This proposal describes a replacement protocol for multistream-select.
 
 ## Protocols
 
-This document proposes 6 new, micro-protocols with two guiding principles:
+This document proposes 5 new, micro-protocols with two guiding principles:
 
 1. Composition over complexity.
 2. Every byte and round-trip counts.
