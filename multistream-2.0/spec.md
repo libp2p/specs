@@ -79,15 +79,6 @@ This protocol should *also* be trivial to optimize in hardware simply by prefix
 matching (i.e., matching on the first N (usually 16-32) bits of the
 stream/message).
 
-* [ ] Q: Technically, the first multicodec is redundant. However, it acts as a
-      magic byte that allows us to figure out what's going on. Should we keep
-      it? We could just start all streams with a single multicodec representing
-      the protocol
-* [ ] Q: Should we somehow distinguish between initiator and receiver? Should we
-      distinguish between bidirectional and unidirectional? We could even bit
-      pack these options into a single byte and use this instead of the leading
-      multicodec...
-
 ### Multistream Dynamic
 
 The `multistream/dynamic` protocol is like the `multistream/use` protocol
@@ -133,12 +124,6 @@ This protocol has *also* been designed to be hardware friendly:
    IDs are chosen by the *receiver* means that the receiver can reuse the same
    IDs for all connected peers (reusing the same hardware routing table).
    
-Note: This *also* used to use 16 bit numbers. However, again, most peers will
-have <= 128 protocols. Worse, peers may want to use multistream as a more
-general-purpose stream router and may need to repeatedly allocate and then
-deallocate contextual IDs. At the end of the day, it's probably better to just
-be flexible.
-
 ### Speculative Stream
 
 
