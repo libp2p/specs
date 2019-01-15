@@ -27,8 +27,8 @@ anything.
    `multistream/advertise` To inform the initiator of *it's* mapping between
    protocols and contextual IDs.
 
-Second, this document proposes 2 auxiliary protocols that can be used with the 4
-multistream protocols to actually negotiate protocols. These are *primarily*
+Second, this document proposes an auxiliary protocol that can be used with the 4
+multistream protocols to actually negotiate protocols. This is *primarily*
 useful (a) in packet-based protocols (without sessions) and (b) when initially
 negotiating a transport session (before protocols have been advertised and the
 stream multiplexer has been configured).
@@ -38,10 +38,6 @@ stream multiplexer has been configured).
    negotiate a protocol, use it, and then return to multistream. It also allows
    us to speculatively choose a single protocol and then drop back down to
    multistream if that doesn't work.
-2. `speculative-stream`: A speculative stream "multiplexer" where the initiator
-   can speculatively initiate multiple streams and the receiver must select at
-   most one and discard the others. On a bidirectional stream, the receiver will
-   inform the initiator of the selected sub-stream, collapsing the state.
    
 All peers *must* implement `multistream/use` and *should* implement
 `serial-stream`. This combination will allow us to apply a series of quick
@@ -54,9 +50,11 @@ Notes:
    should be a *protocol*. Given the `serial-stream` protocol, this shouldn't be
    an issue as we can run as many sub-protocols over the same stream as we want.
 2. To reduce RTTs, all protocols are unidirectional.
-3. These protocols were *also* designed to eventually support packet protocols
-   (the other reason to be unidirectional and a strong motivator for the
-   `speculative-stream` and `serial-stream` protocols).
+3. These protocols were *also* designed to eventually support packet protocols.
+4. We considered a `speculative-stream` protocol where the initiator
+   speculatively starts multiple streams and the receiver acts on at most one.
+   This would have allowed for 0-RTT worst-case protocol negotiation but was
+   deemed too complicated for inclusion in the core spec.
 
 ### Multistream Advertise
 
@@ -124,52 +122,6 @@ This protocol has *also* been designed to be hardware friendly:
    IDs are chosen by the *receiver* means that the receiver can reuse the same
    IDs for all connected peers (reusing the same hardware routing table).
    
-### Speculative Stream
-
-
-The `speculative-stream` protocol allows an initiator to start multiple streams in
-parallel while telling the receiver to only *act* on one of them. This:
-
-1. Allows us to "negotiate" each stream using the other multistream protocols.
-   That is, each message/sub-stream recursively uses multistream.
-2. Pack data into the initial packet to shave off a RTT in many cases.
-3. Support packet transports out of the box where round-trips may not be
-   possible.
-
-Each message in this protocol consists of:
-
-```
-<stream number (varint)>
-<data length (varint)>
-```
-
-The where the receiver can transition to a single one of these streams by
-sending:
-
-```
-<stream number>
-0
-```
-
-And the initiator responds the same way to finish off the transition.
-
-This aborts all the other streams, allowing the chosen stream to completely take
-over the channel.
-
-Note: A *simple* implementation of this protocol would simply send a sequence of
-protocols as `<stream number 1><length><multistream/use>...<stream number
-2><length><multistream/use>...` and then wait for the other side to select the
-appropriate protocol.
-
-* [ ] Q: The current framing system is dead simple but inefficient in some
-      cases. Specifically, one can't just (a) read a *single* header and then
-      (b) jump to the desired sub-stream. Alternatives include:
-    * Have a single header that maps stream numbers to offsets and lengths. This
-      way, one could jump to the correct section immediately.
-    * Have a single list of "sections", no stream numbers. Stream numbers would be
-      inferred by index. This is slightly smaller but not very flexible.
-* [ ] Q: Just do something simpler?
-
 ### Serial Stream
 
 The `serial-stream` protocol is the simplest possible stream multiplexer.
@@ -196,8 +148,7 @@ makes implementing this protocol trivial, even in hardware.
 
 Why: This allows us to:
 
-1. Try protocols and fall back on others (we can also use `speculative-stream`
-   for this).
+1. Try protocols and fall back on others.
 2. More importantly, it allows us to speak a bunch of protocols before setting
    up a stream multiplexer. Specifically, we can use this for
    `multistream/advertise` to send an advertisement as early as possible.
@@ -277,72 +228,48 @@ Now that we're using multistream 2.0, the initiator will send, in a single
 packet:
 
 ```
-<multistream/use (multicodec)><speculative-stream (multicodec)>        // use multistream/use to select speculative-stream
-  <0 (stream number, varint)><len (varint)>                            // in alt stream 0
-    <multistream/use (multicodec)><secio (multicodec)>                 // select SECIO
-      <initial secio packet...>                                        // initiate SECIO
-  <1 (stream number, varint)><len (varint)>                            // in alt stream 1
-    <multistream/use (multicodec)><tls (multicodec)>                   // select TLS
-      <initial tls packet...>                                          // initiate TLS
+<multistream/use (multicodec)><serial-stream (multicodec)>                 // use serial-stream to make the stream recoverable
+  <len>                                                                    // serial-stream message framing
+    <multistream/use (multicodec)><multistream/advertise (multicodec)>     // select advertise protocol
+      supported security protocols...                                      // 
+  -1                                                                       // return to multistream (EOF)
+
+<multistream/use (multicodec)><serial-stream (multicodec)>                 // open a new serial-stream
+  <len>
+    <multistream/use (multicodec)><tls (multicodec)>                       // select TLS
+      <initial tls packet...>                                              // initiate TLS
 ```
-
-The code to do this will likely look roughly like:
-
-```go
-streams := multistream.XOR(stream, ProtocolTLS, ProtocolSecIO)
-var wg sync.WaitGroup
-wg.Add(2)
-var (
-  secioConn, tlsConn net.Conn
-  secioErr,  tlsErr  error
-)
-go func() {
-  defer wg.Done()
-  secioConn, tlsErr = tls.Upgrade(streams[0])
-  ...
-}()
-
-go func() {
-  defer wg.Done()
-  tlsConn, tlsErr = secio.Upgrade(streams[1])
-  ...
-}()
-
-wg.Wait()
-
-switch {
-case tlsErr == nil:
-  return tlsConn
-case secioConn == nil:
-  return secioConn
-default:
-  return (some error)
-}
-```
-
 
 The receiver will respond with:
 
 ```
-<multistream/use (multicodec)><speculative-stream (multicodec)>        // use multistream/use to select speculative-stream
-  <1 (stream number, varint)>0                                         // choose stream 1
+<multistream/use (multicodec)><serial-stream (multicodec)>                 // respond to serial stream
+  <len>
+    <multistream/use (multicodec)><multistream/advertise (multicodec)>     // select advertise protocol
+      security protocols...
+  -1                                                                       // return to multistream (EOF)
 
-<multistream/use (multicodec)><tls (multicodec)>                       // respond to the "use tls" protocol
-<tls response...>                                                      // speak tls
+<multistream/use (multicodec)><serial-stream (multicodec)>                 // respond to second serial stream
+  0                                                                        // transition to a normal stream.
+<multistream/use (multicodec)><tls (multicodec)>                           // select TLS
+  <response tls packet...>                                                 // complete TLS handshake
 ```
 
-The speculative stream handler will likely just try each stream in-order,
-selecting the first stream that ends up negotiating a known protocol. More
-advanced implementations may allow for speculative stream *handlers* to select
-from within multiple known protocols. However, this is unlikely to be necessary
-for a while.
+This:
+
+1. Responds to the advertisement, also advertising available security protocols.
+2. Accepts the TLS stream.
+3. Finishes the TLS handshake.
+
+If the receiver had *not* supported TLS, it would have reset the serial-stream.
+In that case, the initiator would have used the protocols advertised by the
+receiver to select an appropriate security protocol.
 
 Finally, the initiator will finish the TLS negotiation, send a advertise packet,
-*optimistically* negotiate yamux (it could also use speculative-stream to
-negotiate both at the same time but let's not), and sends the DHT request.
+*optimistically* negotiate yamux, and sends the DHT request.
 
 ```
-  <1 (stream number)>0                                                     // choose stream 1
+  0                                                                        // transition to a normal stream.
 
 <tls client auth...>                                                       // finish TLS
 
@@ -386,3 +313,7 @@ And the receiver will send:
 Note: Ideally, we'd be able to avoid the optimistic yamux negotiation. However,
 to do that, some protocol information will have to be embedded in the TLS
 negotiation and exposed through a connection-level `Stat` method.
+
+Alternatively, we could choose to include this information in the advertisement
+sent *before* the security transport. However, that has some security
+implications.
