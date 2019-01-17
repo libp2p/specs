@@ -141,7 +141,7 @@ Where the header is:
   local) should be discarded.
 * -1 - Close: Send an EOF and return to multistream.
 *  0 - Rest: Ends the reuse protocol, transitioning to a direct stream.
-* >0 - Data: The header indicates the length of the data.
+* &gt;0 - Data: The header indicates the length of the data.
 
 We could also use a varint but it's not really worth it. The 16 bit integer
 makes implementing this protocol trivial, even in hardware.
