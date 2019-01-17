@@ -49,7 +49,9 @@ Notes:
 1. The "ls" feature of multistream has been removed. While useful, this really
    should be a *protocol*. Given the `serial-stream` protocol, this shouldn't be
    an issue as we can run as many sub-protocols over the same stream as we want.
-2. To reduce RTTs, all protocols are unidirectional.
+2. All multistream-2 protocols are unidirectional. On a bidirectional stream,
+   these protocols are run once in each direction with the receiver mirroring
+   the initiator.
 3. These protocols were *also* designed to eventually support packet protocols.
 4. We considered a `speculative-stream` protocol where the initiator
    speculatively starts multiple streams and the receiver acts on at most one.
