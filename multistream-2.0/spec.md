@@ -19,13 +19,13 @@ anything.
 
 1. `multistream/advertise`: Inform the remote end about which protocols we
    speak. This should partially replace the current identify protocol.
-2. `multistream/use`: Selects the stream's protocol using a multicodec.
-3. `multistream/dynamic`: Selects the stream's protocol using a string protocol name.
-4. `multistream/contextual`: Selects the stream's protocol using a protocol ID
+2. `multistream/multicodec`: Selects the stream's protocol using a multicodec.
+3. `multistream/string`: Selects the stream's protocol using a string protocol name.
+4. `multistream/dynamic`: Selects the stream's protocol using a protocol ID
    defined by the *receiver*, valid for the duration of the "session"
    (underlying connection). To use this, the *receiver* must have used the
    `multistream/advertise` To inform the initiator of *it's* mapping between
-   protocols and contextual IDs.
+   protocols and dynamic IDs.
 
 Second, this document proposes an auxiliary protocol that can be used with the 4
 multistream protocols to actually negotiate protocols. This is *primarily*
@@ -39,7 +39,7 @@ stream multiplexer has been configured).
    us to speculatively choose a single protocol and then drop back down to
    multistream if that doesn't work.
    
-All peers *must* implement `multistream/use` and *should* implement
+All peers *must* implement `multistream/multicodec` and *should* implement
 `serial-stream`. This combination will allow us to apply a series of quick
 connection upgrades (e.g., to multistream 3.0) with no round trips and no funny
 business (learn from past mistakes).
@@ -59,34 +59,34 @@ Notes:
 ### Multistream Advertise
 
 Unspeced (for now). Really, we just need to send a mapping of protocol
-names/codecs to contextual IDs (and may be some service discovery information).
+names/codecs to dynamic IDs (and may be some service discovery information).
 This is the subset of identify needed for protocol negotiation.
 
 ### Multistream Use
 
-The `multistream/use` protocol is simply two varint multicodecs: the
+The `multistream/multicodec` protocol is simply two varint multicodecs: the
 multistream-use multicodec followed by the multicodec for the protocol to be
 used. This protocol supports unidirectional streams. If the stream is
 bidirectional, the receiver must acknowledge a successful protocol negotiation
 by responding with the same multistream-use protocol sequence.
 
 Every stream starts with multistream-use. Every other protocol defined here will
-be assigned a multicodec and selected with `multistream/use.`
+be assigned a multicodec and selected with `multistream/multicodec.`
 
 This protocol should *also* be trivial to optimize in hardware simply by prefix
 matching (i.e., matching on the first N (usually 16-32) bits of the
 stream/message).
 
-### Multistream Dynamic
+### Multistream String
 
-The `multistream/dynamic` protocol is like the `multistream/use` protocol
+The `multistream/string` protocol is like the `multistream/multicodec` protocol
 *except* that it uses a string to identify the protocol. To do so, the initiator
 simply sends a varint length followed by the name of the protocol.
 
-Including the `multistream/use` portion, the initiator would send:
+Including the `multistream/multicodec` portion, the initiator would send:
 
 ```
-<multistream/use><multistream/dynamic><length(varint)><name(string)>
+<multistream/multicodec><multistream/string><length(varint)><name(string)>
 ```
 
 Note: This used to use a fixed-width 16 bit number for a length. However, a
@@ -94,9 +94,9 @@ varint *really* isn't going to cost us much, if anything, in terms of
 performance as most protocol names will be <= 128 bytes long. On the other hand,
 using different number formats everywhere *will* cost us in terms of complexity.
 
-### Multistream Contextual
+### Multistream Dynamic
 
-The `multistream/contextual` protocol is used to select a protocol using a
+The `multistream/dynamic` protocol is used to select a protocol using a
 *receiver specified*, session-ephemeral protocol ID. These IDs are analogues of
 ephemeral ports.
 
@@ -106,19 +106,19 @@ In this protocol, the stream initiator sends a varint ID specified by the
 Format:
 
 ```
-<multistream/use><multistream/contextual><id(varint)>
+<multistream/multicodec><multistream/dynamic><id(varint)>
 ```
 
 The ID 0 is reserved for saying "same protocol" on a bidirectional stream. The
-receiver of a bidirectional stream can't reuse the same contextual ID that the
-initiator used as this contextual ID is relative *to* the receiver. Really, this
+receiver of a bidirectional stream can't reuse the same dynamic ID that the
+initiator used as this dynamic ID is relative *to* the receiver. Really, this
 last rule *primarily* exists to side-step the TCP simultaneous connect issue.
 
 This protocol has *also* been designed to be hardware friendly:
 
 1. Hardware can compare the first 16 bits of the message against
-   `<multistream/use><multistream/contextual>`.
-2. It can then route the message based on the contextual ID. The fact that these
+   `<multistream/multicodec><multistream/dynamic>`.
+2. It can then route the message based on the dynamic ID. The fact that these
    IDs are chosen by the *receiver* means that the receiver can reuse the same
    IDs for all connected peers (reusing the same hardware routing table).
    
@@ -228,31 +228,31 @@ Now that we're using multistream 2.0, the initiator will send, in a single
 packet:
 
 ```
-<multistream/use (multicodec)><serial-stream (multicodec)>                 // use serial-stream to make the stream recoverable
-  <len>                                                                    // serial-stream message framing
-    <multistream/use (multicodec)><multistream/advertise (multicodec)>     // select advertise protocol
-      supported security protocols...                                      // 
-  -1                                                                       // return to multistream (EOF)
+<multistream/multicodec (multicodec)><serial-stream (multicodec)>             // use serial-stream to make the stream recoverable
+  <len>                                                                       // serial-stream message framing
+    <multistream/multicodec (multicodec)><multistream/advertise (multicodec)> // select advertise protocol
+      supported security protocols...                                         // 
+  -1                                                                          // return to multistream (EOF)
 
-<multistream/use (multicodec)><serial-stream (multicodec)>                 // open a new serial-stream
+<multistream/multicodec (multicodec)><serial-stream (multicodec)>             // open a new serial-stream
   <len>
-    <multistream/use (multicodec)><tls (multicodec)>                       // select TLS
-      <initial tls packet...>                                              // initiate TLS
+    <multistream/multicodec (multicodec)><tls (multicodec)>                   // select TLS
+      <initial tls packet...>                                                 // initiate TLS
 ```
 
 The receiver will respond with:
 
 ```
-<multistream/use (multicodec)><serial-stream (multicodec)>                 // respond to serial stream
+<multistream/multicodec (multicodec)><serial-stream (multicodec)>             // respond to serial stream
   <len>
-    <multistream/use (multicodec)><multistream/advertise (multicodec)>     // select advertise protocol
+    <multistream/multicodec (multicodec)><multistream/advertise (multicodec)> // select advertise protocol
       security protocols...
-  -1                                                                       // return to multistream (EOF)
+  -1                                                                          // return to multistream (EOF)
 
-<multistream/use (multicodec)><serial-stream (multicodec)>                 // respond to second serial stream
-  0                                                                        // transition to a normal stream.
-<multistream/use (multicodec)><tls (multicodec)>                           // select TLS
-  <response tls packet...>                                                 // complete TLS handshake
+<multistream/multicodec (multicodec)><serial-stream (multicodec)>             // respond to second serial stream
+  0                                                                           // transition to a normal stream.
+<multistream/multicodec (multicodec)><tls (multicodec)>                       // select TLS
+  <response tls packet...>                                                    // complete TLS handshake
 ```
 
 This:
@@ -269,45 +269,45 @@ Finally, the initiator will finish the TLS negotiation, send a advertise packet,
 *optimistically* negotiate yamux, and sends the DHT request.
 
 ```
-  0                                                                        // transition to a normal stream.
+  0                                                                            // transition to a normal stream.
 
-<tls client auth...>                                                       // finish TLS
+<tls client auth...>                                                           // finish TLS
 
-<multistream/use (multicodec)><serial-stream (multicodec)>                 // use serial-stream to make the stream recoverable
-  <len>                                                                    // serial-stream message framing
-    <multistream/use (multicodec)><multistream/advertise (multicodec)>     // select advertise protocol
-      <advertise data>                                                     // comlete advertise information (protocols, etc.)
-  -1                                                                       // return to multistream (EOF)
+<multistream/multicodec (multicodec)><serial-stream (multicodec)>              // use serial-stream to make the stream recoverable
+  <len>                                                                        // serial-stream message framing
+    <multistream/multicodec (multicodec)><multistream/advertise (multicodec)>  // select advertise protocol
+      <advertise data>                                                         // comlete advertise information (protocols, etc.)
+  -1                                                                           // return to multistream (EOF)
 
-<multistream/use (multicodec)><serial-stream (multicodec)>                 // open a new serial-stream
+<multistream/multicodec (multicodec)><serial-stream (multicodec)>              // open a new serial-stream
   <len>
-    <multistream/use (multicodec)><multistream/dynamic (multicodec)>       // select multistream/dynamic
-        <len>/yamux/1.0.0                                                  // select yamux
-      <new yamux stream>                                                   // create the stream
-        <multistream/use (multicodec)><multistream/dynamic (multicodec)>   // select multistream/dynamic
-            <len>/ipfs/kad/1.0.0                                           // select kad dht 1.0
-          <dht request...>                                                 // send the DHT request
+    <multistream/multicodec (multicodec)><multistream/string (multicodec)>     // select multistream/string
+        <len>/yamux/1.0.0                                                      // select yamux
+      <new yamux stream>                                                       // create the stream
+        <multistream/multicodec (multicodec)><multistream/string (multicodec)> // select multistream/string
+            <len>/ipfs/kad/1.0.0                                               // select kad dht 1.0
+          <dht request...>                                                     // send the DHT request
 ```
 
 And the receiver will send:
 
 ```
-<multistream/use (multicodec)><serial-stream (multicodec)>             // use serial-stream to make the stream recoverable
-  <len>                                                                // serial-stream message framing
-    <multistream/use (multicodec)><multistream/advertise (multicodec)> // select advertise protocol
-      <advertise data>                                                 // comlete advertise information (protocols, etc.)
-  -1                                                                   // return to multistream (EOF)
+<multistream/multicodec (multicodec)><serial-stream (multicodec)>              // use serial-stream to make the stream recoverable
+  <len>                                                                        // serial-stream message framing
+    <multistream/multicodec (multicodec)><multistream/advertise (multicodec)>  // select advertise protocol
+      <advertise data>                                                         // comlete advertise information (protocols, etc.)
+  -1                                                                           // return to multistream (EOF)
 
-<multistream/use (multicodec)><serial-stream (multicodec)>             // open a new serial-stream
-  -1                                                                   // transition to that stream (we speak yamux)
+<multistream/multicodec (multicodec)><serial-stream (multicodec)>              // open a new serial-stream
+  -1                                                                           // transition to that stream (we speak yamux)
 
-<multistream/use (multicodec)><multistream/dynamic (multicodec)>       // select multistream/dynamic
-    <len>/yamux/1.0.0                                                  // select yamux
-  <yamux stream 1>                                                     // respond to the new yamux stream
-    <multistream/use>                                                  // select multistream/dynamic
-      <multistream/dynamic>
-        <len>/ipfs/kad/1.0.0                                           // select kad dht
-      <dht response...>                                                // send the DHT response
+<multistream/multicodec (multicodec)><multistream/string (multicodec)>         // select multistream/string
+    <len>/yamux/1.0.0                                                          // select yamux
+  <yamux stream 1>                                                             // respond to the new yamux stream
+    <multistream/multicodec>                                                   // select multistream/string
+      <multistream/string>
+        <len>/ipfs/kad/1.0.0                                                   // select kad dht
+      <dht response...>                                                        // send the DHT response
 ```
 
 Note: Ideally, we'd be able to avoid the optimistic yamux negotiation. However,
