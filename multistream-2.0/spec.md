@@ -139,7 +139,7 @@ The protocol is:
 
 Where the header is:
 
-* -2 - Send a reset and return to multistream. All queued data (remote and
+* -2 - Abnormal End: Send a reset and return to multistream. All queued data (remote and
   local) should be discarded.
 * -1 - Close: Send an EOF and return to multistream.
 *  0 - Rest: Ends the reuse protocol, transitioning to a direct stream.
