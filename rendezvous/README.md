@@ -53,7 +53,9 @@ clients.
 The rendezvous protocol provides facilities for real-time peer
 discovery within application specific namespaces. Peers connect to the
 rendezvous point and register their presence in one or more
-namespaces.
+namespaces. It is not allowed to register arbitrary peers in a
+namespace; only the peer initiating the registration can register
+itself.
 
 Peers registered with the rendezvous point can be discovered by other
 nodes by querying the rendezvous point. The query specifies the
