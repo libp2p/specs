@@ -144,6 +144,16 @@ R -> D: {[REGISTER{my-app, {QmE, AddrE}}],
          c3}
 ```
 
+### Proof of Work
+
+The protocol as described so far is susceptible to spam attacks from
+adversarial actors who generate a large number of peer identities and
+register under a namespace of interest (eg: the relay namespace). This
+can be mitigated by requiring a Proof of Work scheme for client
+registrations.
+
+This is TBD before finalizing the spec.
+
 ### Protobuf
 
 ```protobuf
