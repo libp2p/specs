@@ -41,7 +41,7 @@ horizontally scalable ensemble of daemons.
 Rendezvous can be naturally combined with pubsub for effective
 real-time discovery.  At a basic level, rendezvous can be used to
 bootstrap pubsub: nodes can utilize rendezvous in order to discover
-their peers within a topic.  Contrariwise, pubsub can also be used as
+their peers within a topic.  Alternatively, pubsub can also be used as
 a mechanism for building rendezvous services. In this scenerio, a
 number of rendezvous points can federate using pubsub for internal
 real-time distribution, while still providing a simple interface to
