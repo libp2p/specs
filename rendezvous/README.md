@@ -157,6 +157,7 @@ message Message {
     E_INVALID_COOKIE    = 103;
     E_NOT_AUTHORIZED    = 200;
     E_INTERNAL_ERROR    = 300;
+    E_UNAVAILABLE       = 400;
   }
 
   message PeerInfo {
