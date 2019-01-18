@@ -1,5 +1,9 @@
 # Rendezvous Protocol
 
+Author: vyzo
+
+Revision: DRAFT; 2019-01-18
+
 The protocol described in this specification is intended to provide a
 lightweight mechanism for generalized peer discovery. It can be used
 for bootstrap purposes, real time peer discovery, application specific
