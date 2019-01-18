@@ -22,7 +22,7 @@ We even learned how to hide all the complexity of a distributed system behind ga
 
 ## 2.2 Categorizing the network stack protocols by solutions
 
-Before diving into the `libp2p` protocols, it is important to understand the large diversity of protocols already in wide use and deployment that help maintain today's simple abstractions. For example, when one thinks about an HTTP connection, one might naively just think that HTTP/TCP/IP are the main protocols involved, but in reality many more protocols participate, depending on the usage, the networks involved, and so on. Protocols like DNS, DHCP, ARP, OSPF, Ethernet, 802.11 (Wi-Fi) and many others get involved. Looking inside ISPs' own networks would reveal dozens more.
+Before diving into the `libp2p` protocols, it is important to understand the large diversity of protocols already in wide use and deployment that help maintain today's simple abstractions. For example, when one thinks about an HTTP connection, one might naively just think that HTTP/TCP/IP are the main protocols involved, but in reality many more protocols participate, depending on the usage, the networks involved, and so on. Protocols like DNS, DHCP(v6), ARP, NDISC, OSPF, Ethernet, 802.11 (Wi-Fi) and many others get involved. Looking inside ISPs' own networks would reveal dozens more.
 
 Additionally, it's worth noting that the traditional 7-layer OSI model characterization does not fit `libp2p`. Instead, we categorize protocols based on their role, i.e. the problem they solve. The upper layers of the OSI model are geared towards point-to-point links between applications, whereas the `libp2p` protocols speak more towards various sizes of networks, with various properties, under various different security models. Different `libp2p` protocols can have the same role (in the OSI model, this would be "address the same layer"), meaning that multiple protocols can run simultaneously, all addressing one role (instead of one-protocol-per-layer in traditional OSI stacking). For example, bootstrap lists, mDNS, DHT discovery, and PEX are all forms of the role "Peer Discovery"; they can coexist and even synergize.
 
@@ -42,7 +42,8 @@ Additionally, it's worth noting that the traditional 7-layer OSI model character
 ### 2.2.3 Discovering other peers or services
 
 - ARP
-- DHCP
+- NDISC
+- DHCP(v6)
 - DNS
 - Onion
 
