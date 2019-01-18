@@ -86,6 +86,9 @@ Peers can refresh their registrations at any time with a new
 registrations. Peers can also cancel existing registrations at any
 time with an explicit `UNREGISTER` message.
 
+The registration response includes the actual TTL of the registration,
+so that peers know when to refresh.
+
 ### Interaction
 
 Clients `A` and `B` connect to the rendezvous point `R` and register for namespace
@@ -174,6 +177,7 @@ message Message {
   message RegisterResponse {
     optional ResponseStatus status = 1;
     optional string statusText = 2;
+    optional int64 ttl = 3; // in seconds
   }
 
   message Unregister {
