@@ -80,8 +80,8 @@ The `seqno` field is a 64-bit big-endian uint that is a linearly increasing
 number that is unique among messages originating from each given peer. No two
 messages on a pubsub topic from the same peer should have the same `seqno`
 value, however messages from different peers may have the same sequence number,
-so this number alone cannot be used to address messages. (Notably the
-'timecache' in use by the floodsub implementation contains a `message_id`,
+so this number alone cannot be used to address messages. Notably the
+'timecache' in use by the go implementation contains a `message_id`,
 which is constructed from the concatenation of the `seqno` and the `from`
 fields. This `message_id` is then unique among messages. It was also proposed
 in [#116](https://github.com/libp2p/specs/issues/116) to use a `message_hash`,
