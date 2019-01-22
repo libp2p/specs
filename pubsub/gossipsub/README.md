@@ -54,11 +54,11 @@ It implements pubsub in the most basic manner, with two defining aspects:
 
 ### Ambient Peer Discovery
 
-With ambient peer discovery, the function is pushed outside the scope
-of the protocol. Instead, it relies on ambient connection events to
-perform peer discovery via protocol identification. Whenever a new
+In ambient peer discovery, discovering other pubsub peers is a passive action. 
+In other words, pubsub peers discover other peers by relying on 
+the discovery mechanism that peer is using, e.g. DHT, rendezvous,etc. Whenever a new
 peer is connected, the protocol checks to see if the peer implements
-floodsub, and if so it sends a hello packet that announces the topics
+a pubsub variant such as floodsub, and if so it sends a hello packet that announces the topics
 that it is currently subscribing to.
 
 This allows the peer to maintain soft overlays for all topics of
