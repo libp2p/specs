@@ -210,8 +210,9 @@ The protocol is:
 
 More specifically,
 
-1. The initiator sends: `<multistream/multicodec><duplex-stream>0<32 bytes of randomness>`
-1. The receiver sends: `<multistream/multicodec><duplex-stream>1<the same 32 bytes of randomness>`
+1. The initiator generates a 32 byte random ID (`ID`).
+2. The initiator negotiates the `duplex-stream` protocol and then sends `0<ID>` (`0` is a single 0 byte).
+3. The receiver negotiates the `duplex-stream` protocol and then sends `1<ID>` (`1` is a single 1 byte).
 
 If we end up in a situation where both peers want to be the initiator of a
 single pair of unidirectional streams, the peer that picks the *lower* random ID
@@ -229,6 +230,17 @@ On connect, the initiator(s) will:
    handshake.
 3. It'll then start the security negotiation as usual.
 
+Data sent:
+
+```
+<multistream/multicodec><serial-stream>
+  <len>
+    <multistream/multicodec><duplex-stream>
+      0
+      <ID>
+      ... (security negotiation and stuff) ...
+```
+
 If there is a receiver, it will:
 
 1. Handle the serial stream.
@@ -236,13 +248,23 @@ If there is a receiver, it will:
 3. Send a "duplex stream receive" on the other stream.
 4. Handle the security negotiation.
 
-If there are two initiators, they will both.
+Data sent:
+
+```
+<multistream/multicodec><duplex-stream>
+  1
+  <ID>
+  ... (security negotiation and stuff) ...
+```
+
+If there are two initiators, they will both:
 
 1. Handle the serial stream.
 2. See the "duplex stream initiate" message.
 3. Reset their outbound streams, dropping out of serial stream.
-4. The side with the *larger* `RANDOM ID` will try again as the initiator. The
-   side with the smaller will switch to the receiver role.
+4. The side with the *larger* `RANDOM ID` will try again as the initiator
+   (starting over from the top). The side with the smaller will switch to the
+   receiver role.
 
 In practice, both sides should actually be quite a bit more flexible here. That
 is, they should handle protocols as they're negotiated by the other peer instead
