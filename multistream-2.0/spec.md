@@ -187,6 +187,75 @@ Importantly: When we switch to multistream 2.0, we'll tag the connection (and
 any sub connections) with the multistream version. This way, we never have to do
 this again.
 
+## TCP Simultaneous Open
+
+As noted in the [retrospective](retrospective.md), multistream 1.0 doesn't
+provide any way to distinguish between the initiator and the receiver of a
+stream. Multistream 2.0 doesn't either but it *does* allow us to handle the TCP
+Simultaneous Open case without needing any additional round-trips in the fast
+path.
+
+To make this work, we need a new protocol: "duplex-stream" (or whatever we want
+to call it). This protocol allows one to bind two unidirectional streams
+together into a single bidirectional stream.
+
+### Protocol
+
+The protocol is:
+
+1. The side that wants to be the "initiator" of a duplex stream sends a
+   "initiate stream ID" message (where ID is randomly generated 256 bit number).
+2. The receiver sends back "receive stream ID" on a different unidirectional stream.
+3. The two streams are now joined.
+
+More specifically,
+
+1. The initiator sends: `<multistream/multicodec><duplex-stream>0<32 bytes of randomness>`
+1. The receiver sends: `<multistream/multicodec><duplex-stream>1<the same 32 bytes of randomness>`
+
+If we end up in a situation where both peers want to be the initiator of a
+single pair of unidirectional streams, the peer that picks the *lower* random ID
+should back off and act as the receiver.
+
+### Usage
+
+We treat each new TCP connection as a pair of unidirectional streams and use
+this protocol to bind them together.
+
+On connect, the initiator(s) will:
+
+1. Use `serial-stream` to make the stream recoverable.
+2. Inside that "serial stream", it'll do the initiator half of the stream
+   handshake.
+3. It'll then start the security negotiation as usual.
+
+If there is a receiver, it will:
+
+1. Handle the serial stream.
+2. See the "duplex stream initiate".
+3. Send a "duplex stream receive" on the other stream.
+4. Handle the security negotiation.
+
+If there are two initiators, they will both.
+
+1. Handle the serial stream.
+2. See the "duplex stream initiate" message.
+3. Reset their outbound streams, dropping out of serial stream.
+4. The side with the *larger* `RANDOM ID` will try again as the initiator. The
+   side with the smaller will switch to the receiver role.
+
+In practice, both sides should actually be quite a bit more flexible here. That
+is, they should handle protocols as they're negotiated by the other peer instead
+of simply *assuming* that the other peer will negotiate a specific protocol.
+
+For example, peers may want to send a bunch of unidirectional protocol
+advertisements before switching to duplex mode. One or both sides may decide to
+*not* use serial-stream to make the underlying connection recoverable (or they
+may use it multiple times recursively).
+
+In other words, both sides should actually treat the read half of the TCP stream
+as if it were an inbound unidirectional stream until it's not.
+
 ## Example
 
 So, that was way too much how and not enough why or WTF? Let's try an example
