@@ -325,7 +325,7 @@ for each topic in mesh+fanout:
   let mids be mcache.window[topic]
   if mids is not empty:
     select D peers from peers.gossipsub[topic]
-    for each peer not in mesh[topic]
+    for each peer not in mesh[topic] or fanout[topic]
       emit IHAVE(mids)
 
 shift the mcache
