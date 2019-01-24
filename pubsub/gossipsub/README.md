@@ -234,11 +234,14 @@ delay in the overlay with some healthy margin.
 
 Topic membership is controlled by two operations supported by the
 router, as part of the pubsub api:
-- On `JOIN(topic)` the router joins the topic. In order to do so, it
-  selects `D` peers from `peers.gossipsub[topic]`, adds them to `mesh[topic]`
-  and notifies them with a `GRAFT(topic)` control message. If it already has
-  `fanout` peers in the topic, then it selects those peers as the
-  initial mesh peers.
+- On `JOIN(topic)` the router joins the topic. In order to do so, if it already has
+  `D` peers from the `fanout` peers of a topic, then it adds them to `mesh[topic]`,
+  and notifies them with a `GRAFT(topic)` control message. Otherwise, if there are 
+  less than `D` peers (let this number be `x`) in the fanout for a topic (or the 
+  topic is not in the fanout), then it 
+  still adds them as above (if there are any), and selects the remaining number
+  of peers (`D-x`) from `peers.gossipsub[topic]`, and likewise adds them to 
+  `mesh[topic]` and notifies them with a `GRAFT(topic)` control message. 
 - On `LEAVE(topic)` the router leaves the topic. It notifies the peers in
   `mesh[topic]` with a `PRUNE(topic)` message and forgets `mesh[topic]`.
 
