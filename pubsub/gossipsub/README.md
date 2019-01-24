@@ -265,7 +265,7 @@ it publishes the message:
   source of the message.
 
 After processing the payload, it then processes the control messages in the envelope:
-- On `GRAFT(topic, peer)` it adds the peer to `mesh[topic]` if it is
+- On `GRAFT(topic, peer)` it adds the local peer to `mesh[topic]` if it is
   subscribed to the topic. If it is not subscribed, it responds with a `PRUNE(topic)`
   control message.
 - On `PRUNE(topic, peer)` it removes the peer from `mesh[topic]`.
