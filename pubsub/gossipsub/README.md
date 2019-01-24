@@ -239,7 +239,7 @@ router, as part of the pubsub api:
   and notifies them with a `GRAFT(topic)` control message. Otherwise, if there are 
   less than `D` peers (let this number be `x`) in the fanout for a topic, then it 
   still adds them as above (if there are any), and selects the remaining number
-  of peers (`D-x` from `peers.gossipsub[topic]`, and likewise adds them to 
+  of peers (`D-x`) from `peers.gossipsub[topic]`, and likewise adds them to 
   `mesh[topic]` and notifies them with a `GRAFT(topic)` control message. 
 - On `LEAVE(topic)` the router leaves the topic. It notifies the peers in
   `mesh[topic]` with a `PRUNE(topic)` message and forgets `mesh[topic]`.
