@@ -197,9 +197,12 @@ towards them.
 ### Control messages
 
 The protocol defines four control messages:
-- `GRAFT`: graft a mesh link; this notifies the peer that it has been added to the local mesh view.
-- `PRUNE`: prune a mesh link; this notifies the peer that it has been removed from the local mesh view.
-- `IHAVE`: gossip; this notifies the peer that the following messages were recently seen and are available on request.
+- `GRAFT`: graft a mesh link; this notifies a receiving remote peer that
+   it has been added to the dialing peer's local mesh view.
+- `PRUNE`: prune a mesh link; this notifies a receiving remote peer that
+   it has been removed from the dialing peer's local mesh view.
+- `IHAVE`: gossip; this notifies the peer that the following messages were
+   recently seen and are available on request.
 - `IWANT`: request transmission of messages announced in an `IHAVE` message.
 
 ### Router state
@@ -265,9 +268,9 @@ it publishes the message:
   source of the message.
 
 After processing the payload, it then processes the control messages in the envelope:
-- On `GRAFT(topic, peer)` it adds the local peer to `mesh[topic]` if it is
-  subscribed to the topic. If it is not subscribed, it responds with a `PRUNE(topic)`
-  control message.
+- On `GRAFT(topic, peer)` it adds a remote peer to `mesh[topic]` if it is
+  subscribed to the topic. If it is not subscribed, the remote peer responds with a
+  `PRUNE(topic)` control message.
 - On `PRUNE(topic, peer)` it removes the peer from `mesh[topic]`.
 - On `IHAVE(ids, peer)` it checks the `seen` set and requests unknown messages with an `IWANT`
    message.
