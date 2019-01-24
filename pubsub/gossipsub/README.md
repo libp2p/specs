@@ -270,7 +270,8 @@ it publishes the message:
 After processing the payload, it then processes the control messages in the envelope:
 - On `GRAFT(topic, peer)` it adds a remote peer to `mesh[topic]` if it is
   subscribed to the topic. If it is not subscribed, the remote peer responds with a
-  `PRUNE(topic)` control message.
+  `PRUNE(topic)` control message. If the topic is not in the local peer's mesh then
+  it returns an error, the peer must first join the topic.
 - On `PRUNE(topic, peer)` it removes the peer from `mesh[topic]`.
 - On `IHAVE(ids, peer)` it checks the `seen` set and requests unknown messages with an `IWANT`
    message.
