@@ -271,7 +271,9 @@ After processing the payload, it then processes the control messages in the enve
 - On `GRAFT(topic, peer)` it adds a remote peer to `mesh[topic]` if it is
   subscribed to the topic. If it is not subscribed, the remote peer responds with a
   `PRUNE(topic)` control message. If the topic is not in the local peer's mesh then
-  it returns an error, the peer must first join the topic.
+  it returns an error, the peer must first join the topic. (The remote peer must be in
+  the connected peers of the local peer, in order to check whether the remote is
+  subscribed to the topic.)
 - On `PRUNE(topic, peer)` it removes the peer from `mesh[topic]`.
 - On `IHAVE(ids, peer)` it checks the `seen` set and requests unknown messages with an `IWANT`
    message.
