@@ -58,8 +58,8 @@ In ambient peer discovery, discovering other pubsub peers is a passive action.
 In other words, pubsub peers discover other peers by relying on 
 the discovery mechanism that peer is using, e.g. DHT, rendezvous,etc. Whenever a new
 peer is connected, the protocol checks to see if the peer implements
-a pubsub variant such as floodsub, and if so it sends a hello packet that announces the topics
-that it is currently subscribing to.
+a pubsub variant such as floodsub, and if so, it sends a hello packet that announces the topics
+that it is currently subscribing to. As such, the functionality of peer discovery is pushed outside of the pubsub protocol.
 
 This allows the peer to maintain soft overlays for all topics of
 interest. The overlay is maintained by exchanging subscription
