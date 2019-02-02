@@ -1,6 +1,6 @@
 # PubSub interface for libp2p
 
-Revision: draft 1, 2017-02-17
+Revision: draft 2, 2019-02-01
 
 Authors:
 - whyrusleeping (why@ipfs.io)
@@ -66,6 +66,8 @@ message Message {
 	optional bytes data = 2;
 	optional bytes seqno = 3;
 	repeated string topicIDs = 4;
+	optional bytes signature = 5;
+	optional bytes key = 6;
 }
 ```
 
@@ -92,20 +94,32 @@ timecache interval, as they will get rejected as duplicates."
 The `topicIDs` field specifies a set of topics that this message is being
 published to.
 
-Note that messages are currently *not* signed. This will come in the near
-future.
+The `signature` and `key` fields are used for message signing, as explained below.
 
 The size of the `Message` should be limited, say to 1 MiB, but could also
-be configurable, for more information see 
+be configurable, for more information see
 [issue 118](https://github.com/libp2p/specs/issues/118), while messages should be
 rejected if they are over this size.
 Note that for applications where state such as messages is
 stored, such as blockchains, it is suggested to have some kind of storage
-economics (see e.g. 
+economics (see e.g.
 [here](https://ethresear.ch/t/draft-position-paper-on-resource-pricing/2838),
 [here](https://ethresear.ch/t/ethereum-state-rent-for-eth-1-x-pre-eip-document/4378)
 and
 [here](https://ethresear.ch/t/improving-the-ux-of-rent-with-a-sleeping-waking-mechanism/1480)).
+
+## Message Signing
+
+Messages can be optionally signed, and it is up to the peer whether to accept and forward
+unsigned messages.
+
+For signing purposes, the `signature` and `key` fields are used:
+- The `signature` field contains the signature.
+- The `key` field contains the signing key when it cannot be inlined in the source peer ID.
+  When present, it must match the peer ID.
+
+The signature is computed over the marshalled message protobuf _excluding_ the key field.
+The protobuf blob is prefixed by the string `libp2p-pubsub:` before signing.
 
 ## The Topic Descriptor
 
