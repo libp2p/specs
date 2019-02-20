@@ -226,3 +226,7 @@ Web Of Trust publishing. Messages are encrypted with some certificate or
 certificate chain shared amongst trusted peers. (Spec writer's note: this is the
 least clearly defined option and my description here may be wildly incorrect,
 needs checking).
+
+### See also
+
+- [Whisper v2.0](https://github.com/w3f/messaging) [WIP]
