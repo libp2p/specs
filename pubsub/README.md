@@ -122,7 +122,7 @@ The signature is computed over the marshalled message protobuf _excluding_ the k
 The protobuf blob is prefixed by the string `libp2p-pubsub:` before signing.
 
 When signature validation fails for a signed message, the implementation must
-drop the message and block propagation. Locally, it may treat this event in whichever
+drop the message and omit propagation. Locally, it may treat this event in whichever
 manner it wishes (e.g. logging).
 
 ## The Topic Descriptor
