@@ -121,6 +121,10 @@ For signing purposes, the `signature` and `key` fields are used:
 The signature is computed over the marshalled message protobuf _excluding_ the key field.
 The protobuf blob is prefixed by the string `libp2p-pubsub:` before signing.
 
+When signature validation fails for a signed message, the implementation must
+drop the message and block propagation. Locally, it may treat this event in whichever
+manner it wishes (e.g. logging).
+
 ## The Topic Descriptor
 
 The topic descriptor message is used to define various options and parameters
@@ -226,3 +230,18 @@ Web Of Trust publishing. Messages are encrypted with some certificate or
 certificate chain shared amongst trusted peers. (Spec writer's note: this is the
 least clearly defined option and my description here may be wildly incorrect,
 needs checking).
+
+## Topic Validation
+
+Implementations MUST support attaching _validators_ to topics.
+
+_Validators_ have access to the `Message` and can apply any logic to determine its validity. 
+When propagating a message for a topic, implementations will invoke all validators attached 
+to that topic, and will only continue propagation if, and only if all, validations pass.
+
+In its simplest form, a _validator_ is a function with signature `(peer.ID, *Message) => bool`, 
+where the return value is `true` if validation passes, and `false` otherwise.
+
+Local handling of failed validation is left up to the implementation (e.g. logging).
+
+Implementations MAY allow dynamically adding and removing _validators_ at runtime.
