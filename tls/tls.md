@@ -30,9 +30,9 @@ In order to prove ownership of its host key, an endpoint sends two values:
 - the public key corresponding to its host key
 - a signature performed using the host key
 
-The public key allows the peer to calculate the peer ID of the peer it is connecting to. Clients MUST verify that the peer ID derived from the certificate matches the peer ID they intended to connect to, and MUST abort the connection if it there is a mismatch.
+The public key corresponding to the host key allows the peer to calculate the peer ID of the peer it is connecting to. Clients MUST verify that the peer ID derived from the certificate matches the peer ID they intended to connect to, and MUST abort the connection if it there is a mismatch.
 
-The peer signs its public key using the its host key. This signature provides cryptographic proof that the peer was in possession of the private key at the time the certificate was signed. Peers MUST verify the signature, and abort the connection attempt if signature verification fails.
+The peer signs the public key that it used to generate the certificate carrying the libp2p Public Key Extension using the its host key. This signature provides cryptographic proof that the peer was in possession of the private key at the time the certificate was signed. Peers MUST verify the signature, and abort the connection attempt if signature verification fails.
 
 The public key and the signature are ANS.1-encoded into the SignedKey data structure, which is carried in the libp2p Public Key Extension. The libp2p Public Key Extension is a x509 extension with the Object Identier 1.3.6.1.4.1.XXX.YYY.
 
