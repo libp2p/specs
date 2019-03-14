@@ -39,19 +39,8 @@ Here is the process by which we generate peer ids based on the public keys descr
   3.  If the length of the serialized bytes <= 42, then we compute the "identity" multihash of the serialized bytes.  In other words, no hashing is performed, but the [multihash format is still followed](https://github.com/multiformats/multihash) (byte plus varint plus serialized bytes).  The idea here is that if the serialized byte array is short enough, we can fit it in a multihash proto without having to condense it using a hash function.
   4. If the length is >42, then we hash it using it using the SHA256 multihash.
 
-For more information, refer to this block in [libp2p/go-libp2p-peer/peer.go](https://github.com/libp2p/go-libp2p-peer/blob/master/peer.go):
-
-```
-// MaxInlineKeyLength is the maximum length a key can be for it to be inlined in
-// the peer ID.
-//
-// * When `len(pubKey.Bytes()) <= MaxInlineKeyLength`, the peer ID is the
-//   identity multihash hash of the public key.
-// * When `len(pubKey.Bytes()) > MaxInlineKeyLength`, the peer ID is the
-//   sha2-256 multihash of the public key.
-const MaxInlineKeyLength = 42
-```
-
+Peer Ids are multihashes, and they are often encoded into strings, most commonly using a base58 encoding with the alphabet used by bitcoin (`base58btc`).
+An example of a `base58btc` encoded SHA256 peer id: `QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N`.
 
 ## How Keys are Encoded and Messages Signed
 
@@ -71,9 +60,7 @@ The following sections describe each key type's encoding rules.
 
 We encode the public key using the DER-encoded PKIX format.
 
-To sign a message, we first hash it with SHA-256 and then sign it using the RSASSA-PKCS1-V1.5-SIGN from RSA PKCS#1 v1.5.
-
-See [libp2p/go-libp2p-crypto/rsa.go](https://github.com/libp2p/go-libp2p-crypto/blob/master/rsa.go) for details
+To sign a message, we first hash it with SHA-256 and then sign it using the [RSASSA-PKCS1-V1.5-SIGN](https://tools.ietf.org/html/rfc3447#section-8.2) method, as originally defined in [RSA PKCS#1 v1.5](https://tools.ietf.org/html/rfc2313).
 
 ### Ed25519
 
@@ -84,15 +71,10 @@ Ed25519 signatures follow the normal [Ed25519 standard](https://tools.ietf.org/h
 
 We use the standard Bitcoin EC encoding for Secp256k1 public keys.
 
-To sign a message, we hash the message with SHA 256, then sign it using the standard Bitcoin EC signature algorithm (BIP0062), and then use standard Bitcoin encoding.
-
-See [libp2p/go-libp2p-crypto/secp256k1.go](https://github.com/libp2p/go-libp2p-crypto/blob/master/secp256k1.go) for details.
+To sign a message, we hash the message with SHA 256, then sign it using the standard [Bitcoin EC signature algorithm (BIP0062)](https://github.com/bitcoin/bips/blob/master/bip-0062.mediawiki), and then use [standard Bitcoin encoding](https://github.com/bitcoin/bips/blob/master/bip-0062.mediawiki#der-encoding).
 
 ### ECDSA
 
 We encode the public key using ASN.1 DER.
 
-To sign a message, we hash the message with SHA 256, and then sign it with the ECDSA standard algorithm, then we encode it using DER-encoded ASN.1.
-
-See [libp2p/go-libp2p-crypto/ecdsa.go](https://github.com/libp2p/go-libp2p-crypto/blob/master/ecdsa.go) for details.
-
+To sign a message, we hash the message with SHA 256, and then sign it with the [ECDSA standard algorithm](https://tools.ietf.org/html/rfc6979), then we encode it using [DER-encoded ASN.1.](https://wiki.openssl.org/index.php/DER)
