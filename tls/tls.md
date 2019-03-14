@@ -34,9 +34,7 @@ The public host key allows the peer to calculate the peer ID of the peer it is c
 
 The peer signs the public key that it used to generate the certificate carrying the libp2p Public Key Extension using the its private host key. This signature provides cryptographic proof that the peer was in possession of the private host key at the time the certificate was signed. Peers MUST verify the signature, and abort the connection attempt if signature verification fails.
 
-The public host key and the signature are ANS.1-encoded into the SignedKey data structure, which is carried in the libp2p Public Key Extension. The libp2p Public Key Extension is a x509 extension with the Object Identier 1.3.6.1.4.1.XXX.YYY.
-
-TODO: Nothing will break if we just use an arbitrary value for XXX. However, if we want to do things correctly, [OID](https://en.wikipedia.org/wiki/Object_identifier) PENs should be registered with [IANA](https://pen.iana.org/pen/PenApplication.page). 
+The public host key and the signature are ANS.1-encoded into the SignedKey data structure, which is carried in the libp2p Public Key Extension. The libp2p Public Key Extension is a x509 extension with the Object Identier 1.3.6.1.4.1.53594.1.1.
 
 ```asn1
 SignedKey ::= SEQUENCE {
