@@ -36,7 +36,7 @@ Here is the process by which we generate peer ids based on the public keys descr
 
   1. Encode the public key into the protobuf.
   2. Serialize the protobuf containing the public key into bytes using the [canonical protobuf encoding](https://developers.google.com/protocol-buffers/docs/encoding).
-  3.  If the length of the serialized bytes <= 42, then we compute the "identity" multihash of the serialized bytes.  In other words, no hashing is performed, but the [multihash format is still followed](https://github.com/multiformats/multihash) (byte plus varint plus serialized bytes).  The idea here is that if the serialized byte array is short enough, we can fit it in a multihash proto without having to condense it using a hash function.
+  3.  If the length of the serialized bytes <= 42, then we compute the "identity" multihash of the serialized bytes.  In other words, no hashing is performed, but the [multihash format is still followed](https://github.com/multiformats/multihash) (byte plus varint plus serialized bytes).  The idea here is that if the serialized byte array is short enough, we can fit it in a multihash verbatim without having to condense it using a hash function.
   4. If the length is >42, then we hash it using it using the SHA256 multihash.
 
 Peer Ids are multihashes, and they are often encoded into strings, most commonly using a base58 encoding with the alphabet used by bitcoin (`base58btc`).
