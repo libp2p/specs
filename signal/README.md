@@ -67,10 +67,15 @@ using the Rendezvous Protocol), but this is not a strict requirement.
 
 ## Signaling Server API
 
-The Signaling Server uses a simple HTTP API with support for long-polling. The
-HTTP endpoints for the server are as follows:
+The Signaling Server uses a transport-agnostic request/response API. It is
+possible to implement a Signaling Server using HTTP or any other transport
+that can support request/response semantics.
 
-### POST /send_offer
+In practice, not all peers and not all Signaling Servers will support all
+possible transports. There is an implicit requirement for transport negotiation
+which is not covered in this spec.
+
+### SendOffer
 
 Used by an offerer to send an offer to a specific peer.
 
@@ -94,14 +99,9 @@ Used by an offerer to send an offer to a specific peer.
 }
 ```
 
-### POST /get_offers
+### GetOffers
 
 Used by an answerer to receive up to `max_count` pending offers.
-
-This endpoint supports long-polling and the request may be kept alive until at
-least one answer is available. The server may, at its discretion, decide to
-close the request by returning an empty array of answers if no answers are
-available after a certain amount of time has passed.
 
 #### Request
 
@@ -125,7 +125,7 @@ available after a certain amount of time has passed.
 }
 ```
 
-### POST /send_answer
+### SendAnswer
 
 Used by an answerer to send an answer to a specific offerer.
 
@@ -149,14 +149,9 @@ Used by an answerer to send an answer to a specific offerer.
 }
 ```
 
-### POST /get_answers
+### GetAnswers
 
 Used by an offerer to receive up to `max_count` pending answers.
-
-This endpoint supports long-polling and the request may be kept alive until at
-least one answer is available. The server may, at its discretion, decide to
-close the request by returning an empty array of answers if no answers are
-available after a certain amount of time has passed.
 
 #### Request
 
@@ -182,24 +177,23 @@ available after a certain amount of time has passed.
 
 ## Statefulness and Timeouts
 
-The HTTP API above implicitly requires the Signaling Server to maintain some
-state about pending offers and answers. When an answer or offer is sent to the
-server, it will need to store them (typically in a database) until the
-corresponding peer requests them via the `/get_answers` or `/get_offers`
-endpoint. The timeline of an answer/offer handshake is as follows:
+The API above implicitly requires the Signaling Server to maintain some state
+about pending offers and answers. When an answer or offer is sent to the server,
+it will need to store them until the corresponding peer requests them via
+`GetAnswers` or `GetOffers` requests. The timeline of an answer/offer handshake
+is as follows:
 
-1. The offerer sends a `/create_offer` request.
+1. The offerer sends a `CreateOffer` request.
 1. The Signaling Server stores the offer, which is considered "pending".
-1. The answerer polls the `/get_offers` endpoint and receives the offer.
+1. The answerer sends a `GetOffers` request and receives the offer.
 1. After the offer has been received, it is no longer pending and the Signaling Server may safely delete it.
-1. The answerer sends a `/create_answer` request.
+1. The answerer sends a `CreateAnswer` request.
 1. The Signaling Server stores the answer, which is considered "pending".
-1. The offerer receives a the answer via the `/get_answers` endpoint.
+1. The offerer receives a the answer via a `GetAnswers` request.
 1. After the answer has been received, it is no longer pending and the Signaling Server may safely delete it.
 
 In order to avoid filling up storage space with pending answers and offers, the
 Signaling Server should delete any pending answers or offers that have not been
 received after 60 seconds. Clients which communicate with the Signaling Server
-will also understand that if they don't see a response from a specific peer (via
-the `/get_offers` or `/get_answers` endpoint) within 60 seconds, the
-answer/offer has timed out.
+can also drop a peer and update their internal state if they don't receive an
+answer within 60 seconds.
