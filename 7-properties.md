@@ -1,6 +1,9 @@
 7 Properties
 ============
 
+| ⚠️ Warning: this section is incomplete, and parts of it are out of date. Please see [this issue](https://github.com/libp2p/specs/issues/156) to track progress on improving it. ⚠️ |
+| --- |
+
 ## 7.1 Communication Model - Streams
 
 The Network layer handles all the problems of connecting to a peer, and exposes

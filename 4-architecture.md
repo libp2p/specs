@@ -1,6 +1,9 @@
 4 Architecture
 ==============
 
+| ⚠️ Warning: this section is incomplete, and parts of it are out of date. Please see [this issue](https://github.com/libp2p/specs/issues/156) to track progress on improving it. ⚠️ |
+| --- |
+
 `libp2p` was designed around the Unix Philosophy of creating small components that are easy to understand and test. These components should also be able to be swapped in order to accommodate different technologies or scenarios and also make it feasible to upgrade them over time.
 
 Although different peers can support different protocols depending on their capabilities, any peer can act as a dialer and/or a listener for connections from other peers, connections that once established can be reused from both ends, removing the distinction between clients and servers.
