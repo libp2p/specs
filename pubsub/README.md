@@ -25,7 +25,7 @@ You can find information about the PubSub research and notes in the following re
 - FloodSub, simple flooding pubsub (2017)
   - [libp2p/go-libp2p-pubsub/floodsub.go](https://github.com/libp2p/go-libp2p-pubsub/blob/master/floodsub.go);
   - [libp2p/js-libp2p-floodsub](http://github.com/libp2p/js-libp2p-floodsub);
-  - [libp2p/rust-libp2p/floodsub](https://github.com/libp2p/rust-libp2p/tree/master/floodsub)
+  - [libp2p/rust-libp2p/floodsub](https://github.com/libp2p/rust-libp2p/tree/master/protocols/floodsub)
 - GossipSub, extensible baseline pubsub (2018)
   - [gossipsub](https://github.com/libp2p/specs/tree/master/pubsub/gossipsub#implementation-status)
 - [EpiSub](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/episub.md), an epidemic broadcast tree router (defined 2018, not yet started as of Oct 2018)
@@ -235,11 +235,11 @@ needs checking).
 
 Implementations MUST support attaching _validators_ to topics.
 
-_Validators_ have access to the `Message` and can apply any logic to determine its validity. 
-When propagating a message for a topic, implementations will invoke all validators attached 
+_Validators_ have access to the `Message` and can apply any logic to determine its validity.
+When propagating a message for a topic, implementations will invoke all validators attached
 to that topic, and will only continue propagation if, and only if all, validations pass.
 
-In its simplest form, a _validator_ is a function with signature `(peer.ID, *Message) => bool`, 
+In its simplest form, a _validator_ is a function with signature `(peer.ID, *Message) => bool`,
 where the return value is `true` if validation passes, and `false` otherwise.
 
 Local handling of failed validation is left up to the implementation (e.g. logging).
