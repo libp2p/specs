@@ -12,7 +12,7 @@ Implementations in:
 
 - [JavaScript](https://github.com/libp2p/js-libp2p-mplex)
 - [Go](https://github.com/libp2p/go-mplex)
-- [Rust](https://github.com/libp2p/rust-libp2p/tree/master/mplex)
+- [Rust](https://github.com/libp2p/rust-libp2p/tree/master/muxers/mplex)
 
 ## Message format
 
