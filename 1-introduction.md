@@ -5,6 +5,9 @@ While developing [IPFS, the InterPlanetary FileSystem](https://ipfs.io/), we cam
 
 In order to build this library, we focused on tackling problems independently, creating less complex solutions with powerful abstractions that, when composed, can offer an environment for a peer-to-peer application to work successfully.
 
+| ⚠️ Warning: parts of this document are incomplete and out of date. Please see [this issue](https://github.com/libp2p/specs/issues/156), and look for deprecation notices throughout. ⚠️ |
+| --- |
+
 ## 1.1 Motivation
 
 `libp2p` is the result of our collective experience of building a distributed system, in that it puts responsibility on developers to decide how they want an app to interoperate with others in the network, and favors configuration and extensibility instead of making assumptions about the network setup.
