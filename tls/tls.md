@@ -2,14 +2,14 @@
 
 ## Introduction
 
-This document describes how [TLS 1.3](https://tools.ietf.org/html/rfc8446) is used to secure libp2p connections. Endpoints authenticates to their peers by encoding their public key into a x509 certificate extension. The protocol described here allows peers to use arbitrary key types, not constrained to those for which signing of a x509 certificates is specified.
+This document describes how [TLS 1.3](https://tools.ietf.org/html/rfc8446) is used to secure libp2p connections. Endpoints authenticate to their peers by encoding their public key into a x509 certificate extension. The protocol described here allows peers to use arbitrary key types, not constrained to those for which signing of a x509 certificates is specified.
 
 
 ## Handshake Protocol
 
 The libp2p handshake uses TLS 1.3 (and higher). Endpoints MUST NOT negotiate lower TLS versions.
 
-During the handshake, peers authenticate each other’s identity as described in [Peer Authentication](#peer-authentication). Endpoints MUST verify the peer's identy. Specifically, this means that servers MUST require clients authentication during the TLS handshake, and MUST abort a connection attempt if the client fails to provide the requested authentication information.
+During the handshake, peers authenticate each other’s identity as described in [Peer Authentication](#peer-authentication). Endpoints MUST verify the peer's identity. Specifically, this means that servers MUST require client authentication during the TLS handshake, and MUST abort a connection attempt if the client fails to provide the requested authentication information.
 
 
 ## Peer Authentication
@@ -30,7 +30,7 @@ In order to prove ownership of its host key, an endpoint sends two values:
 - the public host key
 - a signature performed using the private host key
 
-The public host key allows the peer to calculate the peer ID of the peer it is connecting to. Clients MUST verify that the peer ID derived from the certificate matches the peer ID they intended to connect to, and MUST abort the connection if it there is a mismatch.
+The public host key allows the peer to calculate the peer ID of the peer it is connecting to. Clients MUST verify that the peer ID derived from the certificate matches the peer ID they intended to connect to, and MUST abort the connection if there is a mismatch.
 
 The peer signs the concatenation of the string "libp2p-tls-handshake:" and the public key that it used to generate the certificate carrying the libp2p Public Key Extension using its private host key. This signature provides cryptographic proof that the peer was in possession of the private host key at the time the certificate was signed. Peers MUST verify the signature, and abort the connection attempt if signature verification fails.
 

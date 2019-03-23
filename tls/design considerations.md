@@ -19,7 +19,7 @@ The handshake protocol described here:
 
 ### TLS 1.3 - What about older versions?
 
-The handshake protocol requires TLS 1.3 support. This means that the handshake between to peers that have never communicated before will typically complete in just a single roundtrip. With older TLS versions, a handshake typically takes two roundtrips. By not specifying support for older TLS versions, we increase perfomance and simplify the protocol.
+The handshake protocol requires TLS 1.3 support. This means that the handshake between two peers that have never communicated before will typically complete in just a single roundtrip. With older TLS versions, a handshake typically takes two roundtrips. By not specifying support for older TLS versions, we increase performance and simplify the protocol.
 
 
 ### Why we're not using the host key for the certificate
@@ -44,4 +44,4 @@ An earlier version of this document included a version negotiation mechanism. Wh
 To keep things simple, the current proposal does not include a version negotiation mechanism. A future version of this protocol might:
 
 1. Change the format in which the keys are transmitted. A x509 extension has an ID (the Objected Identifier, OID), so we can use a new OID if we want to change the way we encode information. x509 certificates allow use to include multiple extensions, so we can even send the old and the new version during a transition period. In the handshake protocol defined here, peers are required to skip over extensions that they don't understand.
-2. For more involved changes, a new version might (ab)use the SNI field field in the ClientHello to announce support for new versions. To allow for this to work, the current version requires clients to send anything in the SNI field and server to completely ignore this field, no matter what its contents are.
+2. For more involved changes, a new version might (ab)use the SNI field in the ClientHello to announce support for new versions. To allow for this to work, the current version requires clients to send anything in the SNI field and server to completely ignore this field, no matter what its contents are.
