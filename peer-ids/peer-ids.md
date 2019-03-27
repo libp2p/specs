@@ -88,6 +88,9 @@ Four key types are supported:
 
 Implementations MUST support RSA and Ed25519. Implementations MAY support Secp256k1 and ECDSA, but nodes using those keys may not be able to connect to all other nodes.
 
+In all cases, implementation MAY allow the user to enable/disable specific key types via configuration. 
+Note that disabling support for compulsory key types may hinder connectivity.
+
 Keys are encoded into byte arrays and serialized into the `Data` field of the
 protobuf messages described above.
 
