@@ -156,6 +156,7 @@ This is TBD before finalizing the spec.
 
 ### Protobuf
 
+#### Messages
 ```protobuf
 message Message {
   enum MessageType {
@@ -219,4 +220,8 @@ message Message {
   optional Discover discover = 5;
   optional DiscoverResponse discoverResponse = 6;
 }
+```
+
+#### Services
+```protobuf
 ```
