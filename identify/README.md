@@ -27,6 +27,11 @@ The push variant works by opening a stream to each remote peer you want to updat
 `/ipfs/id/push/1.0.0` as the protocol id string. When the remote peer accepts the stream,
 the local peer will send an `Identify` message and close the stream.
 
+Upon recieving the pushed `Identify` message, the remote peer should update their local
+metadata repository with the information from the message. Note that missing fields
+should be ignored, as peers may choose to send partial updates containing only the fields
+whose values have changed.
+
 ## The Identify Message
 
 ```protobuf
