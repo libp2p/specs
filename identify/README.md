@@ -1,10 +1,31 @@
 # Identify v1.0.0
 
-The identify protocol is used to query a peer about basic information and its capabilities.
+The identify protocol is used to exchange basic information with other peers
+in the network, including addresses, public keys, and capabilities.
 
-The protocol works by opening a stream, using `/ipfs/id/1.0.0` as the protocol string.
-The peer being identified responds by returning an `Identify` message and closes the
-stream.
+There are two variations of the identify protocol, `identify` and `identify/push`.
+
+### `identify`
+
+The `identify` protocol has the protocol id `/ipfs/id/1.0.0`, and it is used
+to query remote peers for their information.
+
+The protocol works by opening a stream to the remote peer you want to query, using
+`/ipfs/id/1.0.0` as the protocol id string. The peer being identified responds by returning
+an `Identify` message and closes the stream.
+
+### `identify/push`
+
+The `identify/push` protocol has the protocol id `/ipfs/id/push/1.0.0`, and it is used
+to inform known peers about changes that occur at runtime.
+
+When a peer's basic information changes, for example, because they've obtained a new
+public listen address, they can use `identify/push` to inform others about the new
+information.
+
+The push variant works by opening a stream to each remote peer you want to update, using
+`/ipfs/id/push/1.0.0` as the protocol id string. When the remote peer accepts the stream,
+the local peer will send an `Identify` message and close the stream.
 
 ## The Identify Message
 
