@@ -12,8 +12,12 @@ Conceptually, it is very simple. When a peer starts (or detects a network change
 
 - `service-name` is the DNS Service Discovery (DNS-SD) service name for all peers. It is defined as `_p2p._udp.local`.
 - `host-name` is the fully qualified name of the peer. It is derived from the peer's name and `p2p.local`.
-- `peer-name` is the case-insensitive unique identifier of the peer, and is less than 64 characters. It is normally the base-32 encoding of peer's ID.
-  - If the encoding of the peer's ID exceeds 63 characters, then the [Split at 63rd character](https://github.com/ipfs/in-web-browsers/issues/89#issue-341357014) workaround can be used.
+- `peer-name` is the case-insensitive unique identifier of the peer, and is less than 64 characters. It is normally the base-32 encoding of the peer's ID.
+
+   If the encoding of the peer's ID exceeds 63 characters, then the [Split at 63rd character](https://github.com/ipfs/in-web-browsers/issues/89#issue-341357014) workaround can be used.
+
+If a [private network](https://github.com/libp2p/specs/blob/master/pnet/Private-Networks-PSK-V1.md) is in use, then the `service-name` contains the base-16 encoding of the network's fingerprint  as in `_p2p-X._udp.local`. 
+The prevents public and private networks from discovering each other's peers.
 
 ## Peer Discovery
 
