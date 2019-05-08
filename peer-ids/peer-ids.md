@@ -67,12 +67,13 @@ The second is for generating peer ids; this is discussed in the section below.
 
 ## Peer Ids
 
-Here is the process by which we generate peer id's based on the public/private keypairs described above:
+Here is the process by which we generate peer ids based on the public component of the keypairs described above:
 
-  1. Encode the public key into the protobuf.
-  2. Serialize the protobuf containing the public key into bytes using the [canonical protobuf encoding](https://developers.google.com/protocol-buffers/docs/encoding).
-  3.  If the length of the serialized bytes <= 42, then we compute the "identity" multihash of the serialized bytes.  In other words, no hashing is performed, but the [multihash format is still followed](https://github.com/multiformats/multihash) (byte plus varint plus serialized bytes).  The idea here is that if the serialized byte array is short enough, we can fit it in a multihash verbatim without having to condense it using a hash function.
-  4. If the length is >42, then we hash it using it using the SHA256 multihash.
+  1. Encode the public key into a byte array according to the rules [described below](#how-keys-are-encoded-and-messages-signed)
+  2. Construct a `PublicKey` protobuf message, setting the `Data` field to the encoded public key bytes, and also setting the correct `Type` field.
+  3. Serialize the protobuf containing the public key into bytes using the [canonical protobuf encoding](https://developers.google.com/protocol-buffers/docs/encoding).
+  4. If the length of the serialized bytes <= 42, then we compute the "identity" multihash of the serialized bytes.  In other words, no hashing is performed, but the [multihash format is still followed](https://github.com/multiformats/multihash) (byte plus varint plus serialized bytes).  The idea here is that if the serialized byte array is short enough, we can fit it in a multihash verbatim without having to condense it using a hash function.
+  5. If the length is >42, then we hash it using it using the SHA256 multihash.
 
 Peer Ids are multihashes, and they are often encoded into strings.
 The canonical string representation of a Peer Id is a base58 encoding with
