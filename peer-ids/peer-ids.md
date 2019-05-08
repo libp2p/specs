@@ -60,7 +60,7 @@ files.
 
 Keys are used in two places in libp2p.  The first is for signing messages.  Here are some examples of messages we sign:
  - IPNS records
- - PubSub messages (coming soon)
+ - PubSub messages
  - SECIO handshake
 
 The second is for generating peer ids; this is discussed in the section below.
