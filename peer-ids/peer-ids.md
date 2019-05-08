@@ -20,9 +20,12 @@ Key encodings and message signing semantics are
 
 ## Keys
 
-Our key pairs are wrapped in a [simple protobuf](https://github.com/libp2p/go-libp2p-crypto/blob/master/pb/crypto.proto#L5):
+Our key pairs are wrapped in a [simple protobuf](https://github.com/libp2p/go-libp2p-crypto/blob/master/pb/crypto.proto), 
+defined using the [Protobuf version 2 syntax](https://developers.google.com/protocol-buffers/docs/proto):
 
 ```protobuf
+syntax = "proto2";
+
 enum KeyType {
 	RSA = 0;
 	Ed25519 = 1;
