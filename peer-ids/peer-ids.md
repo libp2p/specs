@@ -81,6 +81,10 @@ This encoding is sometimes abbreviated as `base58btc`.
 
 An example of a `base58btc` encoded SHA256 peer id: `QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N`.
 
+Note that some projects using libp2p will prefix "base encoded" strings with a
+[multibase](https://github.com/multiformats/multibase) code that identifies the encoding base and alphabet.
+Peer ids do not use multibase, and can be assumed to be encoded as `base58btc`.
+
 ## How Keys are Encoded and Messages Signed
 
 Four key types are supported:
