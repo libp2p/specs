@@ -74,6 +74,25 @@ Here is the process by which we generate peer ids based on the public component 
   3. Serialize the protobuf containing the public key into bytes using the [canonical protobuf encoding](https://developers.google.com/protocol-buffers/docs/encoding).
   4. If the length of the serialized bytes <= 42, then we compute the "identity" multihash of the serialized bytes.  In other words, no hashing is performed, but the [multihash format is still followed](https://github.com/multiformats/multihash) (byte plus varint plus serialized bytes).  The idea here is that if the serialized byte array is short enough, we can fit it in a multihash verbatim without having to condense it using a hash function.
   5. If the length is >42, then we hash it using it using the SHA256 multihash.
+ 
+### Note about deterministic encoding:
+
+Deterministic encoding of the `PublicKey` message is desirable, as it ensures the same public key will always
+result in the same peer id.
+
+The Protobuf specification does not provide sufficient guidance to ensure deterministic serialization of
+messages. There are two factors that could lead to semantically identical messages having different serialized
+values: field ordering, and the ability to specify the same field multiple times.
+
+In earlier versions of the Protobuf spec, serializers were encouraged to write known fields in sequential
+order by field number, with unknown fields in arbitrary order after the ordered known fields. This guidance 
+has since been removed, however, libp2p implementors should use a protobuf encoder that provides this behavior.
+
+The ability to set a field multiple times (with the last value "winning" in the deserialized message), can lead
+to different serializations of semantically identical messages. libp2p implementors are therefore encouraged to
+set the fields in the `PublicKey` message only once before encoding, and may refuse to deserialize encoded `PublicKey` messages in which a field is set multiple times.
+
+### String representation
 
 Peer Ids are multihashes, and they are often encoded into strings.
 The canonical string representation of a Peer Id is a base58 encoding with
