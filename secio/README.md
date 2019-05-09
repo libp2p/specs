@@ -193,7 +193,7 @@ The peers serialize their `Exchange` messages and write them over the wire. Upon
 receiving the remote peer's `Exchange`, the local peer will compute the remote peer's
 expected `corpus` using the known proposal bytes and the ephemeral public key sent by
 the remote peer in the `Exchange`. The `signature` can then be validated using the
-permanent public key of the remote peer obtained in the initial `Proposal`.
+permanent public key of the remote peer obtained in the initial proposal.
 
 Peers MUST close the connection if the signature does not validate.
 
@@ -318,7 +318,7 @@ The first packet transmitted by each peer must be the remote peer's nonce.
 
 Each peer will decrypt the message body and validate the HMAC signature,
 comparing the decrypted output to the nonce recieved in the initial
-`Proposal` message. If either peer is unable to validate the initial
+`Propose` message. If either peer is unable to validate the initial
 packet against the known nonce, they must abort the connection.
 
 If both peers successfully validate the initial packet, the secure channel has
