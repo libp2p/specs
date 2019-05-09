@@ -42,6 +42,8 @@
         - [Key Stretching](#key-stretching)
         - [Creating the Cipher and HMAC signer](#creating-the-cipher-and-hmac-signer)
         - [Initiate Secure Channel](#initiate-secure-channel)
+            - [Secure Message Framing](#secure-message-framing)
+            - [Initial Packet Verification](#initial-packet-verification)
 
 
 ## Algorithm Support
@@ -116,8 +118,8 @@ negotiation.
 ### Message framing
 
 All messages sent over the wire are prefixed with the message length in bytes,
-encoded as an unsigned variable length integer as defined by the
-[multiformats unsigned-varint spec][unsigned-varint].
+encoded as an unsigned variable length integer as defined
+by the [multiformats unsigned-varint spec][unsigned-varint].
 
 ### Proposal Generation
 
@@ -128,7 +130,7 @@ setting the fields as follows:
 
 | field       | value                                                                                |
 |-------------|--------------------------------------------------------------------------------------|
-| `rand`      | A 16 byte random nonce, generated using the most secure means available             |
+| `rand`      | A 16 byte random nonce, generated using the most secure means available              |
 | `pubkey`    | The sender's public key, serialized [as described in the peer-id spec][peer-id-spec] |
 | `exchanges` | A list of supported [key exchanges](#exchanges) as a comma-separated string          |
 | `ciphers`   | A list of supported [ciphers](#ciphers) as a comma-separated string                  |
@@ -170,7 +172,7 @@ Now the peers prepare a key exchange.
 Both peers generate an ephemeral keypair using the elliptic curve algorithm that was
 chosen from the proposed `exchanges` in the previous step.
 
-With keys generated, both peers create a `Exchange` message. First, they start by
+With keys generated, both peers create an `Exchange` message. First, they start by
 generating a "corpus" that they will sign.
 
 ```
@@ -287,17 +289,41 @@ using the generated initialization vector `IV`.
 ### Initiate Secure Channel
 
 With the cipher and HMAC signer created, the secure channel is ready to be
-opened. Each packet is of the form:
+opened. 
+
+#### Secure Message Framing
+
+To communicate over the channel, peers send packets containing an encrypted
+body and an HMAC signature of the encrypted body.
+
+The encrypted body is produced by applying the stream cipher initialized
+previously to an arbitrary plaintext message payload. The encrypted data
+is then fed into the HMAC signer to produce the HMAC signature.
+
+Once the encrypted body and HMAC signature are known, they are concatenated
+together, and their combined length is prefixed to the resulting payload.
+
+Each packet is of the form:
 
 ```
 [uint32 length of packet | encrypted body | hmac signature of encrypted body]
 ```
 
-The first packet transmitted by each peer must be the remote peer's nonce. Peers
-validate that the remote peer sent them their nonce, closing if unsuccessful.
+The packet length is in bytes, and it is encoded as an unsigned 32-bit integer
+in network (big endian) byte order.
+
+#### Initial Packet Verification
+
+The first packet transmitted by each peer must be the remote peer's nonce.
+
+Each peer will decrypt the message body and validate the HMAC signature,
+comparing the decrypted output to the nonce recieved in the initial
+`Proposal` message. If either peer is unable to validate the initial
+packet against the known nonce, they must abort the connection.
 
 If both peers successfully validate the initial packet, the secure channel has
-been opened and is ready for use.
+been opened and is ready for use, using the framing rules described
+[above](#secure-message-framing).
 
 
 <!-- FIXME(yusef): this link is broken until the peer id PR gets merged -->
