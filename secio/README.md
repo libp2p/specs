@@ -21,7 +21,28 @@
 
 ## Table of Contents
 
-- [Algorithm Support](#algorithm-support)
+- [SECIO 1.0.0](#secio-100)
+    - [Authors](#authors)
+    - [Editors](#editors)
+    - [Implementations](#implementations)
+    - [Table of Contents](#table-of-contents)
+    - [Algorithm Support](#algorithm-support)
+        - [Exchanges](#exchanges)
+        - [Ciphers](#ciphers)
+        - [Hashes](#hashes)
+    - [Data Structures](#data-structures)
+    - [Protocol](#protocol)
+        - [Prerequisites](#prerequisites)
+        - [Message framing](#message-framing)
+        - [Proposal Generation](#proposal-generation)
+        - [Determining Roles and Algorithms](#determining-roles-and-algorithms)
+        - [Key Exchange](#key-exchange)
+            - [Key marshaling](#key-marshaling)
+        - [Shared Secret Generation](#shared-secret-generation)
+        - [Key Stretching](#key-stretching)
+        - [Creating the Cipher and HMAC signer](#creating-the-cipher-and-hmac-signer)
+        - [Initiate Secure Channel](#initiate-secure-channel)
+
 
 ## Algorithm Support
 
