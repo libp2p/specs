@@ -11,11 +11,13 @@
 
 - [Cole Brown](https://github.com/bigs)
 - [Lars Gierth](https://github.com/lgierth)
+- [Yusef Napora](https://github.com/yusefnapora)
 
 ## Implementations
 
 - [js-libp2p-secio](https://github.com/libp2p/js-libp2p-secio)
 - [go-secio](https://github.com/libp2p/go-libp2p-secio)
+- [rust-libp2p](https://github.com/libp2p/rust-libp2p/tree/master/protocols/secio)
 
 ## Table of Contents
 
@@ -26,7 +28,9 @@
 SECIO allows participating peers to support a subset of the following
 algorithms.
 
-### Exhchanges
+### Exchanges
+
+The following elliptic curves are used for ephemeral key generation:
 
 - P-256
 - P-384
@@ -34,48 +38,87 @@ algorithms.
 
 ### Ciphers
 
+The following symmetric ciphers are used for encryption of messages once
+the SECIO channel is established:
+
 - AES-256
 - AES-128
-- Blowfish
+
+Note that current versions of `go-libp2p` support the Blowfish cipher, however
+support for Blowfish will be dropped in future releases and should not be
+considered part of the SECIO spec.
 
 ### Hashes
 
-- SHA-256
-- SHA-512
+The following hash algorithms are used for key stretching and for HMACs once
+the SECIO channel is established:
+
+- SHA256
+- SHA512
 
 ## Data Structures
 
-The SECIO wire protocol features two message types defined in the
-[protobuf description language](https://github.com/libp2p/go-libp2p-secio/blob/master/pb/spipe.proto).
+The SECIO wire protocol features two message types defined in the version 2 syntax of the
+[protobuf description language](https://developers.google.com/protocol-buffers/docs/proto).
+
+```protobuf
+syntax = "proto2";
+
+message Propose {
+	optional bytes rand = 1;
+	optional bytes pubkey = 2;
+	optional string exchanges = 3;
+	optional string ciphers = 4;
+	optional string hashes = 5;
+}
+
+message Exchange {
+	optional bytes epubkey = 1;
+	optional bytes signature = 2;
+}
+```
+
+
 These two messages, `Propose` and `Exchange` are the only serialized types
 required to implement SECIO.
 
 ## Protocol
 
+### Prerequisites
+
+Prior to undertaking the SECIO handshake described below, it is assumed that
+we have already established a dedicated bidirectional channel between both
+parties, and that both have agreed to proceed with the SECIO handshake
+using [multistream-select][multistream-select] or some other form of protocol
+negotiation.
+
+### Message framing
+
+All messages sent over the wire are prefixed with the message length in bytes,
+encoded as an unsigned variable length integer as defined by the
+[multiformats unsigned-varint spec][unsigned-varint].
+
 ### Proposal Generation
 
-SECIO channel negotiation begins with a proposal phase. Both sides generate a
-proposal as follows:
+SECIO channel negotiation begins with a proposal phase.
 
-*Note: the public key should be serialized per the `Bytes` method from
-[go-libp2p-crypto](https://godoc.org/github.com/libp2p/go-libp2p-crypto#Key).*
+Each side will construct a `Propose` protobuf message (as defined [above](#data-structures)),
+setting the fields as follows:
 
-```
-Propose{
-  Rand: <16 secure random bytes>,
-  Pubkey: <public key bytes>,
-  Exchanges: <comma separated string of supported key exchanges>,
-  Ciphers: <comma separated string of supported ciphers>,
-  Hashes: <comma separated string of supported hashes>,
-}
-```
+| field       | value                                                                                |
+|-------------|--------------------------------------------------------------------------------------|
+| `rand`      | A 16 byte random nonce, generated using the most secure means available             |
+| `pubkey`    | The sender's public key, serialized [as described in the peer-id spec][peer-id-spec] |
+| `exchanges` | A list of supported [key exchanges](#exchanges) as a comma-separated string          |
+| `ciphers`   | A list of supported [ciphers](#ciphers) as a comma-separated string                  |
+| `hashes`    | A list of supported [hashes](#hashes) as a comma-separated string                    |
 
-Both peers serialize this message and send it over the wire. Upon deserializing
-their peer's message, they verify that the pubkey matches that described by the
-peer's peer ID (NOTE: this is sometimes only possible for the peer *initiating*
-the connection.) If the key doesn't match the peer ID, the peer can close the
-connection. If the peer doesn't know the remote peer's ID, they can compute and
-store the remote peer ID for later use.
+
+Both parties serialize this message and send it over the wire. If either party
+has prior knowledge of the other party's peer id, they may attempt to validate
+that the given public key can be used to generate the same peer id, and may
+close the connection if there is a mismatch.
+
 
 ### Determining Roles and Algorithms
 
@@ -87,21 +130,24 @@ oh1 := sha256(concat(remotePeerPubKeyBytes, myNonce))
 oh2 := sha256(concat(myPubKeyBytes, remotePeerNonce))
 ```
 
+Where `myNonce` is the `rand` component of the local peer's `Propose` message,
+and `remotePeerNonce` is the `rand` field from the remote peer's proposal.
+
 With these hashes, determine which peer's preferences to favor. This peer will
 be referred to as the "preferred peer". If `oh1 == oh2`, then the peer is
 communicating with itself and should return an error. If `oh1 < oh2`, use the
 remote peer's preferences. If `oh1 > oh2`, prefer the local peer's preferences.
 
-Given our preference, we now sort through each of the `Exchanges`, `Ciphers`,
-and `Hashes` provided by both peers, selecting the first item from our preferred
+Given our preference, we now sort through each of the `exchanges`, `ciphers`,
+and `hashes` provided by both peers, selecting the first item from our preferred
 peer's set that is also shared by the other peer.
 
 ### Key Exchange
 
-Now the peers prepare a key exchange. Both peers generate an ephemeral key based
-on the agreed upon exchange (currently support is only available for elliptic
-curve algorithms). Ephemeral keys are generated via
-[go-libp2p-crypto](https://godoc.org/github.com/libp2p/go-libp2p-crypto#GenerateEKeyPair).
+Now the peers prepare a key exchange. 
+
+Both peers generate an ephemeral keypair using the elliptic curve algorithm that was
+chosen from the proposed `exchanges` in the previous step.
 
 With keys generated, both peers create a `Exchange` message. First, they start by
 generating a "corpus" that they will sign.
@@ -110,41 +156,112 @@ generating a "corpus" that they will sign.
 corpus := concat(myProposalBytes, remotePeerProposalBytes, ephemeralPubKey)
 ```
 
-Then, generate the `Exchange`:
+The `corpus` is then signed using the permanent private key associated with the local
+peer's peer id, producing a byte array `signature`.
 
-```
-Exchange{
-  Epubkey: <ephemeral pubkey>,
-  Signature: <sign corpus with local private key>,
-}
-```
 
-The peers serialize these and write them over the wire. Upon receiving the
-remote peer's `Exchange`, validate the signature by computing the `corpus` you
-expect them to have generated with their public key. Peers should close the
-connection if the signature does not validate.
+| field       | value                                                                     |
+|-------------|---------------------------------------------------------------------------|
+| `epubkey`   | The ephemeral public key, marshaled as described [below](#key-marshaling) |
+| `signature` | The `signature` of the `corpus` described above                           |
+
+
+The peers serialize their `Exchange` messages and write them over the wire. Upon
+receiving the remote peer's `Exchange`, the local peer will compute the remote peer's
+expected `corpus` using the known proposal bytes and the ephemeral public key sent by
+the remote peer in the `Exchange`. The `signature` can then be validated using the
+permanent public key of the remote peer obtained in the initial `Proposal`.
+
+Peers MUST close the connection if the signature does not validate.
+
+#### Key marshaling
+
+Within the `Exchange` message, ephemeral public keys are marshaled into the
+uncompressed form specified in section 4.3.6 of ANSI X9.62. 
+
+This is the behavior provided by the go standard library's 
+[`elliptic.Marshal`](https://golang.org/pkg/crypto/elliptic/#Marshal) function.
+
+### Shared Secret Generation
+
+Peers now generate their shared secret by combining their ephemeral private key with the
+remote peer's ephemeral public key.
+
+First, the remote ephemeral public key is unmarshaled into a point on the elliptic curve
+used in the agreed-upon exchange algorithm. If the point is not valid for the agreed-upon
+curve, secret generation fails and the connection must be closed.
+
+The remote ephemeral public key is then combined with the local ephemeral private key
+by means of elliptic curve scalar multiplication. The result of the multiplication is
+the shared secret, which will then be stretched to produce MAC and cipher keys, as
+described in the next section.
 
 ### Key Stretching
 
-Peers now generate their shared secret based on the function generated by the
-ephemeral key generation, passing it the remote peer's ephemeral key. With the
-shared secret generated, both peers stretch the key using the algorithm
-described by
-[go-libp2p-crypto](https://godoc.org/github.com/libp2p/go-libp2p-crypto#KeyStretcher).
+The key stretching process uses an HMAC algorithm to derive encryption and MAC keys
+and a stream cipher initialization vector from the shared secret.
+
+Key stretching produces the following three values for each peer:
+
+- A MAC key used to initialize an HMAC algorithm for message verification
+- A cipher key used to initialize a block cipher
+- An initialization vector (IV), used to generate a CTR stream cipher from the block cipher
+
+The key stretching function will return two data structures `k1` and `k2`, each containing
+the three values above.
+
+Before beginning the stretching process, the size of the IV and cipher key are determined
+according to the agreed-upon cipher algorithm. The sizes (in bytes) used are as follows:
+
+| cipher type | cipher key size | IV size |
+|-------------|-----------------|---------|
+| AES-128     | 16              | 16      |
+| AES-256     | 32              | 16      |
+
+The generated MAC key will always have a size of 20 bytes.
+
+Once the sizes are known, we can compute the total size of the output we need to generate
+as `outputSize := 2 * (ivSize + cipherKeySize + macKeySize)`.
+
+The stretching algorithm will then proceed as follows:
+
+First, an HMAC instance is initialized using the agreed upon hash function and shared secret.
+
+A fixed seed value of `"key expansion"` (encoded into bytes as UTF-8) is fed into the HMAC
+to produce an initial digest `a`.
+
+Then, the following process repeats until `outputSize` bytes have been generated:
+
+- reset the HMAC instance or generate a new one using the same hash function and shared secret
+- compute digest `b` by feeding `a` and the seed value into the HMAC: 
+  - `b := hmac_digest(concat(a, "key expansion"))`
+- append `b` to previously generated output (if any).
+  - if, after appending `b`, the generated output exceeds `outputSize`, the output is truncated to `outputSize` and generation ends.
+- reset the HMAC and feed `a` into it, producing a new value for `a` to be used in the next iteration
+  - `a = hmac_digest(a)`
+- repeat until `outputSize` is reached
+
+Having generated `outputSize` bytes, the output is then split into six parts to
+produce the final return values `k1` and `k2`:
 
 ```
-k1, k2 := KeyStretcher(sharedSecret)
+| k1.IV | k1.CipherKey | k1.MacKey | k2.IV | k2.CipherKey | k2.MacKey |
 ```
+
+The size of each field is determined by the cipher key and IV sizes detailed above.
+
+### Creating the Cipher and HMAC signer
 
 With `k1` and `k2` computed, swap the two values if the remote peer is the
 preferred peer. After swapping if necessary, `k1` becomes the local peer's key
 and `k2` the remote peer's key.
 
-Each peer now generates a MAC key and cipher for the remote and local keys
-generated in the previous step using the `MacKey` and `CipherKey` from the
-generated
-[`StretchedKeys`](https://godoc.org/github.com/libp2p/go-libp2p-crypto#StretchedKeys)
-objects.
+Each peer now generates an HMAC signer using the agreed upon algorithm and the
+`MacKey` produced by the key stretcher.
+
+Each peer will also initialize the agreed-upon block cipher using the generated
+`CipherKey`, and will then initialize a CTR stream cipher from the block cipher
+using the generated initialization vector `IV`.
 
 ### Initiate Secure Channel
 
@@ -157,4 +274,13 @@ opened. Each packet is of the form:
 
 The first packet transmitted by each peer must be the remote peer's nonce. Peers
 validate that the remote peer sent them their nonce, closing if unsuccessful.
-Otherwise, a secure channel has been successfully opened.
+
+If both peers successfully validate the initial packet, the secure channel has
+been opened and is ready for use.
+
+
+<!-- FIXME(yusef): this link is broken until the peer id PR gets merged -->
+[peer-id-spec]: https://github.com/libp2p/specs/peer-ids/peer-ids.md
+
+[multistream-select]: https://github.com/multiformats/multistream-select
+[unsigned-varint]: https://github.com/multiformats/unsigned-varint
