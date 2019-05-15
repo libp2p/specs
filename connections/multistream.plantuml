@@ -1,0 +1,24 @@
+@startuml
+
+entity Dialer
+entity Listener
+Dialer -> Listener: Open connection
+
+== Establish that both sides support multistream-select ==
+
+note over Dialer, Listener: Both sides may send initial multistream id simultaneously
+Listener -> Dialer: Send multistream protocol id
+Dialer -> Listener: Send multistream protocol id
+note over Dialer, Listener: If anything other than multistream id is received, abort
+
+
+== Negotiate protocol to use ==
+Dialer -> Listener: Send protocol id for desired protocol
+
+alt protocol is supported by Listener
+  Listener -> Dialer: Echo back protocol id to indicate agreement
+else protocol is not supported
+  Listener -> Dialer: Send "na" (not available)
+end
+
+@enduml
