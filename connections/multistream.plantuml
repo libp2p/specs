@@ -21,4 +21,9 @@ else protocol is not supported
   Listener -> Dialer: Send "na" (not available)
 end
 
+== Use negotiated protocol ==
+
+Dialer -> Listener: Send protocol-specific message
+Listener -> Dialer: Send protocol-specific reply
+
 @enduml
