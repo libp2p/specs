@@ -65,7 +65,7 @@ correct handler functions.
 
 libp2p uses a protocol called multistream-select for protocol negotiation. Below
 we cover the basics of multistream-select and its use in libp2p. For more
-details, see [the multistream-select repository][mss**.
+details, see [the multistream-select repository][mss].
 
 Each protocol supported by a peer is identified using a unique string called a
 **protocol id**. While any string can be used, the most common and recommended
