@@ -46,9 +46,22 @@ We enter this stage by posting an `Initial Working Draft` that covers:
   * tentative technical directions: how are we planning to materialise the
     specification in terms of system design.
 
-The `Initial Working Draft` shall be reviewed by the community in no more than 3
-working days. Should there be no defects in form, content or serious technical
-soundness issues, the `Initial Working Draft` will be accepted and merged.
+Upon submission of an `Initial Working Draft`, a minimum of five (5) libp2p
+contributors are required to express interest and commitment to shepherd and
+advise the author(s) throughout the specification process.
+
+The resulting group will constitute the _Interest Group_, formed by consensus,
+barring blocking, binding community feedback. We encourage the _Interest
+Group_ to be heterogeneous yet relevant, and hold representation for libp2p
+implementation teams across various languages.
+
+The _Interest Group_ will be responsible for expediently awarding the review
+approvals or feedback necessary to transition the specification across stages.
+
+The `Initial Working Draft` shall be reviewed by the _Interest Group_ in no
+more than 3 working days. Should there be no defects in form, content or
+serious technical soundness issues, the `Initial Working Draft` will be
+accepted and merged.
 
 Ideas deemed controversial or breaking, and those that garner subjective
 opposition, will still be accepted in order to give them a venue to grow,
@@ -75,8 +88,9 @@ There is at least ONE implementation conforming to the specification. That
 implementation serves as the Reference Implementation.
 
 The promotion from a `Working Draft` to a `Candidate Recommendation` is done
-via a *Pull Request* that is reviewed by the libp2p community in no more than
-8 working days.
+via a *Pull Request* that is reviewed by the _Interest Group_, allowing a
+minimum of 8 working days to elapse to collect feedback from the libp2p
+community at large.
 
 ## Stage 3: Recommendation
 
@@ -85,8 +99,9 @@ demonstrated cross-interoperability. This is the supreme stage in the
 lifecycle of a specification.
 
 The promotion from a `Candidate Recommendation` to a `Recommendation` is done
-via a *Pull Request* that is reviewed by the libp2p community in no more than
-8 working days.
+via a *Pull Request* that is reviewed by the _Interest Group_, allowing a
+minimum of 8 working days to elapse to collect feedback from the libp2p
+community at large.
 
 ## Stage 4: Deprecated
 
@@ -98,7 +113,8 @@ specification reaching the `Candidate Recommendation` stage.
 
 The transition from a `Candidate Recommendation` or a `Recommendation` stage
 to the `Deprecated` stage is performed via a *Pull Request* that is reviewed
-by the libp2p community in no more than 5 working days.
+by the _Interest Group_, allowing a minimum of 5 working days to elapse to
+collect feedback from the libp2p community at large.
 
 ## Stage 5: Abandoned Draft
 
@@ -110,6 +126,17 @@ Extensions can be requested up to 3 times and will only be granted by
 consensus if there's evidence of progress and continued author commitment.
 
 ---
+
+## Interest Group membership changes
+
+Changes in the membership of an _Interest Group_ are possible at any time.
+
+While we don't maintain a comprehensive enumeration of reasons, common sense
+applies.
+
+They include events like waning dedication/commitment of members, changes in
+technical relevance, or violations of the [community code of
+conduct](https://github.com/ipfs/community/blob/master/code-of-conduct.md).
 
 ## References
 
