@@ -131,8 +131,9 @@ In order to motivate accountability, efficiency and order, a specification
 that stays in the `Working Draft` stage for over 4 months of its initial
 approval will automatically transition to the `Abandoned Draft` stage.
 
-Extensions can be requested up to 3 times and will only be granted by
-consensus if there's evidence of progress and continued author commitment.
+Extensions can be requested up to 2 times (making for a cumulative runway 12
+months), and will only be granted by consensus if there's evidence of progress
+and continued author commitment.
 
 ---
 
