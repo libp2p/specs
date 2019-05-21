@@ -59,7 +59,7 @@ The _Interest Group_ will be responsible for expediently awarding the review
 approvals or feedback necessary to transition the specification across stages.
 
 The `Initial Working Draft` shall be reviewed by the _Interest Group_ in no
-more than 3 working days. Should there be no defects in form, content or
+more than 5 working days. Should there be no defects in form, content or
 serious technical soundness issues, the `Initial Working Draft` will be
 accepted and merged.
 
@@ -98,7 +98,7 @@ implementation serves as the Reference Implementation.
 
 The promotion from a `Working Draft` to a `Candidate Recommendation` is done
 via a *Pull Request* that is reviewed by the _Interest Group_, allowing a
-minimum of 8 working days to elapse to collect feedback from the libp2p
+minimum of 10 working days to elapse to collect feedback from the libp2p
 community at large.
 
 ## Stage 3: Recommendation
@@ -109,7 +109,7 @@ lifecycle of a specification.
 
 The promotion from a `Candidate Recommendation` to a `Recommendation` is done
 via a *Pull Request* that is reviewed by the _Interest Group_, allowing a
-minimum of 8 working days to elapse to collect feedback from the libp2p
+minimum of 10 working days to elapse to collect feedback from the libp2p
 community at large.
 
 ## Stage 4: Deprecated
