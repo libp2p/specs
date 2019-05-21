@@ -46,7 +46,7 @@ We enter this stage by posting an `Initial Working Draft` that covers:
   * tentative technical directions: how are we planning to materialise the
     specification in terms of system design.
 
-Upon submission of an `Initial Working Draft`, a minimum of five (5) libp2p
+Upon submission of an `Initial Working Draft`, a minimum of three (3) libp2p
 contributors are required to express interest and commitment to shepherd and
 advise the author(s) throughout the specification process.
 
@@ -74,6 +74,10 @@ To facilitate open progress tracking and observability, as the `Working Draft`
 evolves, the author(s) SHOULD assemble a checklist of items that are pending
 specification, explicitly stating which items are compulsory for promoting the
 spec to a `Candidate Recommendation`.
+
+As a `Working Draft` evolves and shows promise to exit this stage towards a
+`Candidate Recommendation`, the _Interest Group_ shall be expanded by two (2)
+additional members, comprising a total of five (5).
 
 We MAY use GitHub's
 [`CODEOWNERS`](https://help.github.com/en/articles/about-code-owners) feature
