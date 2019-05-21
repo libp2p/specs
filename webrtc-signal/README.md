@@ -1,11 +1,11 @@
-# WebRTC Signal Protocol
+# WebRTC Signaling Protocol
 
 Author: Alex Browne (@albrow)
 
-Revision: DRAFT; 2019-03-18
+Revision: DRAFT; 2019-04-21
 
 This specification describes a protocol for establishing a WebRTC connection
-between two peers via a third-party, called the "signaler".
+between two peers via a common third peer, called the "signaler".
 
 ## Motivation
 
@@ -65,15 +65,34 @@ requirements for the WebRTC signaling protocol described in this document:
 It is possible for a signaler itself to implement peer discovery (e.g.,
 using the Rendezvous Protocol), but this is not a strict requirement.
 
-## Signaler API
+## Multiaddress format
 
-The signaler uses a transport-agnostic request/response API. It is
-possible to implement a signaler using HTTP or any other transport
-that can support request/response semantics.
+The Signaling Protocol is designed to work over existing libp2p transports. We
+use the following multiaddress format for dialing and listening:
 
-In practice, not all peers and not all signalers will support all
-possible transports. There is an implicit requirement for transport negotiation
-which is not covered in this spec.
+```
+<signaler-multiaddr>/p2p-webrtc-signal/<signaler-peer-id>
+```
+
+Where `<signaler-multiaddr>` is the multiaddress for the signaler (including
+the transport to be used for signaling) and `<signaler-peer-id>` is the
+base58-encoded PeerID of the signaler. `<signaler-multiaddr>` may be omitted to
+use an existing connection to `<signaler-peer-id>` for signaling.
+
+This multiaddress format allows for flexibility in the underlying transport
+used. The signaler can be either centralized (all peers use the same signaler)
+or decentralized (two peers use a common third peer for signaling).
+
+### Examples
+
+- Signaling over WebSockets using an IPv4 address:
+  `/ip4/192.168.1.46/tcp/9000/ws/p2p-webrtc-signal/QmWaWqTtzPCaYnpfxsAAGtrVhNumHqQ7jtdcsFsjvs3csS`
+- Signaling over HTTP using a domain name:
+  `/dns6/signaler.myapp.com/tcp/80/http/p2p-webrtc-signal/QmZbw3TKr3dxhHXiPkbNraWaeGoqPNXAXfAcV8RP2Eqngj`
+- Signaling via a common peer:
+  `/p2p-webrtc-signal/QmWeRHDDiwuGnS4xbjF2zXETucL7xQLjadoaTZ4yJE3hQs`
+
+## Message Types
 
 ### SendOffer
 
@@ -183,11 +202,11 @@ signaler, it will need to store them until the corresponding peer requests them
 via `GetAnswers` or `GetOffers` requests. The timeline of an answer/offer
 handshake is as follows:
 
-1. The offerer sends a `CreateOffer` request.
+1. The offerer sends a `SendOffer` request.
 1. The signaler stores the offer, which is considered "pending".
 1. The answerer sends a `GetOffers` request and receives the offer.
 1. After the offer has been received, it is no longer pending and the signaler may safely delete it.
-1. The answerer sends a `CreateAnswer` request.
+1. The answerer sends a `SendAnswer` request.
 1. The signaler stores the answer, which is considered "pending".
 1. The offerer receives a the answer via a `GetAnswers` request.
 1. After the answer has been received, it is no longer pending and the signaler may safely delete it.
