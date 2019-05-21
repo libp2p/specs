@@ -74,9 +74,9 @@ contributors to develop an interoperable implementation.
 There is at least ONE implementation conforming to the specification. That
 implementation serves as the Reference Implementation.
 
-The promotion from a Working Draft to a `Candidate Recommendation` is done via
-a *Pull Request* that is reviewed by the libp2p community in no more than 8
-working days.
+The promotion from a `Working Draft` to a `Candidate Recommendation` is done
+via a *Pull Request* that is reviewed by the libp2p community in no more than
+8 working days.
 
 ## Stage 3: Recommendation
 
@@ -96,9 +96,9 @@ discourages new implementations.
 Transition to this stage is usually the result of a new version of the
 specification reaching the `Candidate Recommendation` stage.
 
-The transition from a `Candidate Recommendation` or a Recommendation stage to
-the Deprecated stage is performed via a *Pull Request* that is reviewed by the
-libp2p community in no more than 5 working days.
+The transition from a `Candidate Recommendation` or a `Recommendation` stage
+to the `Deprecated` stage is performed via a *Pull Request* that is reviewed
+by the libp2p community in no more than 5 working days.
 
 ## Stage 5: Abandoned Draft
 
