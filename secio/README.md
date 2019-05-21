@@ -3,6 +3,11 @@
 > A stream security transport for libp2p. Streams wrapped by SECIO use secure
 > sessions to encrypt all traffic.
 
+## Status
+
+This document is a DRAFT and may be revised for clarity and precision. If you
+find inaccuracies, please [file an issue.](https://github.com/libp2p/specs/issues/new)
+
 ## Authors
 
 - [Juan Benet](https://github.com/jbenet) (October, 2015)
