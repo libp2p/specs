@@ -70,9 +70,14 @@ mature and iterate.
 Once the `Initial Working Draft` is merged, the author may continue revising
 and evolving their specification by self-approving their own *Pull Requests*.
 
+To facilitate open progress tracking and observability, as the `Working Draft`
+evolves, the author(s) SHOULD assemble a checklist of items that are pending
+specification, explicitly stating which items are compulsory for promoting the
+spec to a `Candidate Recommendation`.
+
 We MAY use GitHub's
 [`CODEOWNERS`](https://help.github.com/en/articles/about-code-owners) feature
-to model the approval policy.
+to enforce per-spec approval policies automatically.
 
 ## Stage 2: Candidate Recommendation
 
