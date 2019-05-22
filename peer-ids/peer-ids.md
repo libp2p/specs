@@ -1,6 +1,35 @@
 # Spec: Peer Ids and Keys
 
-Status: **DRAFT**
+**Table of Contents**
+
+- [Spec: Peer Ids and Keys](#spec-peer-ids-and-keys)
+    - [Status](#status)
+    - [Overview](#overview)
+    - [Keys](#keys)
+        - [-](#-)
+    - [Peer Ids](#peer-ids)
+        - [Note about deterministic encoding:](#note-about-deterministic-encoding)
+        - [String representation](#string-representation)
+    - [How Keys are Encoded and Messages Signed](#how-keys-are-encoded-and-messages-signed)
+        - [RSA](#rsa)
+        - [Ed25519](#ed25519)
+        - [Secp256k1](#secp256k1)
+        - [ECDSA](#ecdsa)
+
+
+## Status
+
+Status: 3A - Recommendation, Active
+
+This document is an Active Recommendation and describes the current state of key
+usage and peer id generation in libp2p. 
+
+See [the lifecycle
+document](https://github.com/libp2p/specs/00-framework-01-spec-lifecycle.md) for
+more information on spec status.
+
+ If you find inaccuracies or room for improvment, please [file an
+issue.](https://github.com/libp2p/specs/issues/new)
 
 ## Overview
 
