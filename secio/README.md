@@ -5,8 +5,19 @@
 
 ## Status
 
-This document is a DRAFT and may be revised for clarity and precision. If you
-find inaccuracies, please [file an issue.](https://github.com/libp2p/specs/issues/new)
+Status: 3A - Recommendation, Active
+Last revision: 2019-05-22
+
+This document is an Active Recommendation. SECIO is widely supported across
+libp2p implementations, and it is the current default for connection security in
+libp2p.
+
+See [the lifecycle
+document](https://github.com/libp2p/specs/00-framework-01-spec-lifecycle.md) for
+more information on spec status.
+
+If you find inaccuracies or room for improvment, please [file an
+issue.](https://github.com/libp2p/specs/issues/new)
 
 ## Authors
 
@@ -331,7 +342,6 @@ been opened and is ready for use, using the framing rules described
 [above](#secure-message-framing).
 
 
-<!-- FIXME(yusef): this link is broken until the peer id PR gets merged -->
 [peer-id-spec]: https://github.com/libp2p/specs/peer-ids/peer-ids.md
 
 [multistream-select]: https://github.com/multiformats/multistream-select
