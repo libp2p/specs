@@ -77,20 +77,24 @@ Here is the process by which we generate peer ids based on the public component 
  
 ### Note about deterministic encoding:
 
-Deterministic encoding of the `PublicKey` message is desirable, as it ensures the same public key will always
-result in the same peer id.
+Deterministic encoding of the `PublicKey` message is desirable, as it ensures
+the same public key will always result in the same peer id.
 
-The Protobuf specification does not provide sufficient guidance to ensure deterministic serialization of
-messages. There are two factors that could lead to semantically identical messages having different serialized
-values: field ordering, and the ability to specify the same field multiple times.
+The Protobuf specification does not provide sufficient guidance to ensure
+deterministic serialization of messages. Specifically, there are no guarantees
+about field ordering, and it's possible to add any number of unknown fields to a
+message.
 
-In earlier versions of the Protobuf spec, serializers were encouraged to write known fields in sequential
-order by field number, with unknown fields in arbitrary order after the ordered known fields. This guidance 
-has since been removed, however, libp2p implementors should use a protobuf encoder that provides this behavior.
+A future revision to this spec may define a canonical encoding that is more
+strict than the Protobuf encoding spec.
 
-The ability to set a field multiple times (with the last value "winning" in the deserialized message), can lead
-to different serializations of semantically identical messages. libp2p implementors are therefore encouraged to
-set the fields in the `PublicKey` message only once before encoding, and may refuse to deserialize encoded `PublicKey` messages in which a field is set multiple times.
+In the meantime, implementors SHOULD use a protobuf encoder that orders fields
+by their field number. This is the default behavior in many protobuf encoders,
+but should be verified before committing to an implementation.
+
+Additionally, implementors MUST avoid extending the `PublicKey` message with
+additional fields, as the ordering of unknown fields is currently undefined
+behavior.
 
 ### String representation
 
