@@ -6,7 +6,6 @@
     - [Status](#status)
     - [Overview](#overview)
     - [Keys](#keys)
-        - [-](#-)
     - [Peer Ids](#peer-ids)
         - [Note about deterministic encoding:](#note-about-deterministic-encoding)
         - [String representation](#string-representation)
