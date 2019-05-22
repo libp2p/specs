@@ -1,4 +1,4 @@
-# libp2p specification framework – the five-stage maturity process
+# libp2p specification framework – lifecycle: maturity level and status
 
 > Author: @raulk
 
@@ -6,34 +6,72 @@
 
 ## Prelude
 
-This document establishes a framework to foster rapid and incremental libp2p
+Our goal is to design a framework to foster rapid and incremental libp2p
 specification development, aiming to reduce the barrier to entry for new
-ideas, increasing the throughput of breakthrough creative proposals, promoting
-their evolution and adoption within the community, while maximising consensus
-around a common lifecycle and criteria for progression across stages.
+ideas, increasing the throughput of ideation and crystallization of
+breakthrough novel proposals, promoting their evolution and adoption within
+the ecosystem, while maximising consensus through a common policy for
+progression across lifecycle stages.
 
-We propose a five-stage process to classify the maturity of a specification in
-terms of completeness, demonstrability of implementation, community
-acceptance, and level of technical detail. It is somewhat inspired in the W3C
-Process [0].
+This document defines the policies that regulate specification lifecycle. Our
+ideas are partially inspired in the W3C Process [0].
 
-  1. `Working Draft`
-  2. `Candidate Recommendation`
-  3. `Recommendation`
-  4. `Deprecated`
-  5. `Abandoned Draft`
+## Definitions
 
-## Stage 1: Working draft
+We employ two axes to describe the stage of a specification within its
+lifecycle:
 
-The specification of the system, process, protocol or item is under active
-development. This stage is lightweight and mostly self-directed by the author.
-We aim to reduce the barrier to entry, and it's designed to allow for
-iterative experimentation, discovery and pivoting.
+  * Maturity level: classifies the specification in terms of completeness,
+    demonstrability of implementation, community acceptance, and level of
+    technical detail.
 
-We don't enforce a hard template in an attempt to enhance author
+    We characterize specifications along a three-level, progressive scale:
+
+      * `Level 1: Working Draft`
+      * `Level 2: Candidate Recommendation`
+      * `Level 3: Recommendation`
+
+  * Status: classifies the operativeness of the specification.
+
+      * `Active`
+      * `Deprecated`
+      * `Terminated`
+
+Not all statuses are relevant to all maturity levels. This matrix defines the
+applicability:
+
+|                               | **Active** | **Deprecated** | **Terminated** |
+| ----------------------------: | :--------: | :------------: | :------------: |
+| **Working Draft**             |     ✔      |                |        ✔       |
+| **Candidate Recommendation**  |     ✔      |        ✔       |                |
+| **Recommendation**            |     ✔      |        ✔       |                |
+
+To abbreviate the lifecycle stage of a specification, we combine the maturity
+level and status in a two character string:
+
+```
+<maturity level>    ::= "1" | "2" | "3"
+<status>            ::= "A" | "D" | "T"
+<lifecycle stage>   ::= <maturity level> <status>
+// example: 1A (Working Draft / Active), 2D (Candidate Recommendation / Deprecated).
+```
+
+## Maturity levels
+
+### Level 1: Working Draft
+
+The specification of the system, process, protocol or item is under
+development.
+
+This level is lightweight and mostly self-directed by the author. We aim to
+reduce the barrier to entry, and it's designed to allow for iterative
+experimentation, discovery and pivoting.
+
+We don't enforce a hard template in an attempt to enhance author's
 expressability and creativity.
 
-We enter this stage by posting an `Initial Working Draft` that covers:
+We enter this level by posting an `Initial Working Draft` that covers:
+
   * context: what is the current situation or a brief overview of the
     environment the specification targets.
   * motivation: why this specification is relevant, and how it advances the
@@ -83,9 +121,11 @@ We MAY use GitHub's
 [`CODEOWNERS`](https://help.github.com/en/articles/about-code-owners) feature
 to enforce per-spec approval policies automatically.
 
-## Stage 2: Candidate Recommendation
+A `Working Draft` can be in either `Active` or `Terminated` status.
 
-The changes requested by the specification are considered plausible and
+### Level 2: Candidate Recommendation
+
+The changes proposed in the specification are considered plausible and
 desirable.
 
 The specification document itself is technically complete. It defines wire
@@ -94,46 +134,68 @@ heuristics, behaviours, etc., in a way that it is sufficient to enable
 contributors to develop an interoperable implementation.
 
 There is at least ONE implementation conforming to the specification. That
-implementation serves as the Reference Implementation.
+implementation serves as the _Reference Implementation_.
 
 The promotion from a `Working Draft` to a `Candidate Recommendation` is done
-via a *Pull Request* that is reviewed by the _Interest Group_, allowing a
-minimum of 10 working days to elapse to collect feedback from the libp2p
-community at large.
+via a *Pull Request* that is reviewed by the _Interest Group_, allowing 10
+working days to elapse to collect feedback from the libp2p community at large.
 
-## Stage 3: Recommendation
+A `Candidate Recommendation` can be in either `Active` or `Deprecated` status.
+
+### Level 3: Recommendation
 
 There are at least TWO implementations conforming to the specification, with
 demonstrated cross-interoperability. This is the supreme stage in the
 lifecycle of a specification.
 
 The promotion from a `Candidate Recommendation` to a `Recommendation` is done
-via a *Pull Request* that is reviewed by the _Interest Group_, allowing a
-minimum of 10 working days to elapse to collect feedback from the libp2p
-community at large.
+via a *Pull Request* that is reviewed by the _Interest Group_, allowing 10
+working days to elapse to collect feedback from the libp2p community at large.
 
-## Stage 4: Deprecated
+A `Recommendation` can be in either `Active` or `Deprecated` status.
+
+## Status
+
+### Active
+
+The specification is actively being worked on (`Working Draft`), or it is
+actively encouraged for adoption by implementers (`Candidate Recommendation`,
+`Recommendation`).
+
+This is the entry status for all `Initial Working Drafts`, and is the default
+status until some event triggers deprecation or termination.
+
+### Deprecated
 
 The specification is no longer applicable and the community actively
-discourages new implementations.
+discourages new implementations from being built, unless requirements for
+backwards-compatibility are in force.
 
-Transition to this stage is usually the result of a new version of the
-specification reaching the `Candidate Recommendation` stage.
+Transition to this stage is usually triggered when a new version of a related
+specification superseding this one reaches the `Candidate Recommendation`
+stage.
 
-The transition from a `Candidate Recommendation` or a `Recommendation` stage
-to the `Deprecated` stage is performed via a *Pull Request* that is reviewed
-by the _Interest Group_, allowing a minimum of 5 working days to elapse to
-collect feedback from the libp2p community at large.
+The transition from the `Active` status to the `Deprecated` status is
+performed via a *Pull Request* that is reviewed by the _Interest Group_,
+allowing 5 working days to elapse to collect feedback from the libp2p
+community at large.
 
-## Stage 5: Abandoned Draft
+### Terminated
 
-In order to motivate accountability, efficiency and order, a specification
-that stays in the `Working Draft` stage for over 4 months of its initial
-approval will automatically transition to the `Abandoned Draft` stage.
+A specification in `Working Draft` maturity level aged without ammassing
+consensus in a timely fashion, and it was therefore terminated by the
+procedure below.
 
-Extensions can be requested up to 2 times (making for a cumulative runway 12
-months), and will only be granted by consensus if there's evidence of progress
-and continued author commitment.
+Procedure for termination: In order to motivate accountability, efficiency and
+order, a specification that stays on the `Working Draft` maturity level for
+over 4 months of its initial approval will be transitioned to the `Terminated`
+status automatically.
+
+The author or _Interest Group_ can request extensions up to 2 times (making
+for a cumulative runway 12 months), and will be granted by consensus if
+there's evidence of progress and continued author commitment. We consider this
+an implicit checkpoint to resolve issues that prevent the specification from
+making progress.
 
 ---
 
