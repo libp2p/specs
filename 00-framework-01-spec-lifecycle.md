@@ -8,7 +8,7 @@
 
 Our goal is to design a framework to foster rapid and incremental libp2p
 specification development, aiming to reduce the barrier to entry for new
-ideas, increasing the throughput of ideation and crystallization of
+ideas, increasing the throughput of ideation and crystallisation of
 breakthrough novel proposals, promoting their evolution and adoption within
 the ecosystem, while maximising consensus through a common policy for
 progression across lifecycle stages.
@@ -37,6 +37,8 @@ lifecycle:
       * `Deprecated`
       * `Terminated`
 
+### Applicability matrix
+
 Not all statuses are relevant to all maturity levels. This matrix defines the
 applicability:
 
@@ -46,14 +48,28 @@ applicability:
 | **Candidate Recommendation**  |     ✔      |        ✔       |                |
 | **Recommendation**            |     ✔      |        ✔       |                |
 
+### Abbreviations
+
 To abbreviate the lifecycle stage of a specification, we combine the maturity
-level and status in a two character string:
+level and status into a two-character string:
 
 ```
-<maturity level>    ::= "1" | "2" | "3"
-<status>            ::= "A" | "D" | "T"
-<lifecycle stage>   ::= <maturity level> <status>
+<abbrv maturity level>    ::= "1" | "2" | "3"
+<abbrv status>            ::= "A" | "D" | "T"
+<abbrv lifecycle stage>   ::= <abbrv maturity level> <abbrv status>
 // example: 1A (Working Draft / Active), 2D (Candidate Recommendation / Deprecated).
+```
+
+### Document headers
+
+We use the following nomenclature in document headers to denote its current
+lifecycle stage:
+
+```
+<full maturity level>   ::= "Working Draft" | "Candidate Recommendation" | "Recommendation"
+<full status>           ::= "Active" | "Deprecated" | "Terminated"
+<lifecycle header>      ::= <abbrv lifecycle stage> " – " <full maturity level> " / " <full status>
+// example: 1A – Working Draft / Active.
 ```
 
 ## Maturity levels
@@ -65,9 +81,9 @@ development.
 
 This level is lightweight and mostly self-directed by the author. We aim to
 reduce the barrier to entry, and it's designed to allow for iterative
-experimentation, discovery and pivoting.
+experimentation, discovery, and pivoting.
 
-We don't enforce a hard template in an attempt to enhance author's
+We do not enforce a hard template in an attempt to enhance author's
 expressability and creativity.
 
 We enter this level by posting an `Initial Working Draft` that covers:
