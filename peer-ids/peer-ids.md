@@ -1,13 +1,32 @@
-# Spec: Peer Ids and Keys
+# Peer Ids and Keys
 
-**Table of Contents**
+| Lifecycle Stage | Maturity Level | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
+| 3A              | Recommendation | Active | r0, 2019-05-23  |
 
-- [Spec: Peer Ids and Keys](#spec-peer-ids-and-keys)
-    - [Status](#status)
+
+**Authors**: [@mgoelzer][@mgoelzer], [@yusefnapora][@yusefnapora]
+
+**Interest Group**: [@raulk][@raulk], [@vyzo][@vyzo], [@Stebalien][@Stebalien]
+
+[@mgoelzer]: https://github.com/mgoelzer
+[@yusefnapora]: https://github.com/yusefnapora
+[@raulk]: https://github.com/raulk
+[@vyzo]: https://github.com/vyzo
+[@Stebalien]: https://github.com/Stebalien
+
+See the [lifecycle document](../00-framework-01-spec-lifecycle.md) for context
+about maturity level and spec status.
+
+## Table of Contents
+
+- [Peer Ids and Keys](#peer-ids-and-keys)
+    - [Table of Contents](#table-of-contents)
     - [Overview](#overview)
     - [Keys](#keys)
+        - [Where are keys used?](#where-are-keys-used)
     - [Peer Ids](#peer-ids)
-        - [Note about deterministic encoding:](#note-about-deterministic-encoding)
+        - [Note about deterministic encoding](#note-about-deterministic-encoding)
         - [String representation](#string-representation)
     - [How Keys are Encoded and Messages Signed](#how-keys-are-encoded-and-messages-signed)
         - [RSA](#rsa)
@@ -15,20 +34,6 @@
         - [Secp256k1](#secp256k1)
         - [ECDSA](#ecdsa)
 
-
-## Status
-
-Status: 3A - Recommendation, Active
-
-This document is an Active Recommendation and describes the current state of key
-usage and peer id generation in libp2p. 
-
-See [the lifecycle
-document](https://github.com/libp2p/specs/00-framework-01-spec-lifecycle.md) for
-more information on spec status.
-
- If you find inaccuracies or room for improvment, please [file an
-issue.](https://github.com/libp2p/specs/issues/new)
 
 ## Overview
 
@@ -84,7 +89,7 @@ Current libp2p implementations store private keys on disk as a serialized
 keys can use the `PrivateKey` message definition to deserialize private key
 files.
 
-#### Where it's used?
+### Where are keys used?
 
 Keys are used in two places in libp2p.  The first is for signing messages.  Here are some examples of messages we sign:
  - IPNS records
@@ -103,7 +108,7 @@ Here is the process by which we generate peer ids based on the public component 
   4. If the length of the serialized bytes <= 42, then we compute the "identity" multihash of the serialized bytes.  In other words, no hashing is performed, but the [multihash format is still followed](https://github.com/multiformats/multihash) (byte plus varint plus serialized bytes).  The idea here is that if the serialized byte array is short enough, we can fit it in a multihash verbatim without having to condense it using a hash function.
   5. If the length is >42, then we hash it using it using the SHA256 multihash.
  
-### Note about deterministic encoding:
+### Note about deterministic encoding
 
 Deterministic encoding of the `PublicKey` message is desirable, as it ensures
 the same public key will always result in the same peer id.
@@ -199,3 +204,4 @@ We encode the public key using ASN.1 DER.
 We encode the private key using DER-encoded PKIX.
 
 To sign a message, we hash the message with SHA 256, and then sign it with the [ECDSA standard algorithm](https://tools.ietf.org/html/rfc6979), then we encode it using [DER-encoded ASN.1.](https://wiki.openssl.org/index.php/DER)
+
