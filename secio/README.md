@@ -7,10 +7,9 @@
 |-----------------|----------------|--------|-----------------|
 | 3A              | Recommendation | Active | r0, 2019-05-27  |
 
-Authors: [@jbenet][@jbenet], [@bigs][@bigs], [@yusefnapora][@yusefnapora]
+Authors: [@jbenet], [@bigs], [@yusefnapora]
 
-Interest Group: [@Stebalien][@Stebalien],
-[@richardschneider][@richardschneider], [@tomaka][@tomaka], [@raulk][@raulk]
+Interest Group: [@Stebalien], [@richardschneider], [@tomaka], [@raulk]
 
 [@jbenet]: https://github.com/jbenet
 [@bigs]: https://github.com/bigs
