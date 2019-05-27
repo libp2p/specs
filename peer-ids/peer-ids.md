@@ -5,9 +5,9 @@
 | 3A              | Recommendation | Active | r0, 2019-05-23  |
 
 
-**Authors**: [@mgoelzer][@mgoelzer], [@yusefnapora][@yusefnapora]
+**Authors**: [@mgoelzer], [@yusefnapora]
 
-**Interest Group**: [@raulk][@raulk], [@vyzo][@vyzo], [@Stebalien][@Stebalien]
+**Interest Group**: [@raulk], [@vyzo], [@Stebalien]
 
 [@mgoelzer]: https://github.com/mgoelzer
 [@yusefnapora]: https://github.com/yusefnapora
