@@ -3,45 +3,31 @@
 > A stream security transport for libp2p. Streams wrapped by SECIO use secure
 > sessions to encrypt all traffic.
 
-## Status
+| Lifecycle Stage | Maturity Level | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
+| 3A              | Recommendation | Active | r0, 2019-05-27  |
 
-Status: 3A - Recommendation, Active
-Last revision: 2019-05-22
+Authors: [@jbenet][@jbenet], [@bigs][@bigs], [@yusefnapora][@yusefnapora]
 
-This document is an Active Recommendation. SECIO is widely supported across
-libp2p implementations, and it is the current default for connection security in
-libp2p.
+Interest Group: [@Stebalien][@Stebalien],
+[@richardschneider][@richardschneider], [@tomaka][@tomaka], [@raulk][@raulk]
 
-See [the lifecycle
-document](https://github.com/libp2p/specs/00-framework-01-spec-lifecycle.md) for
-more information on spec status.
+[@jbenet]: https://github.com/jbenet
+[@bigs]: https://github.com/bigs
+[@yusefnapora]: https://github.com/yusefnapora
+[@Stebalien]: https://github.com/Stebalien
+[@richardschneider]: https://github.com/richardschneider
+[@tomaka]: https://github.com/tomaka
+[@raulk]: https://github.com/raulk
 
-If you find inaccuracies or room for improvment, please [file an
-issue.](https://github.com/libp2p/specs/issues/new)
-
-## Authors
-
-- [Juan Benet](https://github.com/jbenet) (October, 2015)
-
-## Editors
-
-- [Cole Brown](https://github.com/bigs)
-- [Lars Gierth](https://github.com/lgierth)
-- [Yusef Napora](https://github.com/yusefnapora)
-
-## Implementations
-
-- [js-libp2p-secio](https://github.com/libp2p/js-libp2p-secio)
-- [go-secio](https://github.com/libp2p/go-libp2p-secio)
-- [rust-libp2p](https://github.com/libp2p/rust-libp2p/tree/master/protocols/secio)
+See the [lifecycle document](../00-framework-01-spec-lifecycle.md) for context
+about maturity level and spec status.
 
 ## Table of Contents
 
 - [SECIO 1.0.0](#secio-100)
-    - [Authors](#authors)
-    - [Editors](#editors)
-    - [Implementations](#implementations)
     - [Table of Contents](#table-of-contents)
+    - [Implementations](#implementations)
     - [Algorithm Support](#algorithm-support)
         - [Exchanges](#exchanges)
         - [Ciphers](#ciphers)
@@ -61,6 +47,11 @@ issue.](https://github.com/libp2p/specs/issues/new)
             - [Secure Message Framing](#secure-message-framing)
             - [Initial Packet Verification](#initial-packet-verification)
 
+## Implementations
+
+- [js-libp2p-secio](https://github.com/libp2p/js-libp2p-secio)
+- [go-secio](https://github.com/libp2p/go-libp2p-secio)
+- [rust-libp2p](https://github.com/libp2p/rust-libp2p/tree/master/protocols/secio)
 
 ## Algorithm Support
 
