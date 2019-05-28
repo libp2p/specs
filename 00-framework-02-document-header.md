@@ -1,6 +1,6 @@
 # Document Header for libp2p Specs
 
-> A standard document header to indicate spec maturity, status & ownership
+> A standard document header to indicate spec maturity, status & ownership.
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
@@ -62,7 +62,7 @@ and spec status.
 Each spec begins with its title, formatted as an H1 markdown header. 
 
 The title can optionally be followed by a short block-quote introducing the
-spec, which should be a maximum of one or two lines.
+spec, which serves as a subtitle and should be a maximum of one or two lines.
 
 ### Status Table
 
@@ -93,7 +93,7 @@ The following fields are all required:
   - The full name of the status that the spec is currently in.
   - For `Candidate Recommendation` or `Recommendation` specs, valid values are
     `Active` and `Deprecated`.
-  - For `Working Draft` specs, valid values are: `Active` and `Terminated`
+  - For `Working Draft` specs, valid values are: `Active` and `Terminated`.
 - `Latest Revision`
   - A revision number and date to indicate when the spec was last modified,
     separated by a comma.
@@ -112,7 +112,11 @@ to Github profiles.
 
 To make the list readable in the markdown source, we use the [shortcut reference
 link syntax][gfm-shortcut-refs], which allows us to wrap the author name in
-square brackets in the list and define the link target below. For example:
+square brackets in the list and define the link target below. Albeit this may
+appear redundant when viewing in github.com with the GitHub renderer, it's
+necessary to avoid losing information when viewing elsewhere.
+
+For example:
 
 ```markdown
 Authors: [@author1], [@author2]
