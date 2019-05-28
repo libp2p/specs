@@ -100,7 +100,7 @@ The following fields are all required:
   - Revision numbers start with lowercase `r` followed by an integer, which gets
     bumped whenever the spec is modified by merging a new PR.
   - Revision numbers start at `r0` when the spec is first merged.
-  - Dates are formatted according to [ISO 8601](https://xkcd.com/1179/)
+  - Dates are formatted according to [ISO 8601](https://xkcd.com/1179/).
 
 ### Authors and Interest Group
 
