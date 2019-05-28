@@ -4,13 +4,18 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r0, 2019-05-27  |
+| 1A              | Working Draft | Active | r0, 2019-05-28  |
 
 Authors: [@yusefnapora]
 
-Interest Group: TBD
+Interest Group: [@raulk], [@vyzo], [@mgoelzer], [@jacobheun], [@tomaka]
 
 [@yusefnapora]: https://github.com/yusefnapora
+[@raulk]: https://github.com/raulk
+[@vyzo]: https://github.com/vyzo
+[@mgoelzer]: https://github.com/mgoelzer
+[@jacobheun]: https://github.com/jacobheun
+[@tomaka]: https://github.com/tomaka
 
 See the [lifecycle document][lifecycle-spec] for context about maturity level
 and spec status.
