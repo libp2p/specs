@@ -92,7 +92,7 @@ The following fields are all required:
 - `Status`
   - The full name of the status that the spec is currently in.
   - For `Candidate Recommendation` or `Recommendation` specs, valid values are
-    `Active` and `Deprecated`
+    `Active` and `Deprecated`.
   - For `Working Draft` specs, valid values are: `Active` and `Terminated`
 - `Latest Revision`
   - A revision number and date to indicate when the spec was last modified,
