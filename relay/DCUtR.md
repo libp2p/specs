@@ -70,11 +70,20 @@ upgrade protocol as follows:
      obtained from the `Connect` message.
    - Upon expiry of the timer, `B` starts a direct dial to `A` using the addresses obtained
      from the `Connect` message.
-6. If the connection is successful, then it is prioritized over the relay connection, which
-   can now be closed, possibly after a grace period.
 
 The purpose of the `Sync` message and `B`'s timer is to allow the two peers to synchronize
 so that they perform a simultaneous open that allows hole punching to succeed.
+
+If the direct connection is successful, then the peers should migrate
+to it by prioritizing over the existing relay connection. All new
+streams should be opened in the direct connection, while the relay
+connection should be closed after a grace period.  Existing indefinite
+duration streams will have to be recreated in the new connection once
+the relay connection is closed.  This can be accomplised by observing
+network notifications: the new direct connection will emit a new
+`Connected` notification, while closing the relay connection will
+sever existing streams and emit `Disconnected` notification.
+
 
 ### Protobuf
 
