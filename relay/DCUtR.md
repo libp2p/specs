@@ -4,14 +4,14 @@
 |-----------------|---------------|--------|--------------------|
 | 1A              | Working Draft | Active | DRAFT, 2019-05-29  |
 
-Authors: vyzo
+Authors: [@vyzo]
 
-Interest Group: raulk, stebalien, whyrusleeping
+Interest Group: [@raulk], [@stebalien], [@whyrusleeping]
 
-[vyzo]: https://github.com/vyzo
-[raulk]: https://github.com/raulk
-[steablien]: https://github.com/stebalien
-[whyrusleeping]: https://github.com/whyrusleeping
+[@vyzo]: https://github.com/vyzo
+[@raulk]: https://github.com/raulk
+[@stebalien]: https://github.com/stebalien
+[@whyrusleeping]: https://github.com/whyrusleeping
 
 See the [lifecycle document](https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md)
 for context about maturity level and spec status.
