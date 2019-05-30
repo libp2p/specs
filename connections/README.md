@@ -193,7 +193,33 @@ upgrade process is complete, and both peers are able to use the resulting libp2p
 connection to open new secure multiplexed streams.
 
 
-### Stream Multiplexing
+## Opening New Streams Over a Connection
+
+Once we've established a libp2p connection to another peer, new streams are
+multiplexed over the connection using the native facilities of the transport, or
+the stream multiplexer negotiated during the [upgrade
+process](#upgrading-connections) if the transport lacks native multiplexing.
+Either peer can open a new stream to the other over an existing connection.
+
+When a new stream is opened, a protocol is negotiated using
+`multistream-select`. The [protocol negotiation process](#protocol-negotiation)
+for new streams is very similar to the one used for upgrading connections.
+However, while the security and stream multiplexing modules for conneciton
+upgrades are typically libp2p framework components, the protocols negotiated for
+new streams can be easily defined by libp2p applications.
+
+Streams are routed to application-defined handler functions based on their
+protocol id string. Incoming stream requests will propose a protocol id to use
+for the stream using `multistream-select`, and the peer accepting the stream
+request will determine if there are any registered handlers capable of handling
+the protocol. If no handlers are found, the peer will respond to the proposal
+with `"na"`.
+
+When registering protocol handlers, it's possible to use a custom predicate or
+"match function", which will receive incoming protocol ids and return `true` if
+the handler supports the protocol. This allows more flexible behavior than exact
+literal matching, which is the default behavior if no match function is
+provided.
 
 ## Practical Considerations
 
