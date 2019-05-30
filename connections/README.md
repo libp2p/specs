@@ -1,13 +1,14 @@
 # Connection Establishment in libp2p
 
-> Specification for connection handshake between libp2p peers
+| Lifecycle Stage | Maturity      | Status | Latest Revision |
+|-----------------|---------------|--------|-----------------|
+| 1A              | Working Draft | Active | r0, 2019-05-30  |
 
-Revision: draft 1, 2019-05-13
+Authors: [@yusefnapora]
 
-Authors:
-- @yusefnapora (yusef@protocol.ai)
+Interest Group: TBD
 
-TK: brief intro that outlines what's covered in the spec. also add TOC
+[@yusefnapora]: https://github.com/yusefnapora
 
 ## Overview
 
