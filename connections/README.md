@@ -96,9 +96,9 @@ itself has a protocol id of `/multistream/1.0.0`.
 Before engaging in the multistream-select negotiation process, it is assumed
 that the peers have already established a bidirectional communication channel,
 which may or may not have the security and multiplexing capabilities of a libp2p
-connection. If those capabilities are missing, multistream-select is used in
-the connection upgrade process to determine how to provide them, as described
-[below](#upgrading-connections).
+connection. If those capabilities are missing, multistream-select is used in the
+[connection upgrade process](#upgrading-connections) to determine how to provide
+them.
 
 Messages are sent encoded as UTF-8 byte strings, and they are always followed by
 a `\n` newline character. Each message is also prefixed with its length in bytes
@@ -155,7 +155,8 @@ connections is called "upgrading" the connection.
 Because there are many valid ways to provide the libp2p capabilities, the
 connection upgrade process uses protocol negotiation to decide which specific
 protocols to use for each capability. The protocol negotiation process uses
-multistream-select as described [above](#protocol-negotiation).
+multistream-select as described in the [Protocol
+Negotiation](#protocol-negotiation) section.
 
 When raw connections need both security and multiplexing, security is always
 established first, and the negotiation for stream multiplexing takes place over
