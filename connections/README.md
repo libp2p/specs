@@ -12,7 +12,25 @@ Interest Group: TBD
 
 ## Overview
 
-Let's clarify a few terms before we get too deep.
+This document describes the process of establishing connections to new peers in
+libp2p and, if necessary, adding security and stream multiplexing capabilities
+to "raw" connections provided by transport protocols.
+
+We also discuss opening new streams over an existing connection, and the
+protocol negotiation proccess that occurs to route traffic to the correct
+protocol handler.
+
+This document does not cover the establishment of "transport level" connections,
+for example opening "raw" TCP sockets, as those semantics are specific to each
+transport.
+
+What is covered here is the process that occurs after making the initial
+transport level connection, up to the point where "application level" streams
+are opened and their protocols are identified and routed to the appropriate
+handlers.
+
+
+## Definitions
 
 A **connection** is a reliable, bidirectional communication channel between two
 libp2p peers that provides **security** and the ability to open multiple
