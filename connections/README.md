@@ -120,10 +120,10 @@ The basic multistream-select interaction flow looks like this:
 ![see multistream.plantuml for diagram source](multistream.svg)
 
 Let's walk through the diagram above. The peer initiating the connection is
-called the **Dialer**, and the peer accepting the connection is the
-**Listener**.
+called the **Initiator**, and the peer accepting the connection is the
+**Responder**.
 
-The Dialer first opens a channel to the Listener. This channel could either be a
+The Initiator first opens a channel to the Responder. This channel could either be a
 new connection or a new stream multiplexed over an existing connection.
 
 Next, both peers will send the multistream protocol id to establish that they
@@ -132,10 +132,10 @@ multistream protocol id simultaneously, without waiting to recieve data from the
 other side. If either side recieves anything other than the multistream protocol
 id as the first message, they abort the negotiation process.
 
-Once both peers have agreed to use multistream-select, the Dialer sends the
-protocol id for the protocol they would like to use. If the Listener supports
+Once both peers have agreed to use multistream-select, the Initiator sends the
+protocol id for the protocol they would like to use. If the Responder supports
 that protocol, it will respond by echoing back the protocol id, which signals
-agreement. If the protocol is not supported, the Listener will respond with the
+agreement. If the protocol is not supported, the Responder will respond with the
 string `"na"` to indicate that the requested protocol is Not Available.
 
 If the peers agree on a protocol, multistream-select's job is done, and future
@@ -169,11 +169,11 @@ Here's an example of the connection upgrade process:
 First, the peers both send the multistream protocol id to establish that they'll
 use multistream-select to negotiate protocols for the connection upgrade.
 
-Next, the Dialer proposes the [TLS protocol](../tls/tls.md) for encryption, but
-the Listener rejects the proposal as they don't support TLS.
+Next, the Initiator proposes the [TLS protocol](../tls/tls.md) for encryption, but
+the Responder rejects the proposal as they don't support TLS.
 
-The Dialer then proposes the [SECIO protocol](../secio), which is supported by
-the Listener. The Listener echoes back the protocol id for SECIO to indicate
+The Initiator then proposes the [SECIO protocol](../secio), which is supported by
+the Responder. The Listener echoes back the protocol id for SECIO to indicate
 agreement.
 
 At this point the SECIO protocol takes over, and the peers exchange the SECIO
