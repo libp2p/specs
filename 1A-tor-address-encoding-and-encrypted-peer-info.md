@@ -1,6 +1,20 @@
-1A – Working Draft / Active
+# Tor Address Encoding and Encrypted `PeerInfo`
 
-Tor Address Encoding and Encrypted `PeerInfo`
+| Lifecycle Stage | Maturity      | Status | Latest Revision   |
+|-----------------|---------------|--------|-------------------|
+| 1A              | Working Draft | Active | DRAFT, 2019-05-31 |
+
+Authors: [@Zolmeister]
+
+Interest Group: [@yusefnapora], others TBD
+
+[@Zolmeister]: https://github.com/Zolmeister
+[@yusefnapora]: https://github.com/yusefnapora
+
+See the [lifecycle document][lifecycle-spec] for context about maturity level
+and spec status.
+
+[lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
 
 ### Context:
 
