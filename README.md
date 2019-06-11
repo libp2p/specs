@@ -31,7 +31,7 @@ consistency.
 
 This document replaces an earlier RFC, which still contains much useful
 information and is helpful for understanding the libp2p design philosophy. It is
-avaliable at [archive/README.md](./archive/README.md).
+avaliable at [_archive/README.md](./_archive/README.md).
 
 ## Specification Index
 
