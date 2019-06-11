@@ -65,6 +65,20 @@ security, multiplexing, and other purposes.
 - [tls][spec_tls] The libp2p TLS Handshake (TLS 1.3+)
 
 
+## Contributions
+
+Thanks for your interest in improving libp2p! We welcome contributions from all
+interested parties. Please take a look at the [Spec Lifecycle][spec_lifecycle]
+document to get a feel for how the process works, and [open an
+issue](https://github.com/libp2p/specs/issues/new) if there's work you'd like to
+discuss.
+
+For discussions about libp2p that aren't specific to a particular spec, or if
+you feel an issue isn't the appropriate place for your topic, please join our
+[discussion forum](https://discuss.libp2p.io) and post a new topic in the
+[contributor's section](https://discuss.libp2p.io/c/contributors).
+
+
 [libp2p_implementations]: https://libp2p.io/implementations
 [spec_lifecycle]: 00-framework-01-spec-lifecycle.md
 [spec_header]: 00-framework-02-document-header.md
