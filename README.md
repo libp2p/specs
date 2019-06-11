@@ -62,6 +62,7 @@ security, multiplexing, and other purposes.
 - [relay][spec_relay] - Circuit Switching for libp2p (similar to TURN)
 - [rendezvous][spec_rendezvous] - Rendezvous Protocol for generalized
   peer discovery
+- [secio][spec_secio] - SECIO, a transport security protocol for libp2p
 - [tls][spec_tls] The libp2p TLS Handshake (TLS 1.3+)
 
 
@@ -90,4 +91,5 @@ you feel an issue isn't the appropriate place for your topic, please join our
 [spec_episub]: ./pubsub/gossipsub/episub.md
 [spec_relay]: ./relay/README.md
 [spec_rendezvous]: ./rendezvous/README.md
+[spec_secio]: ./secio/README.md
 [spec_tls]: ./tls/tls.md
