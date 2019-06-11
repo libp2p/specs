@@ -263,7 +263,7 @@ to build up a routing table.
 
 Even during a single invocation of an application, you're likely to benefit from
 an in-memory metadata storage facility, which will allow you to cache addresses
-for connection resumption. Desining a storage interface which can be backed by
+for connection resumption. Designing a storage interface which can be backed by
 memory or persistent storage will let you swap in whichever is appropriate for
 your use case and stage of development.
 
