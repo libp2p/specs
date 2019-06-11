@@ -8,6 +8,7 @@
 <a href="http://protocol.ai"><img src="https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square" /></a>
 <a href="http://libp2p.io/"><img src="https://img.shields.io/badge/project-libp2p-yellow.svg?style=flat-square" /></a>
 <a href="http://webchat.freenode.net/?channels=%23libp2p"><img src="https://img.shields.io/badge/freenode-%23libp2p-yellow.svg?style=flat-square" /></a>
+<a href="https://discuss.libp2p.io"><img src="https://img.shields.io/discourse/https/discuss.libp2p.io/posts.svg" /></a>
 
 ## Overview
 
@@ -32,20 +33,47 @@ This document replaces an earlier RFC, which still contains much useful
 information and is helpful for understanding the libp2p design philosophy. It is
 avaliable at [archive/README.md](./archive/README.md).
 
-## Index
+## Specification Index
 
-- [identify](./identify/README.md) Exchange keys and addresses with other peers
-- [mplex](./mplex/README.md) The friendly stream multiplexer
-- [pnet](./pnet/README.md) Private networking in libp2p using pre-shared keys
-- [pubsub](./pubsub/README.md) PubSub interface for libp2p
-  - [gossipsub](./pubsub/gossipsub/README.md) An extensible baseline PubSub
-    protocol
-    - [episub](./pubsub/gossipsub/episub.md) Proximity Aware Epidemic PubSub for libp2p
-- [relay](./relay/README.md) Circuit Switching for libp2p (aka TURN in
-  networking literature)
-- [rendezvous](./rendezvous/README.md) Rendezvous protocol
-- [tls](./tls/tls.md) The libp2p TLS Handshake (TLS 1.3+)
+This index contains links to all the spec documents that are currently merged.
+If documents are moved to new locations within the repository, this index will
+be updated to reflect the new locations.
+
+### Specs Framework
+
+These specs define processes for the specification framework itself, such as the
+expected lifecycle and document formatting.
+
+- [Spec Lifecycle][spec_lifecycle] - The process for introducing, revising and
+  adopting specs.
+- [Document Header][spec_header] - A standard document header for libp2p specs.
+
+### Protocols
+
+These specs define wire protocols that are used by libp2p for connectivity,
+security, multiplexing, and other purposes.
+
+- [identify][spec_identify] -  Exchange keys and addresses with other peers
+- [mplex][spec_mplex] - The friendly stream multiplexer
+- [pnet][spec_pnet] - Private networking in libp2p using pre-shared keys
+- [pubsub][spec_pubsub] - PubSub interface for libp2p
+  - [gossipsub][spec_gossipsub] - An extensible baseline PubSub protocol
+    - [episub][spec_episub] - Proximity Aware Epidemic PubSub for libp2p
+- [relay][spec_relay] - Circuit Switching for libp2p (similar to TURN)
+- [rendezvous][spec_rendezvous] - Rendezvous Protocol for generalized
+  peer discovery
+- [tls][spec_tls] The libp2p TLS Handshake (TLS 1.3+)
 
 
 [libp2p_implementations]: https://libp2p.io/implementations
 [spec_lifecycle]: 00-framework-01-spec-lifecycle.md
+[spec_header]: 00-framework-02-document-header.md
+[spec_identify]: ./identify/README.md
+[spec_mplex]: ./mplex/README.md
+[spec_pnet]: ./pnet/README.md
+[spec_pubsub]: ./pubsub/README.md
+[spec_gossipsub]: ./pubsub/gossipsub/README.md
+[spec_episub]: ./pubsub/gossipsub/episub.md
+[spec_relay]: ./relay/README.md
+[spec_rendezvous]: ./rendezvous/README.md
+[spec_tls]: ./tls/tls.md
