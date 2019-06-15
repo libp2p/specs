@@ -54,9 +54,9 @@ traversal issues or other connectivity barriers.
 Connections take place over an underlying **transport**, for example TCP
 sockets, websockets, or various protocols layered over UDP.
 
-While some transport protocols like [QUIC](https://www.chromium.org/quic)
-have "built in" security and stream multiplexing, others such as TCP need to
-have those capabilites layered on top of the "raw" transport connection.
+While some transport protocols like [QUIC][quic-spec] have "built in" security
+and stream multiplexing, others such as TCP need to have those capabilites
+layered on top of the "raw" transport connection.
 
 When the base capabilities of security and stream multiplexing are not natively
 supported by the underlying transport protocol, a **connection upgrade** process
@@ -76,9 +76,10 @@ each connection.
 
 The process of selecting protocols is called **protocol negotiation**. In
 addition to its role in the connection upgrade process, protocol negotiation is
-also used whenever a new stream is opened over an existing connection. This
-allows libp2p applications to route application-specific protocols to the
-correct handler functions.
+also used whenever [a new stream is opened over an existing
+connection](#opening-new-streams-over-a-connection). This allows libp2p
+applications to route application-specific protocols to the correct handler
+functions.
 
 ### multistream-select
 
@@ -169,10 +170,10 @@ Here's an example of the connection upgrade process:
 First, the peers both send the multistream protocol id to establish that they'll
 use multistream-select to negotiate protocols for the connection upgrade.
 
-Next, the Initiator proposes the [TLS protocol](../tls/tls.md) for encryption, but
+Next, the Initiator proposes the [TLS protocol][tls-libp2p] for encryption, but
 the Responder rejects the proposal as they don't support TLS.
 
-The Initiator then proposes the [SECIO protocol](../secio), which is supported by
+The Initiator then proposes the [SECIO protocol][secio-spec], which is supported by
 the Responder. The Listener echoes back the protocol id for SECIO to indicate
 agreement.
 
@@ -267,9 +268,8 @@ for connection resumption. Designing a storage interface which can be backed by
 memory or persistent storage will let you swap in whichever is appropriate for
 your use case and stage of development.
 
-For examples, see 
-[go-libp2p-peerstore](https://github.com/libp2p/go-libp2p-peerstore) and
-[js-peer-book](https://github.com/libp2p/js-peer-book).
+For examples, see [go-libp2p-peerstore][go-libp2p-peerstore] and
+[js-peer-book][js-peer-book].
 
 #### Connection Limits
 
@@ -318,3 +318,8 @@ baseline would be:
 [mss]: https://github.com/multiformats/multistream-select
 [uvarint]: https://github.com/multiformats/unsigned-varint
 [mplex]: ../mplex/README.md
+[secio-spec]: ../secio/README.md
+[tls-libp2p]: ../tls/tls.md
+[go-libp2p-peerstore]: https://github.com/libp2p/go-libp2p-peerstore
+[js-peer-book]: https://github.com/libp2p/js-peer-book
+[quic-spec]: https://datatracker.ietf.org/doc/draft-ietf-quic-transport/
