@@ -48,6 +48,11 @@ expected lifecycle and document formatting.
   adopting specs.
 - [Document Header][spec_header] - A standard document header for libp2p specs.
 
+### Core Abstractions and Types
+
+- [Peer Ids and Keys][spec_peerids] - Public key types & encodings, peer id calculation, and
+  message signing semantics
+
 ### Protocols
 
 These specs define wire protocols that are used by libp2p for connectivity,
@@ -93,3 +98,4 @@ you feel an issue isn't the appropriate place for your topic, please join our
 [spec_rendezvous]: ./rendezvous/README.md
 [spec_secio]: ./secio/README.md
 [spec_tls]: ./tls/tls.md
+[spec_peerids]: ./peer-ids/peer-ids.md
