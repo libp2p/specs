@@ -1,8 +1,26 @@
 # Rendezvous Protocol
 
-Author: vyzo
+| Lifecycle Stage | Maturity      | Status | Latest Revision |
+|-----------------|---------------|--------|-----------------|
+| 1A              | Working Draft | Active | r1, 2019-01-18  |
 
-Revision: DRAFT; 2019-01-18
+Authors: [@vyzo]
+
+Interest Group: [@daviddias], [@whyrusleeping], [@Stebalien], [@jacobheun], [@yusefnapora]
+
+[@vyzo]: https://github.com/vyzo
+[@daviddias]: https://github.com/daviddias
+[@whyrusleeping]: https://github.com/whyrusleeping
+[@Stebalien]: https://github.com/Stebalien
+[@jacobheun]: https://github.com/jacobheun
+[@yusefnapora]: https://github.com/yusefnapora
+
+See the [lifecycle document][lifecycle-spec] for context about maturity level
+and spec status.
+
+[lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
+
+## Overview
 
 The protocol described in this specification is intended to provide a
 lightweight mechanism for generalized peer discovery. It can be used
