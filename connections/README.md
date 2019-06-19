@@ -26,8 +26,8 @@ transport.
 
 What is covered here is the process that occurs after making the initial
 transport level connection, up to the point where "application level" streams
-are opened and their protocols are identified and routed to the appropriate
-handlers.
+are opened, and their protocols are identified and data is routed appropriately
+to handler functions.
 
 
 ## Definitions
@@ -81,18 +81,27 @@ connection](#opening-new-streams-over-a-connection). This allows libp2p
 applications to route application-specific protocols to the correct handler
 functions.
 
+Each protocol supported by a peer is identified using a unique string called a
+**protocol id**. While any string can be used, the conventional format is a
+path-like structure containing a short name and a version number, separated by
+`/` characters. For example: `/mplex/1.0.0` identifies version 1.0.0 of the
+[`mplex` stream multiplexing protocol][mplex]. multistream-select itself has a
+protocol id of `/multistream/1.0.0`. 
+
+Including a version number in the protocol id simplifies the case where you want
+to concurrently support multiple versions of a protocol, perhaps a stable version
+and an in-development version. By default, libp2p will route each protocol id
+to its handler function using exact literal matching of the protocol id, so new
+versions will need to be registered seperately. However, the handler function
+receives the protocol id negotiated for each new stream, so it's possible to
+register the same handler for multiple versions of a protocol and dynamically alter
+functionality based on the version in use for a given stream.
+
 ### multistream-select
 
 libp2p uses a protocol called multistream-select for protocol negotiation. Below
 we cover the basics of multistream-select and its use in libp2p. For more
 details, see [the multistream-select repository][mss].
-
-Each protocol supported by a peer is identified using a unique string called a
-**protocol id**. While any string can be used, the most common and recommended
-format is a path-like structure containing a short name and a version number,
-separated by `/` characters. For example: `/mplex/1.0.0` identifies version
-1.0.0 of the [`mplex` stream multiplexing protocol][mplex]. multistream-select
-itself has a protocol id of `/multistream/1.0.0`.
 
 Before engaging in the multistream-select negotiation process, it is assumed
 that the peers have already established a bidirectional communication channel,
@@ -286,6 +295,11 @@ Resource allocation, measurement and enforcement policies are all an active area
 of discussion in the libp2p community, and implementations are free to develop
 whatever prioritization system makes sense.
 
+There is currently a draft of a [connection manager
+specification][connmgr-v2-spec] that may replace the current [connmgr
+interface][connmgr-go-interface] in go-libp2p and may also form the basis of
+other connection manager implementations. 
+
 ### Connection Lifecycle Events
 
 The establishment of new connections and streams is likely to be a
@@ -319,6 +333,8 @@ baseline would be:
 [uvarint]: https://github.com/multiformats/unsigned-varint
 [mplex]: ../mplex/README.md
 [secio-spec]: ../secio/README.md
+[connmgr-v2-spec]: https://github.com/libp2p/specs/pull/161
+[connmgr-go-interface]: https://github.com/libp2p/go-libp2p-core/blob/master/connmgr/connmgr.go
 [tls-libp2p]: ../tls/tls.md
 [go-libp2p-peerstore]: https://github.com/libp2p/go-libp2p-peerstore
 [js-peer-book]: https://github.com/libp2p/js-peer-book
