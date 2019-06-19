@@ -39,9 +39,9 @@ profiles.
 
 ## Implementation status
 
-- Go: [libp2p/go-floodsub#67](https://github.com/libp2p/go-floodsub/pull/67) (experimental)
-- JS: not yet started
-- Rust: not yet started
+- Go: [libp2p/go-libp2p-pubsub/gossipsub.go](https://github.com/libp2p/go-libp2p-pubsub/blob/master/gossipsub.go) (experimental)
+- JS: [ChainSafeSystems/gossipsub-js](https://github.com/ChainSafeSystems/gossipsub-js) – work in progress; check branches and PRs.
+- Rust: [libp2p/rust-libp2p#898](https://github.com/libp2p/rust-libp2p/pull/898) implements the spec but is missing some features. [libp2p/rust-libp2p#767](https://github.com/libp2p/rust-libp2p/pull/767) is an alternative, partial implementation that differs slightly from the spec (see [#142](https://github.com/libp2p/specs/issues/142) for details).
 - Gerbil: [vyzo/gerbil-simsub](https://github.com/vyzo/gerbil-simsub) (simulator)
 
 
@@ -54,12 +54,13 @@ It implements pubsub in the most basic manner, with two defining aspects:
 
 ### Ambient Peer Discovery
 
-With ambient peer discovery, the function is pushed outside the scope
-of the protocol. Instead, it relies on ambient connection events to
-perform peer discovery via protocol identification. Whenever a new
-peer is connected, the protocol checks to see if the peer implements
-floodsub, and if so it sends a hello packet that announces the topics
-that it is currently subscribing to.
+With ambient peer discovery, the function is pushed outside the scope of the
+protocol. Instead, the mechanism for discovering peers is provided for by the
+environment. In practice, this can be embodied by DHT walks, rendezvous
+points, etc. This protocol relies on the ambient connection events produced by
+such mechanisms. Whenever a new peer is connected, the protocol checks to see
+if the peer implements floodsub and/or gossipsub, and if so, it sends it a
+hello packet that announces the topics that it is currently subscribing to.
 
 This allows the peer to maintain soft overlays for all topics of
 interest. The overlay is maintained by exchanging subscription
@@ -234,11 +235,14 @@ delay in the overlay with some healthy margin.
 
 Topic membership is controlled by two operations supported by the
 router, as part of the pubsub api:
-- On `JOIN(topic)` the router joins the topic. In order to do so, it
-  selects `D` peers from `peers.gossipsub[topic]`, adds them to `mesh[topic]`
-  and notifies them with a `GRAFT(topic)` control message. If it already has
-  `fanout` peers in the topic, then it selects those peers as the
-  initial mesh peers.
+- On `JOIN(topic)` the router joins the topic. In order to do so, if it already has
+  `D` peers from the `fanout` peers of a topic, then it adds them to `mesh[topic]`,
+  and notifies them with a `GRAFT(topic)` control message. Otherwise, if there are 
+  less than `D` peers (let this number be `x`) in the fanout for a topic (or the 
+  topic is not in the fanout), then it 
+  still adds them as above (if there are any), and selects the remaining number
+  of peers (`D-x`) from `peers.gossipsub[topic]`, and likewise adds them to 
+  `mesh[topic]` and notifies them with a `GRAFT(topic)` control message. 
 - On `LEAVE(topic)` the router leaves the topic. It notifies the peers in
   `mesh[topic]` with a `PRUNE(topic)` message and forgets `mesh[topic]`.
 
@@ -286,7 +290,7 @@ application layer), then it proceeds similarly to the payload reaction:
 
 ### Heartbeat
 
-The router periodically runs a hearbeat procedure, which is
+The router periodically runs a heartbeat procedure, which is
 responsible for maintaining the mesh, emitting gossip, and shifting
 the message cache.
 
@@ -325,7 +329,7 @@ for each topic in mesh+fanout:
   let mids be mcache.window[topic]
   if mids is not empty:
     select D peers from peers.gossipsub[topic]
-    for each peer not in mesh[topic]
+    for each peer not in mesh[topic] or fanout[topic]
       emit IHAVE(mids)
 
 shift the mcache

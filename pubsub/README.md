@@ -1,6 +1,6 @@
 # PubSub interface for libp2p
 
-Revision: draft 1, 2017-02-17
+Revision: draft 2, 2019-02-01
 
 Authors:
 - whyrusleeping (why@ipfs.io)
@@ -21,12 +21,14 @@ You can find information about the PubSub research and notes in the following re
 - https://github.com/libp2p/research-pubsub
 - https://github.com/libp2p/pubsub-notes
 
-Implementations:
+## Implementations
 - FloodSub, simple flooding pubsub (2017)
-  - [libp2p/go-floodsub](https://github.com/libp2p/go-floodsub/pull/67), [libp2p/js-libp2p-floodsub](http://github.com/libp2p/js-libp2p-floodsub), [libp2p/rust-libp2p/floodsub](https://github.com/libp2p/rust-libp2p/tree/master/floodsub)
+  - [libp2p/go-libp2p-pubsub/floodsub.go](https://github.com/libp2p/go-libp2p-pubsub/blob/master/floodsub.go);
+  - [libp2p/js-libp2p-floodsub](http://github.com/libp2p/js-libp2p-floodsub);
+  - [libp2p/rust-libp2p/floodsub](https://github.com/libp2p/rust-libp2p/tree/master/protocols/floodsub)
 - GossipSub, extensible baseline pubsub (2018)
-  - [gossipsub](./gossipsub)
-
+  - [gossipsub](https://github.com/libp2p/specs/tree/master/pubsub/gossipsub#implementation-status)
+- [EpiSub](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/episub.md), an epidemic broadcast tree router (defined 2018, not yet started as of Oct 2018)
 
 ## The RPC
 
@@ -64,6 +66,8 @@ message Message {
 	optional bytes data = 2;
 	optional bytes seqno = 3;
 	repeated string topicIDs = 4;
+	optional bytes signature = 5;
+	optional bytes key = 6;
 }
 ```
 
@@ -74,30 +78,69 @@ done to allow content to be routed through a swarm of pubsubbing peers.
 The `data` field is an opaque blob of data, it can contain any data that the
 publisher wants it to.
 
-The `seqno` field is a linearly increasing number that is unique among messages
-originating from each given peer. No two messages on a pubsub topic from the
-same peer should have the same `seqno` value, however messages from different
-peers may have the same sequence number, so this number alone cannot be used to
-address messages. (Notably the 'timecache' in use by the floodsub
-implementation uses the concatenation of the `seqno` and the `from` field.)
+The `seqno` field is a 64-bit big-endian uint that is a linearly increasing
+number that is unique among messages originating from each given peer. No two
+messages on a pubsub topic from the same peer should have the same `seqno`
+value, however messages from different peers may have the same sequence number,
+so this number alone cannot be used to address messages. Notably the
+'timecache' in use by the go implementation contains a `message_id`,
+which is constructed from the concatenation of the `seqno` and the `from`
+fields. This `message_id` is then unique among messages. It was also proposed
+in [#116](https://github.com/libp2p/specs/issues/116) to use a `message_hash`,
+however, it was noted: "a potential caveat with using hashes instead of seqnos:
+the peer won't be able to send identical messages (e.g. keepalives) within the
+timecache interval, as they will get rejected as duplicates."
 
 The `topicIDs` field specifies a set of topics that this message is being
 published to.
 
-Note that messages are currently *not* signed. This will come in the near
-future.
+The `signature` and `key` fields are used for message signing, as explained below.
+
+The size of the `Message` should be limited, say to 1 MiB, but could also
+be configurable, for more information see
+[issue 118](https://github.com/libp2p/specs/issues/118), while messages should be
+rejected if they are over this size.
+Note that for applications where state such as messages is
+stored, such as blockchains, it is suggested to have some kind of storage
+economics (see e.g.
+[here](https://ethresear.ch/t/draft-position-paper-on-resource-pricing/2838),
+[here](https://ethresear.ch/t/ethereum-state-rent-for-eth-1-x-pre-eip-document/4378)
+and
+[here](https://ethresear.ch/t/improving-the-ux-of-rent-with-a-sleeping-waking-mechanism/1480)).
+
+## Message Signing
+
+Messages can be optionally signed, and it is up to the peer whether to accept and forward
+unsigned messages.
+
+For signing purposes, the `signature` and `key` fields are used:
+- The `signature` field contains the signature.
+- The `key` field contains the signing key when it cannot be inlined in the source peer ID.
+  When present, it must match the peer ID.
+
+The signature is computed over the marshalled message protobuf _excluding_ the key field.
+The protobuf blob is prefixed by the string `libp2p-pubsub:` before signing.
+
+When signature validation fails for a signed message, the implementation must
+drop the message and omit propagation. Locally, it may treat this event in whichever
+manner it wishes (e.g. logging).
 
 ## The Topic Descriptor
 
 The topic descriptor message is used to define various options and parameters
 of a topic. It currently specifies the topic's human readable name, its
-authentication options, and its encryption options.
+authentication options, and its encryption options. The `AuthOpts` and `EncOpts`
+of the topic descriptor message are not used in current implementations, but
+may be used in future. For clarity, this is added as a comment in the file,
+and may be removed once used.
 
 The `TopicDescriptor` protobuf is as follows:
 
 ```protobuf
 message TopicDescriptor {
 	optional string name = 1;
+	// AuthOpts and EncOpts are unused as of Oct 2018, but
+	// are planned to be used in future.
 	optional AuthOpts auth = 2;
 	optional EncOpts enc = 3;
 
@@ -125,8 +168,16 @@ message TopicDescriptor {
 }
 ```
 
-The `name` field is a string used to identify or mark the topic, It can be
+The `name` field is a string used to identify or mark the topic. It can be
 descriptive or random or anything that the creator chooses.
+
+Note that instead of using `TopicDescriptor.name`, for privacy reasons the
+`TopicDescriptor` struct may be hashed, and used as the topic ID. Another
+option is to use a CID as a topic ID. While a consensus has not been reached,
+for forwards and backwards compatibility, using an enum `TopicID` that allows
+custom types in variants (i.e. `Name`, `hashedTopicDescriptor`, `CID`)
+may be the most suitable option if it is available within an implementation's
+language (otherwise it would be implementation defined).
 
 The `auth` field specifies how authentication will work for this topic. Only
 authenticated peers may publish to a given topic. See 'AuthOpts' below for
@@ -179,3 +230,18 @@ Web Of Trust publishing. Messages are encrypted with some certificate or
 certificate chain shared amongst trusted peers. (Spec writer's note: this is the
 least clearly defined option and my description here may be wildly incorrect,
 needs checking).
+
+## Topic Validation
+
+Implementations MUST support attaching _validators_ to topics.
+
+_Validators_ have access to the `Message` and can apply any logic to determine its validity.
+When propagating a message for a topic, implementations will invoke all validators attached
+to that topic, and will only continue propagation if, and only if all, validations pass.
+
+In its simplest form, a _validator_ is a function with signature `(peer.ID, *Message) => bool`,
+where the return value is `true` if validation passes, and `false` otherwise.
+
+Local handling of failed validation is left up to the implementation (e.g. logging).
+
+Implementations MAY allow dynamically adding and removing _validators_ at runtime.

@@ -1,6 +1,9 @@
 7 Properties
 ============
 
+| ⚠️ Warning: this section is incomplete, and parts of it are out of date. Please see [this issue](https://github.com/libp2p/specs/issues/156) to track progress on improving it. ⚠️ |
+| --- |
+
 ## 7.1 Communication Model - Streams
 
 The Network layer handles all the problems of connecting to a peer, and exposes
@@ -104,18 +107,18 @@ We have the **hard constraint** of making IPFS work across _any_ duplex stream (
 To make this work, IPFS has to solve a few problems:
 
 - [Protocol Multiplexing](#751-protocol-multiplexing) - running multiple protocols over the same stream
-  - [multistream](#752-multistream-self-describing-protocol-stream) - self-describing protocol streams
-  - [multistream-select](#753-multistream-selector-self-describing-protocol-stream-selector) - a self-describing protocol selector
+  - [multistream](#752-multistream---self-describing-protocol-stream) - self-describing protocol streams
+  - [multistream-select](#753-multistream-selector---self-describing-protocol-stream-selector) - a self-describing protocol selector
   - [Stream Multiplexing](#754-stream-multiplexing) - running many independent streams over the same wire
 - [Portable Encodings](#755-portable-encodings) - using portable serialization formats
-- [Secure Communications](#756-secure-communication) - using ciphersuites to establish security and privacy (like TLS)
+- [Secure Communications](#756-secure-communications) - using ciphersuites to establish security and privacy (like TLS)
 
 ### 7.5.1 Protocol-Multiplexing
 
 Protocol Multiplexing means running multiple different protocols over the same stream. This could happen sequentially (one after the other), or concurrently (at the same time, with their messages interleaved). We achieve protocol multiplexing using three pieces:
 
-- [multistream](#752-multistream-self-describing-protocol-stream) - self-describing protocol streams
-- [multistream-select](#753-multistream-selector-self-describing-protocol-stream-selector) - a self-describing protocol selector
+- [multistream](#752-multistream---self-describing-protocol-stream) - self-describing protocol streams
+- [multistream-select](#753-multistream-selector---self-describing-protocol-stream-selector) - a self-describing protocol selector
 - [Stream Multiplexing](#754-stream-multiplexing) - running many independent streams over the same wire
 
 ### 7.5.2 multistream - self-describing protocol stream
