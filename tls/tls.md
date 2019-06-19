@@ -1,5 +1,36 @@
 # libp2p TLS Handshake
 
+| Lifecycle Stage | Maturity                 | Status | Latest Revision |
+|-----------------|--------------------------|--------|-----------------|
+| 2A              | Candidate Recommendation | Active | r0, 2019-03-23  |
+
+Authors: [@marten-seemann]
+
+Interest Group: [@Stebalien], [@jacobheun], [@raulk], [@Kubuxu], [@yusefnapora]
+
+[@marten-seemann]: https://github.com/marten-seemann
+[@Stebalien]: https://github.com/Stebalien
+[@jacobheun]: https://github.com/jacobheun
+[@raulk]: https://github.com/raulk
+[@Kubuxu]: https://github.com/Kubuxu
+[@yusefnapora]: https://github.com/yusefnapora
+
+
+See the [lifecycle document][lifecycle-spec] for context about maturity level
+and spec status.
+
+[lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
+
+## Table of Contents
+
+- [libp2p TLS Handshake](#libp2p-tls-handshake)
+    - [Table of Contents](#table-of-contents)
+    - [Introduction](#introduction)
+    - [Handshake Protocol](#handshake-protocol)
+    - [Peer Authentication](#peer-authentication)
+        - [libp2p Public Key Extension](#libp2p-public-key-extension)
+    - [Future Extensibility](#future-extensibility)
+
 ## Introduction
 
 This document describes how [TLS 1.3](https://tools.ietf.org/html/rfc8446) is used to secure libp2p connections. Endpoints authenticate to their peers by encoding their public key into a x509 certificate extension. The protocol described here allows peers to use arbitrary key types, not constrained to those for which signing of a x509 certificates is specified.
