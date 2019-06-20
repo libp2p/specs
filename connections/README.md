@@ -6,9 +6,36 @@
 
 Authors: [@yusefnapora]
 
-Interest Group: TBD
+Interest Group: [@JustMaier], [@vasco-santos] [@bigs], [@mgoelzer]
 
 [@yusefnapora]: https://github.com/yusefnapora
+[@JustMaier]: https://github.com/JustMaier
+[@vasco-santos]: https://github.com/vasco-santos
+[@bigs]: https://github.com/bigs
+[@mgoelzer]: https://github.com/mgoelzer
+
+See the [lifecycle document][lifecycle-spec] for context about maturity level
+and spec status.
+
+[lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
+
+## Table of Contents
+
+- [Connection Establishment in libp2p](#connection-establishment-in-libp2p)
+    - [Table of Contents](#table-of-contents)
+    - [Overview](#overview)
+    - [Definitions](#definitions)
+    - [Protocol Negotiation](#protocol-negotiation)
+        - [multistream-select](#multistream-select)
+    - [Upgrading Connections](#upgrading-connections)
+    - [Opening New Streams Over a Connection](#opening-new-streams-over-a-connection)
+    - [Practical Considerations](#practical-considerations)
+        - [Interoperability](#interoperability)
+        - [State Management](#state-management)
+            - [Peer Metadata Storage](#peer-metadata-storage)
+            - [Connection Limits](#connection-limits)
+        - [Connection Lifecycle Events](#connection-lifecycle-events)
+    - [Future Work](#future-work)
 
 ## Overview
 
