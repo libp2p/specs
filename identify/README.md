@@ -41,8 +41,16 @@ and spec status.
 
 ## Overview
 
-There are three variations of the identify protocol, `identify`,
-`identify/push`, and `identify/delta`.
+There are three variations of the identify protocol, listed below:
+
+| Protocol         | Protocol Id           | Description                                    |
+|------------------|-----------------------|------------------------------------------------|
+| `identify`       | `/ipfs/id/1.0.0`      | Respond to queries for identifying info.       |
+| `identify/push`  | `/ipfs/id/push/1.0.0` | Send info proactively to inform about changes. |
+| `identify/delta` | `/p2p/id/delta/1.0.0` | Send partial updates to inform about changes.  |
+
+Note that the newer `identify/delta` protocol uses the more recently adopted
+`/p2p/` protocol prefix, while the older protocols use the `/ipfs/` prefix.
 
 ### `identify`
 
