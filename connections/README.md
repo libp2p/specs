@@ -295,11 +295,6 @@ Resource allocation, measurement and enforcement policies are all an active area
 of discussion in the libp2p community, and implementations are free to develop
 whatever prioritization system makes sense.
 
-There is currently a draft of a [connection manager
-specification][connmgr-v2-spec] that may replace the current [connmgr
-interface][connmgr-go-interface] in go-libp2p and may also form the basis of
-other connection manager implementations. 
-
 ### Connection Lifecycle Events
 
 The establishment of new connections and streams is likely to be a
@@ -328,6 +323,45 @@ baseline would be:
 | Listen       | We've started listening on a new address  |
 | ListenClose  | We've stopped listening on an address     |
 
+## Future Work
+
+A replacement for multistream-select is [being discussed][mss-2-pr] which
+proposes solutions for several inefficiencies and shortcomings in the current
+protocol negotiation and connection establishment process. The ideal outcome of
+that discussion will require many changes to this document, once the new
+multistream semantics are fully specified.
+
+For connection management, there is currently a draft of a [connection manager
+specification][connmgr-v2-spec] that may replace the current [connmgr
+interface][connmgr-go-interface] in go-libp2p and may also form the basis of
+other connection manager implementations. There is also [a
+proposal][resource-manager-issue] for a more comprehensive resource management
+system, which would track and manage other finite resources as well as
+connections.
+
+Also related to connection management, libp2p has recently added support for
+[QUIC][quic-spec], a transport protocol layered on UDP that can resume sessions
+with much lower overhead than killing and re-establishing a TCP connection. As
+QUIC and other "connectionless" transports become more widespread, we want to
+take advantage of this behavior where possible and integrate lightweight session
+resumption into the connection manager.
+
+Event delivery is also undergoing a refactoring in go-libp2p, with work on an
+[in-process event bus][go-eventbus] in progress now that will augment (and
+perhaps eventually replace) the current [notification system][go-net-notifee].
+
+One of the near-term goals of the event bus refactor is to more easily respond
+to changes in the protocols supported by a remote peer. Those changes are
+communicated over the wire using the [identify/push protocol][identify-push].
+Using an event bus allows other, unrelated components of libp2p (for
+example, a DHT module) to respond to changes without tightly coupling components
+together with direct dependencies.
+
+While the event bus refactoring is specific to go-libp2p, a future spec may
+standardize event types used to communicate information across key libp2p
+subsystems, and may possibly require libp2p implementations to provide an
+in-process event delivery system. If and when this occurs, this spec will be
+updated to incorporate the changes.
 
 [mss]: https://github.com/multiformats/multistream-select
 [uvarint]: https://github.com/multiformats/unsigned-varint
@@ -339,3 +373,7 @@ baseline would be:
 [go-libp2p-peerstore]: https://github.com/libp2p/go-libp2p-peerstore
 [js-peer-book]: https://github.com/libp2p/js-peer-book
 [quic-spec]: https://datatracker.ietf.org/doc/draft-ietf-quic-transport/
+[mss-2-pr]: https://github.com/libp2p/specs/pull/95
+[go-eventbus]: https://gihub.com/libp2p/go-eventbus
+[go-net-notifee]: https://github.com/libp2p/go-libp2p-core/blob/master/network/notifee.go
+[identify/push]: ../identify/README.md#identify-push
