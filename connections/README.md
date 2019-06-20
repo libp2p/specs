@@ -137,10 +137,10 @@ The Initiator first opens a channel to the Responder. This channel could either 
 new connection or a new stream multiplexed over an existing connection.
 
 Next, both peers will send the multistream protocol id to establish that they
-want to use multistream-select. Note that both sides may send the initial
-multistream protocol id simultaneously, without waiting to recieve data from the
-other side. If either side recieves anything other than the multistream protocol
-id as the first message, they abort the negotiation process.
+want to use multistream-select. Both sides may send the initial multistream
+protocol id simultaneously, without waiting to recieve data from the other side.
+If either side recieves anything other than the multistream protocol id as the
+first message, they abort the negotiation process.
 
 Once both peers have agreed to use multistream-select, the Initiator sends the
 protocol id for the protocol they would like to use. If the Responder supports
@@ -226,10 +226,10 @@ the protocol. If no handlers are found, the peer will respond to the proposal
 with `"na"`.
 
 When registering protocol handlers, it's possible to use a custom predicate or
-"match function", which will receive incoming protocol ids and return `true` if
-the handler supports the protocol. This allows more flexible behavior than exact
-literal matching, which is the default behavior if no match function is
-provided.
+"match function", which will receive incoming protocol ids and return a boolean
+indicating whether the handler supports the protocol. This allows more flexible
+behavior than exact literal matching, which is the default behavior if no match
+function is provided.
 
 ## Practical Considerations
 
