@@ -41,7 +41,8 @@ and spec status.
 
 ## Overview
 
-There are two variations of the identify protocol, `identify` and `identify/push`.
+There are three variations of the identify protocol, `identify`,
+`identify/push`, and `identify/delta`.
 
 ### `identify`
 
@@ -66,9 +67,28 @@ The push variant works by opening a stream to each remote peer you want to updat
 the local peer will send an `Identify` message and close the stream.
 
 Upon recieving the pushed `Identify` message, the remote peer should update their local
-metadata repository with the information from the message. Note that missing fields
-should be ignored, as peers may choose to send partial updates containing only the fields
-whose values have changed.
+metadata repository with the information from the message. Note that
+`identify/push` sends a complete `Identify` message containing the full state at
+the time of broadcast. To send partial updates instead, peers may use the
+`identify/delta` protocol described below.
+
+
+### `identify/delta`
+
+The `identify/delta` protocol has the protocol id `/p2p/id/delta/1.0.0`, and
+like `identify/push`, it is used to notify known peers about runtime changes. In
+contrast to `identify/push`, the delta protocol does not send the full
+`Identify` message state. Instead, it sends only a small message containing
+protocols which were added or removed. This allows more efficient updates when a
+peer dynamically changes its capabilites at runtime.
+
+When a peer adds or removes support for one or more protocols, it may open a
+stream to each remote peer that it wants to update using `/p2p/id/delta/1.0.0`
+as the protocol id. When the remote peer accepts the stream, the local peer will
+send an `Identify` message with only the `delta` field set. The value of the
+`delta` field is a `Delta` message, which will include the protocol ids of added
+or removed protocols in the `added_protocols` and `rm_protocols` fields,
+respectively.
 
 ## The Identify Message
 
@@ -80,8 +100,19 @@ message Identify {
   repeated bytes listenAddrs = 2;
   optional bytes observedAddr = 4;
   repeated string protocols = 3;
+  optional Delta delta = 7;
+}
+
+message Delta {
+  repeated string added_protocols = 1;
+  repeated string rm_protocols = 2;
 }
 ```
+
+The `delta` field of the `Identify` message is only set when sending partial
+updates as part of the [`identify/delta`](#identify-delta) protocol. When the
+`delta` field is set, it MUST be the only field present in the `Identify`
+message, with all other fields unset.
 
 ### protocolVersion
 
