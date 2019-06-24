@@ -50,6 +50,11 @@ expected lifecycle and document formatting.
 
 ### Core Abstractions and Types
 
+These specs define abstractions and data types that form the "core" of libp2p
+and are used throughout the system.
+
+- [Connections and Upgrading][spec_connections] - Establishing secure,
+  multiplexed connections between peers, possibly over insecure, single stream transports.
 - [Peer Ids and Keys][spec_peerids] - Public key types & encodings, peer id calculation, and
   message signing semantics
 
@@ -99,3 +104,4 @@ you feel an issue isn't the appropriate place for your topic, please join our
 [spec_secio]: ./secio/README.md
 [spec_tls]: ./tls/tls.md
 [spec_peerids]: ./peer-ids/peer-ids.md
+[spec_connections]: ./connections/README.md
