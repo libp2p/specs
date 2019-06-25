@@ -6,7 +6,7 @@
 
 Authors: [@vyzo]
 
-Interest Group: [@yusefnapora], [@raulk], [@vyzo], [@Stebalien], [@jamesray1]
+Interest Group: [@yusefnapora], [@raulk], [@vyzo], [@Stebalien], [@jamesray1], [@vasco-santos]
 
 [@whyrusleeping]: https://github.com/whyrusleeping
 [@yusefnapora]: https://github.com/yusefnapora
@@ -14,6 +14,7 @@ Interest Group: [@yusefnapora], [@raulk], [@vyzo], [@Stebalien], [@jamesray1]
 [@vyzo]: https://github.com/vyzo
 [@Stebalien]: https://github.com/Stebalien
 [@jamesray1]: https://github.com/jamesray1
+[@vasco-santos]: https://github.com/vasco-santos
 
 Author's note:
 - This is based on an earlier research draft about an epidemic broadcast protocol

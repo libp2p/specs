@@ -7,7 +7,8 @@
 
 Authors: [@vyzo]
 
-Interest Group: [@yusefnapora], [@raulk], [@whyrusleeping], [@Stebalien], [@jamesray1]
+Interest Group: [@yusefnapora], [@raulk], [@whyrusleeping], [@Stebalien],
+[@jamesray1], [@vasco-santos]
 
 [@whyrusleeping]: https://github.com/whyrusleeping
 [@yusefnapora]: https://github.com/yusefnapora
@@ -15,6 +16,7 @@ Interest Group: [@yusefnapora], [@raulk], [@whyrusleeping], [@Stebalien], [@jame
 [@vyzo]: https://github.com/vyzo
 [@Stebalien]: https://github.com/Stebalien
 [@jamesray1]: https://github.com/jamesray1
+[@vasco-santos]: https://github.com/vasco-santos
 
 See the [lifecycle document][lifecycle-spec] for context about maturity level
 and spec status.
