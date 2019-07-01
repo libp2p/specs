@@ -8,12 +8,13 @@
 
 Authors: [@richardschneider]
 
-Interest Group: [@yusefnapora], [@raulk], [@daviddias]
+Interest Group: [@yusefnapora], [@raulk], [@daviddias], [@jacobheun]
 
 [@richardschneider]: https://github.com/richardschneider
 [@yusefnapora]: https://github.com/yusefnapora
 [@raulk]: https://github.com/raulk
 [@daviddias]: https://github.com/daviddias
+[@jacobheun]: https://github.com/jacobheun
 
 See the [lifecycle document][lifecycle-spec] for context about maturity level
 and spec status.
