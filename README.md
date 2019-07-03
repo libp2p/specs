@@ -19,15 +19,20 @@ libp2p has several [implementations][libp2p_implementations], with more in devel
 The main goal of this repository is to provide accurate reference documentation
 for the aspects of libp2p that are independent of language or implementation.
 This includes wire protocols, addressing conventions, and other "network level"
-concerns. 
+concerns.
+
+For user-facing documentation, please see https://docs.libp2p.io
+
+In addition to describing the current state of libp2p, the specs repository
+serves as a coordination point and a venue to drive future developments in
+libp2p. To participate in the evolution of libp2p via the specs process, please
+see the [Contributions section](#contributions).
 
 ## Status
 
-The specifications for libp2p are currently incomplete, and we have recently
-[defined a process][spec_lifecycle] for categorizing specs according to their
-maturity and status. Many of the existing specs linked below are not yet
-categorized according to this framework, however, they will soon be updated for
-consistency.
+The specifications for libp2p are currently incomplete, and we are working to
+address this by revising existing specs to ensure correctness and writing new
+specifications to detail currently unspecified parts of libp2p.
 
 This document replaces an earlier RFC, which still contains much useful
 information and is helpful for understanding the libp2p design philosophy. It is

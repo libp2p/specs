@@ -1,6 +1,42 @@
 # mplex
 
-> This repo contains the spec of mplex, the friendly Stream Multiplexer (that works in 3 languages!)
+> The spec for the friendly Stream Multiplexer (that works in 3 languages!)
+
+| Lifecycle Stage | Maturity       | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
+| 3A              | Recommendation | Active | r0, 2018-10-10  |
+
+Authors: [@daviddias], [@Stebalien], [@tomaka]
+
+Interest Group: [@yusefnapora], [@richardschneider], [@jacobheun]
+
+[@daviddias]: https://github.com/daviddias
+[@Stebalien]: https://github.com/Stebalien
+[@tomaka]: https://github.com/tomaka
+[@yusefnapora]: https://github.com/yusefnapora
+[@richardschneider]: https://github.com/richardschneider
+[@jacobheun]: https://github.com/jacobheun
+
+See the [lifecycle document][lifecycle-spec] for context about maturity level
+and spec status.
+
+[lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
+
+## Table of Contents
+
+- [mplex](#mplex)
+    - [Table of Contents](#table-of-contents)
+    - [Overview](#overview)
+    - [Message format](#message-format)
+        - [Flag Values](#flag-values)
+    - [Protocol](#protocol)
+        - [Opening a new stream](#opening-a-new-stream)
+        - [Writing to a stream](#writing-to-a-stream)
+        - [Closing a stream](#closing-a-stream)
+        - [Resetting a stream](#resetting-a-stream)
+    - [Implementation notes](#implementation-notes)
+
+## Overview
 
 Mplex is a Stream Multiplexer protocol used by js-ipfs and go-ipfs in their implementations. The origins of this protocol are based in [multiplex](https://github.com/maxogden/multiplex), the JavaScript-only Stream Multiplexer. After many battle field tests, we felt the need to improve and fix some of its bugs and mechanics, resulting on this new version used by libp2p.
 

@@ -1,6 +1,28 @@
-## Pre-shared Key Based Private Networks in IPFS
+## Pre-shared Key Based Private Networks in libp2p
 
-This document describes the first version of private networks (PN) featured in IPFS.
+| Lifecycle Stage | Maturity       | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
+| 3A              | Recommendation | Active | r0, 2017-02-17  |
+
+
+Authors: [@Kubuxu]
+
+Interest Group: [@yusefnapora], [@jacobheun], [@lgierth], [@daviddias]
+
+[@Kubuxu]: https://github.com/Kubuxu
+[@yusefnapora]: https://github.com/yusefnapora
+[@jacobheun]: https://github.com/jacobheun
+[@lgierth]: https://github.com/lgierth
+[@daviddias]: https://github.com/daviddias
+
+See the [lifecycle document][lifecycle-spec] for context about maturity level
+and spec status.
+
+[lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
+
+---
+
+This document describes the first version of private networks (PN) featured in libp2p.
 
 For the first implementation, only pre-shared key (PSK) functionality is available, as the Public Key Infrastructure approach is much more complex and requires more technical preparation.
 

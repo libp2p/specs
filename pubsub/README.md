@@ -1,9 +1,50 @@
 # PubSub interface for libp2p
 
-Revision: draft 2, 2019-02-01
+> Generalized publish/subscribe interface for libp2p.
 
-Authors:
-- whyrusleeping (why@ipfs.io)
+| Lifecycle Stage | Maturity       | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
+| 3A              | Recommendation | Active | r2, 2019-02-01  |
+
+Authors: [@whyrusleeping]
+
+Interest Group: [@yusefnapora], [@raulk], [@vyzo], [@Stebalien], [@jamesray1], [@vasco-santos]
+
+[@whyrusleeping]: https://github.com/whyrusleeping
+[@yusefnapora]: https://github.com/yusefnapora
+[@raulk]: https://github.com/raulk
+[@vyzo]: https://github.com/vyzo
+[@Stebalien]: https://github.com/Stebalien
+[@jamesray1]: https://github.com/jamesray1
+[@vasco-santos]: https://github.com/vasco-santos
+
+See the [lifecycle document][lifecycle-spec] for context about maturity level
+and spec status.
+
+[lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
+
+## Table of Contents
+
+- [PubSub interface for libp2p](#pubsub-interface-for-libp2p)
+    - [Table of Contents](#table-of-contents)
+    - [Overview](#overview)
+    - [Implementations](#implementations)
+    - [The RPC](#the-rpc)
+    - [The Message](#the-message)
+    - [Message Signing](#message-signing)
+    - [The Topic Descriptor](#the-topic-descriptor)
+        - [AuthOpts](#authopts)
+            - [AuthMode 'NONE'](#authmode-none)
+            - [AuthMode 'KEY'](#authmode-key)
+            - [AuthMode 'WOT'](#authmode-wot)
+        - [EncOpts](#encopts)
+            - [EncMode 'NONE'](#encmode-none)
+            - [EncMode 'SHAREDKEY'](#encmode-sharedkey)
+            - [EncMode 'WOT'](#encmode-wot)
+    - [Topic Validation](#topic-validation)
+
+
+## Overview
 
 This is the specification for generalized pubsub over libp2p. Pubsub in libp2p
 is currently still experimental and this specification is subject to change.

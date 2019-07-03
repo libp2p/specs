@@ -2,6 +2,26 @@
 
 > Circuit Switching for libp2p, also known as TURN or Relay in Networking literature.
 
+| Lifecycle Stage | Maturity       | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
+| 3A              | Recommendation | Active | r1, 2018-06-03  |
+
+Authors: [@daviddias]
+
+Interest Group: [@lgierth], [@hsanjuan], [@jamesray1], [@vyzo], [@yusefnapora]
+
+[@daviddias]: https://github.com/daviddias
+[@lgierth]: https://github.com/lgierth
+[@hsanjuan]: https://github.com/hsanjuan
+[@jamesray1]: https://github.com/jamesray1
+[@vyzo]: https://github.com/vyzo
+[@yusefnapora]: https://github.com/yusefnapora
+
+See the [lifecycle document][lifecycle-spec] for context about maturity level
+and spec status.
+
+[lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
+
 ## Implementations
 
 - [js-libp2p-circuit](https://github.com/libp2p/js-libp2p-circuit)

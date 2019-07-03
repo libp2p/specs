@@ -1,8 +1,29 @@
 # gossipsub: An extensible baseline pubsub protocol
 
-Revision: r1; 2018-08-29
+| Lifecycle Stage | Maturity       | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
+| 3A              | Recommendation | Active | r1, 2018-08-29  |
 
-Author: vyzo
+
+Authors: [@vyzo]
+
+Interest Group: [@yusefnapora], [@raulk], [@whyrusleeping], [@Stebalien],
+[@jamesray1], [@vasco-santos]
+
+[@whyrusleeping]: https://github.com/whyrusleeping
+[@yusefnapora]: https://github.com/yusefnapora
+[@raulk]: https://github.com/raulk
+[@vyzo]: https://github.com/vyzo
+[@Stebalien]: https://github.com/Stebalien
+[@jamesray1]: https://github.com/jamesray1
+[@vasco-santos]: https://github.com/vasco-santos
+
+See the [lifecycle document][lifecycle-spec] for context about maturity level
+and spec status.
+
+[lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
+
+---
 
 This is the specification for an extensible baseline pubsub protocol,
 based on randomized topic meshes and gossip. It is a general purpose

@@ -1,10 +1,20 @@
 # Episub: Proximity Aware Epidemic PubSub for libp2p
 
-Revision: draft 1, 2018-06-28
+| Lifecycle Stage | Maturity      | Status | Latest Revision |
+|-----------------|---------------|--------|-----------------|
+| 1A              | Working Draft | Active | r1, 2018-06-28  |
 
-Author: vyzo
+Authors: [@vyzo]
 
-Editor: jamesray1
+Interest Group: [@yusefnapora], [@raulk], [@vyzo], [@Stebalien], [@jamesray1], [@vasco-santos]
+
+[@whyrusleeping]: https://github.com/whyrusleeping
+[@yusefnapora]: https://github.com/yusefnapora
+[@raulk]: https://github.com/raulk
+[@vyzo]: https://github.com/vyzo
+[@Stebalien]: https://github.com/Stebalien
+[@jamesray1]: https://github.com/jamesray1
+[@vasco-santos]: https://github.com/vasco-santos
 
 Author's note:
 - This is based on an earlier research draft about an epidemic broadcast protocol
@@ -12,6 +22,8 @@ Author's note:
   It serves as reference for the design of episub, an extended gossipsub router
   optimized for single source multicast and scenarios with a few fixed sources
   broadcasting to a large number of clients in a topic.
+
+--- 
 
 <!-- toc -->
 

@@ -1,7 +1,45 @@
 # Identify v1.0.0
 
-The identify protocol is used to exchange basic information with other peers
-in the network, including addresses, public keys, and capabilities.
+> The identify protocol is used to exchange basic information with other peers
+> in the network, including addresses, public keys, and capabilities.
+
+| Lifecycle Stage | Maturity Level | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
+| 3A              | Recommendation | Active | r0, 2019-05-01  |
+
+Authors: [@vyzo]
+
+Interest Group: [@yusefnapora], [@tomaka], [@richardschneider], [@Stebalien], [@bigs]
+
+[@vyzo]: https://github.com/vyzo
+[@yusefnapora]: https://github.com/yusefnapora
+[@tomaka]: https://github.com/tomaka
+[@richardschneider]: https://github.com/richardschneider
+[@Stebalien]: https://github.com/Stebalien
+[@bigs]: https://github.com/bigs
+
+See the [lifecycle document][lifecycle-spec] for context about maturity level
+and spec status.
+
+[lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
+
+## Table of Contents
+
+- [Identify v1.0.0](#identify-v100)
+    - [Table of Contents](#table-of-contents)
+    - [Overview](#overview)
+        - [`identify`](#identify)
+        - [`identify/push`](#identifypush)
+    - [The Identify Message](#the-identify-message)
+        - [protocolVersion](#protocolversion)
+        - [agentVersion](#agentversion)
+        - [publicKey](#publickey)
+        - [listenAddrs](#listenaddrs)
+        - [observedAddr](#observedaddr)
+        - [protocols](#protocols)
+
+
+## Overview
 
 There are two variations of the identify protocol, `identify` and `identify/push`.
 
