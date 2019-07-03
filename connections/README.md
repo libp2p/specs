@@ -44,7 +44,7 @@ libp2p and, if necessary, adding security and stream multiplexing capabilities
 to "raw" connections provided by transport protocols.
 
 We also discuss opening new streams over an existing connection, and the
-protocol negotiation proccess that occurs to route traffic to the correct
+protocol negotiation process that occurs to route traffic to the correct
 protocol handler.
 
 This document does not cover the establishment of "transport level" connections,
@@ -64,7 +64,7 @@ libp2p peers that provides **security** and the ability to open multiple
 logically independent **streams**.
 
 **Security** in this context means that all communications (after an initial
-handshake) are encrypted, and that the identity of each peer is cryptographicaly
+handshake) are encrypted, and that the identity of each peer is cryptographically
 verifiable by the other peer.
 
 **Streams** are reliable, bidirectional channels that are multiplexed over a
@@ -82,7 +82,7 @@ Connections take place over an underlying **transport**, for example TCP
 sockets, websockets, or various protocols layered over UDP.
 
 While some transport protocols like [QUIC][quic-spec] have "built in" security
-and stream multiplexing, others such as TCP need to have those capabilites
+and stream multiplexing, others such as TCP need to have those capabilities
 layered on top of the "raw" transport connection.
 
 When the base capabilities of security and stream multiplexing are not natively
@@ -119,7 +119,7 @@ Including a version number in the protocol id simplifies the case where you want
 to concurrently support multiple versions of a protocol, perhaps a stable version
 and an in-development version. By default, libp2p will route each protocol id
 to its handler function using exact literal matching of the protocol id, so new
-versions will need to be registered seperately. However, the handler function
+versions will need to be registered separately. However, the handler function
 receives the protocol id negotiated for each new stream, so it's possible to
 register the same handler for multiple versions of a protocol and dynamically alter
 functionality based on the version in use for a given stream.
@@ -165,8 +165,8 @@ new connection or a new stream multiplexed over an existing connection.
 
 Next, both peers will send the multistream protocol id to establish that they
 want to use multistream-select. Both sides may send the initial multistream
-protocol id simultaneously, without waiting to recieve data from the other side.
-If either side recieves anything other than the multistream protocol id as the
+protocol id simultaneously, without waiting to receive data from the other side.
+If either side receives anything other than the multistream protocol id as the
 first message, they abort the negotiation process.
 
 Once both peers have agreed to use multistream-select, the Initiator sends the
@@ -178,7 +178,7 @@ string `"na"` to indicate that the requested protocol is Not Available.
 If the peers agree on a protocol, multistream-select's job is done, and future
 traffic over the channel will adhere to the rules of the agreed-upon protocol.
 
-If a peer recieves a `"na"` response to a proposed protocol id, they can either
+If a peer receives a `"na"` response to a proposed protocol id, they can either
 try again with a different protocol id or close the channel.
 
 
@@ -186,7 +186,7 @@ try again with a different protocol id or close the channel.
 
 libp2p is designed to support a variety of transport protocols, including those
 that do not natively support the core libp2p capabilities of security and stream
-multiplexing. The process of layering capabilites onto "raw" transport
+multiplexing. The process of layering capabilities onto "raw" transport
 connections is called "upgrading" the connection.
 
 Because there are many valid ways to provide the libp2p capabilities, the
@@ -241,7 +241,7 @@ Either peer can open a new stream to the other over an existing connection.
 When a new stream is opened, a protocol is negotiated using
 `multistream-select`. The [protocol negotiation process](#protocol-negotiation)
 for new streams is very similar to the one used for upgrading connections.
-However, while the security and stream multiplexing modules for conneciton
+However, while the security and stream multiplexing modules for connection
 upgrades are typically libp2p framework components, the protocols negotiated for
 new streams can be easily defined by libp2p applications.
 
