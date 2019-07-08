@@ -9,9 +9,10 @@
 
 Authors: [@yusefnapora]
 
-Interest Group: TBD
+Interest Group: [@raulk], TBD
 
 [@yusefnapora]: https://github.com/yusefnapora
+[@raulk]: https://github.com/raulk
 
 See the [lifecycle document][lifecycle-spec] for context about maturity level
 and spec status.
@@ -42,7 +43,7 @@ process][conn-spec-conn-upgrade].
 ## Protocol Id and Version History
 
 The plaintext protocol described in this document has the protocol id of
-`/plaintext/1.1.0`. 
+`/plaintext/2.0.0`. 
 
 An earlier version, `/plaintext/1.0.0`, was implemented in several languages,
 but it did not include any exchange of public keys or peer ids. This led to
@@ -105,8 +106,8 @@ unsigned-varint spec][uvarint-spec].
 
 ### Exchange
 
-Once the plaintext protocol has been negotiated, both peers send an `Exchange`
-message containing their peer id and public key. 
+Once the plaintext protocol has been negotiated, both peers immediately send an
+`Exchange` message containing their peer id and public key.
 
 Upon receiving an `Exchange` message from the remote peer, each side will
 validate that the given peer id is consistent with the given public key by
@@ -114,7 +115,7 @@ deriving a peer id from the key and asserting that it's a match with the `id`
 field in the `Exchange` message.
 
 Dialing a peer in libp2p requires knowledge of the listening peer's peer id. As
-a result, the dialing peer also verifies that the peer id presented by the
+a result, the dialing peer ALSO verifies that the peer id presented by the
 listening peer matches the peer id that they attempted to dial. As the listening
 peer has no prior knowledge of the dialer's id, only one peer is able to perform
 this additional check.
@@ -124,13 +125,14 @@ key and peer id for the remote peer in their local peer metadata storage (e.g.
 go-libp2p's [peerstore][go-libp2p-peerstore], or js-libp2p's
 [peer-book][js-peer-book]).
 
-Following delivery of `Exchange` messages, the plaintext protocol is complete.
-No response is required, as it is assumed that peers will close the connection
-if peer id validation fails.
+Following delivery and verification of `Exchange` messages, the plaintext
+protocol is complete. Should a verification or timeout error occur, the
+connection MUST be terminated abruptly.
 
-Once the exchange is complete, the remainder of the [connection upgrade
-process][conn-spec-conn-upgrade] takes place, and a stream multiplexer is
-negotiated if the underlying transport requires one.
+The connection is now ready for insecure and unauthenticated data exchange.
+While we do exchange public keys upfront, replay attacks and forgery are
+trivial, and we perform no authentication of messages. Therefore, we reiterate
+the unsuitability of `/plaintext/2.0.0` for production usage.
 
 [protobuf-spec]: https://developers.google.com/protocol-buffers/docs/reference/proto2-spec
 [secio-spec]: ../secio/README.md
