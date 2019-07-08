@@ -45,7 +45,7 @@ The plaintext protocol described in this document has the protocol id of
 `/plaintext/1.1.0`. 
 
 An earlier version, `/plaintext/1.0.0`, was implemented in several languages,
-but did not include any exchange of public keys or peer ids. This led to
+but it did not include any exchange of public keys or peer ids. This led to
 undefined behavior in parts of libp2p that assumed the presence of a peer id.
 
 As version `1.0.0` had no associated wire protocol, it was never specified.
@@ -124,14 +124,15 @@ key and peer id for the remote peer in their local peer metadata storage (e.g.
 go-libp2p's [peerstore][go-libp2p-peerstore], or js-libp2p's
 [peer-book][js-peer-book]).
 
-Following delivery of `Exchange` message, the plaintext protocol is complete. No
-response is required, as it is assumed that peers will close the connection if
-peer id validation fails.
+Following delivery of `Exchange` messages, the plaintext protocol is complete.
+No response is required, as it is assumed that peers will close the connection
+if peer id validation fails.
 
 Once the exchange is complete, the remainder of the [connection upgrade
 process][conn-spec-conn-upgrade] takes place, and a stream multiplexer is
 negotiated if the underlying transport requires one.
 
+[protobuf-spec]: https://developers.google.com/protocol-buffers/docs/reference/proto2-spec
 [secio-spec]: ../secio/README.md
 [tls-spec]: ../tls/tls.md
 [peer-id-spec]: ../peer-ids/peer-ids.md
