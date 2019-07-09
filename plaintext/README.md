@@ -38,6 +38,13 @@ from public keys][peer-id-spec], even when peers are communicating over an
 insecure channel. For this reason, peers using the plaintext protocol still
 exchange public keys and peer ids when connecting to each other.
 
+It bears repeating that the plaintext protocol was designed for development and
+testing **ONLY**, and **MUST NOT** be used in production environments. No
+encryption or authentication of any kind is provided. Also note that enabling
+the plaintext module will effectively nullify the security guarantees of any
+other security modules that may be enabled, as an attacker will be able to
+negotiate a plaintext connection at any time.
+
 This document describes the exchange of peer ids and keys that occurs when
 initiating a plaintext connection. This exchange happens after the plaintext
 protocol has been negotiated as part of the [connection upgrade
