@@ -9,10 +9,13 @@
 
 Authors: [@yusefnapora]
 
-Interest Group: [@raulk], TBD
+Interest Group: [@raulk], [@Warchant], [@Stebalien], [@mhchia]
 
 [@yusefnapora]: https://github.com/yusefnapora
 [@raulk]: https://github.com/raulk
+[@Warchant]: https://github.com/Warchant
+[@Stebalien]: https://github.com/Stebalien
+[@mhchia]: https://github.com/mhchia
 
 See the [lifecycle document][lifecycle-spec] for context about maturity level
 and spec status.
