@@ -70,6 +70,7 @@ security, multiplexing, and other purposes.
 
 - [identify][spec_identify] -  Exchange keys and addresses with other peers
 - [mplex][spec_mplex] - The friendly stream multiplexer
+- [plaintext][spec_plaintext] - An insecure transport for non-production usage
 - [pnet][spec_pnet] - Private networking in libp2p using pre-shared keys
 - [pubsub][spec_pubsub] - PubSub interface for libp2p
   - [gossipsub][spec_gossipsub] - An extensible baseline PubSub protocol
@@ -110,3 +111,4 @@ you feel an issue isn't the appropriate place for your topic, please join our
 [spec_tls]: ./tls/tls.md
 [spec_peerids]: ./peer-ids/peer-ids.md
 [spec_connections]: ./connections/README.md
+[spec_plaintext]: ./plaintext/README.md
