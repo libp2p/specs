@@ -101,7 +101,7 @@ you feel an issue isn't the appropriate place for your topic, please join our
 [spec_header]: 00-framework-02-document-header.md
 [spec_identify]: ./identify/README.md
 [spec_mplex]: ./mplex/README.md
-[spec_pnet]: ./pnet/README.md
+[spec_pnet]: ./pnet/Private-Networks-PSK-V1.md
 [spec_pubsub]: ./pubsub/README.md
 [spec_gossipsub]: ./pubsub/gossipsub/README.md
 [spec_episub]: ./pubsub/gossipsub/episub.md
