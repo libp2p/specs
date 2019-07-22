@@ -58,6 +58,7 @@ expected lifecycle and document formatting.
 These specs define abstractions and data types that form the "core" of libp2p
 and are used throughout the system.
 
+- [Addressing][spec_addressing] - Working with addresses in libp2p.
 - [Connections and Upgrading][spec_connections] - Establishing secure,
   multiplexed connections between peers, possibly over insecure, single stream transports.
 - [Peer Ids and Keys][spec_peerids] - Public key types & encodings, peer id calculation, and
@@ -112,3 +113,4 @@ you feel an issue isn't the appropriate place for your topic, please join our
 [spec_peerids]: ./peer-ids/peer-ids.md
 [spec_connections]: ./connections/README.md
 [spec_plaintext]: ./plaintext/README.md
+[spec_addressing]: ./addressing/README.md
