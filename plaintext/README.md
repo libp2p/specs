@@ -1,6 +1,8 @@
-# Plaintext Connection Protocol
+# Plaintext Secure Channel
 
-> An insecure connection handshake for non-production environments.
+> An insecure connection handshake **for non-production environments.**
+
+> **⚠️ Intended only for debugging and interoperability testing purposes. ⚠️**
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
