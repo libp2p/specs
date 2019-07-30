@@ -23,7 +23,7 @@ and spec status.
 In order to support direct connections through NATs with hole
 punching, we need to account for simultaneous open. In such cases,
 there is no single initiator and responder, but instead both peers act
-as initiators. This is breaks protocol negotiation in
+as initiators. This breaks protocol negotiation in
 multistream-select, which assumes a single initator.
 
 This draft proposes a simple extension to the multistream protocol
