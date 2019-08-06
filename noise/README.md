@@ -343,8 +343,8 @@ the arrows reversed from the canonical (Alice-initiated) notation.
 ```
 XX:
   -> e
-  <- e, ee, s, es   [Alice's identity payload]
-  -> s, se          [Bob's identity payload]
+  <- e, ee, s, es   [Bob's identity payload]
+  -> s, se          [Alice's identity payload]
   
 
 IK:
