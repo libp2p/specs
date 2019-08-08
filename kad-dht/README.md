@@ -26,16 +26,6 @@ Code snippets use a Go-like syntax.
 * [Raúl Kripalani](https://github.com/raulk)
 * [John Hiesey](https://github.com/jhiesey)
 
-## Distance function (dXOR)
-
-The libp2p Kad DHT uses the **XOR distance metric** as defined in the original
-Kademlia paper [0]. Peer IDs are normalised through the SHA256 hash function.
-
-For recap, `dXOR(sha256(id1), sha256(id2))` is the number of common leftmost
-bits between SHA256 of each peer IDs. The `dXOR` between us and a peer X
-designates the bucket index that peer X will take up in the Kademlia routing
-table.
-
 ## Kademlia routing table
 
 The data structure backing this system is a k-bucket routing table, closely
@@ -59,13 +49,14 @@ Records in the DHT are keyed by CID [4], roughly speaking. There are intentions
 to move to multihash [5] keys in the future, as certain CID components like the
 multicodec are redundant. This will be an incompatible change.
 
-The format of `key` varies depending on message type; however, in all cases
-`dXOR(sha256(key1), sha256(key2))` see [Distance function](#distance-function-dxor)
-is used as the distance between two keys.
+The format of `key` varies depending on message type; however, in all cases, the
+distance between the two keys is `XOR(sha256(key1), sha256(key2))`.
 
-* For `GET_VALUE` and `PUT_VALUE`, `key` is an unstructured array of bytes, except
-if it is being used to look up a public key for a `PeerId`, in which case it is
-the ASCII string '/pk/' concatenated with the binary `PeerId`.
+* For `GET_VALUE` and `PUT_VALUE`, `key` is an unstructured array of bytes.
+  However, all nodes in the DHT will have rules to _validate_ whether or not a
+  value is valid for an associated key. For example, the default validator
+  accepts keys of the form `/pk/BINARY_PEER_ID` mapped the serialized public key
+  associated with the peer ID in question.
 * For `ADD_PROVIDER` and `GET_PROVIDERS`, `key` is interpreted and validated as
 a CID.
 * For `FIND_NODE`, `key` is a binary `PeerId`
