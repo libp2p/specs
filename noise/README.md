@@ -784,6 +784,8 @@ by concatenating the following values:
 - The UTF-8 string `NoiseSocketInit2`
 - Alice's initial `negotiation_data_len`
 - Alice's initial `negotiation_data`
+- Alice's initial `noise_message_len`
+- Alice's initial `noise_message`
 - Bob's responding `negotiation_data_len`
 - Bob's responding `negotiation_data`
 
