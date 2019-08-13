@@ -741,30 +741,50 @@ total length of the Noise message to exceed 65535 bytes.
 
 ## Encryption and I/O
 
-During the handshake phase, the initiator will choose their preferred Noise
-protocol, e.g. `Noise_IX_25519_AESGCM_SHA256`, and will initialize a Noise
+During the handshake phase, the initiator (Alice) will choose their preferred
+Noise protocol, e.g. `Noise_IX_25519_AESGCM_SHA256`, and will initialize a Noise
 [`HandshakeState` object][npf-handshake-state] with the corresponding
 parameters.
 
-Alice will construct negotiation data as
-described in [Noise Socket Negotiation Data](#noise-socket-negotiation-data) and
-serialize it to a byte array. She will then construct a [Noise Socket Handshake
+Alice will construct negotiation data as described in [Noise Socket Negotiation
+Data](#noise-socket-negotiation-data) and serialize it to a byte array. She will
+then construct a [Noise Socket Handshake
 Message](#noise-socket-handshake-messages), setting the `negotiation_data_len`
 and `negotiation_data` fields to store the negotiation data. The `noise_message`
 field will contain the initial Noise handshake message in the chosen handshake
 pattern.
 
-Upon receiving an initial Noise Socket handshake message, the Bob will
-"peek" at the negotiation data by decoding `negotiation_data_len`, reading
-`negotiation_data` and decoding the serialized negotiation data. They will then
-either accept the proposed protocol and send the next handshake message, or they
-will attempt to switch to a new Noise protocol.
+Alice sets the [Noise prologue][npf-prologue] for the handshake using data from
+her initial message. The prologue data consists of the following values
+concatenated together:
 
-If Bob's first response to Alice does include `negotiation_data`, it indicates
-that Bob would like to switch to a fallback protocol. Alice will re-initialize
-her Noise `HandshakeState` with the new fallback protocol, taking care to
-preserve the ephemeral key sent in her initial message. She will then respond
-with the next handshake message in the pattern used by the fallback protocol.
+- The UTF-8 string `NoiseSocketInit1`
+- Alice's initial `negotiation_data_len`
+- Alice's initial `negotiation_data`
+
+Upon receiving an initial Noise Socket handshake message, Bob will "peek" at the
+negotiation data by decoding `negotiation_data_len`, reading `negotiation_data`
+and decoding the serialized negotiation data. They will then either accept the
+proposed protocol and send the next handshake message, or they will attempt to
+switch to a new Noise protocol.
+
+If Bob accepts Alice's preferred protocol, he will derive Noise prologue data
+from her initial message as described above.
+
+If Bob would like to switch to a fallback protocol, his first response to Alice
+will include a non-empty `negotiation_data` field. Alice will re-initialize her
+Noise `HandshakeState` with the new fallback protocol, taking care to preserve
+the ephemeral key sent in her initial message. She will then respond with the
+next handshake message in the pattern used by the fallback protocol.
+
+When switching to Bob's new protocol, both parties derive Noise prologue data
+by concatenating the following values:
+
+- The UTF-8 string `NoiseSocketInit2`
+- Alice's initial `negotiation_data_len`
+- Alice's initial `negotiation_data`
+- Bob's responding `negotiation_data_len`
+- Bob's responding `negotiation_data`
 
 Whether Bob accepts Alice's initial protocol or switches to a new protocol,
 Alice and Bob will continue to exchange handshake messages until the chosen
