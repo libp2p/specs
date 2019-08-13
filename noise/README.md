@@ -362,10 +362,10 @@ case. Other systems may prefer to cycle static Noise keys frequently to reduce
 exposure.
 
 To authenticate the static Noise key used in a handshake, noise-libp2p includes
-the static Noise public key in a [signed handshake
-payload](#the-libp2p-signed-handshake-payload). This payload is signed with the
-private libp2p identity key, which proves that the sender was in possession of
-the private identity key at the time the payload was generated.
+a signature of the static Noise public key in a [handshake
+payload](#the-libp2p-signed-handshake-payload). This signature is produced with
+the private libp2p identity key, which proves that the sender was in possession
+of the private identity key at the time the payload was generated.
 
 ### libp2p Data in Handshake Messages
 
@@ -377,7 +377,8 @@ round-trip negotiation after the handshake completes.
 
 Any early data provided to noise-libp2p when initiating a connection MUST be
 included in the [signed handshake payload](#the-libp2p-signed-handshake-payload)
-as a byte string without alteration by the noise-libp2p implementation.
+as a byte string without alteration by the noise-libp2p implementation, and a
+valid signature of the early data MUST be included as described below.
 
 #### The libp2p Signed Handshake Payload
 
