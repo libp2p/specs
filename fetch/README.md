@@ -91,14 +91,14 @@ The libp2p protocol ID for this protocol is `/libp2p/fetch/0.0.1`
 The messages in the Fetch protocol use on of the following protobufs (proto3 syntax):
 
 ```
-message RequestLatest {
+message FetchRequest {
 	string identifier = 1;
 }
 
-message RespondLatest {
+message FetchResponse {
 	StatusCode status = 1;
 	enum StatusCode {
-		SUCCESS = 0;
+		OK = 0;
 		NOT_FOUND = 1;
 	}
 	bytes data = 2;
