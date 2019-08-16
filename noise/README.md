@@ -646,7 +646,7 @@ I/O](#encryption-and-io).
 #### SecureOutbound
 
 ```
-SecureOutbound(insecure: InsecureConnection, remotePeer: PeerId) -> Result<SecureConnection, Error>
+SecureOutbound(insecure: InsecureConnection, remotePeer: PeerId) -> Result<NoiseConnection, Error>
 ```
 
 `SecureOutbound` initiates a noise-libp2p connection to `remotePeer` over the
@@ -665,7 +665,7 @@ for the remote peer.
 #### SecureInbound
 
 ```
-SecureInbound(insecure: InsecureConnection) -> Result<SecureConnection, Error>
+SecureInbound(insecure: InsecureConnection) -> Result<NoiseConnection, Error>
 ```
 
 `SecureInbound` attempts to complete a noise-libp2p handshake initiated by a
