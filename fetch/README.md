@@ -26,9 +26,6 @@ and spec status.
 - [Overview](#overview)
 - [Spec Proposal Info](#spec-proposal-info)
 - [Wire protocol](#wire-protocol)
-- [Interfaces](#interfaces)
-- [Implementation Details](#implementation-details)
-- [Removing existing relay protocol](#removing-existing-relay-protocol)
 
 ## Overview
 
@@ -81,7 +78,7 @@ The `go-libp2p-pubsub-router` implementation requires:
  
  `value`: At least as generic as a byte array
  
- `statusCode`: Supports at least `SUCCESS` and `NOT_FOUND`
+ `statusCode`: Supports at least `OK`, `NOT_FOUND`, and `ERROR`
 
 ## Wire protocol
 
