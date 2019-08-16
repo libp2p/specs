@@ -155,6 +155,6 @@ the unsuitability of `/plaintext/2.0.0` for production usage.
 [uvarint-spec]: https://github.com/multiformats/unsigned-varint
 [multihash]: https://github.com/multiformats/multihash
 [conn-spec-conn-upgrade]: ../connections/README.md#connection-upgrade
-[conn-spec-protocol-negotiation]: ../connnection/README.md#protocol-negotiation
+[conn-spec-protocol-negotiation]: ../connections/README.md#protocol-negotiation
 [go-libp2p-peerstore]: https://github.com/libp2p/go-libp2p-peerstore
 [js-peer-book]: https://github.com/libp2p/js-peer-book
