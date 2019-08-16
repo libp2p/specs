@@ -306,7 +306,7 @@ Pipes](#optimistic-0-rtt-with-noise-pipes) and is described in that context belo
 
 ### Optimistic 0-RTT with Noise Pipes
 
-The Noise spec describes a [compound protocol][npf-compound-protocol] called
+The Noise spec describes a [compound protocol][npf-compound-protocols] called
 [Noise Pipes][npf-noise-pipes], which enables 0-RTT encryption in the optimistic
 case, while allowing peers to fallback to a different Noise protocol if their
 initial handshake attempt fails.
@@ -727,7 +727,7 @@ currently supported by the spec, while libp2p identity keys may be of other
 unsupported types like RSA.
 
 [peer-id-spec]: ../peer-ids/peer-ids.md
-[peer-id-spec-key-rules]: ../peer-ids/peer-ids.md#how-keys-are-encoded-and-messages-signed
+[peer-id-spec-signing-rules]: ../peer-ids/peer-ids.md#how-keys-are-encoded-and-messages-signed
 
 [conn-spec]: ../connections/README.md
 [multiselect-2-pr]: https://github.com/libp2p/specs/pull/95
