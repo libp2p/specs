@@ -100,6 +100,7 @@ message FetchResponse {
 	enum StatusCode {
 		OK = 0;
 		NOT_FOUND = 1;
+		ERROR = 2;
 	}
 	bytes data = 2;
 }
