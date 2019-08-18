@@ -4,7 +4,7 @@
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r1, 2019-05-05  |
+| 0A              | Working Draft  | Active | r1, 2019-05-05  |
 
 Authors: [@richardschneider]
 
