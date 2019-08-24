@@ -204,54 +204,86 @@ the early data MUST be included as described below.
 
 #### The libp2p Signed Handshake Payload
 
-libp2p-specific data, including the signature used for static key
-authentication, is transmitted in Noise handshake message payloads. When
-decrypted, the message payload has the structure described in [Encrypted
+libp2p-specific early data, plus a signature that links the static Noise key
+of the session with the libp2p identity key (for authentication), is
+transmitted in Noise handshake message payloads.
+
+These payloads MUST appear in the first handshake message that guarantees
+secrecy, sender authentication, and integrity:
+
+* In XX-initiated handshakes, the initiator will send its payload in message 3
+  (closing message), whereas the responder will send it in message 2 (its only
+  message).
+* In IK-initiated optimistic handshakes, the initiator will send its message
+  payload message 1, as it satisfies the guarantees.
+    * If the responder continues the IK handshake, it will send its message
+      payload in message 2.
+    * If the responder fall backs to XXfallback, it won't be able to decrypt
+      the initiator's message data from message 1. Therefore, the initiator
+      MUST rebuild the message payload with the new cryptographic material,
+      and resend it in the 3rd message.
+
+To guard against replay attacks, these message payloads are signed with the
+ephemeral key of the session.
+
+When decrypted, the signed payload has the structure described in [Encrypted
 Payloads](#encrypted-payloads), consisting of a length-prefixed `body` field
-followed by optional padding. The `body` of the payload contains a serialized
-[protobuf][protobuf] message with the following schema:
+followed by optional padding.
+
+The `body` of the payload contains a serialized [protobuf][protobuf]
+`NoiseSignedHandshakePayload` message with the following schema:
 
 ``` protobuf
+message NoiseSignedHandshakePayload {
+    NoiseHandshakePayload payload = 1;
+    bytes payload_sig = 2;
+}
+
 message NoiseHandshakePayload {
-	bytes libp2p_key = 1;
-	bytes noise_static_key_signature = 2;
-    bytes libp2p_data = 3;
-    bytes libp2p_data_signature = 4;
+	bytes identity_key = 1;
+	bytes identity_sig = 2;
+    bytes data = 3;
+    bytes data_sig = 4;
 }
 ```
 
-The `libp2p_key` field contains a serialized `PublicKey` message as defined in
-the [peer id spec][peer-id-spec].
+The `payload` field contains a Protobuf-serialized `NoiseHandshakePayload`
+struct.
 
-The `noise_static_key_signature` field is produced using the libp2p identity
-private key according to the [signing rules in the peer id
+The `payload_sig` field contains the signature of the `payload` against the
+ephemeral key for the session.
+
+The `identity_key` field contains a serialized `PublicKey` message as defined
+in the [peer id spec][peer-id-spec].
+
+The `identity_sig` field is produced using the libp2p identity private key
+according to the [signing rules in the peer id
 spec][peer-id-spec-signing-rules]. The data to be signed is the UTF-8 string
 `noise-libp2p-static-key:`, followed by the Noise static public key, encoded
 according to the rules defined in [section 5 of RFC 7748][rfc-7748-sec-5].
 
-The `libp2p_data` field contains the "early data" provided to the Noise module
-when initiating the handshake, if any. The structure of this data is opaque to
+The `data` field contains the "early data" provided to the Noise module when
+initiating the handshake, if any. The structure of this data is opaque to
 noise-libp2p and is expected to be defined in a future iteration of the
 connection establishment spec.
 
-If `libp2p_data` is non-empty, the `libp2p_data_signature` field MUST contain a
-signature produced with the libp2p identity key. The data to be signed is the
-UTF-8 string `noise-libp2p-early-data:` followed by the contents of the
-`libp2p_data` field.
+If `data` is non-empty, the `data_sig` field MUST contain a signature produced
+with the libp2p identity key. The data to be signed is the UTF-8 string
+`noise-libp2p-early-data:` followed by the contents of the `data` field.
 
-Upon receiving the handshake payload, peers MUST decode the public key from the
-`libp2p_key` field into a usable form. The key MUST be used to validate the
-`noise_static_key_signature` field against the static Noise key received in the
+Upon receiving the handshake payload, peers MUST decode the public key from
+the `identity_key` field into a usable form. The key MUST be used to validate
+the `identity_sig` field against the static Noise key received in the
 handshake. If the signature is invalid, the connection MUST be terminated
 immediately.
 
-If the `libp2p_data` field is non-empty, the `libp2p_data_signature` MUST be
-validated against the supplied `libp2p_data`. If the signature is invalid, the
-connection MUST be terminated immediately.
+If the `data` field is non-empty, the `data_sig` MUST be validated against the
+supplied `data`. If the signature is invalid, the connection MUST be
+terminated immediately.
 
 If a noise-libp2p implementation does not expose an API for early data, they
-MUST still validate the signature upon receiving a non-empty `libp2p_data`
-field and abort the connection if it is invalid.
+MUST still validate the signature upon receiving a non-empty `data` field and
+abort the connection if it is invalid.
 
 ### Supported Handshake Patterns
 
