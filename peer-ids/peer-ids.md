@@ -131,7 +131,7 @@ behavior.
 
 ### String representation
 
-Peer Ids are [multihashes][multihash] represented with [CIDs](https://github.com/ipld/cid) when encoded into strings.
+Peer Ids are [multihashes][multihash] canonically represented with [CIDs](https://github.com/ipld/cid) when encoded into strings.
 
 CID is a multihash with a prefix that specifies things like base encoding, cid version and the type of data behind it:
 
@@ -139,7 +139,7 @@ CID is a multihash with a prefix that specifies things like base encoding, cid v
 <cidv1> ::= <multibase><cid-version><multicodec><multihash>
 ```
 
-Encoding and decoding of string representation must follow [CID spec][cid-decoding].
+Encoding and decoding of string representation must follow [CID spec][cid-decoding].  
 
 #### libp2p-key CID
 
@@ -152,6 +152,14 @@ with `base32` [multibase][multibase] ([RFC4648](https://tools.ietf.org/html/rfc4
 
 - `libp2p-key` multicodec is mandatory when serializing to text (ensures Peer Id is self-describing)
 - `base32`  is the default multibase encoding: projects are free to use a different one if it is more suited to their needs
+
+##### Decoding string representation
+
+To decode a CID, follow the following algorithm:
+
+- If it is 46 characters long and starts with `Qm...`, it's a CIDv0. Decode it as base58btc multihash.
+- Otherwise, decode it according to the multibase and [CID spec][cid-decoding].
+
 
 Examples:
 

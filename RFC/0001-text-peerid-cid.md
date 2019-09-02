@@ -41,6 +41,12 @@ from Multihash to CIDv1 in Base32 and to support encoding/decoding text Peer Ids
 
 [rfc4648]: https://tools.ietf.org/html/rfc4648
 
+### Upgrade path
+
+1. Release support for reading Peer Id represented with CIDv1
+2. Wait three months or until the next release (whichever comes first)
+3. Switch the default Peer Id output format to CIDv1 in Base32
+
 ### Backward compatibility
 
 The old text representation (Multihash encoded as [`base58btc`][base58btc])
