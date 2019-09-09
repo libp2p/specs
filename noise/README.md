@@ -43,7 +43,6 @@ and spec status.
     - [Cryptographic Primitives](#cryptographic-primitives)
     - [Valid Noise Protocol Names](#valid-noise-protocol-names)
     - [Wire Format](#wire-format)
-        - [Encrypted Payloads](#encrypted-payloads)
     - [Encryption and I/O](#encryption-and-io)
     - [libp2p Interfaces and API](#libp2p-interfaces-and-api)
         - [Initialization](#initialization)
@@ -56,6 +55,9 @@ and spec status.
         - [Why ChaChaPoly?](#why-chachapoly)
         - [Distinct Noise and Identity Keys](#distinct-noise-and-identity-keys)
         - [Why Not Noise Signatures?](#why-not-noise-signatures)
+    - [Future Work](#future-work)
+        - [QUIC Support](#quic-support)
+        - [Pre-shared Keys / Private Networking](#pre-shared-keys--private-networking)
 
 ## Overview
 
@@ -734,6 +736,38 @@ to complete a Noise Signatures handshake. Also, only Ed25519 signatures are
 currently supported by the spec, while libp2p identity keys may be of other
 unsupported types like RSA.
 
+## Future Work
+
+This section will outline some things we'd like to accomplish in the future but
+were ommitted from this draft because the path forward isn't yet clear.
+
+### QUIC Support
+
+go-libp2p has recently added support for [QUIC][ietf-quic-spec], a UDP-based
+protocol with many excellent properties, including native support for
+multiplexing and encryption. The current QUIC draft spec uses TLS 1.3 to secure
+connections. However, it is possible to extend QUIC to use Noise, as
+demonstrated by [nQUIC][nquic-paper], an experimental variant of the QUIC spec.
+
+We would like to explore the possiblity of integrating the Noise handshake into
+libp2p's QUIC transport. This would likely build upon the nQUIC work, and may
+involve extending nQUIC to support more than the `IK` handshake specified in the
+nQUIC paper.
+
+### Pre-shared Keys / Private Networking
+
+Noise supports a "psk" variant of all the fundamental handshake patterns, which
+uses an additional pre-shared key to secure traffic. This could potentially
+provide an alternative to the current [private networking][libp2p-psk-spec]
+functionality in libp2p, in which a pre-shared key is used to encrypt all data
+within a given libp2p network.
+
+The current libp2p private network feature operates independently of the secure
+handshake protocol, encrypting all traffic even before the secure channel
+protocol has been negotiated. As a result, using Noise to implement private
+networks may require changes to internal libp2p APIs, the scope of which aren't
+yet clear.
+
 [peer-id-spec]: ../peer-ids/peer-ids.md
 [peer-id-spec-signing-rules]: ../peer-ids/peer-ids.md#how-keys-are-encoded-and-messages-signed
 
@@ -763,3 +797,4 @@ unsupported types like RSA.
 [protobuf]: https://developers.google.com/protocol-buffers/
 [noise-socket-spec]: https://github.com/noisesocket/spec
 [noise-signatures-spec]: https://github.com/noiseprotocol/noise_sig_spec/blob/master/output/noise_sig.pdf
+[ietf-quic-spec]: https://datatracker.ietf.org/doc/draft-ietf-quic-transport/
