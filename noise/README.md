@@ -93,9 +93,17 @@ traffic. The [Noise Handshake section](#the-noise-handshake) describes the
 libp2p-specific data is exchanged during the
 handshake](#libp2p-data-in-handshake-messages). 
 
-During the handshake, the static
-DH key used for Noise is authenticated using the libp2p identity keypair, as
-described in the [Static Key Authentication section](#static-key-authentication).
+By default, noise-libp2p uses the [`XX` handshake pattern](#xx), which provides
+strong privacy and security guarantees and requires 1.5 round trip message
+exchanges to be sound. Implementations may optionally support a compound
+protocol called "Noise Pipes." Noise Pipes allows peers to attempt the more
+efficient [`IK` handshake pattern](#ik) using a cached static key, falling back
+to the `XX` pattern if the `IK` attempt fails. For details, see [Optimistic
+0-RTT With Noise Pipes](#optimistic-0-rtt-with-noise-pipes).
+
+During the handshake, the static DH key used for Noise is authenticated using
+the libp2p identity keypair, as described in the [Static Key Authentication
+section](#static-key-authentication).
 
 Following a successful handshake, peers use the resulting encryption keys to
 send ciphertexts back and forth. The format for transport messages and the wire
@@ -275,7 +283,9 @@ handshake pattern.
 The [IK handshake pattern](#ik) is used in the context of [Optimistic 0-RTT with
 Noise Pipes](#optimistic-0-rtt-with-noise-pipes) and is described in that
 section along with the [`XXfallback`](#xxfallback) variation on the `XX`
-pattern.
+pattern. Support for `IK` and `XXfallback` is optional, and they are only
+supported in the context of the Noise Pipes pattern. Implementations that do not
+support Noise Pipes should not support the `IK` handshake.
 
 #### XX
 
@@ -334,6 +344,16 @@ described below. Noise Pipes is an optional feature of noise-libp2p, and
 implementations that do support it SHOULD offer a single configuration option to
 enable Noise Pipes, rather than separate options for enabling `IK` and
 `XXfallback`.
+
+Although Noise Pipes can be more efficient than the default `XX` pattern, it's
+worth noting that in many real-world use cases the difference is not as large as
+it would appear at a glance. While `XX` requires 1.5 round trips, the final
+handshake message (sent by the initiator) can be immediately followed by a
+transport message, both of which will almost certainly fit in the same network
+packet or datagram. In cases where the initiator of the handshake is also the
+party expected to send the first transport message (as in the common request /
+reply scenario), the cost of the final handshake message is effectively
+eliminated.
 
 #### IK
 
