@@ -33,7 +33,7 @@ and spec status.
     - [The Noise Handshake](#the-noise-handshake)
         - [Static Key Authentication](#static-key-authentication)
         - [libp2p Data in Handshake Messages](#libp2p-data-in-handshake-messages)
-            - [The libp2p Signed Handshake Payload](#the-libp2p-signed-handshake-payload)
+            - [The libp2p Handshake Payload](#the-libp2p-handshake-payload)
         - [Supported Handshake Patterns](#supported-handshake-patterns)
             - [XX](#xx)
         - [Optimistic 0-RTT with Noise Pipes](#optimistic-0-rtt-with-noise-pipes)
@@ -180,9 +180,9 @@ exposure.
 
 To authenticate the static Noise key used in a handshake, noise-libp2p includes
 a signature of the static Noise public key in a [handshake
-payload](#the-libp2p-signed-handshake-payload). This signature is produced with
-the private libp2p identity key, which proves that the sender was in possession
-of the private identity key at the time the payload was generated.
+payload](#the-libp2p--handshake-payload). This signature is produced with the
+private libp2p identity key, which proves that the sender was in possession of
+the private identity key at the time the payload was generated.
 
 ### libp2p Data in Handshake Messages
 
@@ -206,11 +206,11 @@ been validated. If the handshake fails for any reason, the early data payload
 MUST be discarded immediately.
 
 Any early data provided to noise-libp2p MUST be included in the [signed
-handshake payload](#the-libp2p-signed-handshake-payload) as a byte string
-without alteration by the noise-libp2p implementation, and a valid signature of
-the early data MUST be included as described below.
+handshake payload](#the-libp2p-handshake-payload) as a byte string without
+alteration by the noise-libp2p implementation, and a valid signature of the
+early data MUST be included as described below.
 
-#### The libp2p Signed Handshake Payload
+#### The libp2p Handshake Payload
 
 libp2p-specific data, including the signature used for static key
 authentication, is transmitted in Noise handshake message payloads. When
@@ -302,8 +302,8 @@ to the other party.
 The first handshake message contains the initiator's ephemeral public key, which
 allows subsequent key exchanges and message payloads to be encrypted.
 
-The second and third handshake messages include a [signed handshake
-payload](#the-libp2p-signed-handshake-payload), which contains a signature
+The second and third handshake messages include a [Noise handshake
+payload](#the-libp2p-handshake-payload), which contains a signature
 authenticating the sender's static Noise key as described in the [Static Key
 Authentication section](#static-key-authentication) and may include other
 internal libp2p data.
@@ -377,8 +377,8 @@ key has changed, they may initiate an [`XXfallback`](#xxfallback) handshake,
 using the ephemeral public key from the failed `IK` handshake message as
 pre-message knowledge.
 
-Each handshake message will include a [libp2p signed handshake
-payload](#the-libp2p-signed-handshake-payload) that identifies the sender and
+Each handshake message will include a [libp2p handshake
+payload](#the-libp2p-handshake-payload) that identifies the sender and
 authenticates the static Noise key.
 
 #### XXfallback
@@ -408,8 +408,8 @@ key is obtained from her initial `IK` message, moving it to the pre-message
 section of the handshake pattern. Essentially, the failed `IK` message serves
 the same role as the first handshake message in the standard `XX` pattern.
 
-Each handshake message will include a [libp2p signed handshake
-payload](#the-libp2p-signed-handshake-payload) that identifies the sender and
+Each handshake message will include a [libp2p handshake
+payload](#the-libp2p-handshake-payload) that identifies the sender and
 authenticates the static Noise key.
 
 #### Noise Pipes Message Flow
@@ -489,7 +489,9 @@ and [SHA256 hash function][npf-hash-sha256] as defined in the Noise spec.
 ## Valid Noise Protocol Names
 
 This section lists the [Noise protocol names][npf-protocol-names] that are valid
-according to the definitions in this spec.
+according to the definitions in this spec. While these names are useful
+internally when working with Noise, they are never sent "on the wire" or used
+for any kind of handshake negotiation and are provided for reference.
 
 Because only a single set of cryptographic primitives is supported, the Noise
 protocol name depends on the handshake pattern in use.
@@ -521,34 +523,18 @@ The `noise_message` field contains a [Noise Message as defined in the Noise
 spec][npf-message-format], which has a maximum length of 65535 bytes. 
 
 During the handshake phase, `noise_message` will be a Noise handshake message.
-Noise handshake messages may contain encrypted payloads. If so, they will have
-the structure described in the [Encrypted Payloads
-section](#encrypted-payloads).
+Noise handshake messages may contain encrypted payloads. If so, the decrypted
+handshake payload will have the format described in [The libp2p Hanshake
+Payload](#the-libp2p-handshake-payload).
 
 After the handshake completes, `noise_message` will be a Noise transport
 message, which is defined as an AEAD ciphertext consisting of an encrypted
 payload plus 16 bytes of authentication data. The decrypted plaintext of the
-encrypted payload will have the structure described in the [Encrypted Payloads
-section](#encrypted-payloads).
+encrypted payload will contain up to 65535 bytes of "application layer" data.
+It is the responsibilty of the noise-libp2p implementation to segment
+application data into chunks that will fit into a Noise transport message when
+sending, and to buffer and recombine chunks when receiving.
 
-### Encrypted Payloads
-
-All Noise transport messages have a single encrypted payload. Noise handshake
-messages may or may not have an encrypted payload.
-
-Once decrypted, the plaintext of an encrypted payload will have this structure:
-
-| `body_len` | `body`          | `padding`       |
-|------------|-----------------|-----------------|
-| 2 bytes    | variable length | variable length |
-
-The `body_len` field stores the length in bytes of the `body` field as an
-unsigned 16-bit big-endian integer.
-
-All data following the `body` field consists of padding bytes, which must be
-ignored by the recipient. Senders SHOULD use a source of random data to populate
-the padding field and may use any length of padding that does not cause the
-total length of the Noise message to exceed 65535 bytes.
 
 ## Encryption and I/O
 
@@ -577,10 +563,12 @@ transport message, which is an AEAD ciphertext consisting of an encrypted
 payload plus 16 bytes of authentication data, as [defined in the Noise
 spec][npf-message-format].
 
-When decrypted, the payload of a Noise transport message will have the structure
-described in [Encrypted Payloads](#encrypted-payloads). Receivers MUST decode
-the `body_len` field from the decrypted payload, and MUST ignore any additional
-padding following the `body` field.
+When decrypted, the payload of a Noise transport message will contain up to
+65535 bytes of plaintext "application layer" data. This should be buffered by
+the reciever and exposed as a continuous readable stream of binary data.
+Likewise, when sending data, the noise-libp2p module should expose a writable
+streaming interface. The segmentation of data into Noise transport messages
+should be "invisible" outside of the noise-libp2p module.
 
 In the unlikely event that peers exchange more than `2^64 - 1` messages, they
 MUST terminate the connection to avoid reusing nonces, in accordance with the
