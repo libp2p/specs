@@ -4,7 +4,7 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r0, 2019-08-05  |
+| 1A              | Working Draft | Active | r1, 2019-09-09  |
 
 Authors: [@yusefnapora]
 
@@ -58,6 +58,8 @@ and spec status.
     - [Future Work](#future-work)
         - [QUIC Support](#quic-support)
         - [Pre-shared Keys / Private Networking](#pre-shared-keys--private-networking)
+    - [Changelog](#changelog)
+        - [r1 - 2019-09-09](#r1---2019-09-09)
 
 ## Overview
 
@@ -767,6 +769,15 @@ handshake protocol, encrypting all traffic even before the secure channel
 protocol has been negotiated. As a result, using Noise to implement private
 networks may require changes to internal libp2p APIs, the scope of which aren't
 yet clear.
+
+
+## Changelog
+
+### r1 - 2019-09-09
+
+- removed the padding from the plaintext of encrypted payloads for simpler I/O
+- added Future Work section
+- a bit more context on Noise Pipes, including why you might not need it
 
 [peer-id-spec]: ../peer-ids/peer-ids.md
 [peer-id-spec-signing-rules]: ../peer-ids/peer-ids.md#how-keys-are-encoded-and-messages-signed
