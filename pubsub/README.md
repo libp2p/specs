@@ -105,7 +105,7 @@ this should be named better?). The Message protobuf looks like this:
 message Message {
 	optional string from = 1;
 	optional bytes data = 2;
-	optional bytes seqno = 3;
+	optional uint64 seqno = 3;
 	repeated string topicIDs = 4;
 	optional bytes signature = 5;
 	optional bytes key = 6;
@@ -119,7 +119,7 @@ done to allow content to be routed through a swarm of pubsubbing peers.
 The `data` field is an opaque blob of data, it can contain any data that the
 publisher wants it to.
 
-The `seqno` field is a 64-bit big-endian uint that is a linearly increasing
+The `seqno` field is a uint that is a linearly increasing
 number that is unique among messages originating from each given peer. No two
 messages on a pubsub topic from the same peer should have the same `seqno`
 value, however messages from different peers may have the same sequence number,
