@@ -1,4 +1,4 @@
-# Simultaneous Open for multistream-select
+# Simultaneous Open for bootstrapping connections in multistream-select
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
