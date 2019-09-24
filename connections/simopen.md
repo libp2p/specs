@@ -42,7 +42,8 @@ If both peers believe they are the initiator, then they both send
 phase, where one of the peers is selected to act as the initiator. In
 order to do so, they both generate a random 256-bit integer and send
 it as response to the `iamclient` directive, prefixed with the
-`select:` string. The peer with the highest integer is selected to act
+`select:` string. The integer is in big-endian format, encoded in base64.
+The peer with the highest integer is selected to act
 as the initator and sends an `initiator` message. The peer with the
 lowest integer responds with `responder` message and both peers
 transition to protocol negotiation with a distinct initiator.
