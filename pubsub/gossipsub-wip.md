@@ -31,7 +31,7 @@ This is the specification for an extensible pubsub protocol over libp2p, based
 on randomized topic meshes and gossip. It is a general purpose pubsub protocol
 with moderate amplification factors and good scaling properties. The protocol is
 designed to be extensible by more specialized routers, which may add protocol
-messages and gossip in order to provide behaviour optimized for specific
+messages and gossip in order to provide behavior optimized for specific
 application profiles.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -90,7 +90,7 @@ large.
 ## gossipsub: The gossiping mesh router
 
 gossipsub addresses the key shortcomings of floodsub by imposing an upper bound
-on the outbound degree of each peer and globally controling the amplification
+on the outbound degree of each peer and globally controlling the amplification
 factor.
 
 In order to do so, gossipsub peers form an overlay mesh, in which each peer
@@ -108,18 +108,23 @@ notified with a [`GRAFT` control message](#graft).
 
 Upon leaving a topic, a peer will notify the members of its mesh with a [`PRUNE`
 message](#prune) and remove the mesh from its [local state](#router-state).
+[Further maintenance](#mesh-maintenance) is performed periodically as part of
+the [heartbeat procedure](#heartbeat) to keep the mesh size within acceptable
+bounds as peers come and go.
 
-Mesh links are bidirectional - when a peer recieves a `GRAFT` message informing
+Mesh links are bidirectional - when a peer receives a `GRAFT` message informing
 them that they have been added to another peer's mesh, they will in turn add the
-peer to their own mesh, if it is still subscribed to the topic. In steady
-state (after [message processing](#message-processing)), if a peer `A` is in the
-mesh of peer `B`, then peer `B` is also in the mesh of peer `A`.
+peer to their own mesh, assuming they are still subscribed to the topic. In
+steady state (after [message processing](#message-processing)), if a peer `A` is
+in the mesh of peer `B`, then peer `B` is also in the mesh of peer `A`.
 
-One shortcoming of the overlay mesh is that it necessarily offers a restricted
-view of the global network. To allow peers to "reach beyond" their mesh view of
-a topic, we use _gossip_ to propagate _metadata_ about the message flow
-throughout the network. This gossip is emitted to a random subset of peers who
-are not in the mesh.
+To allow peers to "reach beyond" their mesh view of a topic, we use _gossip_ to
+propagate _metadata_ about the message flow throughout the network. This gossip
+is emitted to a random subset of peers who are not in the mesh. We can think of
+the mesh members as "full message" peers, to whom we propagate the full content
+of all messages received in a topic. The remaining peers we're aware of in a
+topic can be considered "metadata-only" peers, to whom we emit gossip at
+[regular intervals](#heartbeat).
 
 The metadata can be arbitrary, but as a baseline, we send the [`IHAVE`
 message](#ihave), which includes the message ids of messages we've seen in the
@@ -128,7 +133,7 @@ can request them using an [`IWANT` message](#iwant).
 
 The router can use this metadata to improve the mesh, for instance an
 [episub](./episub.md) router built on top of gossipsub can create epidemic
-broadcast trees, suitible for use cases in which a relatively small set of
+broadcast trees, suitable for use cases in which a relatively small set of
 publishers broadcasts to a much larger audience.
 
 Other possible uses for gossip include restarting message transmission at
@@ -139,7 +144,7 @@ mesh by opportunistically skipping hops.
 ## Dependencies
 
 Pubsub is designed to fit into the libp2p "ecosystem" of modular components that
-serve complemenatary purposes. As such, some key functionality is assumed to be
+serve complementary purposes. As such, some key functionality is assumed to be
 present and is not specified as part of pubsub itself.
 
 ### Ambient Peer Discovery
@@ -153,7 +158,7 @@ As peer discovery is broadly useful and not specific to pubsub, neither the
 particular discovery mechanism. Instead, this function is assumed to be provided
 by the environment. A pubsub-enabled libp2p application must also be configured
 with a peer discovery mechanism, which will send ambient connection events to
-inform other libp2p subsytems (such as pubsub) of newly connected peers.
+inform other libp2p subsystems (such as pubsub) of newly connected peers.
 
 Whenever a new peer is connected, the gossipsub implementation checks to see if
 the peer implements floodsub and/or gossipsub, and if so, it sends it a hello
@@ -161,7 +166,75 @@ packet that announces the topics that it is currently subscribing to.
 
 ## Parameters
 
+This section lists the configurable parameters that control the behavior of
+gossipsub, along with a short description and reasonable defaults. Each
+parameter is introduced with full context elsewhere in this document.
+
+| Parameter            | Purpose                                               | Reasonable Default |
+|----------------------|-------------------------------------------------------|--------------------|
+| `D`                  | The desired outbound degree of the network            | 6                  |
+| `D_low`              | Lower bound for outbound degree                       | 4                  |
+| `D_high`             | Upper bound for outbound degree                       | 12                 |
+| `heartbeat_interval` | Time between [heartbeats](#heartbeat)                 | 1 second           |
+| `fanout_ttl`         | Time-to-live for each topic's fanout state            | 60 seconds         |
+| `mcache_len`         | Number of history windows in message cache            | 5                  |
+| `mcache_gossip`      | Number of history windows to use when emitting gossip | 3                  |
+| `seen_ttl`           | Expiry time for cache of seen message ids             | 2 minutes          |
+
 ## Router State
+
+The router keeps track of some necessary state to maintain stable overlay meshes
+and emit useful gossip.
+
+The state can be roughly divided into two categories: [peering
+state](#peering-state), and state related to the [message cache](#message-cache).
+
+### Peering State
+
+Peering state is how the router keeps track of the pubsub-capable peers it's
+aware of and the relationship with each of them.
+
+There are three main pieces of peering state:
+
+- `peers` is a set of ids of all known peers that support gossipsub or floodsub.
+  Throughout this document `peers.gossipsub` will denote peers supporting
+  gossipsub, while `peers.floodsub` denotes floodsub peers.
+  
+- `mesh` is a map of subscribed topics to the set of peers in our overlay mesh
+  for that topic.
+
+- `fanout`, like `mesh`, is a map of topics to a set of peers, however, the
+  `fanout` map contains topics to which we _are not_ subscribed.
+
+In addition to the gossipsub-specific state listed above, the libp2p pubsub
+implementation maintains some "router-agnostic" state. This includes the set of
+topics to which we are subscribed, as well as the set of topics to which each of
+our peers is subscribed.
+
+### Message Cache
+
+The message cache (or `mcache`), is a data structure that stores message IDs and
+their corresponding messages, segmented into "history windows." Each window
+corresponds to one heartbeat interval, and the windows is shifted during the
+[heartbeat procedure](#heartbeat) following [gossip emission](#gossip-emission).
+
+The message cache supports the following operations:
+
+- `mcache.put(m)`: adds a message to the current window and the cache.
+- `mcache.get(id)`: retrieves a message from the cache by its ID, if it is still present.
+- `mcache.window()`: retrieves the message IDs for messages in the current history window.
+- `mcache.shift()`: shifts the current window, discarding messages older than the
+   history length of the cache.
+
+We also keep a `seen` cache, which is a timed least-recently-used cache of
+message IDs that we have observed recently. The value of "recently" is
+determined by the [parameter](#parameter) `seen_ttl`, with a reasonable default
+of two minutes. This value should be chosen to approximate the propagation delay
+in the overlay with a healthy margin.
+
+In the go implementation, the `seen` cache is provided by the pubsub framework
+and is omitted from the `mcache`, however other implementations may wish to
+combine them into one data structure.
 
 ## Topic Membership
 
@@ -175,8 +248,22 @@ packet that announces the topics that it is currently subscribing to.
 
 ### IWANT
 
-## Mesh Maintenance
+## Message Processing
 
-### Heartbeat
+## Heartbeat
+
+Each peer runs a periodic stabilization process called the "heartbeat procedure"
+at regular intervals. The frequency of the heartbeat is controlled by the
+[parameter](#parameters) `H`, with a reasonable default of 1 second.
+
+The heartbeat serves three functions: [mesh maintenance](#mesh-maintenance),
+[fanout maintenance](#fanout-maintenance), and [gossip
+emission](#gossip-emission).
+
+### Mesh Maintenance
+
+### Fanout Maintenance
+
+### Gossip Emission
 
 [pubsub-interface-spec]: ../README.md
