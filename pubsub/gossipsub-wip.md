@@ -205,7 +205,7 @@ There are three main pieces of peering state:
 - `peers` is a set of ids of all known peers that support gossipsub or floodsub.
   Throughout this document `peers.gossipsub` will denote peers supporting
   gossipsub, while `peers.floodsub` denotes floodsub peers.
-  
+
 - `mesh` is a map of subscribed topics to the set of peers in our overlay mesh
   for that topic.
 
@@ -280,34 +280,117 @@ contains fewer than `D` peers, the router will attempt to fill `mesh[topic]`
 with peers from `peers.gossipsub[topic]` which is the set of all
 gossipsub-capable peers it is aware of that are members of the topic.
 
-Regardless of whether they came from `fanout` or
-`peers.gossipsub`, the router will inform the new members of `mesh[topic]` that
-they have been added to the mesh by sending them a [`GRAFT` control
-message](#graft).
+Regardless of whether they came from `fanout` or `peers.gossipsub`, the router
+will inform the new members of `mesh[topic]` that they have been added to the
+mesh by sending them a [`GRAFT` control message](#graft).
 
-The application can invoke `LEAVE(topic)` to unsubscribe to a topic. The router
-will inform the peers in `mesh[topic]` by sending them a [`PRUNE` control
-message](#prune), so that they can remove the link from their own mesh. After
-sending `PRUNE` messages, the router will forget `mesh[topic]` and delete it
-from its local state.
+The application can invoke `LEAVE(topic)` to unsubscribe from a topic. The
+router will inform the peers in `mesh[topic]` by sending them a [`PRUNE` control
+message](#prune), so that they can remove the link from their own topic mesh.
+After sending `PRUNE` messages, the router will forget `mesh[topic]` and delete
+it from its local state.
 
 ## Control Messages
 
+Control messages are exchanged to maintain topic meshes and emit gossip. This
+section lists the control messages in the core gossipsub protocol, although it
+is worth noting that extensions to gossipsub (such as [episub](./episub) may
+define further control messages for their own purposes.
+
+For details on how gossipsub routers respond to control messages, see [Message
+Processing](#message-processing).
+
+The [protobuf](https://developers.google.com/protocol-buffers) schema for
+control messages is detailed in the [Protobuf](#protobuf) section.
+
 ### GRAFT
+
+The `GRAFT` message grafts a new link in a topic mesh. The `GRAFT` informs a peer
+that it has been added to the local router's mesh view for the included topic id.
 
 ### PRUNE
 
+The `PRUNE` message prunes a mesh link from a topic mesh. `PRUNE` notifies a
+peer that it has been removed from the local router's mesh view for the
+included topic id.
+
 ### IHAVE
+
+The `IHAVE` message is [emitted as gossip](gossip-emission). It provides the
+remote peer with a list of messages that were recently seen by the local router.
+The remote peer may then request the full message content with an [`IWANT` message](#iwant).
 
 ### IWANT
 
+The `IWANT` message requests the full content of one or more messages whose IDs
+were announced by a remote peer in an [`IHAVE` message](#ihave).
+
 ## Message Processing
+
+Upon receiving a message, the router will first process the message payload.
+Payload processing will validate the message according to application-defined
+rules and check the [`seen` cache](#message-cache) to determine if the message
+has been processed previously. It will also ensure that it was not the source of
+the message; if the router receives a message that it published itself, it will
+not forward it further.
+
+If the message is valid, was not published by the router itself, and has not
+been previously seen, the router will forward the message. First, it will
+forward the message to every peer in `peers.floodsub[topic]` for
+backwards-compatibility with [floodsub](#in-the-beginning-was-floodsub). Next,
+it will forward the message to every peer in its local gossipsub topic mesh,
+contained in `mesh[topic]`.
+
+After processing the message payload, the router will process the control
+messages:
+
+- On receiving a [`GRAFT(topic)` message](#graft), the router will check to see
+  if it is indeed subscribed to the topic identified in the message. If so, the
+  router will add the sender to `mesh[topic]`. If the router is no longer
+  subscribed to the topic, it will respond with a [`PRUNE(topic)`
+  message](#prune) to inform the sender that it should remove its mesh link.
+
+- On receiving a [`PRUNE(topic)` message](#prune), the router will remove the
+  sender from `mesh[topic]`.
+
+- On receiving an [`IHAVE(ids)` message](#ihave), the router will check it's
+  `seen` cache. If the `IHAVE` message contains message IDs that have not been
+  seen, the router will request them with an `IWANT` message.
+
+- On receiving an [`IWANT(ids)` message](#iwant), the router will check its
+  [`mcache`](#message-cache) and will forward any requested messages that are
+  present in the `mcache` to the peer who sent the `IWANT` message.
+
+Apart from forwarding received messages, the router can of course publish
+messages on its own behalf, which originate at the application layer. This is
+very similar to forwarding received messages:
+
+- First, the message is sent to every peer in `peers.floodsub[topic]`.
+- If the router is subscribed to the topic, it will send the message to all
+  peers in `mesh[topic]`.
+- If the router is not subscribed to the topic, it will examine the set of peers
+  in `fanout[topic]`. If this set is empty, the router will choose up to `D`
+  peers from `peers.gossipsub[topic]` and add them to `fanout[topic]`. Assuming
+  there are now some peers in `fanout[topic]`, the router will send the message
+  to each.
+
+## Control Message Piggybacking
+
+Gossip and other control messages do not have to be transmitted in their own
+message. Instead, they can be coalesced and piggybacked on any other message in
+the regular flow, for any topic. This can lead to message rate reduction
+whenever there is some correlated flow between topics, which can be significant
+for densely connected peers.
+
+For piggyback implementation details, consult the [Go
+implementation](https://github.com/libp2p/go-libp2p-pubsub/blob/master/gossipsub.go).
 
 ## Heartbeat
 
 Each peer runs a periodic stabilization process called the "heartbeat procedure"
 at regular intervals. The frequency of the heartbeat is controlled by the
-[parameter](#parameters) `H`, with a reasonable default of 1 second.
+[parameter](#parameters) `heartbeat_interval`, with a reasonable default of 1
+second.
 
 The heartbeat serves three functions: [mesh maintenance](#mesh-maintenance),
 [fanout maintenance](#fanout-maintenance), and [gossip
@@ -315,8 +398,121 @@ emission](#gossip-emission).
 
 ### Mesh Maintenance
 
+Topic meshes are maintained with the following stabilization algorithm:
+
+```
+for each topic in mesh:
+ if |mesh[topic]| < D_low:
+   select D - |mesh[topic]| peers from peers.gossipsub[topic] - mesh[topic]
+    ; i.e. not including those peers that are already in the topic mesh.
+   for each new peer:
+     add peer to mesh[topic]
+     emit GRAFT(topic) control message to peer
+
+ if |mesh[topic]| > D_high:
+   select |mesh[topic]| - D peers from mesh[topic]
+   for each new peer:
+     remove peer from mesh[topic]
+     emit PRUNE(topic) control message to peer
+```
+
+The [parameters](#parameters) of the algorithm are:
+
+- `D`: the desired outbound degree of the network
+- `D_low`: an acceptable lower threshold for `D`. If there are fewer than
+  `D_low` peers in a given topic mesh, we attempt to add new peers.
+- `D_high`: an acceptable upper threshold for `D`. If there are more than
+  `D_high` peers in a given topic mesh, we randomly select peers for removal.
+
 ### Fanout Maintenance
+
+The `fanout` map is maintained by keeping track of the last published time for
+each topic. If we do not publish any messages to a topic within a configurable
+TTL, the fanout state for that topic is discarded.
+
+We also try to ensure that each `fanout[topic]` set has at least `D` members.
+
+The fanout maintenance algorithm is:
+
+```
+for each topic in fanout:
+  if time since last published > fanout_ttl
+    remove topic from fanout
+  else if |fanout[topic]| < D
+    select D - |fanout[topic]| peers from peers.gossipsub[topic] - fanout[topic]
+    add the peers to fanout[topic]
+```
+
+The [parameters](#parameters) of the algorithm are:
+
+- `D`: the desired outbound degree of the network.
+- `fanout_ttl`: the time for which we keep the fanout state for each topic. If
+  we do not publish to a topic within `fanout_ttl`, the `fanout[topic]` set is
+  discarded.
 
 ### Gossip Emission
 
+Gossip is emitted to a random selection of peers for each topic that are not
+already members of the topic mesh:
+
+```
+for each topic in mesh+fanout:
+  let mids be mcache.get_gossip_ids(topic)
+  if mids is not empty:
+    select D peers from peers.gossipsub[topic]
+    for each peer not in mesh[topic] or fanout[topic]
+      emit IHAVE(mids)
+
+shift the mcache
+```
+
+Note that we use the same parameter `D` as the target degree for both gossip and
+mesh membership, however this is not normative. A separate parameter `D_lazy`
+can be used to explicitly control the gossip propagation factor, which allows
+for tuning the tradeoff between eager and lazy transmission of messages.
+
+## Protobuf
+
+The gossipsub protocol extends the [existing `RPC` message
+structure][pubsub-spec-rpc] with a new field, `control`. This is an instance of
+`ControlMessage` which may contain one or more control messages. 
+
+The four control messages are `ControlIHave` for [`IHAVE`](#ihave) messages,
+`ControlIWant` for [`IWANT`](#iwant) messages, `ControlGraft` for
+[`GRAFT`](#graft) messages and `ControlPrune` for [`PRUNE`](#prune) messages.
+
+The protobuf is as follows:
+
+```protobuf
+message RPC {
+    // ... see definition in pubsub interface spec
+	optional ControlMessage control = 3;
+}
+
+message ControlMessage {
+	repeated ControlIHave ihave = 1;
+	repeated ControlIWant iwant = 2;
+	repeated ControlGraft graft = 3;
+	repeated ControlPrune prune = 4;
+}
+
+message ControlIHave {
+	optional string topicID = 1;
+	repeated string messageIDs = 2;
+}
+
+message ControlIWant {
+	repeated string messageIDs = 1;
+}
+
+message ControlGraft {
+	optional string topicID = 1;
+}
+
+message ControlPrune {
+	optional string topicID = 1;
+}
+```
+
 [pubsub-interface-spec]: ../README.md
+[pubsub-spec-rpc]: ../README.md#the-rpc
