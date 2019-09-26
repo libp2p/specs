@@ -223,14 +223,19 @@ The message cache (or `mcache`), is a data structure that stores message IDs and
 their corresponding messages, segmented into "history windows." Each window
 corresponds to one heartbeat interval, and the windows are shifted during the
 [heartbeat procedure](#heartbeat) following [gossip emission](#gossip-emission).
+The number of history windows to keep is determined by the `mcache_len`
+[parameter](#parameters), while the number of windows to examine when sending
+gossip is controlled by `mcache_gossip`.
 
 The message cache supports the following operations:
 
 - `mcache.put(m)`: adds a message to the current window and the cache.
 - `mcache.get(id)`: retrieves a message from the cache by its ID, if it is still present.
-- `mcache.window()`: retrieves the message IDs for messages in the current history window.
+- `mcache.get_gossip_ids(topic)`: retrieves the message IDs for messages in the
+  most recent history windows, scoped to a given topic. The number of windows to
+  examine is controlled by the `mcache_gossip` parameter.
 - `mcache.shift()`: shifts the current window, discarding messages older than the
-   history length of the cache.
+   history length of the cache (`mcache_len`).
 
 We also keep a `seen` cache, which is a timed least-recently-used cache of
 message IDs that we have observed recently. The value of "recently" is
