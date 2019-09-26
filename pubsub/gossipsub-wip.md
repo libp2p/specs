@@ -38,6 +38,28 @@ application profiles.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Contents**
 
+- [Motivations and Prior Work](#motivations-and-prior-work)
+  - [In the beginning was floodsub](#in-the-beginning-was-floodsub)
+- [gossipsub: The gossiping mesh router](#gossipsub-the-gossiping-mesh-router)
+- [Dependencies](#dependencies)
+  - [Ambient Peer Discovery](#ambient-peer-discovery)
+- [Parameters](#parameters)
+- [Router State](#router-state)
+  - [Peering State](#peering-state)
+  - [Message Cache](#message-cache)
+- [Topic Membership](#topic-membership)
+- [Control Messages](#control-messages)
+  - [GRAFT](#graft)
+  - [PRUNE](#prune)
+  - [IHAVE](#ihave)
+  - [IWANT](#iwant)
+- [Message Processing](#message-processing)
+- [Control Message Piggybacking](#control-message-piggybacking)
+- [Heartbeat](#heartbeat)
+  - [Mesh Maintenance](#mesh-maintenance)
+  - [Fanout Maintenance](#fanout-maintenance)
+  - [Gossip Emission](#gossip-emission)
+- [Protobuf](#protobuf)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
