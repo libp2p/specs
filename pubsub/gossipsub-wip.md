@@ -183,7 +183,7 @@ parameter is introduced with full context elsewhere in this document.
 
 ## Router State
 
-The router keeps track of some necessary state to maintain stable overlay meshes
+The router keeps track of some necessary state to maintain stable topic meshes
 and emit useful gossip.
 
 The state can be roughly divided into two categories: [peering
@@ -215,7 +215,7 @@ our peers is subscribed.
 
 The message cache (or `mcache`), is a data structure that stores message IDs and
 their corresponding messages, segmented into "history windows." Each window
-corresponds to one heartbeat interval, and the windows is shifted during the
+corresponds to one heartbeat interval, and the windows are shifted during the
 [heartbeat procedure](#heartbeat) following [gossip emission](#gossip-emission).
 
 The message cache supports the following operations:
@@ -230,13 +230,21 @@ We also keep a `seen` cache, which is a timed least-recently-used cache of
 message IDs that we have observed recently. The value of "recently" is
 determined by the [parameter](#parameter) `seen_ttl`, with a reasonable default
 of two minutes. This value should be chosen to approximate the propagation delay
-in the overlay with a healthy margin.
+in the overlay, within a healthy margin.
+
+The `seen` cache serves two purposes. In all pubsub implementations, we can
+first check the `seen` cache before forwarding messages to avoid wastefully
+republishing the same message multiple times. For gossipsub in particular, the
+`seen` cache is used when processing an [`IHAVE` message](#ihave) sent by
+another peer, so that we only request messages we have not already seen before.
 
 In the go implementation, the `seen` cache is provided by the pubsub framework
-and is omitted from the `mcache`, however other implementations may wish to
+and is separate from the `mcache`, however other implementations may wish to
 combine them into one data structure.
 
 ## Topic Membership
+
+
 
 ## Control Messages
 
