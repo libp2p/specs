@@ -235,9 +235,11 @@ There are three main pieces of peering state:
   `fanout` map contains topics to which we _are not_ subscribed.
 
 In addition to the gossipsub-specific state listed above, the libp2p pubsub
-implementation maintains some "router-agnostic" state. This includes the set of
+framework maintains some "router-agnostic" state. This includes the set of
 topics to which we are subscribed, as well as the set of topics to which each of
-our peers is subscribed.
+our peers is subscribed. Elsewhere in this document, we refer to
+`peers.floodsub[topic]` and `peers.gossipsub[topic]` to denote floodsub or
+gossipsub capable peers within a specific topic.
 
 ### Message Cache
 
