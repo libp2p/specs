@@ -175,11 +175,17 @@ parameter is introduced with full context elsewhere in this document.
 | `D`                  | The desired outbound degree of the network            | 6                  |
 | `D_low`              | Lower bound for outbound degree                       | 4                  |
 | `D_high`             | Upper bound for outbound degree                       | 12                 |
+| `D_lazy`             | (Optional) the outbound degree for gossip emission    | `D`                |
 | `heartbeat_interval` | Time between [heartbeats](#heartbeat)                 | 1 second           |
 | `fanout_ttl`         | Time-to-live for each topic's fanout state            | 60 seconds         |
 | `mcache_len`         | Number of history windows in message cache            | 5                  |
 | `mcache_gossip`      | Number of history windows to use when emitting gossip | 3                  |
 | `seen_ttl`           | Expiry time for cache of seen message ids             | 2 minutes          |
+
+Note that `D_lazy` is considered optional. It is used to control the outbound
+degree when [emitting gossip](#gossip-emission), which may be tuned separately
+than the degree for eager message propagation. By default, we simply use `D` for
+both.
 
 ## Router State
 
