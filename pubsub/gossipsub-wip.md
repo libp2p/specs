@@ -244,7 +244,41 @@ combine them into one data structure.
 
 ## Topic Membership
 
+The [pubsub interface spec][pubsub-interface-spec] defines the baseline RPC
+message format used by all libp2p pubsub routers. As part of the RPC message,
+peers can include announcements regarding the topics they wish to subscribe to
+or unsubscribe from. These announcements are sent to all known pubsub-capable
+peers, regardless of whether we currently have any topics in common.
 
+For this document, we assume that the underlying pubsub framework is responsible
+for sending the RPC messages announcing subscription changes. A gossipsub
+implementation that does not build upon an existing libp2p pubsub framework
+would need to implement those control RPC messages.
+
+In addition to the `SUBSCRIBE` / `UNSUBSCRIBE` events sent by the pubsub
+framework, gossipsub must do additional work to maintain the mesh for the topic
+it is joining or leaving. We will refer to the two topic membership operations
+below as `JOIN(topic)` and `LEAVE(topic)`.
+
+When the application invokes `JOIN(topic)`, the router will form a topic mesh by
+selecting up to [`D`](#parameters) peers from its [local peering
+state](#peering-state) first examining the `fanout` map. If there are peers in
+`fanout[topic]`, the router will move those peers from the `fanout` map to
+`mesh[topic]`. If the topic is not in the `fanout` map, or if `fanout[topic]`
+contains fewer than `D` peers, the router will attempt to fill `mesh[topic]`
+with peers from `peers.gossipsub[topic]` which is the set of all
+gossipsub-capable peers it is aware of that are members of the topic.
+
+Regardless of whether they came from `fanout` or
+`peers.gossipsub`, the router will inform the new members of `mesh[topic]` that
+they have been added to the mesh by sending them a [`GRAFT` control
+message](#graft).
+
+The application can invoke `LEAVE(topic)` to unsubscribe to a topic. The router
+will inform the peers in `mesh[topic]` by sending them a [`PRUNE` control
+message](#prune), so that they can remove the link from their own mesh. After
+sending `PRUNE` messages, the router will forget `mesh[topic]` and delete it
+from its local state.
 
 ## Control Messages
 
