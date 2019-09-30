@@ -133,13 +133,16 @@ behavior.
 
 Peer Ids are [multihashes][multihash] canonically represented with [CIDs](https://github.com/ipld/cid) when encoded into strings.
 
-CID is a multihash with a prefix that specifies things like base encoding, cid version and the type of data behind it:
+Encoding and decoding of string representation MUST follow [CID specification][cid-decoding].
+
+Implementations parsing IDs from text MUST support both base58 CIDv0 and CIDv1 in base32, and they MUST generate base32-encoded CIDv1 by default. Generating CIDv0 is allowed as an opt-in (behind a flag).
+
+CIDv0 is a multihash encoded in Base58.  
+CIDv1 is a multihash with a prefix that specifies things like base encoding, cid version and the type of data behind it:
 
 ```
 <cidv1> ::= <multibase><cid-version><multicodec><multihash>
 ```
-
-Encoding and decoding of string representation must follow [CID spec][cid-decoding].  
 
 #### libp2p-key CID
 
