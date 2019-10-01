@@ -2,10 +2,9 @@
 
 | Lifecycle Stage | Maturity Level | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r0, 2019-05-23  |
+| 3A              | Recommendation | Active | r1, 2019-08-15  |
 
-
-**Authors**: [@mgoelzer], [@yusefnapora]
+**Authors**: [@mgoelzer], [@yusefnapora], [@lidel]
 
 **Interest Group**: [@raulk], [@vyzo], [@Stebalien]
 
@@ -14,6 +13,7 @@
 [@raulk]: https://github.com/raulk
 [@vyzo]: https://github.com/vyzo
 [@Stebalien]: https://github.com/Stebalien
+[@lidel]: https://github.com/lidel
 
 See the [lifecycle document](../00-framework-01-spec-lifecycle.md) for context
 about maturity level and spec status.
@@ -53,7 +53,7 @@ Key encodings and message signing semantics are
 
 ## Keys
 
-Our key pairs are wrapped in a [simple protobuf](https://github.com/libp2p/go-libp2p-crypto/blob/master/pb/crypto.proto), 
+Our key pairs are wrapped in a [simple protobuf](https://github.com/libp2p/go-libp2p-crypto/blob/master/pb/crypto.proto),
 defined using the [Protobuf version 2 syntax](https://developers.google.com/protocol-buffers/docs/proto):
 
 ```protobuf
@@ -107,7 +107,7 @@ Here is the process by which we generate peer ids based on the public component 
   3. Serialize the protobuf containing the public key into bytes using the [canonical protobuf encoding](https://developers.google.com/protocol-buffers/docs/encoding).
   4. If the length of the serialized bytes <= 42, then we compute the "identity" multihash of the serialized bytes.  In other words, no hashing is performed, but the [multihash format is still followed](https://github.com/multiformats/multihash) (byte plus varint plus serialized bytes).  The idea here is that if the serialized byte array is short enough, we can fit it in a multihash verbatim without having to condense it using a hash function.
   5. If the length is >42, then we hash it using it using the SHA256 multihash.
- 
+
 ### Note about deterministic encoding
 
 Deterministic encoding of the `PublicKey` message is desirable, as it ensures
@@ -131,16 +131,54 @@ behavior.
 
 ### String representation
 
-Peer Ids are multihashes, and they are often encoded into strings.
-The canonical string representation of a Peer Id is a base58 encoding with
-[the alphabet used by bitcoin](https://en.bitcoinwiki.org/wiki/Base58#Alphabet_Base58).
-This encoding is sometimes abbreviated as `base58btc`.
+Peer Ids are [multihashes][multihash] canonically represented with [CIDs](https://github.com/ipld/cid) when encoded into strings.
 
-An example of a `base58btc` encoded SHA256 peer id: `QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N`.
+Encoding and decoding of string representation MUST follow [CID specification][cid-decoding].
 
-Note that some projects using libp2p will prefix "base encoded" strings with a
-[multibase](https://github.com/multiformats/multibase) code that identifies the encoding base and alphabet.
-Peer ids do not use multibase, and can be assumed to be encoded as `base58btc`.
+Implementations parsing IDs from text MUST support both base58 CIDv0 and CIDv1 in base32, and they MUST generate base32-encoded CIDv1 by default. Generating CIDv0 is allowed as an opt-in (behind a flag).
+
+CIDv0 is a multihash encoded in Base58.  
+CIDv1 is a multihash with a prefix that specifies things like base encoding, cid version and the type of data behind it:
+
+```
+<cidv1> ::= <multibase><cid-version><multicodec><multihash>
+```
+
+#### libp2p-key CID
+
+The canonical string representation of a Peer Id is a CID v1  
+with `base32` [multibase][multibase] ([RFC4648](https://tools.ietf.org/html/rfc4648), without padding) and `libp2p-key` [multicodec][multicodec]:
+
+| multibase | cid version |  multicodec  |
+| --------- | ----------- | ------------ |
+|  `base32` |         `1` | `libp2p-key` |
+
+- `libp2p-key` multicodec is mandatory when serializing to text (ensures Peer Id is self-describing)
+- `base32`  is the default multibase encoding: projects are free to use a different one if it is more suited to their needs
+
+##### Decoding string representation
+
+To decode a CID, follow the following algorithm:
+
+- If it is 46 characters long and starts with `Qm...`, it's a CIDv0. Decode it as base58btc multihash.
+- Otherwise, decode it according to the multibase and [CID spec][cid-decoding].
+
+
+Examples:
+
+- SHA256 Peer Id encoded as canonical [CIDv1][cid-versions]:   
+  `bafzbeie5745rpv2m6tjyuugywy4d5ewrqgqqhfnf445he3omzpjbx5xqxe` ([inspect](http://cid.ipfs.io/#bafzbeie5745rpv2m6tjyuugywy4d5ewrqgqqhfnf445he3omzpjbx5xqxe))
+- Peer Ids that do not start with a valid multibase prefix are assumed to be legacy [CIDv0][cid-versions]
+(a multihash with implicit  [`base58btc`][base58btc] encoding, without any prefix).
+An example of the same Peer Id as a legacy CIDv0: `QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N`
+
+
+[multihash]: https://github.com/multiformats/multihash
+[multicodec]: https://github.com/multiformats/multicodec
+[multibase]: https://github.com/multiformats/multibase
+[base58btc]: https://en.bitcoinwiki.org/wiki/Base58#Alphabet_Base58
+[cid-decoding]: https://github.com/multiformats/cid#decoding-algorithm
+[cid-versions]: https://github.com/multiformats/cid#versions
 
 ## How Keys are Encoded and Messages Signed
 
@@ -152,7 +190,7 @@ Four key types are supported:
 
 Implementations MUST support RSA and Ed25519. Implementations MAY support Secp256k1 and ECDSA, but nodes using those keys may not be able to connect to all other nodes.
 
-In all cases, implementation MAY allow the user to enable/disable specific key types via configuration. 
+In all cases, implementation MAY allow the user to enable/disable specific key types via configuration.
 Note that disabling support for compulsory key types may hinder connectivity.
 
 Keys are encoded into byte arrays and serialized into the `Data` field of the
@@ -204,4 +242,3 @@ We encode the public key using ASN.1 DER.
 We encode the private key using DER-encoded PKIX.
 
 To sign a message, we hash the message with SHA 256, and then sign it with the [ECDSA standard algorithm](https://tools.ietf.org/html/rfc6979), then we encode it using [DER-encoded ASN.1.](https://wiki.openssl.org/index.php/DER)
-
