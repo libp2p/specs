@@ -20,7 +20,8 @@ anything.
 1. `multistream/advertise`: Inform the remote end about which protocols we
    speak. This should partially replace the current identify protocol.
 2. `multistream/multicodec`: Selects the stream's protocol using a multicodec.
-3. `multistream/string`: Selects the stream's protocol using a string protocol name.
+3. `multistream/string`: Selects the stream's protocol using a string protocol
+   name.
 4. `multistream/dynamic`: Selects the stream's protocol using a protocol ID
    defined by the *receiver*, valid for the duration of the "session"
    (underlying connection). To use this, the *receiver* must have used the
