@@ -77,7 +77,7 @@ records, so that peers can distribute addresses that they are not fully certain
 are correct, while still asserting that they created the record. For example,
 when requesting a dial-back via the [AutoNAT service][autonat], a peer could
 send a "provisional" address record. When the AutoNAT peer confirms the address,
-that address could be marked as publicly-routable and advertised in a new record.
+that address could be marked as confirmed and advertised in a new record.
 
 Regarding the fourth point about ambiguous addresses, it would also be desirable
 for the address record to include a notion of "routability," which would
@@ -87,85 +87,84 @@ reachable address but would still like to distribute it to local peers.
 
 ## Address Record Format
 
-There are many potential data structures that we could use to store and transmit
-address information. This section sketches out a possible design using
-[IPLD][ipld], although we may end up adopting a different format. Everything in
-this section is subject to change as part of the RFC process.
+Here's a protobuf that might work:
 
-These types are defined using IPLD's Schema notation, the best reference for
-which I'm currently aware of is [its own schema definition][ipld-schema-schema].
-
-```sh
-
-## How accessible we believe a given address to be.
-## Maybe include params? We could potentially have a subnet mask for local addresses
-type Routability enum {
-  | "GLOBAL"   ## Available on the public internet
-  | "LOCAL"    ## Available on a local network (probably in a private address range)
-  | "LOOPBACK" ## Available on a loopback address on the same machine
-  | "UNKNOWN"  ## Catch all (may include in-memory transports, etc)
-}
-
-## How confident we are in the validity of an address
-type Confidence enum {
-  | "CONFIRMED"   ## We have verified that we're reachable on this address
-  | "UNCONFIRMED" ## We suspect, but have not confirmed that we're reachable
-  | "INVALID"     ## We know that this address is invalid and should be deleted
-  | "UNKNOWN"     ## No assertions about validity one way or another
-}
-
-## A tuple of an address, how "routable" (public / private, etc) the address is,
-## and how confident we are in its validity.
-type AddressInfo struct {
-  addr Bytes ## Binary multiaddr
-  routability Routability
-  confidence Confidence
-}
-
-## A point-in-time snapshot of all addresses (plus their info) that we know
-## about at the time we issued the record.
-##
-type AddressState struct {
-  ## The subject of this record. Who do these addresses belong to?
-  subject PeerRef
-
-  ## When was this record constructed?
-  issuedAt Timestamp 
+```protobuf
+// Routability indicates the "scope" of an address, meaning how visible
+// or accessible it is. This allows us to distinguish between LAN and
+// WAN addresses.
+//
+// Side Note: we could potentially have a GLOBAL_RELAY case, which would
+// make it easy to prioritize non-relay addresses in the dialer. Bit of
+// a mix of concerns though.
+enum Routability {
+  // catch-all default / unknown scope
+  UNKNOWN = 1;
   
-  ## A list of all AddressInfo records that apply at the current moment.
-  addresses List {
-    valueType &AddressInfo
-  }
-}
-
-## A signed envelope containing an `AddressState` struct, our 
-## public key, and a signature of the state (verifiable with public key).
-type AddressEnvelope {
-  state AddressState
+  // another process on the same machine
+  LOOPBACK = 2;
   
-  # Public key of issuer.
-  pubkey Bytes 
+  // a local area network
+  LOCAL = 3;
+  
+  // public internet
+  GLOBAL = 4;
 
-  # Signature of `state`. Can be verified with `pubkey`.
-  # Maybe it's better to sign a merkle link to `state` instead...
-  sig Bytes
+  // reserved for future use
+  INTERPLANETARY = 100;
 }
 
-## Unix epoch timestamp, UTC timezone. TODO: what precision?
-type Timestamp Int
 
-# binary multihash of public key
-type PeerId Bytes
+// Confidence indicates how much we believe in the validity of the
+// address.
+enum Confidence {
+  // default, unknown confidence. we don't know one way or another
+  UNKNOWN = 1;
+  
+  // INVALID means we know that this address is invalid and should be deleted
+  INVALID = 2;
+  
+  // UNCONFIRMED means that we suspect this address is valid, but we haven't
+  // fully confirmed that we're reachable.
+  UNCONFIRMED = 3;
+  
+  // CONFIRMED means that we fully believe this address is valid.
+  // Each node / implementation can have their own criteria for confirmation.
+  CONFIRMED = 4;
+}
 
-## A peer id, plus a peer-specific version clock. 
-## Represents a peer _at a moment in time_, where time is loosely defined as
-## unit-less quantity that's always increasing. Version
-## numbers must increase monotonically but do not need to be strictly
-## sequential. If you don't want to preserve state across restarts or coordinate
-## a counter, you can use epoch timestamps as version numbers.
-type PeerRef struct {
-  peer PeerId
-  version Int
+// AddressInfo is a multiaddr plus some metadata.
+message AddressInfo {
+  bytes multiaddr = 1;
+  Routability routability = 2;
+  Confidence confidence = 3;
+}
+
+// AddressState contains the listen addresses (and their metadata) 
+// for a peer at a particular point in time.
+//
+// Although this record contains a wall-clock `issuedAt` timestamp,
+// there are no guarantees about node clocks being in sync or correct.
+// As such, the `issuedAt` field should be considered informational,
+// and `seqno` should be preferred when ordering records.
+message AddressState {
+  // the peer id of the subject of the record.
+  bytes subjectPeer = 1;
+  
+  // `seqno` is an increment-only counter that can be used to
+  // order AddressState records chronologically. Newer records
+  // MUST have a higher `seqno` than older records, but there
+  // can be gaps between sequence numbers.
+  uint64 seqno = 2;
+  
+  // The `issuedAt` timestamp stores the creation time of this record in
+  // seconds from the unix epoch, according to the issuer's clock. There
+  // are no guarantees about clock sync or correctness. SHOULD NOT be used
+  // to order AddressState records; use `seqno` instead.
+  uint64 issuedAt = 3;
+  
+  // All current listen addresses and their metadata.
+  repeated AddressInfo addresses = 4;
 }
 ```
 
@@ -175,11 +174,9 @@ address. This is wrapped in an `AddressInfo` struct along with the address
 itself.
 
 Then you have a big list of `AddressInfo`s, which we put in an `AddressState`.
-An `AddressState` identifies the `subject` of the record, who is also the
-issuing peer. We could potentially split that out into a separate `subject` and
-`issuer` field, which would let peers make statements about each other in
-addition to making statements about themselves. That complicates things though,
-and may not be worth it.
+An `AddressState` identifies the `subject` of the record,
+
+### TODO: rewrite this to use generic envelope
 
 The state and a signature of it are wrapped in an `AddressEnvelope`, along with
 the public key that produced the signature. Recipients must validate that the
@@ -220,6 +217,18 @@ but not routable via the public internet:
 If Alice wants to publish her address to a public shared resource like a DHT,
 she should omit `LOCAL` and other unreachable addresses, and peers should
 likewise filter out `LOCAL` addresses from public sources.
+
+## Signature Production & Validation
+
+TK: describe signing and validating the `AddressState` structure.
+
+
+## Peer Store APIs
+
+
+
+## Dialing Strategies
+
 
 ## TODO
 
