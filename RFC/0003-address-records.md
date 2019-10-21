@@ -164,7 +164,7 @@ message AddressState {
   // The `issuedAt` timestamp stores the creation time of this record in
   // seconds from the unix epoch, according to the issuer's clock. There
   // are no guarantees about clock sync or correctness. SHOULD NOT be used
-  // to order AddressState records; use `seqno` instead.
+  // to order AddressState records; use `version` instead.
   uint64 issuedAt = 3;
   
   // All current listen addresses and their metadata.
@@ -178,8 +178,10 @@ address. This is wrapped in an `AddressInfo` struct along with the address
 itself.
 
 Then you have a big list of `AddressInfo`s, which we put in an `AddressState`.
-An `AddressState` identifies the `subject` of the record,
-
+An `AddressState` identifies the `subjectPeer`, which is the peer that the
+record is about, to whom the addresses belong. It also includes a `version`
+number, so that we can replace earlier `AddressState`s with newer ones, and a
+timestamp for informational purposes.
 
 #### Example
 
@@ -219,23 +221,42 @@ us issue "self-certified" address records that are signed by the `subjectPeer`.
 
 ## Peer Store APIs
 
+This section is a WIP, and I'd love input.
 
+We need to figure out how to surface the address metadata in the peerstore APIs.
+
+In go, extending the [`AddrInfo`
+struct](https://github.com/libp2p/go-libp2p-core/blob/master/peer/addrinfo.go)
+to include metadata seems like a decent place to start, and js likewise has
+[js-peer-info](https://github.com/libp2p/js-peer-info) that could be extended.
+
+When storing this metadata internally, we may want to make a distinction between
+the remote peer's confidence in an address and our own confidence; we may decide
+an address is invalid when the remote peer thinks otherwise. One idea is to have
+our local confidence just be a numeric score (for easy sorting) that takes the
+remote peer's confidence value as an input.
+  
+The go [AddrBook
+interface](https://github.com/libp2p/go-libp2p-core/blob/master/peerstore/peerstore.go#L89)
+would also need to be updated - it currently deals with "raw" multiaddrs, and
+the only metadata exposed is a TTL for expiration. Changing this interface seems
+like a fairly big refactor to me, especially with the implementation in another
+repo. I'd love if some gophers could weigh in on a good way forward.
 
 ## Dialing Strategies
 
+Once we're surfacing routability info alongside addresses, the dialer can decide
+to optionally prioritize addresses it thinks are most likely to be reachable. We
+can also add an option to only dial self-certified addresses, although that
+likely won't be practical until self-certified addresses become commonplace.
 
-## TODO
+## Changes to core libp2p protocols
 
-Some things I'd like to cover but haven't got to or figured out yet:
+How to publish these to the DHT? Are the backward compatibility issues with
+older unsigned address records? Maybe we just publish these to a different key
+prefix...
 
-- how to store signed records 
-  - should be separate from "working set" that's optimized for retrieval
-  - need to store unaltered bytes
-- how to surface routability and confidence via peerstore APIs
-- figure out if IPLD is the way to go here. If not, what serialization format,
-  etc.
-- extend identify protocol to include signed records?
-- how are addresses prioritized when dialing?
+Should we update identify and mDNS discovery to use signed records?
 
 
 [identify-spec]: ../identify/README.md
