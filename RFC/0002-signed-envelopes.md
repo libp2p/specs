@@ -25,21 +25,33 @@ been tampered with.
 Signatures can be used for a variety of purposes, and a signature made for a
 specific purpose MUST NOT be considered valid for a different purpose.
 
-Without this property, an attacker could convince a peer to sign a paylod in one
-context and present it as valid in another, for example, presenting a signed
+Without this property, an attacker could convince a peer to sign a payload in
+one context and present it as valid in another, for example, presenting a signed
 address record as a pubsub message.
 
 We separate signatures into "domains" by prefixing the data to be signed with a
 string unique to each domain. This string is not contained within the payload or
-the outer envelope structure. Instead, each libp2p subystem that makes use of
+the outer envelope structure. Instead, each libp2p subsystem that makes use of
 signed envelopes will provide their own domain string when constructing the
 envelope, and again when validating the envelope. If the domain string used to
 validate is different from the one used to sign, the signature validation will
 fail.
 
-Domain strings may be any valid UTF-8 string, but MUST NOT contain the `:`
-character (UTF-8 code point `0x3A`), as this is used to separate the domain
-string from the content when signing.
+Domain strings may be any valid UTF-8 string, but should be fairly short and
+descriptive of their use case, for example `"libp2p-routing-record"`.
+
+## Type Hinting
+
+The envelope record can contain an arbitrary byte string payload, which will
+need to be interpreted in the context of a specific use case. To assist in
+"hydrating" the payload into an appropriate domain object, we include a "type
+hint" field. The type hint consists of a [multicodec][multicodec] code,
+optionally followed by an arbitrary byte sequence.
+
+This allows very compact type hints that contain just a multicodec, as well as
+"path" multicodecs of the form `/some/thing`, using the ["namespace"
+multicodec](https://github.com/multiformats/multicodec/blob/master/table.csv#L23),
+whose binary value is equivalent to the UTF-8 `/` character.
 
 ## Wire Format
 
@@ -50,8 +62,9 @@ can use protobuf for this as well and easily embed the key in the envelope:
 ```protobuf
 message SignedEnvelope {
   PublicKey publicKey = 1; // see peer id spec for definition
-  bytes contents = 2;      // payload
-  bytes signature = 3;     // signature of domain string + contents
+  bytes typeHint = 2;      // type hint
+  bytes contents = 3;      // payload
+  bytes signature = 4;     // see below for signing rules
 }
 ```
 
@@ -59,14 +72,27 @@ The `publicKey` field contains the public key whose secret counterpart was used
 to sign the message. This MUST be consistent with the peer id of the signing
 peer, as the recipient will derive the peer id of the signer from this key.
 
+The `typeHint` field contains a [multicodec][multicodec]-prefixed type hint as
+described in the [Type Hinting section](#type-hinting).
+
+The `contents` field contains the arbitrary byte string payload.
+
+The `signature` field contains a signature of all fields except `publicKey`,
+generated as described below.
 
 ## Signature Production / Verification
 
 When signing, a peer will prepare a buffer by concatenating the following:
 
-- The [domain separation string](#domain-separation), encoded as UTF-8
-- The UTF-8 encoded `:` character
-- The `contents` field
+- The length of the [domain separation string](#domain-separation) string in
+  bytes, encoded as an [unsigned varint][uvarint]
+- The domain separation string, encoded as UTF-8
+- The length of the `typeHint` field in bytes, encoded as an [unsigned
+  varint][uvarint]
+- The value of the `typeHint` field
+- The length of the `contents` field in bytes, encoded as an [unsigned
+  varint][uvarint]
+- The value of the `contents` field
 
 Then they will sign the buffer according to the rules in the [peer id
 spec][peer-id-spec] and set the `signature` field accordingly.
@@ -77,3 +103,5 @@ against it.
 
 [addr-records-rfc]: ./0003-address-records.md
 [peer-id-spec]: ../peer-ids/peer-ids.md
+[multicodec]: https://github.com/multiformats/multicodec
+[uvarint]: https://github.com/multiformats/unsigned-varint
