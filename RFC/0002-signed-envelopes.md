@@ -85,14 +85,15 @@ generated as described below.
 When signing, a peer will prepare a buffer by concatenating the following:
 
 - The length of the [domain separation string](#domain-separation) string in
-  bytes, encoded as an [unsigned varint][uvarint]
+  bytes
 - The domain separation string, encoded as UTF-8
-- The length of the `typeHint` field in bytes, encoded as an [unsigned
-  varint][uvarint]
+- The length of the `typeHint` field in bytes
 - The value of the `typeHint` field
-- The length of the `contents` field in bytes, encoded as an [unsigned
-  varint][uvarint]
+- The length of the `contents` field in bytes
 - The value of the `contents` field
+
+The length values for each field are encoded as 64-bit unsigned integers in
+network order (big-endian).
 
 Then they will sign the buffer according to the rules in the [peer id
 spec][peer-id-spec] and set the `signature` field accordingly.
