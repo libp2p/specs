@@ -81,8 +81,8 @@ Here's a protobuf that might work:
 
 ```protobuf
 
-// RoutingRecord contains the listen addresses for a peer at a particular point in time.
-message RoutingRecord {
+// RoutingState contains the listen addresses for a peer at a particular point in time.
+message RoutingState {
   // AddressInfo wraps a multiaddr. In the future, it may be extended to
   // contain additional metadata, such as "routability" (whether an address is
   // local or global, etc).
@@ -91,7 +91,7 @@ message RoutingRecord {
   }
 
   // the peer id of the subject of the record (who these addresses belong to).
-  bytes subjectPeer = 1;
+  bytes peerId = 1;
   
   // A monotonically increasing sequence number, used for record ordering.
   uint64 seq = 2;
@@ -114,7 +114,7 @@ epoch time as the `seq` value, however they MUST NOT attempt to interpret a
 
 ```javascript
   {
-    subjectPeer: "QmAlice...",
+    peerId: "QmAlice...",
     seq: 1570215229,
       
     addresses: [
@@ -131,10 +131,11 @@ epoch time as the `seq` value, however they MUST NOT attempt to interpret a
 
 ## Certification / Verification
 
-This structure can be contained in a [signed envelope][envelope-rfc], which lets
-us issue "self-certified" address records that are signed by the `subjectPeer`.
+This structure can be serialized and contained in a [signed
+envelope][envelope-rfc], which lets us issue "self-certified" address records
+that are signed by the peer that the addresses belong to.
 
-To produce a "self-certified" address, a peer will construct a `RoutingRecord`
+To produce a "self-certified" address, a peer will construct a `RoutingState`
 containing all of their publicly-reachable listen addresses. A peer SHOULD only
 include addresses that it believes are routable via the public internet, ideally
 having confirmed that this is the case via some external mechanism such as a
@@ -145,18 +146,19 @@ example, when testing the DHT using many processes on a single machine. To
 support this, implementations may use a global runtime configuration flag or
 environment variable to control whether local addresses will be included.
 
-Once the `RoutingRecord` has been constructed, it should be serialized to a byte
+Once the `RoutingState` has been constructed, it should be serialized to a byte
 string and wrapped in a [signed envelope][envelope-rfc]. The `publicKey` field
-of the envelope MUST be consistent with the `subjectPeer` peer id for the record
-to be considered valid.
+of the envelope MUST be able to derive the `peerId` contained in the record. If
+the envelope's `publicKey` does not match the `peerId` of the routing record,
+the record MUST be rejected as invalid.
 
 ### Signed Envelope Domain
 
-Signed envelopes require a "domain separation" string that defines the "scope"
+Signed envelopes require a "domain separation" string that defines the scope
 or purpose of a signature.
 
-When wrapping a `RoutingRecord` in a signed envelope, the domain string MUST be
-`libp2p-routing-record`.
+When wrapping a `RoutingState` in a signed envelope, the domain string MUST be
+`libp2p-routing-state`.
 
 ### Signed Envelope Type Hint
 
@@ -165,8 +167,8 @@ contents of the envelope.
 
 Ideally, we should define a new multicodec for routing records, so that we can
 identify them in a few bytes. While we're still spec'ing and working on the
-initial implementation, we can use the UTF-8 string ``"/libp2p/routing-record"`
-as the type hint value.
+initial implementation, we can use the UTF-8 string
+`"/libp2p/routing-state-record"` as the type hint value.
 
 ## Peer Store APIs
 
@@ -187,7 +189,7 @@ And possibly:
   - has a particular address been self-certified by the given peer?
 
 
-We'll also need a method that constructs a new `RoutingRecord` containing our
+We'll also need a method that constructs a new `RoutingState` containing our
 listen address and wraps it in a signed envelope. This may belong on the Host
 instead of the peer store, since it needs access to the private signing key.
 
@@ -224,7 +226,7 @@ multiaddrs.
 Another potentially useful extension would be a compact protocol table or bloom
 filter that could be used to test whether a peer supports a given protocol
 before interacting with them directly. This could be added as a new field in the
-`RoutingRecord` message.
+`RoutingState` message.
 
 
 
