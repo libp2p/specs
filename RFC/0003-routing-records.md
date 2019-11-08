@@ -183,6 +183,10 @@ We will need to add a few methods to the peer store:
 - `CertifiedAddrs(peerId) -> Set<Multiaddr>`
   - return the set of self-certified addresses for the given peer id
 
+- `SignedRoutingState(peerId) -> Maybe<SignedEnvelope>`
+  - retrive the signed envelope that was most recently added to the peerstore
+    for the given peer, if any exists.
+
 And possibly:
 
 - `IsCertified(peerId, multiaddr) -> Boolean`
@@ -190,7 +194,7 @@ And possibly:
 
 
 We'll also need a method that constructs a new `RoutingState` containing our
-listen address and wraps it in a signed envelope. This may belong on the Host
+listen addresses and wraps it in a signed envelope. This may belong on the Host
 instead of the peer store, since it needs access to the private signing key.
 
 ## Dialing Strategies
