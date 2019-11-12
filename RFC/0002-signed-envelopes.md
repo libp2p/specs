@@ -5,7 +5,7 @@
 
 ## Abstract
 
-This RFC proposes a "signed envelope" structure that contains an arbitray byte
+This RFC proposes a "signed envelope" structure that contains an arbitrary byte
 string payload, a signature of the payload, and the public key that can be used
 to verify the signature.
 
