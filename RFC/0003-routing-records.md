@@ -193,7 +193,7 @@ We will need to add a few methods to the peer store:
   - return the set of self-certified addresses for the given peer id
 
 - `SignedRoutingState(peer_id) -> Maybe<SignedEnvelope>`
-  - retrive the signed envelope that was most recently added to the peerstore
+  - retrieve the signed envelope that was most recently added to the peerstore
     for the given peer, if any exists.
 
 And possibly:
@@ -206,6 +206,17 @@ We'll also need a method that constructs a new `RoutingState` containing our
 listen addresses and wraps it in a signed envelope. This may belong on the Host
 instead of the peer store, since it needs access to the private signing key.
 
+When adding records to the peerstore, a receiving peer MUST keep track of the
+latest `seq` value received for each peer and reject incoming `RoutingState`
+messages unless they contain a greater `seq` value than the last received.
+
+After integrating the information from the `RoutingState` into the peerstore,
+implementations SHOULD retain the original signed envelope. This will allow
+other libp2p systems to share signed `RoutingState` records with other peers in
+the network, preserving the signature of the issuing peer. The [Exchanging
+Records section](#exchanging-records) section lists some systems that would need
+to retrieve the original signed record from the peerstore.
+
 ## Dialing Strategies
 
 Once self-certified addresses are available via the peer store, we can update
@@ -213,13 +224,27 @@ the dialer to prefer using them when possible. Some systems may want to _only_
 dial self-certified addresses, so we should include some configuration options
 to control whether non-certified addresses are acceptable.
 
-## Changes to core libp2p protocols
+## Exchanging Records
 
-How to publish these to the DHT? Are there backward compatibility issues with
-older unsigned address records? Maybe we just publish these to a different key
-prefix...
+We currently have several systems in libp2p that deal with peer addressing and
+which could be updated to use signed routing records:
 
-Should we update identify and mDNS discovery to use signed records?
+- Public peer discovery using [libp2p's DHT][dht-spec]
+- Local peer discovery with [mDNS][mdns-spec]
+- Direct exchange using the [identify protocol][identify-spec]
+- Service discovery via the [rendezvous protocol][rendezvous-spec]
+- A proposal for [a public peer exchange protocol][pex-proposal]
+
+Of these, the highest priority for updating seems to be the DHT, since it's
+actively used by several deployed systems and is vulnerable to routing attacks
+by malicious peers. We should work on extending the `FIND_NODE`, `ADD_PROVIDER`,
+and `GET_PROVIDERS` RPC messages to support returning signed records in addition
+to the current unsigned address information they currently support.
+
+We should also either define a new "secure peer routing" interface or extend the
+existing peer routing interfaces to support signed records, so that we don't end
+up with a bunch of similar but incompatible APIs for exchanging signed address
+records.
 
 ## Future Work
 
@@ -245,8 +270,9 @@ before interacting with them directly. This could be added as a new field in the
 
 [identify-spec]: ../identify/README.md
 [peer-id-spec]: ../peer-ids/peer-ids.md
+[mdns-spec]: ../discovery/mdns.md
+[rendezvous-spec]: ../rendezvous/README.md
+[pex-proposal]: https://github.com/libp2p/notes/issues/7
 [autonat]: https://github.com/libp2p/specs/issues/180
-[ipld]: https://ipld.io/
-[ipld-schema-schema]: https://github.com/ipld/specs/blob/master/schemas/schema-schema.ipldsch
 [envelope-rfc]: ./0002-signed-envelopes.md
 [eip-778]: https://eips.ethereum.org/EIPS/eip-778
