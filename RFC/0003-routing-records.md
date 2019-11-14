@@ -128,6 +128,14 @@ epoch time as the `seq` value, however they MUST NOT attempt to interpret a
   }
 ```
 
+A peer SHOULD only include addresses that it believes are routable via the
+public internet, ideally having confirmed that this is the case via some
+external mechanism such as a successful AutoNAT dial-back.
+
+In some cases we may want to include localhost or LAN-local address; for
+example, when testing the DHT using many processes on a single machine. To
+support this, implementations may use a global runtime configuration flag or
+environment variable to control whether local addresses will be included.
 
 ## Certification / Verification
 
@@ -136,21 +144,22 @@ envelope][envelope-rfc], which lets us issue "self-certified" address records
 that are signed by the peer that the addresses belong to.
 
 To produce a "self-certified" address, a peer will construct a `RoutingState`
-containing all of their publicly-reachable listen addresses. A peer SHOULD only
-include addresses that it believes are routable via the public internet, ideally
-having confirmed that this is the case via some external mechanism such as a
-successful AutoNAT dial-back.
+containing their listen addresses and serialize it to a byte array using a
+protobuf encoder. The serialized records will then be wrapped in a [signed
+envelope][envelope-rfc], which is signed with the libp2p peer's private host
+key. The corresponding public key MUST be included in the envelope's
+`public_key` field.
 
-In some cases we may want to include localhost or LAN-local address; for
-example, when testing the DHT using many processes on a single machine. To
-support this, implementations may use a global runtime configuration flag or
-environment variable to control whether local addresses will be included.
+When receiving a `RoutingState` wrapped in a signed envelope, a peer MUST
+validate the signature before deserializing the `RoutingState` record. If the
+signature is invalid, the envelope MUST be discarded without deserializing the
+envelope payload.
 
-Once the `RoutingState` has been constructed, it should be serialized to a byte
-string and wrapped in a [signed envelope][envelope-rfc]. The `public_key` field
-of the envelope MUST be able to derive the `peer_id` contained in the record. If
-the envelope's `public_key` does not match the `peer_id` of the routing record,
-the record MUST be rejected as invalid.
+Once the signature has been verified and the `RoutingState` has been
+deserialized, the receiving peer MUST verify that the `peer_id` contained in the
+`RoutingState` matches the `public_key` from the envelope. If the public key in
+the envelope cannot derive the peer id contained in the routing state record,
+the `RoutingState` MUST be discarded.
 
 ### Signed Envelope Domain
 
