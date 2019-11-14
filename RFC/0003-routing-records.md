@@ -91,7 +91,7 @@ message RoutingState {
   }
 
   // the peer id of the subject of the record (who these addresses belong to).
-  bytes peerId = 1;
+  bytes peer_id = 1;
   
   // A monotonically increasing sequence number, used for record ordering.
   uint64 seq = 2;
@@ -114,7 +114,7 @@ epoch time as the `seq` value, however they MUST NOT attempt to interpret a
 
 ```javascript
   {
-    peerId: "QmAlice...",
+    peer_id: "QmAlice...",
     seq: 1570215229,
       
     addresses: [
@@ -147,9 +147,9 @@ support this, implementations may use a global runtime configuration flag or
 environment variable to control whether local addresses will be included.
 
 Once the `RoutingState` has been constructed, it should be serialized to a byte
-string and wrapped in a [signed envelope][envelope-rfc]. The `publicKey` field
-of the envelope MUST be able to derive the `peerId` contained in the record. If
-the envelope's `publicKey` does not match the `peerId` of the routing record,
+string and wrapped in a [signed envelope][envelope-rfc]. The `public_key` field
+of the envelope MUST be able to derive the `peer_id` contained in the record. If
+the envelope's `public_key` does not match the `peer_id` of the routing record,
 the record MUST be rejected as invalid.
 
 ### Signed Envelope Domain
@@ -160,15 +160,15 @@ or purpose of a signature.
 When wrapping a `RoutingState` in a signed envelope, the domain string MUST be
 `libp2p-routing-state`.
 
-### Signed Envelope Type Hint
+### Signed Envelope Payload Type
 
-Signed envelopes contain a "type hint" that indicates how to interpret the
-contents of the envelope.
+Signed envelopes contain a `payload_type` field that indicates how to interpret
+the contents of the envelope.
 
 Ideally, we should define a new multicodec for routing records, so that we can
 identify them in a few bytes. While we're still spec'ing and working on the
 initial implementation, we can use the UTF-8 string
-`"/libp2p/routing-state-record"` as the type hint value.
+`"/libp2p/routing-state-record"` as the `payload_type` value.
 
 ## Peer Store APIs
 
@@ -180,16 +180,16 @@ We will need to add a few methods to the peer store:
     If any certified addresses already exist for the peer, only accept the new
     envelope if it has a greater `seq` value than existing envelopes.
     
-- `CertifiedAddrs(peerId) -> Set<Multiaddr>`
+- `CertifiedAddrs(peer_id) -> Set<Multiaddr>`
   - return the set of self-certified addresses for the given peer id
 
-- `SignedRoutingState(peerId) -> Maybe<SignedEnvelope>`
+- `SignedRoutingState(peer_id) -> Maybe<SignedEnvelope>`
   - retrive the signed envelope that was most recently added to the peerstore
     for the given peer, if any exists.
 
 And possibly:
 
-- `IsCertified(peerId, multiaddr) -> Boolean`
+- `IsCertified(peer_id, multiaddr) -> Boolean`
   - has a particular address been self-certified by the given peer?
 
 
