@@ -22,11 +22,14 @@ Peers advertising a multiaddr that includes a handshake protocol MUST support Mu
 
 #### TCP Simultaneous Open
 
-TCP allows the establishment of a connection if two endpoints start initiating a connection at the same time. This is called TCP Simultaneous Open. For libp2p, this is problematic, since most stream multiplexers assign stream IDs based on the role (client or server) of and endpoint.
+TCP allows the establishment of a connection if two endpoints start initiating a connection at the same time. This is called TCP Simultaneous Open. For libp2p, on the one hand, this poses a problem, since most stream multiplexers assign stream IDs based on the role (client or server) of an endpoint. On the other hand, it can be used as a hole punching technique to facilitate NAT traversal.
 
-It is therefore desirable to fail a connection attempt as early as possible, if a TCP Simultaneous Open occurs. TLS 1.3 and Noise provide this guarantee: For example, the TLS handshake will fail if an endpoint receives a ClientHello instead of a ServerHello as a response to its ClientHello.
+TLS as well as Noise will fail the handshake if both endpoints act as clients. In case of such a handshake failure, the two endpoints need to restart the handshake. Endpoints MUST NOT close the underlying TCP connection in this case. Implementations SHOULD specifically test for this type of handshake failure, and not treat any handshake failure as a potential Simultaneous Open.
 
-Since secio doesn't provide this property, secio cannot be used with Multiselect 2.0.
+To determine the roles in the second handshake attempt, endpoints calculate the SHA-256 hash of the handshake messages that were sent and received (including any error message(s) that the handshake protocol might have sent) during the failed handshake attempt.
+The peer that sent the messages resulting in the numerically smaller hash value acts a client in the second handshake attempt, the peer that sent the messages resulting in the numerically larger hash value acts as a server.
+
+Since secio assign roles during the handshake, it is not possible to detect a Simultaneous Open in this case. Therefore, secio MUST NOT be used with Multiselect 2.0.
 
 ### Stream Multiplexer Selection
 
