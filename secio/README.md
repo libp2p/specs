@@ -124,8 +124,7 @@ negotiation.
 ### Message framing
 
 All messages sent over the wire are prefixed with the message length in bytes,
-encoded as an unsigned variable length integer as defined
-by the [multiformats unsigned-varint spec][unsigned-varint].
+encoded as an unsigned 32-bit Big Endian integer.
 
 ### Proposal Generation
 
