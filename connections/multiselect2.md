@@ -35,9 +35,12 @@ Since secio assign roles during the handshake, it is not possible to detect a Si
 
 This section only applies if Multiselect 2 is run over a transport that is not natively multipexed. Transports that provide stream multiplexing on the transport layer (e.g. QUIC) don't need to do anything described in this section.
 
-Some handshake protocols (TLS 1.3, some variants of Noise (**TODO**: specify which)) support sending of *Early Data*. Early Data can be sent by the server after receiving the first handshake message from the client. It is encrypted, however, at that point of the handshake the client's identity is not yet verified.
+Some handshake protocols (TLS 1.3, Noise) support sending of *Early Data*. 
 
 In Multiselect 2 the server makes use of Early Data by sending a list of stream multiplexers. This ensures that the client can choose a stream multiplexer as soon as the handshake completes (or fail the connection if it doesn't support any stream multiplexer offered by the server).
+
+When using TLS 1.3, the server can send Early Data after it receives the ClientHello. Early Data is encrypted, but at this point of the handshake the client's identity is not yet verified.
+While Noise in principle allows sending of unencrypted data, endpoints MUST NOT use this to send their list of stream multiplexers. An endpoint MAY send it as soon it is possible to send encrypted data, even if the peers' identity is not verified at that point.
 
 Note that this negotiation scheme allows peers to negotiate a "monoplexed" connection, i.e. a connection that doesn't use any stream multiplexer. Endpoints can offer support for monoplexed connections by offering the `/monoplex` stream multiplexer.
 
@@ -49,7 +52,7 @@ Handshake protocols (or implementations of handshake protocols) that don't suppo
 
 #### 0-RTT
 
-When using 0-RTT session resumption as offered by TLS 1.3 and some variants of Noise (**TODO**: specify which), the endpoints MUST remember the negotiated stream multiplexer used on the original connection. This ensures that the client can send application data in the first flight when resuming a connection.
+When using 0-RTT session resumption as offered by TLS 1.3 and Noise, the endpoints MUST remember the negotiated stream multiplexer used on the original connection. This ensures that the client can send application data in the first flight when resuming a connection.
 
 ## Protocol Speficiation
 
