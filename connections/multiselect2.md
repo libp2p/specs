@@ -12,9 +12,9 @@ By using protobufs for all control messages, Multiselect 2.0 provides an easy pa
 
 ## High-Level Overview
 
-### Handshake Protocol Selection
+### Secure Channel Selection
 
-Handshake protocols are not being negotiated, but are announced in the peers' multiaddrs. 
+Conversely to multistream-select 1.0, secure channel protocols are not dynamically negotiated in multiselect 2.0. Instead, they are announced upfront in the peer multiaddrs. It is up to the implementers to decide whether each secure channel is exposed over a different port, or if a single port handles all secure channels, and a demultiplexing strategy is used to identify which protocol is being used.
 
 **TODO**: Do we need to describe the format here? I guess we don't, but we will probably need another document for that change, and we can link to it from here.
 
