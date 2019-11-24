@@ -26,8 +26,7 @@ TCP allows the establishment of a connection if two endpoints start initiating a
 
 TLS as well as Noise will fail the handshake if both endpoints act as clients. In case of such a handshake failure, the two endpoints need to restart the handshake. Endpoints MUST NOT close the underlying TCP connection in this case. Implementations SHOULD specifically test for this type of handshake failure, and not treat any handshake failure as a potential Simultaneous Open.
 
-To determine the roles in the second handshake attempt, endpoints calculate the SHA-256 hash of the handshake messages that were sent and received (including any error message(s) that the handshake protocol might have sent) during the failed handshake attempt.
-The peer that sent the messages resulting in the numerically smaller hash value acts a client in the second handshake attempt, the peer that sent the messages resulting in the numerically larger hash value acts as a server.
+To determine the roles in the second handshake attempt, endpoints compare the SHA-256 hashes of their peer IDs. The peer with the numerically smaller hash value acts as a client in the second handshake attempt, the peer with the numerically larger hash value acts as a server.
 
 Since secio assign roles during the handshake, it is not possible to detect a Simultaneous Open in this case. Therefore, secio MUST NOT be used with Multiselect 2.0.
 
