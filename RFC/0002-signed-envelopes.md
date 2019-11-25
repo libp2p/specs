@@ -96,8 +96,8 @@ When signing, a peer will prepare a buffer by concatenating the following:
 - The length of the `payload` field in bytes
 - The value of the `payload` field
 
-The length values for each field are encoded as 64-bit unsigned integers in
-network order (big-endian).
+The length values for each field are encoded as unsigned variable-length
+integers as defined in the [multiformats uvarint spec][uvarint].
 
 Then they will sign the buffer according to the rules in the [peer id
 spec][peer-id-spec] and set the `signature` field accordingly.
