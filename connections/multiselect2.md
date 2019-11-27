@@ -14,7 +14,9 @@ By using protobufs for all control messages, Multiselect 2.0 provides an easy pa
 
 ### Secure Channel Selection
 
-Conversely to multistream-select 1.0, secure channel protocols are not dynamically negotiated in multiselect 2.0. Instead, they are announced upfront in the peer multiaddrs. It is up to the implementers to decide whether each secure channel is exposed over a different port, or if a single port handles all secure channels, and a demultiplexing strategy is used to identify which protocol is being used.
+Conversely to multistream-select 1.0, secure channel protocols are not dynamically negotiated in-band. Instead, they are announced upfront in the peer multiaddrs (<add link to multiaddr spec>). This way, implementations can jump straight into a cryptographic handshake, thus curtailing the possibility of packet-inspection-based censorship and dynamic downgrade attacks.
+
+It is up to the implementers to decide whether each secure channel is exposed over a different port, or if a single port handles all secure channels, and a demultiplexing strategy is used to identify which protocol is being used.
 
 **TODO**: Do we need to describe the format here? I guess we don't, but we will probably need another document for that change, and we can link to it from here.
 
@@ -53,7 +55,7 @@ Handshake protocols (or implementations of handshake protocols) that don't suppo
 
 When using 0-RTT session resumption as offered by TLS 1.3 and Noise, the endpoints MUST remember the negotiated stream multiplexer used on the original connection. This ensures that the client can send application data in the first flight when resuming a connection.
 
-## Protocol Speficiation
+## Protocol Specification
 
 All messages are Protobuf messages using the `proto3` syntax. Every message is wrapped by the `Multiselect` message:
 
