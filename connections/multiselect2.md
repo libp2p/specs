@@ -5,10 +5,10 @@
 Multiselect 2.0 replaces the Multistream protocol. Compared to its predecessor, it offers:
 
 1. Downgrade protection for the security protocol negotiation.
-2. Zero-rountrip stream multiplexer negotiation for handshake protocols that take advantage of early data mechanisms (one-roundtrip negotation for protocols / implementations that don't).
+2. Zero-roundtrip stream multiplexer negotiation for handshake protocols that take advantage of early data mechanisms (one-roundtrip negotiation for protocols / implementations that don't).
 3. Compression for the protocol identifiers of frequently used protocols.
 
-By using protobufs for all control messages, Multiselect 2.0 provides an easy path for future protocol upgrades. The protobuf format guarantees that unknown field in a message will be skipped, thus future version of the protocol can add new fields that signal support for new protocol features.
+By using protobufs for all control messages, Multiselect 2.0 provides an easy path for future protocol upgrades. The protobuf format guarantees that unknown fields in a message will be skipped, thus future versions of the protocol can add new fields that signal support for new protocol features.
 
 ## High-Level Overview
 
@@ -34,7 +34,7 @@ Since secio assign roles during the handshake, it is not possible to detect a Si
 
 ### Stream Multiplexer Selection
 
-This section only applies if Multiselect 2 is run over a transport that is not natively multipexed. Transports that provide stream multiplexing on the transport layer (e.g. QUIC) don't need to do anything described in this section.
+This section only applies if Multiselect 2 is run over a transport that is not natively multiplexed. Transports that provide stream multiplexing on the transport layer (e.g. QUIC) don't need to do anything described in this section.
 
 Some handshake protocols (TLS 1.3, Noise) support sending of *Early Data*. 
 
@@ -87,12 +87,12 @@ message Offer {
 }
 ```
 
-The `Use` message is sent in response to the `Offer`. And endpoint MUST treat the receipt of a `Use` message before having sent a `Offer` message on the stream as a connection error.
-If none of the protocol(s) listed in the `Offer` message are acceptable, and endpoint resets both the send- and the receive-side of the stream.
+The `Use` message is sent in response to the `Offer`. An endpoint MUST treat the receipt of a `Use` message before having sent an `Offer` message on the stream as a connection error.
+If none of the protocol(s) listed in the `Offer` message are acceptable, an endpoint MUST reset both the send- and the receive-side of the stream.
 
-If an endpoint receives an  `Offer` message that only offers a single protocol, it accepts this protocol by sending an empty `Use` message (i.e. a message that doesn't list any `protocol`), or a `Use` message that assigns a protocol id (see below). Sending an empty `Use` message in response to a`Offer` message that offers multiple protocols is not permitted, and MUST be treated as a connection error by an endpoint.
+If an endpoint receives an  `Offer` message that only offers a single protocol, it accepts this protocol by sending an empty `Use` message (i.e. a message that doesn't list any `protocol`), or a `Use` message that assigns a protocol id (see below). Sending an empty `Use` message in response to an `Offer` message that offers multiple protocols is not permitted, and MUST be treated as a connection error by an endpoint.
 
-If an endpoint receives a `Offer` message that offers multiple protocols, it chooses an application protocol that it would like to speak on this stream. It informs the peer about its choice by sending its selection in the `protocol` field of the `Use` message.
+If an endpoint receives an `Offer` message that offers multiple protocols, it chooses an application protocol that it would like to speak on this stream. It informs the peer about its choice by sending its selection in the `protocol` field of the `Use` message.
 
 When choosing a protocol, an endpoint can allow its peer to save bytes on the wire for future use of the same protocol by assigning a numeric identifier for the protocol by sending an `id`. The identifier is valid for the lifetime of the connection. The identifier must be unique for the protocol, an endpoint MUST NOT use the same identifier for different protocols.
 
