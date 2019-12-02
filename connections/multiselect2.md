@@ -95,7 +95,7 @@ message Offer {
             uint64 id = 2;
         }
     }
-    repeated Protocol protocols = 1;
+    Protocol protocols = 1;
 }
 ```
 
@@ -106,11 +106,7 @@ And the third one is the `Use` message:
 # By using an id (instead of a name), an endpoint can provide the peer
 # an abbreviation to use for future uses of the same protocol.
 message Use {
-    message Protocol {
-        uint64 id = 1;
-        string name = 2;
-    }
-    Protocol protocol = 1;
+    uint64 id;
 }
 ```
 
@@ -119,19 +115,13 @@ message Use {
 The `OfferMultiplexer` message is used to select a stream multiplexer to use on a connection. Each endpoint MUST send this message exactly once as the first message on a transport that does not support native stream multiplexing. This message MUST NOT be sent on transports that support native stream multiplexing (e.g. QUIC), and it MUST NOT be sent at any later moment during the connection.
 Once an endpoint has both sent and received the `OfferMultiplexer` message, it determines the stream multiplexer to use on the connection as described in {{stream-multiplexer-selection}}. From this moment, it now has a multiplexed connection that can be used to exchange application data.
 
-An endpoint uses the `Offer` message to initiate a conversation on a new stream. The `Offer` message can be used in two distinct scenarios:
-1. The endpoint knows exactly which protocol it wants to use. It then lists this protocol in the `Offer` message.
-2. The endpoint wants to use any of a set of protocols, and lets the peer decide which one. It then lists the set of protocols in the `Offer` message.
-
-A `Protocol` is the application protocol spoken on top of an ordered byte stream. The `name` of a protocol is the protocol identifier, e.g. `/ipfs/ping/1.0.0`. The `id` is a numeric abbreviation for this protocol (see below for details how `id`s are assigned).
-If the endpoint only selects a single protocol, it MAY start sending application data right after the protobuf message. Since it has not received confirmation if the peer actually supports the protocol, any such data might be lost in that case. If the endpoint selects multiple protocols, it MUST wait for the peer's choice of the application protocol (see description of the `Use` message) before sending application.
+An endpoint uses the `Offer` message to initiate a conversation on a new stream. The `Offer` names the protocol that an endpoint wants to use on the stream. A `Protocol` is the application protocol spoken on top of an ordered byte stream. The `name` of a protocol is the protocol identifier, e.g. `/ipfs/ping/1.0.0`. The `id` is a numeric abbreviation for this protocol (see below for details how `id`s are assigned).
+An endpoint MAY start sending application data right after the protobuf message. Since it has not received confirmation if the peer actually supports the protocol, any such data might be lost in that case.
 
 The `Use` message is sent in response to the `Offer`. An endpoint MUST treat the receipt of a `Use` message before having sent an `Offer` message on the stream as a connection error.
-If none of the protocol(s) listed in the `Offer` message are acceptable, an endpoint MUST reset both the send- and the receive-side of the stream.
+If the protocol offered in the `Offer` message is not acceptable, an endpoint MUST reset both the send- and the receive-side of the stream.
 
-If an endpoint receives an  `Offer` message that only offers a single protocol, it accepts this protocol by sending an empty `Use` message (i.e. a message that doesn't list any `protocol`), or a `Use` message that assigns a protocol id (see below). Sending an empty `Use` message in response to an `Offer` message that offers multiple protocols is not permitted, and MUST be treated as a connection error by an endpoint.
-
-If an endpoint receives an `Offer` message that offers multiple protocols, it chooses an application protocol that it would like to speak on this stream. It informs the peer about its choice by sending its selection in the `protocol` field of the `Use` message.
+An endpoint accepts the protocol offered in the `Offer` message by sending an empty `Use` message (i.e. a message that doesn't list any `protocol`), or a `Use` message that assigns a protocol id (see below).
 
 When choosing a protocol, an endpoint can allow its peer to save bytes on the wire for future use of the same protocol by assigning a numeric identifier for the protocol by sending an `id`. The identifier is valid for the lifetime of the connection. The identifier must be unique for the protocol, an endpoint MUST NOT use the same identifier for different protocols.
 
