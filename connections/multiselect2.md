@@ -103,10 +103,14 @@ message Use {
 
 ### Protocol Description
 
-The `Offer` message is used to initiate a conversation on a new stream. It contains either a single or multiple protocols that the endpoint would like to use on the stream.
+An endpoint uses the `Offer` message to initiate a conversation on a new stream. The `Offer` message can be used in two distinct scenarios:
+1. The endpoint knows exactly which protocol it wants to use. It then lists this protocol in the `Offer` message.
+2. The endpoint wants to use any of a set of protocols, and lets the peer decide which one. It then lists the set of protocols in the `Offer` message.
+
 A `Protocol` is the application protocol spoken on top of an ordered byte stream. The `name` of a protocol is the protocol identifier, e.g. `/ipfs/ping/1.0.0`. The `id` is a numeric abbreviation for this protocol (see below for details how `id`s are assigned).
-If the endpoint only selects a single protocol, it MAY start sending application data right after the protobuf message. Since it has not received confirmation if the peer actually supports the protocol, any such data might be lost in that case.
-If the endpoint selects multiple protocols, it MUST wait for the peer's choice of the application protocol (see description of the `Use` message) before sending application.
+If the endpoint only selects a single protocol, it MAY start sending application data right after the protobuf message. Since it has not received confirmation if the peer actually supports the protocol, any such data might be lost in that case. If the endpoint selects multiple protocols, it MUST wait for the peer's choice of the application protocol (see description of the `Use` message) before sending application.
+
+Listing a set of protocols is useful for stream multiplexer selection. A server that supports multiple stream multiplexers will send its list of multiplexers in Early Data (or right after completion of the handshake, see above).
 
 The `Use` message is sent in response to the `Offer`. An endpoint MUST treat the receipt of a `Use` message before having sent an `Offer` message on the stream as a connection error.
 If none of the protocol(s) listed in the `Offer` message are acceptable, an endpoint MUST reset both the send- and the receive-side of the stream.
