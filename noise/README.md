@@ -8,7 +8,7 @@
 
 Authors: [@yusefnapora]
 
-Interest Group: [@raulk], [@tomaka], [@romanb], [@shahankhatch], [@Mikerah]
+Interest Group: [@raulk], [@tomaka], [@romanb], [@shahankhatch], [@Mikerah], [@djrtwo], [@dryajov], [@mpetrunic], [@AgeManning], [@morrigan], [@araskachoi]
 
 [@yusefnapora]: https://github.com/yusefnapora
 [@raulk]: https://github.com/raulk
@@ -16,7 +16,12 @@ Interest Group: [@raulk], [@tomaka], [@romanb], [@shahankhatch], [@Mikerah]
 [@romanb]: https://github.com/romanb
 [@shahankhatch]: https://github.com/shahankhatch
 [@Mikerah]: https://github.com/Mikerah
-
+[@djrtwo]: https://github.com/djrtwo
+[@dryajov]: https://github.com/dryajov
+[@mpetrunic]: https://github.com/mpetrunic
+[@AgeManning]: https://github.com/AgeManning
+[@morrigan]: https://github.com/morrigan
+[@araskachoi]: https://github.com/araskachoi
 
 See the [lifecycle document][lifecycle-spec] for context about maturity level
 and spec status.
