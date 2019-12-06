@@ -288,8 +288,8 @@ each party performs the following actions:
 3. Writes the result on the encrypted channel, prefixed with a Protobuf varint
    length prefix. We call this payload the "handshake seal".
 4. Awaits to receive the handshake seal from its peer.
-5. Verifies the peer's seal signature against the peer's libp2p public key, and its
-   local value of `HandshakeHash`.
+5. Verifies the peer's seal signature against the peer's libp2p public key, and
+   its local value of `HandshakeHash`.
 6. If the signature verification passes, the Noise state machine is destroyed
    and the encrypted channel is handed over to the libp2p stack. If the
    verification fails, the party terminates the network connection immediately.
@@ -398,8 +398,8 @@ key has changed, they may initiate an [`XXfallback`](#xxfallback) handshake,
 using the ephemeral public key from the failed `IK` handshake message as
 pre-message knowledge.
 
-Each handshake message will include a [payload](#the-libp2p-handshake-payload) that identifies the sender and
-authenticates the static Noise key.
+Each handshake message will include a [payload](#the-libp2p-handshake-payload)
+that identifies the sender and authenticates the static Noise key.
 
 #### XXfallback
 
@@ -428,8 +428,8 @@ key is obtained from her initial `IK` message, moving it to the pre-message
 section of the handshake pattern. Essentially, the failed `IK` message serves
 the same role as the first handshake message in the standard `XX` pattern.
 
-Each handshake message will include a [payload](#the-libp2p-handshake-payload) that identifies the sender and
-authenticates the static Noise key.
+Each handshake message will include a [payload](#the-libp2p-handshake-payload)
+that identifies the sender and authenticates the static Noise key.
 
 #### Noise Pipes Message Flow
 
