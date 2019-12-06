@@ -233,7 +233,7 @@ These payloads MUST be inserted into the first message of the handshake pattern
       the fresh cryptographic material is necessary. This is performed in
       message 3.
 
-When decrypted, the signed payload has the structure described in [Encrypted
+When decrypted, the payload has the structure described in [Encrypted
 Payloads](#encrypted-payloads), consisting of a length-prefixed `body` field
 followed by optional padding.
 
@@ -265,10 +265,6 @@ Upon receiving the handshake payload, peers MUST decode the public key from the
 `identity_key` field into a usable form. The key MUST then be used to validate
 the `identity_sig` field against the static Noise key received in the handshake.
 If the signature is invalid, the connection MUST be terminated immediately.
-
-If a noise-libp2p implementation does not expose an API for early data, they
-MUST still validate the signature upon receiving a non-empty `data` field and
-abort the connection if it is invalid.
 
 #### Handshake sealing
 
