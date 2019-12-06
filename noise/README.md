@@ -178,7 +178,7 @@ exposure.
 
 To authenticate the static Noise key used in a handshake, noise-libp2p includes
 a signature of the static Noise public key in a [handshake
-payload](#the-libp2p-signed-handshake-payload). This signature is produced with
+payload](#the-libp2p-handshake-payload). This signature is produced with
 the private libp2p identity key, which proves that the sender was in possession
 of the private identity key at the time the payload was generated.
 
@@ -203,8 +203,8 @@ libp2p components after the handshake is complete and the payload signature has
 been validated. If the handshake fails for any reason, the early data payload
 MUST be discarded immediately.
 
-Any early data provided to noise-libp2p MUST be included in the [signed
-handshake payload](#the-libp2p-signed-handshake-payload) as a byte string
+Any early data provided to noise-libp2p MUST be included in a [handshake 
+payload](#the-libp2p-handshake-payload) as a byte string
 without alteration by the noise-libp2p implementation, and a valid signature of
 the early data MUST be included as described below.
 
@@ -288,8 +288,8 @@ each party performs the following actions:
 3. Writes the result on the encrypted channel, prefixed with a Protobuf varint
    length prefix. We call this payload the "handshake seal".
 4. Awaits to receive the handshake seal from its peer.
-5. Verifies the signature against the libp2p public key of its peer, and its
-   local value of `HandshakeHash`.
+5. Verifies the peer's seal signature against the peer's libp2p public key, and
+   its local value of `HandshakeHash`.
 6. If the signature verification passes, the Noise state machine is destroyed
    and the encrypted channel is handed over to the libp2p stack. If the
    verification fails, the party terminates the network connection immediately.
@@ -333,8 +333,8 @@ to the other party.
 The first handshake message contains the initiator's ephemeral public key, which
 allows subsequent key exchanges and message payloads to be encrypted.
 
-The second and third handshake messages include a [signed handshake
-payload](#the-libp2p-signed-handshake-payload), which contains a signature
+The second and third handshake messages include a 
+[payload](#the-libp2p-handshake-payload), which contains a signature
 authenticating the sender's static Noise key as described in the [Static Key
 Authentication section](#static-key-authentication) and may include other
 internal libp2p data.
@@ -398,9 +398,8 @@ key has changed, they may initiate an [`XXfallback`](#xxfallback) handshake,
 using the ephemeral public key from the failed `IK` handshake message as
 pre-message knowledge.
 
-Each handshake message will include a [libp2p signed handshake
-payload](#the-libp2p-signed-handshake-payload) that identifies the sender and
-authenticates the static Noise key.
+Each handshake message will include a [payload](#the-libp2p-handshake-payload)
+that identifies the sender and authenticates the static Noise key.
 
 #### XXfallback
 
@@ -429,9 +428,8 @@ key is obtained from her initial `IK` message, moving it to the pre-message
 section of the handshake pattern. Essentially, the failed `IK` message serves
 the same role as the first handshake message in the standard `XX` pattern.
 
-Each handshake message will include a [libp2p signed handshake
-payload](#the-libp2p-signed-handshake-payload) that identifies the sender and
-authenticates the static Noise key.
+Each handshake message will include a [payload](#the-libp2p-handshake-payload)
+that identifies the sender and authenticates the static Noise key.
 
 #### Noise Pipes Message Flow
 
