@@ -218,7 +218,7 @@ messages. We leverage this construct to transmit:
 2. arbitrary data private to the libp2p stack. This facility is not exposed to
    userland. Examples of usage include streamlining muxer selection.
 
-These payloads MUST be inserted the first message of the handshake pattern
+These payloads MUST be inserted into the first message of the handshake pattern
 **that guarantees secrecy**.
 
 * In XX-initiated handshakes, the initiator will send its payload in message 3
@@ -242,8 +242,8 @@ The `body` of the payload contains a serialized [protobuf][protobuf]
 
 ``` protobuf
 message NoiseHandshakePayload {
-	bytes identity_key = 1;
-	bytes identity_sig = 2;
+  bytes identity_key = 1;
+  bytes identity_sig = 2;
   bytes data         = 3;
 }
 ```
