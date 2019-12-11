@@ -38,10 +38,13 @@ This section only applies if Multiselect 2 is run over a transport that is not n
 
 Some handshake protocols (TLS 1.3, Noise) support sending of *Early Data*. 
 
-In Multiselect 2 the server makes use of Early Data by sending a list of stream multiplexers. This ensures that the client can choose a stream multiplexer as soon as the handshake completes (or fail the connection if it doesn't support any stream multiplexer offered by the server).
+In Multiselect 2 endpoints make use of Early Data to speed up stream multiplexcer selection. As soon as an endpoints reaches a state during the handshake where it can send encrypted application data, it sends a list of supported stream multiplexers. The first entry of the client's list of stream multiplexers is selected, thus the client SHOULD send its list ordered by preference.
 
-When using TLS 1.3, the server can send Early Data after it receives the ClientHello. Early Data is encrypted, but at this point of the handshake the client's identity is not yet verified.
+When using TLS 1.3, the server can send Early Data after it receives the ClientHello. Early Data is encrypted, but at this point of the handshake the client's identity is not yet verified. 
 While Noise in principle allows sending of unencrypted data, endpoints MUST NOT use this to send their list of stream multiplexers. An endpoint MAY send it as soon it is possible to send encrypted data, even if the peers' identity is not verified at that point.
+
+The stream multiplexer that is used in the connection is determined by intersection the lists sent by both endpoints, as follows: First all stream multiplexers that aren't supported by both endpoints are removed from the clients' list of stream multiplexers. The stream multiplexer chosen is then the first element of this list.
+If there is no overlap between the two lists, it is not possible to communicate with the peer, and an endpoint MUST close the connection.
 
 Note that this negotiation scheme allows peers to negotiate a "monoplexed" connection, i.e. a connection that doesn't use any stream multiplexer. Endpoints can offer support for monoplexed connections by offering the `/monoplex` stream multiplexer.
 
@@ -65,13 +68,23 @@ All messages are Protobuf messages using the `proto3` syntax. Every message is w
 # Wraps every message
 message Multiselect {
     oneof message {
-        Offer offer = 1;
-        Use use = 2;
+        OfferMultiplexer offerMultiplexer = 1;
+        Offer offer = 2;
+        Use use = 3;
     }
 }
 ```
 
-This document defines two messages. The first one is the `Offer` message:
+This document defines three messages. The first one is the `OfferMultiplexer` message:
+
+```protobuf
+# Offer a list of stream multiplexers.
+message OfferMultiplexer {
+    repeated string name = 1;
+}
+```
+
+The second one is the `Offer` message:
 
 ```protobuf
 # Select a list of protocols.
@@ -86,7 +99,7 @@ message Offer {
 }
 ```
 
-And the second one is the `Use` message:
+And the third one is the `Use` message:
 
 ```protobuf
 # Declare that a protocol is used on this stream.
@@ -103,14 +116,15 @@ message Use {
 
 ### Protocol Description
 
+The `OfferMultiplexer` message is used to select a stream multiplexer to use on a connection. Each endpoint MUST send this message exactly once as the first message on a transport that does not support native stream multiplexing. This message MUST NOT be sent on transports that support native stream multiplexing (e.g. QUIC), and it MUST NOT be sent at any later moment during the connection.
+Once an endpoint has both sent and received the `OfferMultiplexer` message, it determines the stream multiplexer to use on the connection as described in {{stream-multiplexer-selection}}. From this moment, it now has a multiplexed connection that can be used to exchange application data.
+
 An endpoint uses the `Offer` message to initiate a conversation on a new stream. The `Offer` message can be used in two distinct scenarios:
 1. The endpoint knows exactly which protocol it wants to use. It then lists this protocol in the `Offer` message.
 2. The endpoint wants to use any of a set of protocols, and lets the peer decide which one. It then lists the set of protocols in the `Offer` message.
 
 A `Protocol` is the application protocol spoken on top of an ordered byte stream. The `name` of a protocol is the protocol identifier, e.g. `/ipfs/ping/1.0.0`. The `id` is a numeric abbreviation for this protocol (see below for details how `id`s are assigned).
 If the endpoint only selects a single protocol, it MAY start sending application data right after the protobuf message. Since it has not received confirmation if the peer actually supports the protocol, any such data might be lost in that case. If the endpoint selects multiple protocols, it MUST wait for the peer's choice of the application protocol (see description of the `Use` message) before sending application.
-
-Listing a set of protocols is useful for stream multiplexer selection. A server that supports multiple stream multiplexers will send its list of multiplexers in Early Data (or right after completion of the handshake, see above).
 
 The `Use` message is sent in response to the `Offer`. An endpoint MUST treat the receipt of a `Use` message before having sent an `Offer` message on the stream as a connection error.
 If none of the protocol(s) listed in the `Offer` message are acceptable, an endpoint MUST reset both the send- and the receive-side of the stream.
