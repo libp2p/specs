@@ -38,7 +38,7 @@ This section only applies if Multiselect 2 is run over a transport that is not n
 
 Some handshake protocols (TLS 1.3, Noise) support sending of *Early Data*. 
 
-In Multiselect 2 endpoints make use of Early Data to speed up stream multiplexcer selection. As soon as an endpoints reaches a state during the handshake where it can send encrypted application data, it sends a list of supported stream multiplexers. The list SHOULD be ordered be ordered by descending preference.
+In Multiselect 2 endpoints make use of Early Data to speed up stream multiplexcer selection. As soon as an endpoints reaches a state during the handshake where it can send encrypted application data, it sends a list of supported stream multiplexers. The first entry of the client's list of stream multiplexers is selected, thus the client SHOULD send its list ordered by preference.
 
 When using TLS 1.3, the server can send Early Data after it receives the ClientHello. Early Data is encrypted, but at this point of the handshake the client's identity is not yet verified. 
 While Noise in principle allows sending of unencrypted data, endpoints MUST NOT use this to send their list of stream multiplexers. An endpoint MAY send it as soon it is possible to send encrypted data, even if the peers' identity is not verified at that point.
