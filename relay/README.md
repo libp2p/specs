@@ -62,7 +62,8 @@ The circuit relay is both a tunneled transport and a mounted swarm protocol. The
 
 **Notes for the reader:**
 
-- We're using the `/p2p` multiaddr protocol instead of `/ipfs` in this document. `/ipfs` is currently the canonical way of addressing a libp2p or IPFS node, but given the growing non-IPFS usage of libp2p, we'll migrate to using `/p2p`.
+- In this document, we use `/p2p/Qm...` multiaddrs. Libp2p previously used `/ipfs/Qm...` for multiaddrs you'll likely see uses of this notation in the wild. `/ipfs` and `/p2p` multiaddrs are equivalent but `/ipfs` is deprecated `/p2p` should be preferred.
+- You may also see `/ipfs/Qm...` used for _file paths_ in IPFS. These are _not_ multiaddrs and this confusion is one of the many motivations for switching to `/p2p/Qm...` multiaddrs.
 
 ## Dramatization
 
