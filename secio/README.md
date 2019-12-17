@@ -124,7 +124,8 @@ negotiation.
 ### Message framing
 
 All messages sent over the wire are prefixed with the message length in bytes,
-encoded as an unsigned 32-bit Big Endian integer.
+encoded as an unsigned 32-bit Big Endian integer. The message length should always
+be inferior to 0x800000 (or 8MiB).
 
 ### Proposal Generation
 
