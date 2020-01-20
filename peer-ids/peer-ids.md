@@ -190,7 +190,7 @@ it using [DER-encoded ASN.1.](https://wiki.openssl.org/index.php/DER)
 Peer IDs are derived by hashing the encoded public key with
 [multihash][multihash]. Keys that serialize to more than 42 bytes must be hashed
 using sha256 multihash, keys that serialize to at most 42 bytes must be hashed
-using the "identity" mulish codec.
+using the "identity" multihash codec.
 
 Specifically, to compute a peer ID of a key:
 
@@ -249,7 +249,7 @@ Examples:
 - `bafzbeie5745rpv2m6tjyuugywy4d5ewrqgqqhfnf445he3omzpjbx5xqxe` -- Peer ID (sha256) encoded as a CID
   ([inspect](http://cid.ipfs.io/#bafzbeie5745rpv2m6tjyuugywy4d5ewrqgqqhfnf445he3omzpjbx5xqxe)).
 - `QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N` -- Peer ID (sha256) encoded as a raw base58btc multihash.
-- `12D3KooWD3eckifWpRn9wQpMG9R9hX3sD158z7EqHWmweQAJU5SA` -- Peer ID (ed25519, using the "identity" multihash") encoded as a raw base58btc multihash.
+- `12D3KooWD3eckifWpRn9wQpMG9R9hX3sD158z7EqHWmweQAJU5SA` -- Peer ID (ed25519, using the "identity" multihash) encoded as a raw base58btc multihash.
 
 [multihash]: https://github.com/multiformats/multihash
 [multicodec]: https://github.com/multiformats/multicodec
