@@ -138,7 +138,7 @@ This section covers the method of [authenticating the Noise static
 key](#static-key-authentication), the [libp2p-specific
 data](#libp2p-data-in-handshake-messages) that is exchanged in handshake message
 payloads, and the set of [supported handshake
-patterns](supported-handshake-patterns).
+patterns](#supported-handshake-patterns).
 
 A brief overview of the payload security and identity hiding properties of each
 handshake pattern is included in the description of each pattern, however,
