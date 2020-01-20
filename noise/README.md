@@ -1,14 +1,16 @@
 # noise-libp2p - Secure Channel Handshake
 
-> A libp2p transport secure channel handshake built with the Noise Protocol Framework.
+> A libp2p transport secure channel handshake built with the Noise Protocol
+> Framework.
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r0, 2019-08-05  |
+| 1A              | Working Draft | Active | r1, 2020-01-20  |
 
 Authors: [@yusefnapora]
 
-Interest Group: [@raulk], [@tomaka], [@romanb], [@shahankhatch], [@Mikerah], [@djrtwo], [@dryajov], [@mpetrunic], [@AgeManning], [@morrigan], [@araskachoi]
+Interest Group: [@raulk], [@tomaka], [@romanb], [@shahankhatch], [@Mikerah],
+[@djrtwo], [@dryajov], [@mpetrunic], [@AgeManning], [@morrigan], [@araskachoi]
 
 [@yusefnapora]: https://github.com/yusefnapora
 [@raulk]: https://github.com/raulk
@@ -23,6 +25,7 @@ Interest Group: [@raulk], [@tomaka], [@romanb], [@shahankhatch], [@Mikerah], [@d
 [@morrigan]: https://github.com/morrigan
 [@araskachoi]: https://github.com/araskachoi
 
+
 See the [lifecycle document][lifecycle-spec] for context about maturity level
 and spec status.
 
@@ -32,35 +35,35 @@ and spec status.
 ## Table of Contents
 
 - [noise-libp2p - Secure Channel Handshake](#noise-libp2p---secure-channel-handshake)
-    - [Table of Contents](#table-of-contents)
-    - [Overview](#overview)
-    - [Negotiation](#negotiation)
-    - [The Noise Handshake](#the-noise-handshake)
-        - [Static Key Authentication](#static-key-authentication)
-        - [libp2p Data in Handshake Messages](#libp2p-data-in-handshake-messages)
-            - [The libp2p Signed Handshake Payload](#the-libp2p-signed-handshake-payload)
-        - [Supported Handshake Patterns](#supported-handshake-patterns)
-            - [XX](#xx)
-        - [Optimistic 0-RTT with Noise Pipes](#optimistic-0-rtt-with-noise-pipes)
-            - [IK](#ik)
-            - [XXfallback](#xxfallback)
-            - [Noise Pipes Message Flow](#noise-pipes-message-flow)
-    - [Cryptographic Primitives](#cryptographic-primitives)
-    - [Valid Noise Protocol Names](#valid-noise-protocol-names)
-    - [Wire Format](#wire-format)
-        - [Encrypted Payloads](#encrypted-payloads)
-    - [Encryption and I/O](#encryption-and-io)
-    - [libp2p Interfaces and API](#libp2p-interfaces-and-api)
-        - [Initialization](#initialization)
-        - [Secure Transport Interface](#secure-transport-interface)
-            - [NoiseConnection](#noiseconnection)
-            - [SecureOutbound](#secureoutbound)
-            - [SecureInbound](#secureinbound)
-    - [Design Considerations](#design-considerations)
-        - [No Negotiation of Noise Protocols](#no-negotiation-of-noise-protocols)
-        - [Why ChaChaPoly?](#why-chachapoly)
-        - [Distinct Noise and Identity Keys](#distinct-noise-and-identity-keys)
-        - [Why Not Noise Signatures?](#why-not-noise-signatures)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Negotiation](#negotiation)
+  - [The Noise Handshake](#the-noise-handshake)
+    - [Static Key Authentication](#static-key-authentication)
+    - [libp2p Data in Handshake Messages](#libp2p-data-in-handshake-messages)
+      - [The libp2p Handshake Payload](#the-libp2p-handshake-payload)
+    - [Supported Handshake Patterns](#supported-handshake-patterns)
+      - [XX](#xx)
+    - [Optimistic 0-RTT with Noise Pipes](#optimistic-0-rtt-with-noise-pipes)
+      - [IK](#ik)
+      - [XXfallback](#xxfallback)
+      - [Noise Pipes Message Flow](#noise-pipes-message-flow)
+  - [Cryptographic Primitives](#cryptographic-primitives)
+  - [Valid Noise Protocol Names](#valid-noise-protocol-names)
+  - [Wire Format](#wire-format)
+    - [Encrypted Payloads](#encrypted-payloads)
+  - [Encryption and I/O](#encryption-and-io)
+  - [libp2p Interfaces and API](#libp2p-interfaces-and-api)
+    - [Initialization](#initialization)
+    - [Secure Transport Interface](#secure-transport-interface)
+      - [NoiseConnection](#noiseconnection)
+      - [SecureOutbound](#secureoutbound)
+      - [SecureInbound](#secureinbound)
+  - [Design Considerations](#design-considerations)
+    - [No Negotiation of Noise Protocols](#no-negotiation-of-noise-protocols)
+    - [Why ChaChaPoly?](#why-chachapoly)
+    - [Distinct Noise and Identity Keys](#distinct-noise-and-identity-keys)
+    - [Why Not Noise Signatures?](#why-not-noise-signatures)
 
 ## Overview
 
@@ -71,9 +74,8 @@ with verifiable security properties.
 This document specifies noise-libp2p, a libp2p channel security handshake built
 using the Noise Protocol Framework. As a framework for building protocols rather
 than a protocol itself, Noise presents a large decision space with many
-tradeoffs. The [Design Considerations
-section](#design-considerations) goes into detail about the
-choices made when designing the protocol.
+tradeoffs. The [Design Considerations section](#design-considerations) goes into
+detail about the choices made when designing the protocol.
 
 Secure channels in libp2p are established with the help of a transport upgrader,
 a component that layers security and stream multiplexing over "raw" connections
@@ -98,9 +100,9 @@ traffic. The [Noise Handshake section](#the-noise-handshake) describes the
 libp2p-specific data is exchanged during the
 handshake](#libp2p-data-in-handshake-messages). 
 
-During the handshake, the static
-DH key used for Noise is authenticated using the libp2p identity keypair, as
-described in the [Static Key Authentication section](#static-key-authentication).
+During the handshake, the static DH key used for Noise is authenticated using
+the libp2p identity keypair, as described in the [Static Key Authentication
+section](#static-key-authentication).
 
 Following a successful handshake, peers use the resulting encryption keys to
 send ciphertexts back and forth. The format for transport messages and the wire
@@ -207,56 +209,63 @@ handshake payload](#the-libp2p-signed-handshake-payload) as a byte string
 without alteration by the noise-libp2p implementation, and a valid signature of
 the early data MUST be included as described below.
 
-#### The libp2p Signed Handshake Payload
+#### The libp2p Handshake Payload
 
-libp2p-specific data, including the signature used for static key
-authentication, is transmitted in Noise handshake message payloads. When
-decrypted, the message payload has the structure described in [Encrypted
+The Noise Protocol Framework caters for sending early data alongside handshake
+messages. We leverage this construct to transmit:
+
+1. the libp2p identity key along with a signature, to authenticate each party to
+   the other.
+2. arbitrary data private to the libp2p stack. This facility is not exposed to
+   userland. Examples of usage include streamlining muxer selection.
+
+These payloads MUST be inserted into the first message of the handshake pattern
+**that guarantees secrecy**.
+
+* In XX-initiated handshakes, the initiator will send its payload in message 3
+  (closing message), whereas the responder will send theirs in message 2 (their
+  only message).
+* In IK-initiated handshakes, the initiator will optimistically send its payload
+  in message 1 (as it satisfies the guarantee). Next, this case bifurcates:
+    * If the responder continues the IK handshake, it will send its payload in
+      message 2. The handshake ends.
+    * If the responder fall backs to `XXfallback`, it will have failed to
+      decrypt the payload in message 1. A retransmission from the initiator with
+      the fresh cryptographic material is necessary. This is performed in
+      message 3.
+
+When decrypted, the payload has the structure described in [Encrypted
 Payloads](#encrypted-payloads), consisting of a length-prefixed `body` field
-followed by optional padding. The `body` of the payload contains a serialized
-[protobuf][protobuf] message with the following schema:
+followed by optional padding.
+
+The `body` of the payload contains a serialized [protobuf][protobuf]
+`NoiseHandshakePayload` message with the following schema:
 
 ``` protobuf
 message NoiseHandshakePayload {
-	bytes libp2p_key = 1;
-	bytes noise_static_key_signature = 2;
-    bytes libp2p_data = 3;
-    bytes libp2p_data_signature = 4;
+  bytes identity_key = 1;
+  bytes identity_sig = 2;
+  bytes data         = 3;
 }
 ```
 
-The `libp2p_key` field contains a serialized `PublicKey` message as defined in
-the [peer id spec][peer-id-spec].
+The `identity_key` field contains a serialized `PublicKey` message as defined
+in the [peer id spec][peer-id-spec].
 
-The `noise_static_key_signature` field is produced using the libp2p identity
-private key according to the [signing rules in the peer id
+The `identity_sig` field is produced using the libp2p identity private key
+according to the [signing rules in the peer id
 spec][peer-id-spec-signing-rules]. The data to be signed is the UTF-8 string
 `noise-libp2p-static-key:`, followed by the Noise static public key, encoded
 according to the rules defined in [section 5 of RFC 7748][rfc-7748-sec-5].
 
-The `libp2p_data` field contains the "early data" provided to the Noise module
-when initiating the handshake, if any. The structure of this data is opaque to
-noise-libp2p and is expected to be defined in a future iteration of the
-connection establishment spec.
-
-If `libp2p_data` is non-empty, the `libp2p_data_signature` field MUST contain a
-signature produced with the libp2p identity key. The data to be signed is the
-UTF-8 string `noise-libp2p-early-data:` followed by the contents of the
-`libp2p_data` field.
+The `data` field contains the "early data" provided to the Noise module when
+initiating the handshake, if any. The structure of this data is opaque to
+noise-libp2p and is defined in the connection establishment specs.
 
 Upon receiving the handshake payload, peers MUST decode the public key from the
-`libp2p_key` field into a usable form. The key MUST be used to validate the
-`noise_static_key_signature` field against the static Noise key received in the
-handshake. If the signature is invalid, the connection MUST be terminated
-immediately.
-
-If the `libp2p_data` field is non-empty, the `libp2p_data_signature` MUST be
-validated against the supplied `libp2p_data`. If the signature is invalid, the
-connection MUST be terminated immediately.
-
-If a noise-libp2p implementation does not expose an API for early data, they
-MUST still validate the signature upon receiving a non-empty `libp2p_data`
-field and abort the connection if it is invalid.
+`identity_key` field into a usable form. The key MUST then be used to validate
+the `identity_sig` field against the static Noise key received in the handshake.
+If the signature is invalid, the connection MUST be terminated immediately.
 
 ### Supported Handshake Patterns
 
@@ -307,7 +316,8 @@ The XX handshake MUST be supported by noise-libp2p implementations.
 
 A variation on the `XX` handshake, [`XXfallback`](#xxfallback) can be optionally
 enabled to support [Optimistic 0-RTT with Noise
-Pipes](#optimistic-0-rtt-with-noise-pipes) and is described in that context below.
+Pipes](#optimistic-0-rtt-with-noise-pipes) and is described in that context
+below.
 
 ### Optimistic 0-RTT with Noise Pipes
 
@@ -482,7 +492,8 @@ protocol name depends on the handshake pattern in use.
 The `Noise_XX_25519_ChaChaPoly_SHA256` protocol MUST be supported by all
 implementations.
 
-Implementations that support Noise Pipes will also support the following Noise protocols:
+Implementations that support Noise Pipes will also support the following Noise
+protocols:
 
 - `Noise_IK_25519_ChaChaPoly_SHA256`
 - `Noise_XXfallback_25519_ChaChaPoly_SHA256`
@@ -754,7 +765,7 @@ unsupported types like RSA.
 [npf-handshake-indistinguishability]: https://noiseprotocol.org/noise.html#handshake-indistinguishability
 [npf-handshake-state]: https://noiseprotocol.org/noise.html#the-handshakestate-object
 [npf-cipher-state]: https://noiseprotocol.org/noise.html#the-cipherstate-object
-
+[npf-channel-binding]: https://noiseprotocol.org/noise.html#channel-binding
 
 [rfc-7748-sec-5]: https://tools.ietf.org/html/rfc7748#section-5
 [protobuf]: https://developers.google.com/protocol-buffers/
