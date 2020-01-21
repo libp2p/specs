@@ -10,7 +10,8 @@
 Authors: [@yusefnapora]
 
 Interest Group: [@raulk], [@tomaka], [@romanb], [@shahankhatch], [@Mikerah],
-[@djrtwo], [@dryajov], [@mpetrunic], [@AgeManning], [@morrigan], [@araskachoi]
+[@djrtwo], [@dryajov], [@mpetrunic], [@AgeManning], [@morrigan], [@araskachoi],
+[@mhchia]
 
 [@yusefnapora]: https://github.com/yusefnapora
 [@raulk]: https://github.com/raulk
@@ -24,6 +25,7 @@ Interest Group: [@raulk], [@tomaka], [@romanb], [@shahankhatch], [@Mikerah],
 [@AgeManning]: https://github.com/AgeManning
 [@morrigan]: https://github.com/morrigan
 [@araskachoi]: https://github.com/araskachoi
+[@mhchia]: https://github.com/mhchia
 
 
 See the [lifecycle document][lifecycle-spec] for context about maturity level
