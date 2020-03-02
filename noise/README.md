@@ -181,7 +181,7 @@ exposure.
 
 To authenticate the static Noise key used in a handshake, noise-libp2p includes
 a signature of the static Noise public key in a [handshake
-payload](#the-libp2p-signed-handshake-payload). This signature is produced with
+payload](#the-libp2p-handshake-payload). This signature is produced with
 the private libp2p identity key, which proves that the sender was in possession
 of the private identity key at the time the payload was generated.
 
@@ -206,8 +206,7 @@ libp2p components after the handshake is complete and the payload signature has
 been validated. If the handshake fails for any reason, the early data payload
 MUST be discarded immediately.
 
-Any early data provided to noise-libp2p MUST be included in the [signed
-handshake payload](#the-libp2p-signed-handshake-payload) as a byte string
+Any early data provided to noise-libp2p MUST be included in the [handshake payload](#the-libp2p-handshake-payload) as a byte string
 without alteration by the noise-libp2p implementation, and a valid signature of
 the early data MUST be included as described below.
 
@@ -308,8 +307,8 @@ to the other party.
 The first handshake message contains the initiator's ephemeral public key, which
 allows subsequent key exchanges and message payloads to be encrypted.
 
-The second and third handshake messages include a [signed handshake
-payload](#the-libp2p-signed-handshake-payload), which contains a signature
+The second and third handshake messages include a [handshake
+payload](#the-libp2p-handshake-payload), which contains a signature
 authenticating the sender's static Noise key as described in the [Static Key
 Authentication section](#static-key-authentication) and may include other
 internal libp2p data.
@@ -374,8 +373,8 @@ key has changed, they may initiate an [`XXfallback`](#xxfallback) handshake,
 using the ephemeral public key from the failed `IK` handshake message as
 pre-message knowledge.
 
-Each handshake message will include a [libp2p signed handshake
-payload](#the-libp2p-signed-handshake-payload) that identifies the sender and
+Each handshake message will include a [libp2p handshake
+payload](#the-libp2p-handshake-payload) that identifies the sender and
 authenticates the static Noise key.
 
 #### XXfallback
@@ -405,8 +404,8 @@ key is obtained from her initial `IK` message, moving it to the pre-message
 section of the handshake pattern. Essentially, the failed `IK` message serves
 the same role as the first handshake message in the standard `XX` pattern.
 
-Each handshake message will include a [libp2p signed handshake
-payload](#the-libp2p-signed-handshake-payload) that identifies the sender and
+Each handshake message will include a [libp2p handshake
+payload](#the-libp2p-handshake-payload) that identifies the sender and
 authenticates the static Noise key.
 
 #### Noise Pipes Message Flow
