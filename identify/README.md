@@ -93,10 +93,7 @@ peer dynamically changes its capabilites at runtime.
 When a peer adds or removes support for one or more protocols, it may open a
 stream to each remote peer that it wants to update using `/p2p/id/delta/1.0.0`
 as the protocol id. When the remote peer accepts the stream, the local peer will
-send an `Identify` message with only the `delta` field set. The value of the
-`delta` field is a `Delta` message, which will include the protocol ids of added
-or removed protocols in the `added_protocols` and `rm_protocols` fields,
-respectively.
+send an `IdentifyDelta` message listing the added and removed protocols.
 
 ## The Identify Message
 
@@ -108,19 +105,8 @@ message Identify {
   repeated bytes listenAddrs = 2;
   optional bytes observedAddr = 4;
   repeated string protocols = 3;
-  optional Delta delta = 7;
-}
-
-message Delta {
-  repeated string added_protocols = 1;
-  repeated string rm_protocols = 2;
 }
 ```
-
-The `delta` field of the `Identify` message is only set when sending partial
-updates as part of the [`identify/delta`](#identify-delta) protocol. When the
-`delta` field is set, it MUST be the only field present in the `Identify`
-message, with all other fields unset.
 
 ### protocolVersion
 
@@ -159,3 +145,16 @@ observable source address.
 ### protocols
 
 This is a list of protocols supported by the peer.
+
+## The Identify Delta Message
+
+```protobuf
+message IdentifyDelta {
+  repeated string added_protocols = 1;
+  repeated string rm_protocols = 2;
+}
+```
+
+`added_protocols` and `rm_protocols` MUST not intersect. When processing an
+update with intersecting `added_protocols` and `rm_protocols`, the recipient
+MUST process the removed protocols after the added protocols.
