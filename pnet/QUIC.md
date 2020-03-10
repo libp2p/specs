@@ -32,7 +32,7 @@ Note that this mechanism assumes specifics of QUIC version 1. It MUST NOT be app
 
 ### Encryption Algorithm
 
-The key used for encrypting Handshake packets is derived from the 32-byte PSK by running HDKF-Expand-Label using the label “libp2p protector”.
+The key used for encrypting Handshake packets is derived from the 32-byte PSK by running HKDF-Expand using SHA256 as the hash function and the “libp2p protector” as the context.
 Packets are encrypted using ChaCha20 and an encryption scheme that is inspired by [QUIC’s header protection](https://tools.ietf.org/html/draft-ietf-quic-tls-27#section-5.4.4) algorithm:
 The payload of the Handshake packets (i.e. all bytes remaining after the QUIC packet header) is split into two parts: the first 16 bytes and the rest. Since all QUIC ciphersuites use 16 byte AEAD tags (and QUIC forbids empty payloads), it is guaranteed that a valid QUIC packet has a payload that is at least 17 bytes long. The first 16 bytes are used as a sample.
 The first 4 bytes of the sample are the block counter, the remaining 12 bytes are the counter. ChaCha20 is then invoked on the second part of the payload.
