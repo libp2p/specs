@@ -53,7 +53,7 @@ the emitting peer is allowed to omit the signed peer record if it doesn't have o
 In this case, the pruned peer will have to utilize an external service to discover addresses for
 the peer, eg the DHT.
 
-### Protobuf Changes
+### Protobuf
 
 The `ControlPrune` message is extended with a `peer` field as follows.
 
@@ -71,6 +71,19 @@ message PeerInfo {
 ```
 
 ## Flood Publishing
+
+In gossipsub v1.0 a freshly published message is propagated through the mesh or the fanout map
+if the publisher is not subscribed to the topic. In gossipsub v1.1 publishing is (optionally)
+done by publishing the message to all connected peers with a score above a publish threshold
+(see Peer Scoring below).
+
+This behaviour is prescribed to counter eclipse attacks and ensure that a newly published message
+from a honest node will reach all connected honest nodes and get out to the network at large.
+When flood publishing is in use there is no point in utilizing a fanout map or emitting gossip when
+the peer is a pure publisher not subscribed in the topic.
+
+This behaviour also reduces message propagation latency as the message is injected to more points
+in the network.
 
 ## Adaptive Gossip Dissemination
 
