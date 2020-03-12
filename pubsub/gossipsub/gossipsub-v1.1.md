@@ -39,7 +39,7 @@ can support the protocol. With Peer Exchange, the protocol can now bootstrap fro
 set of nodes, without relying on an external peer discovery service.
 
 Peer Exchange (PX) kicks in when pruning a mesh because of oversubscription. Instead of simply
-telling the pruned peer to go away, the pruning peer provides a set of other peers where the
+telling the pruned peer to go away, the pruning peer _may_ provide a set of other peers where the
 pruned peer can connect to reform its mesh. In addition, both the pruned and the pruning peer
 add a backoff period from each other, within which they will not try to regraft. Both the pruning
 and the pruned peer will immediate prune a `GRAFT` within the backoff period.
@@ -86,5 +86,24 @@ This behaviour also reduces message propagation latency as the message is inject
 in the network.
 
 ## Adaptive Gossip Dissemination
+
+In gossipsub v1.0 gossip is emitted to a fixed number of peers, as specified by the `D_lazy`
+parameter. In gossipsub v1.1 the disemmination of gossip is adaptive; instead of emitting gossip
+to a fixed number of peers, we emit gossip to a percentage of our peers with a minimum of `D_lazy`
+peers.
+
+The parameter controlling the emission of gossip is called the gossip _factor_. When a node wants
+to emit gossip during the heartbeat, first it selects all peers with a peer score above a gossip
+threshold (see Peer Scoring below). From these peers, it randomly selects gossip factor peers with
+a minimum of `D_lazy`, and emits gossip to the selected peers.
+
+The recommended value for the gossip factor is `0.25`, which with the default of 3 rounds of gossip
+per message ensures that each peer has at least 50% chance of receiving gossip about a message.
+More specifically, for 3 rounds of gossip, the probability of a peer _not_ receiving gossip about
+a fresh message is `(3/4)³=27/64=0.421875`. So each peer receives gossip about a fresh message with
+a `0.578125` probability.
+
+This behaviour is prescribed to counter sybil attacks and ensures that a message from a honest
+node propagates in the network with high probability.
 
 ## Peer Scoring
