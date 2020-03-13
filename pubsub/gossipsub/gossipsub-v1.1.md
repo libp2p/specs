@@ -191,7 +191,168 @@ The parameters are defined as follows:
 
 ### Topic Parameter Calculation and Decay
 
-TBD
+The topic parameters are implemented using counters maintained internally by the router
+whenever an event of interest occurs. The counters _decay_ periodically so that their values are
+not continuously increasing and ensure that a large positive or negative score isn't sticky for
+the lifetime of the peer.
+
+#### P₁: Time in Mesh
+
+In order to compute P₁, the router records the time when the peer is GRAFTed. The time in mesh
+is calculated lazily during the decay update to avoid a large number of calls to `gettimeofday`.
+The parameter value is the division of the time ellapsed since the GRAFT with an application
+configurable quantum.
+
+In pseudo-go:
+```go
+// topic configuration parameters
+var TimeInMeshQuantum time.Duration
+var TimeInMeshCap     float64
+
+// lazily updated time in mesh
+var meshTime time.Duration
+
+// P₁
+p1 := float64(meshTime / TimeInMeshQuantum)
+if p1 > TimeInMeshCap {
+  p1 = TimeInMeshCap
+}
+```
+
+#### P₂: First Message Deliveries
+
+In order to compute P₂, the router maintains a counter that increments whenever a message
+is first delivered in the topic by the peer. The parameter has a cap that applies at the time
+of increment.
+
+In pseudo-go:
+```go
+// topic configuration parameters
+var FirstMessageDeliveriesCap float64
+
+// couner updated every time a first message delivery occurs
+var firstMessageDeliveries float64
+
+// counter update
+firstMessageDeliveries += 1
+if firstMessageDeliveries > FirstMessageDeliveriesCap {
+  firstMessageDeliveries = FirstMessageDeliveriesCap
+}
+
+// P₂
+p2 := firstMessageDeliveries
+```
+
+#### P₃ and P₃b: Mesh Message Delivery
+
+In order to compute P₃, the router maintains a counter that increments whenever a first
+or near-first message delivery occurs in the topic by a peer in the mesh.  A near-first message
+delivery is a message delivery that occurs while a message has been first received and is being
+validated or it has been received within a configurable window of validation of first message
+delivery. The window is configurable but should be small (in the order of milliseconds) to avoid
+allowing a mesh peer to build score by simply replaying back the messages received by the current
+router. The parameter has a cap that applies at the time of increment.
+
+In order to avoid triggering the penalty too early, the parameter has an activation window.
+This is a configurable value that is the time that the peer must have been in the mesh before
+the parameter applies.
+
+In pseudo-go:
+```go
+// topic configuration parameters
+var MeshMessageDeliveriesCap, MeshMessageDeliveriesThreshold     float64
+var MeshMessageDeliveriesWindow, MeshMessageDeliveriesActivation time.Duration
+
+// time in mesh, lazily updated
+var meshTime time.Duration
+
+// counter updated every time a first or near-first message delivery occurs by a mesh peer
+var meshMessageDeliveries float64
+
+// counter update
+meshMessageDeliveries += 1
+if meshMessageDeliveries > MeshMessageDeliveriesCap {
+  meshMessageDeliveries = MeshMessageDeliveriesCap
+}
+
+// calculation of P₃
+var deficit float64
+if meshTime > MeshMessageDeliveriesActivation && meshMessageDeliveries < MeshMessageDeliveriesThreshold {
+  deficit = MeshMessageDeliveriesThreshold - meshMessageDeliveries
+}
+
+p3 := deficit * deficit
+```
+
+In order to calculate P₃b, the router maintains a counter that is updated whenever the peer is pruned
+with an active deficit in message delivery. The parameter is uncapped.
+
+In pseudo-go:
+```go
+// counter updated at prune time
+var meshFailurePenalty float64
+
+// counter update
+if meshTime > MeshMessageDeliveriesActivation && meshMessageDeliveries < MeshMessageDeliveriesThreshold {
+  deficit = MeshMessageDeliveriesThreshold - meshMessageDeliveries
+  meshFailurePenalty += deficit * deficit
+}
+
+// P₃b
+p3b := meshFailurePenalty
+```
+
+#### P₄: Invalid Messages
+
+In order to compute P₄, the router maintains a counter that increments whenever a message fails
+validation. The counter is uncapped.
+
+In pseudo-go:
+```go
+// counter updated every time a message fails validation
+var invalidMessageDeliveries float64
+
+// counter update
+invalidMessageDeliveries += 1
+
+// P₄
+p4 := invalidMessageDeliveries
+```
+
+#### Parameter Decay
+
+The counters associated with P₂, P₃, P₃b, and P₄ decay periodically by multiplying with a configurable
+decay factor. When the value drops below a threshold it is considered zero.
+
+In pseudo-go:
+```go
+// decay factors
+var FirstMessageDeliveriesDecay, MeshMessageDeliveriesDecay, MeshFailurePenaltyDecay, InvalidMessageDeliveriesDecay float64
+
+// 0-threshold
+var DecayToZero float64
+
+// periodic decay of counters
+firstMessageDeliveries *= FirstMessageDeliveriesDecay
+if firstMessageDeliveries < DecayToZero {
+  firstMessageDeliveries = 0
+}
+
+meshMessageDeliveries *= MeshMessageDeliveriesDecay
+if meshMessageDeliveries < DecayToZero {
+  meshMessageDeliveries = 0
+}
+
+meshFailurePenalty *= MeshFailurePenaltyDecay
+if meshFailurePenalty < DecayToZero {
+  meshFailurePenalty = 0
+}
+
+invalidMessageDeliveries *= InvalidMessageDeliveriesDecay
+if invalidMessageDeliveries < DecayToZero {
+  invalidMessageDeliveries = 0
+}
+```
 
 ### Guidelines for Tuning the Scoring Function
 
