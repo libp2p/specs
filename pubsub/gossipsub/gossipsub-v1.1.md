@@ -358,6 +358,17 @@ if invalidMessageDeliveries < DecayToZero {
 
 TBD
 
-## Spam Protection
+## Spam Protection Measures
 
-TBD
+In order counter spam that elicits responses and consumes resources, some measures have been taken:
+- `GRAFT` messages for unknown topics are ignored; in gossipsub v1.0 the router would always
+  respond with a `PRUNE`, which opens up an avenue for flooding with spam `GRAFT` messages and
+  consuming resources.
+- `IWANT` message responses are limited in the number of retransmissions to a certain peer;
+  in gossipsub v1.0 the router always responds to `IWANT` messages when the message in the cache.
+  In gossipsub v1.1 the router responds a limited number of times to each peer so that `IWANT` spam
+  does not cause a signficant drain of resources.
+- Invalid message spam, either directly transmitted or as a response to an `IHAVE` message is
+  penalized by the score function. A peer transmitting lots of spam will quickly get graylisted,
+  reducing the surface of spam-induced computation (eg validation). The application can take
+  further steps and blacklist the peer if the spam persists after the negative score decays.
