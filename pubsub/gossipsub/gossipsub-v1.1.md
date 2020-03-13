@@ -107,3 +107,38 @@ This behaviour is prescribed to counter sybil attacks and ensures that a message
 node propagates in the network with high probability.
 
 ## Peer Scoring
+
+In gossipsub v1.1 we introduce a peer scoring component: each individual peer maintains a score
+for other peers. The score is locally computed by each individual peer based on observed behaviour
+and is not shared. The score is a real value, computed as weighted mix of parameters,
+with pluggable application specific scoring. The score is computed across all (configured) topics
+with a weighted mix, such that faulty behaviour in one topic percolates to other topics.
+Furthermore, the score is retained for some period of time when a peer disconnects, so that malicious
+peers cannot easily reset their score when it drops to negative and well behaving
+peers don't lose their status because of a disconnection.
+
+The intention is to detect malicious or faulty behaviour and penalize the misbehaving peers
+with a negative score.
+
+### Score Thresholds
+
+The score is plugged into various gossipsub algorithms such that peers with negative scores are
+removed from the mesh. Peers with heavily negative score are further penalized or even ignored
+if the score drops too low.
+
+More specifically, the following thresholds apply:
+- `0`: the baseline threshold; peers with a score below this threshold are pruned from the mesh
+  during the heartbeat and ignored when looking for peers to graft. Furthermore, no PX information
+  is emitted towards those peers and PX is ignored from them.
+- `gossipThreshold`: when a peer's score drops below this threshold, no gossip is emitted towards
+  that peer and gossip from that peer is ignored. This threshold should be negative, such that
+  some information can be propagated to/from mildly negatively scoring peers.
+- `publishThreshold`: when a peer's score drops below this threshold, self published messages are
+  not propagated towards this peer when (flood) publishing. This threshold should be negative, and
+  less than or equal to the gossip threshold.
+- `graylistThreshold`: when a peer's score drops below this threshold, the peer is graylisted and
+  its RPCs are ignored. This threshold must be negative, and less than the gossip/publish threshold.
+
+
+
+## Spam Protection
