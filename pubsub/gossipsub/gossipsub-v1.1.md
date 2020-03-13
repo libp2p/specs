@@ -139,6 +139,64 @@ More specifically, the following thresholds apply:
 - `graylistThreshold`: when a peer's score drops below this threshold, the peer is graylisted and
   its RPCs are ignored. This threshold must be negative, and less than the gossip/publish threshold.
 
+### Heartbeat Maintenance
 
+The score is checked explicitly during heartbeat maintenance such that:
+- Peers with negative score are pruned from all meshes.
+- When pruning because of oversubscription, the peer keeps the best `D_score` scoring peers and
+  selects the remaining peers to keep at random. This protects the mesh from takeover attacks
+  and ensures that the best scoring peers are kept in the mesh. At the same time, we do keep some
+  peers as random so that the protocol is responsive to new peers joining the mesh.
+- When selecting peers to graft because of undersubscription, peers with a negative score are ignored.
+
+### The Score Function
+
+The score function is a weighted mix of parameters, 4 of them per topic and 2 of them globally
+applicable.
+```
+Score(p) = Σtᵢ*(w₁(tᵢ)*P₁(tᵢ) + w₂(tᵢ)*P₂(tᵢ) + w₃(tᵢ)*P₃(tᵢ) + w₃b(tᵢ)*P₃b(tᵢ) + w₄(tᵢ)*P₄(tᵢ)) + w₅*P₅ + w₆*P₆
+```
+where `tᵢ` is the topic weight for each topic where per topic parameters apply.
+
+The parameters are defined as follows:
+- P₁: time in mesh for a topic. This is the time a peer has been in the mesh, capped to a small value
+  and mixed with a small positive weight. This is intended to boost peers already in the mesh so that
+  they are not prematurely pruned because of oversubscription.
+- P₂: first message deliveries for a topic. This is the number of message first delivered by the peer
+  in the topic, mixed with a positive weight. This is intended to reward peers who first forward a
+  valid message.
+- P₃: mesh message delivery rate for a topic. This parameter is a threshold for the expected message
+  delivery rate within the mesh in the topic. If the number of deliveries is above the threshold,
+  then the value is 0. If the number is below the threshold, then the value of the parameter is
+  the square of the deficit.
+  This is intended to penalize peers in the mesh who are not delivering the expected
+  number of messages so that they can be removed from the mesh. The parameter is mixed with a negative
+  weight.
+- P₃b: mesh message delivery failures for a topic. This is a sticky parameter that counts the number
+  of mesh message delivery failures. Whenever a peer is pruned with a negative score, the parameter
+  is augmented by the rate deficit at the time of prune. This is intended to keep history of prunes
+  so that a peer that was pruned because of underdelivery cannot quickly get regrafted into the
+  mesh. The parameter is mixed with negative weight.
+- P₄: invalid messages for a topic. This is he number of invalid messages delivered in the topic.
+  This is intended to penalize peers who transmit invalid messages, according to application specific
+  validation rules. It is mixed with a negative weight.
+- P₅: application specific score. This is the score component assigned to the peer by the application
+  itself, using application specific rules. The weight is positive, but the parameter itself has an
+  arbitrary real value, so that the application can signal misbehaviour with a negative score or gate
+  peers before an application specific handshake is completed.
+- P₆: IP colocation factor. This parameter is a threshold for the number of peers using the same IP
+  address. If the number of peers in the same IP exceeds the threshold, then the value is the square
+  of the surpluss, otherwise it is 0. This is intended to make it difficult to carry out sybil attacks
+  by using a small number of IPs. The parameter is mixed with a negative weight.
+
+### Topic Parameter Calculation and Decay
+
+TBD
+
+### Guidelines for Tuning the Scoring Function
+
+TBD
 
 ## Spam Protection
+
+TBD
