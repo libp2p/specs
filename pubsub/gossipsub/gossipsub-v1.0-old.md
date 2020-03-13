@@ -17,6 +17,8 @@ Interest Group: [@yusefnapora], [@raulk], [@whyrusleeping], [@Stebalien],
 [@Stebalien]: https://github.com/Stebalien
 [@jamesray1]: https://github.com/jamesray1
 [@vasco-santos]: https://github.com/vasco-santos
+[@daviddias]: https://github.com/daviddias
+[@yiannisbot]: https://github.com/yiannisbot
 
 See the [lifecycle document][lifecycle-spec] for context about maturity level
 and spec status.
