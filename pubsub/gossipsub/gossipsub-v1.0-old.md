@@ -8,7 +8,7 @@
 Authors: [@vyzo]
 
 Interest Group: [@yusefnapora], [@raulk], [@whyrusleeping], [@Stebalien],
-[@jamesray1], [@vasco-santos]
+[@jamesray1], [@vasco-santos], [@daviddias], [@yiannisbot]
 
 [@whyrusleeping]: https://github.com/whyrusleeping
 [@yusefnapora]: https://github.com/yusefnapora
