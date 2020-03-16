@@ -1,4 +1,4 @@
-# gossipsub v1.1: gossipsub extensions to improve bootstrapping and attack resistance
+# gossipsub v1.1: Security extensions to improve on attack resilience and bootstrapping
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
@@ -23,6 +23,31 @@ and spec status.
 
 ---
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+- [Overview](#overview)
+- [Attack Vectors considered](#attack-vectors-considered)
+- [Protocol extensions](#protocol-extensions)
+  - [Peer Exchange](#peer-exchange)
+    - [Protobuf](#protobuf)
+  - [Flood Publishing](#flood-publishing)
+  - [Adaptive Gossip Dissemination](#adaptive-gossip-dissemination)
+  - [Peer Scoring](#peer-scoring)
+    - [Score Thresholds](#score-thresholds)
+    - [Heartbeat Maintenance](#heartbeat-maintenance)
+    - [The Score Function](#the-score-function)
+    - [Topic Parameter Calculation and Decay](#topic-parameter-calculation-and-decay)
+      - [P₁: Time in Mesh](#p%E2%82%81-time-in-mesh)
+      - [P₂: First Message Deliveries](#p%E2%82%82-first-message-deliveries)
+      - [P₃ and P₃b: Mesh Message Delivery](#p%E2%82%83-and-p%E2%82%83b-mesh-message-delivery)
+      - [P₄: Invalid Messages](#p%E2%82%84-invalid-messages)
+      - [Parameter Decay](#parameter-decay)
+    - [Guidelines for Tuning the Scoring Function](#guidelines-for-tuning-the-scoring-function)
+  - [Spam Protection Measures](#spam-protection-measures)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Overview
 
 This document specifies extensions to [gossipsub v1.0](gossipsub-v1.0.md) intended to improve
@@ -31,7 +56,13 @@ prescribe local peer behaviour and are fully backwards compatible with v1.0 of t
 Peers that implement these extensions, advertise v1.1 of the protocol using `/meshsub/1.1.0`
 as the protocol string.
 
-## Peer Exchange
+## Attack Vectors considered
+
+`To be written`
+
+## Protocol extensions 
+
+### Peer Exchange
 
 Gossipsub relies on ambient peer discovery in order to find peers within a topic of interest.
 This puts pressure to the implementation of a scalable peer discovery service that
@@ -53,7 +84,7 @@ the emitting peer is allowed to omit the signed peer record if it doesn't have o
 In this case, the pruned peer will have to utilize an external service to discover addresses for
 the peer, eg the DHT.
 
-### Protobuf
+#### Protobuf
 
 The `ControlPrune` message is extended with a `peer` field as follows.
 
@@ -70,7 +101,7 @@ message PeerInfo {
 
 ```
 
-## Flood Publishing
+### Flood Publishing
 
 In gossipsub v1.0 a freshly published message is propagated through the mesh or the fanout map
 if the publisher is not subscribed to the topic. In gossipsub v1.1 publishing is (optionally)
@@ -85,7 +116,7 @@ the peer is a pure publisher not subscribed in the topic.
 This behaviour also reduces message propagation latency as the message is injected to more points
 in the network.
 
-## Adaptive Gossip Dissemination
+### Adaptive Gossip Dissemination
 
 In gossipsub v1.0 gossip is emitted to a fixed number of peers, as specified by the `D_lazy`
 parameter. In gossipsub v1.1 the disemmination of gossip is adaptive; instead of emitting gossip
@@ -106,7 +137,7 @@ a `0.578125` probability.
 This behaviour is prescribed to counter sybil attacks and ensures that a message from a honest
 node propagates in the network with high probability.
 
-## Peer Scoring
+### Peer Scoring
 
 In gossipsub v1.1 we introduce a peer scoring component: each individual peer maintains a score
 for other peers. The score is locally computed by each individual peer based on observed behaviour
@@ -120,7 +151,7 @@ peers don't lose their status because of a disconnection.
 The intention is to detect malicious or faulty behaviour and penalize the misbehaving peers
 with a negative score.
 
-### Score Thresholds
+#### Score Thresholds
 
 The score is plugged into various gossipsub algorithms such that peers with negative scores are
 removed from the mesh. Peers with heavily negative score are further penalized or even ignored
@@ -139,7 +170,7 @@ More specifically, the following thresholds apply:
 - `graylistThreshold`: when a peer's score drops below this threshold, the peer is graylisted and
   its RPCs are ignored. This threshold must be negative, and less than the gossip/publish threshold.
 
-### Heartbeat Maintenance
+#### Heartbeat Maintenance
 
 The score is checked explicitly during heartbeat maintenance such that:
 - Peers with negative score are pruned from all meshes.
@@ -149,7 +180,7 @@ The score is checked explicitly during heartbeat maintenance such that:
   peers as random so that the protocol is responsive to new peers joining the mesh.
 - When selecting peers to graft because of undersubscription, peers with a negative score are ignored.
 
-### The Score Function
+#### The Score Function
 
 The score function is a weighted mix of parameters, 4 of them per topic and 2 of them globally
 applicable.
@@ -189,14 +220,14 @@ The parameters are defined as follows:
   of the surpluss, otherwise it is 0. This is intended to make it difficult to carry out sybil attacks
   by using a small number of IPs. The parameter is mixed with a negative weight.
 
-### Topic Parameter Calculation and Decay
+#### Topic Parameter Calculation and Decay
 
 The topic parameters are implemented using counters maintained internally by the router
 whenever an event of interest occurs. The counters _decay_ periodically so that their values are
 not continuously increasing and ensure that a large positive or negative score isn't sticky for
 the lifetime of the peer.
 
-#### P₁: Time in Mesh
+##### P₁: Time in Mesh
 
 In order to compute P₁, the router records the time when the peer is GRAFTed. The time in mesh
 is calculated lazily during the decay update to avoid a large number of calls to `gettimeofday`.
@@ -219,7 +250,7 @@ if p1 > TimeInMeshCap {
 }
 ```
 
-#### P₂: First Message Deliveries
+##### P₂: First Message Deliveries
 
 In order to compute P₂, the router maintains a counter that increments whenever a message
 is first delivered in the topic by the peer. The parameter has a cap that applies at the time
@@ -243,7 +274,7 @@ if firstMessageDeliveries > FirstMessageDeliveriesCap {
 p2 := firstMessageDeliveries
 ```
 
-#### P₃ and P₃b: Mesh Message Delivery
+##### P₃ and P₃b: Mesh Message Delivery
 
 In order to compute P₃, the router maintains a counter that increments whenever a first
 or near-first message delivery occurs in the topic by a peer in the mesh.  A near-first message
@@ -302,7 +333,7 @@ if meshTime > MeshMessageDeliveriesActivation && meshMessageDeliveries < MeshMes
 p3b := meshFailurePenalty
 ```
 
-#### P₄: Invalid Messages
+##### P₄: Invalid Messages
 
 In order to compute P₄, the router maintains a counter that increments whenever a message fails
 validation. The counter is uncapped.
@@ -319,7 +350,7 @@ invalidMessageDeliveries += 1
 p4 := invalidMessageDeliveries
 ```
 
-#### Parameter Decay
+##### Parameter Decay
 
 The counters associated with P₂, P₃, P₃b, and P₄ decay periodically by multiplying with a configurable
 decay factor. When the value drops below a threshold it is considered zero.
@@ -354,11 +385,11 @@ if invalidMessageDeliveries < DecayToZero {
 }
 ```
 
-### Guidelines for Tuning the Scoring Function
+#### Guidelines for Tuning the Scoring Function
 
 TBD
 
-## Spam Protection Measures
+### Spam Protection Measures
 
 In order counter spam that elicits responses and consumes resources, some measures have been taken:
 - `GRAFT` messages for unknown topics are ignored; in gossipsub v1.0 the router would always

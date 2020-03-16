@@ -1,16 +1,12 @@
-# gossipsub: An extensible baseline pubsub protocol
+# gossipsub v1.0: An extensible baseline pubsub protocol
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
 | 3A              | Recommendation | Active | r2, 2020-03-12  |
 
-
 Authors: [@vyzo]
-
 Editor: [@yusefnapora]
-
-Interest Group: [@yusefnapora], [@raulk], [@whyrusleeping], [@Stebalien],
-[@jamesray1], [@vasco-santos]
+Interest Group: [@yusefnapora], [@raulk], [@whyrusleeping], [@Stebalien], [@jamesray1], [@vasco-santos], [@daviddias], [@yiannisbot]
 
 [@whyrusleeping]: https://github.com/whyrusleeping
 [@yusefnapora]: https://github.com/yusefnapora

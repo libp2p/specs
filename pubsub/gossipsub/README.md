@@ -1,6 +1,5 @@
 # gossipsub: An extensible baseline pubsub protocol
 
-
 Gossipsub is an extensible baseline pubsub protocol,
 based on randomized topic meshes and gossip. It is a general purpose
 pubsub protocol with moderate amplification factors and good scaling
@@ -11,14 +10,10 @@ profiles.
 
 ## Specification
 
-- [gossipsub-v1.0](gossipsub-v1.0.md): v1.0 of the gossipsub protocol.
-  This is a revised specification, to use a more normative language.
-  The original v1.0 specification is [here](gossippsub-v1.0-old.md).
+- [gossipsub-v1.0](gossipsub-v1.0.md): v1.0 of the gossipsub protocol. This is a revised specification, to use a more normative language. 
+  - The original v1.0 specification is [here](gossippsub-v1.0-old.md).
 - [gossipsub-v1.1](gossipsub-v1.1.md): v1.1 of the gossipsub protocol.
-
-## Research Notes
-
-- [episub](episub.md): a research note on a protocol building on top of gossipsub to implement epidemic broadcast trees.
+- [(not in use) episub](episub.md): a research note on a protocol building on top of gossipsub to implement [epidemic broadcast trees](https://www.gsd.inesc-id.pt/~ler/reports/srds07.pdf).
 
 ## Implementation status
 

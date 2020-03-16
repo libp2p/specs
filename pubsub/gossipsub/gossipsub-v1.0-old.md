@@ -1,14 +1,13 @@
-# gossipsub: An extensible baseline pubsub protocol
+# gossipsub v1.0 (OLD): An extensible baseline pubsub protocol
+
+> `DISCLAIMER:` This is the original specification, please refer to [gossipsub-v1.0](gossipsub-v1.0.md) from now on
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
 | 3A              | Recommendation | Active | r1, 2018-08-29  |
 
-
 Authors: [@vyzo]
-
-Interest Group: [@yusefnapora], [@raulk], [@whyrusleeping], [@Stebalien],
-[@jamesray1], [@vasco-santos], [@daviddias], [@yiannisbot]
+Interest Group: [@yusefnapora], [@raulk], [@whyrusleeping], [@Stebalien], [@jamesray1], [@vasco-santos], [@daviddias], [@yiannisbot]
 
 [@whyrusleeping]: https://github.com/whyrusleeping
 [@yusefnapora]: https://github.com/yusefnapora
@@ -39,30 +38,27 @@ profiles.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Contents**
 
-- [gossipsub: An extensible baseline pubsub protocol](#gossipsub-an-extensible-baseline-pubsub-protocol)
-  - [Implementation status](#implementation-status)
-  - [In the beginning was floodsub](#in-the-beginning-was-floodsub)
-    - [Ambient Peer Discovery](#ambient-peer-discovery)
-    - [Flood routing](#flood-routing)
-    - [Retrospective](#retrospective)
-  - [Controlling the flood](#controlling-the-flood)
-    - [randomsub: A random message router](#randomsub-a-random-message-router)
-    - [meshsub: An overlay mesh router](#meshsub-an-overlay-mesh-router)
-    - [gossipsub: The gossiping mesh router](#gossipsub-the-gossiping-mesh-router)
-  - [The gossipsub protocol](#the-gossipsub-protocol)
-    - [Control messages](#control-messages)
-    - [Router state](#router-state)
-    - [Topic membership](#topic-membership)
-    - [Message processing](#message-processing)
-    - [Heartbeat](#heartbeat)
-    - [Control message piggybacking](#control-message-piggybacking)
-    - [Protobuf](#protobuf)
+- [Implementation status](#implementation-status)
+- [Context - In the beginning was floodsub](#context--in-the-beginning-was-floodsub)
+  - [Ambient Peer Discovery](#ambient-peer-discovery)
+  - [Flood routing](#flood-routing)
+  - [Retrospective](#retrospective)
+- [Proposed alternatives - Controlling the flood](#proposed-alternatives--controlling-the-flood)
+  - [randomsub: A random message router](#randomsub-a-random-message-router)
+  - [meshsub: An overlay mesh router](#meshsub-an-overlay-mesh-router)
+  - [gossipsub: The gossiping mesh router](#gossipsub-the-gossiping-mesh-router)
+- [Protocol Architecture - Gossipsub](#protocol-architecture--gossipsub)
+  - [Control messages](#control-messages)
+  - [Router state](#router-state)
+  - [Topic membership](#topic-membership)
+  - [Message processing](#message-processing)
+  - [Heartbeat](#heartbeat)
+  - [Control message piggybacking](#control-message-piggybacking)
+  - [Protobuf](#protobuf)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-
-
-## In the beginning was floodsub
+## Context - In the beginning was floodsub
 
 The initial pubsub experiment in libp2p was `floodsub`.
 It implements pubsub in the most basic manner, with two defining aspects:
@@ -125,8 +121,7 @@ the amplification factor is only bounded by the sum of degrees of all
 nodes in the overlay, which creates a scaling problem for densely
 connected overlays at large.
 
-
-## Controlling the flood
+## Proposed alternatives - Controlling the flood
 
 In order to scale pubsub without excessive bandwidth waste or peer
 overload, we need a router that bounds the degree of each peer and
@@ -205,12 +200,14 @@ with the meshsub construction and augments it using gossip propagation
 of metadata with the randomsub technique.
 
 
-## The gossipsub protocol
+## Protocol Architecture - Gossipsub
 
 We can now provide a specification of the pubsub protocol by sketching
 out the router implementation.  The router is backwards compatible
 with floodsub, as it accepts floodsub peers and behaves like floodsub
 towards them.
+
+If you would like to get a video presentation and visualization on Gossipsub, watch [Scalable PubSub with GossipSub - Dimitris Vyzovitis](https://www.youtube.com/watch?v=mlrf1058ENY&index=3&list=PLuhRWgmPaHtRPl3Itt_YdHYA0g0Eup8hQ) from the [IPFS London Hack Week of 2018 Q4](http://gateway.ipfs.io/ipns/blog.ipfs.io/65-london-hack-week-report/).
 
 ### Control messages
 
