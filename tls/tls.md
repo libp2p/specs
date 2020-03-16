@@ -64,7 +64,7 @@ Certificates MUST omit the `subjectUniqueId` or `issuerUniqueId` fields in X.509
 
 Certificates MUST omit the optional ASN.1 NULL parameters in RSA-PSS AlgorithmIds. Endpoints MAY abort the connection attempt if these parameters are not omitted.
 
-Certificates MUST use the `NamedCurve` encoding for elliptic curve parameters. Endpoints MUST abort the connection attempt if is not used. Failure to enforce this restriction allows [“Whose Curve Is It Anyway”](https://whosecurve.com) attacks, which completely compromise the security of the connection.
+Certificates MUST use the `NamedCurve` encoding for elliptic curve parameters. Endpoints MUST abort the connection attempt if is not used. Failure to enforce this restriction allows [“Whose Curve Is It Anyway”](https://whosecurve.com) attacks, which completely compromise the security of the connection. Similarly, hash functions with an output length less than 256 bits MUST NOT be used, due to the possibility of collision attacks.
 
 Note for clients: Since clients complete the TLS handshake immediately after sending the certificate (and the TLS `ClientFinished` message), the handshake will appear as having succeeded before the server had the chance to verify the certificate. In this state, the client can already send application data. If certificate verification fails on the server side, the server will close the connection without processing any data that the client sent.
 
