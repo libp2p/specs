@@ -60,7 +60,7 @@ as the protocol string.
 
 `To be written`
 
-## Protocol extensions 
+## Protocol extensions
 
 ### Peer Exchange on PRUNE
 
@@ -71,13 +71,15 @@ set of nodes, without relying on an external peer discovery service.
 
 Peer Exchange (PX) kicks in when pruning a mesh because of oversubscription. Instead of simply
 telling the pruned peer to go away, the pruning peer _may_ provide a set of other peers where the
-pruned peer can connect to reform its mesh. In addition, both the pruned and the pruning peer
-add a backoff period from each other, within which they will not try to regraft. Both the pruning
-and the pruned peer will immediate prune a `GRAFT` within the backoff period.
-The recommended duration for the back period is 1 minute.
+pruned peer can connect to reform its mesh (see Peer Scoring below).
+In addition, both the pruned and the pruning peer add a backoff period from each other, within which
+they will not try to regraft. Both the pruning and the pruned peer will immediate prune a `GRAFT`
+within the backoff period.
+The recommended duration for the backoff period is 1 minute, while the recommended number of peers
+to exchange is equal to `D` so that the pruned peer can form a full mesh.
 
 In order to implement PX, we extend the `PRUNE` control message to include an optional set of
-peers the pruned peer can connect to. This set of includes the Peer ID and a [_signed_ peer
+peers the pruned peer can connect to. This set of peers includes the Peer ID and a [_signed_ peer
 record](https://github.com/libp2p/specs/pull/217) for each peer exchanged.
 In order to facilitate transion to the usage of signed peer records within the libp2p ecosystem,
 the emitting peer is allowed to omit the signed peer record if it doesn't have one.
@@ -160,7 +162,8 @@ if the score drops too low.
 More specifically, the following thresholds apply:
 - `0`: the baseline threshold; peers with a score below this threshold are pruned from the mesh
   during the heartbeat and ignored when looking for peers to graft. Furthermore, no PX information
-  is emitted towards those peers and PX is ignored from them.
+  is emitted towards those peers and PX is ignored from them. In addition, when performing PX only
+  peers with non-negative scores are exchanged.
 - `gossipThreshold`: when a peer's score drops below this threshold, no gossip is emitted towards
   that peer and gossip from that peer is ignored. This threshold should be negative, such that
   some information can be propagated to/from mildly negatively scoring peers.
