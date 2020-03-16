@@ -81,7 +81,7 @@ to exchange is equal to `D` so that the pruned peer can form a full mesh.
 In order to implement PX, we extend the `PRUNE` control message to include an optional set of
 peers the pruned peer can connect to. This set of peers includes the Peer ID and a [_signed_ peer
 record](https://github.com/libp2p/specs/pull/217) for each peer exchanged.
-In order to facilitate transion to the usage of signed peer records within the libp2p ecosystem,
+In order to facilitate the transition to the usage of signed peer records within the libp2p ecosystem,
 the emitting peer is allowed to omit the signed peer record if it doesn't have one.
 In this case, the pruned peer will have to utilize an external service to discover addresses for
 the peer, eg the DHT.
