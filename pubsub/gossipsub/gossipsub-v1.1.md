@@ -62,7 +62,7 @@ as the protocol string.
 
 ## Protocol extensions 
 
-### Peer Exchange
+### Peer Exchange on PRUNE
 
 Gossipsub relies on ambient peer discovery in order to find peers within a topic of interest.
 This puts pressure to the implementation of a scalable peer discovery service that
