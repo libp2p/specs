@@ -27,9 +27,9 @@ and spec status.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 - [Overview](#overview)
-- [Attack Vectors considered](#attack-vectors-considered)
+- [Attack Considerations](#attack-considerations)
 - [Protocol extensions](#protocol-extensions)
-  - [Peer Exchange](#peer-exchange)
+  - [Peer Exchange on PRUNE](#peer-exchange-on-prune)
     - [Protobuf](#protobuf)
   - [Flood Publishing](#flood-publishing)
   - [Adaptive Gossip Dissemination](#adaptive-gossip-dissemination)
@@ -51,12 +51,12 @@ and spec status.
 ## Overview
 
 This document specifies extensions to [gossipsub v1.0](gossipsub-v1.0.md) intended to improve
-bootstrapping and protocol attack resistant. The extensions change the algorithms that
+bootstrapping and protocol attack resistance. The extensions change the algorithms that
 prescribe local peer behaviour and are fully backwards compatible with v1.0 of the protocol.
 Peers that implement these extensions, advertise v1.1 of the protocol using `/meshsub/1.1.0`
 as the protocol string.
 
-## Attack Vectors considered
+## Attack Considerations
 
 `To be written`
 
