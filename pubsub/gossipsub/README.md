@@ -18,6 +18,6 @@ profiles.
 ## Implementation status
 
 - Go: [libp2p/go-libp2p-pubsub/gossipsub.go](https://github.com/libp2p/go-libp2p-pubsub/blob/master/gossipsub.go) (experimental)
-- JS: [ChainSafeSystems/gossipsub-js](https://github.com/ChainSafeSystems/gossipsub-js) – work in progress; check branches and PRs.
+- JS: [ChainSafeSystems/gossipsub-js](https://github.com/ChainSafeSystems/gossipsub-js) (compliant with `gossipsub-v1.0`).
 - Rust: [libp2p/rust-libp2p#898](https://github.com/libp2p/rust-libp2p/pull/898) implements the spec but is missing some features. [libp2p/rust-libp2p#767](https://github.com/libp2p/rust-libp2p/pull/767) is an alternative, partial implementation that differs slightly from the spec (see [#142](https://github.com/libp2p/specs/issues/142) for details).
 - Gerbil: [vyzo/gerbil-simsub](https://github.com/vyzo/gerbil-simsub) (simulator)
