@@ -416,8 +416,7 @@ if invalidMessageDeliveries < DecayToZero {
 ### Overview of New Parameters
 
 The extensions that make up gossipsub v1.1 introduce several new application configurable
-parameters. This section lists all the new parameters along with a brief description. More detail is
-available in the discussion of the protocol extensions below.
+parameters. This section summarizes all the new parameters along with a brief description.
 
 The following parameters apply globally:
 
