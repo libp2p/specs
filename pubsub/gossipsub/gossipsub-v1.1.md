@@ -57,6 +57,84 @@ as the protocol string.
 
 ## Protocol extensions
 
+### Overview of New Parameters
+
+The extensions that make up gossipsub v1.1 introduce several new application configurable
+parameters. This section lists all the new parameters along with a brief description. More detail is
+available in the discussion of the protocol extensions below.
+
+The following parameters apply globally:
+
+| Parameter      | Type             | Description                                                            | Reasonable Default |
+|----------------|------------------|------------------------------------------------------------------------|--------------------|
+| `PruneBackoff` | Duration         | Time after pruning a mesh peer before we consider grafting them again. | `1 minute`         |
+| `FloodPublish` | Boolean          | Whether to enable flood publishing                                     | `true`             |
+| `GossipFactor` | Float [0.0, 1.0] | % of peers to send gossip to, if we have more than `D_lazy` available  | `0.25`             |
+
+
+The remaining parameters apply to [Peer Scoring](#peer-scoring). Because many parameters are
+inter-related and may be application-specific, reasonable defaults are not shown here. See
+[Guidelines for Tuning the Scoring Function](#guidelines-for-tuning-the-scoring-function) to
+understand how tune the parameters to the needs of an application.
+
+The following peer scoring parameters apply globally to all peers and topics:
+
+| Parameter           | Type     | Description                                                             | Constraints                  |
+|---------------------|----------|-------------------------------------------------------------------------|------------------------------|
+| `GossipThreshold`   | Float    | No gossip emitted to peers below threshold; incoming gossip is ignored. | Must be < 0                  |
+| `PublishThreshold`  | Float    | No self-published messages are sent to peers below threshold.           | Must be < `GossipThreshold`  |
+| `GraylistThreshold` | Float    | All RPC messages are ignored from peers below threshold.                | Must be < `PublishThreshold` |
+| `DecayInterval`     | Duration | Interval at which parameter decay is calculated.                        |                              |
+| `DecayToZero`       | Float    | Limit below which we consider a decayed param to be "zero".             | Should be close to 0.0       |
+| `RetainScore`       | Duration | Time to remember peer scores after a peer disconnects.                  |                              |
+
+The remaining peer score parameters affect how scores are computed for each peer based on their
+observed behavior. 
+
+Parameters with type `Weight` are floats in the range [0.0, 1.0] that determine
+how much a score parameter contributes to the overall score for a peer. See [The Score
+Function](#the-score-function) for details.
+
+There are some parameters that apply to the peer "as a whole", regardless of
+which topics they are subscribed to:
+
+| Parameter                     | Type   | Description                                           | Constraints                                                   |
+|-------------------------------|--------|-------------------------------------------------------|---------------------------------------------------------------|
+| `AppSpecificWeight`           | Weight | Weight of `P₅`, the application-specific score.       | Must be positive, however score values may be negative.       |
+| `IPColocationFactorWeight`    | Weight | Weight of `P₆`, the IP colocation score.              | Must be negative, to penalize peers with multiple IPs.        |
+| `IPColocationFactorThreshold` | Float  | Number of IPs a peer may have before being penalized. | Must be at least 1. Values above threshold will be penalized. |
+
+The remaining parameters are applied to a peer's behavior within a single topic. Implementations
+should be able to accept configurations for multiple topics, keyed by topic ID string. Each topic
+may be configured with the following params. If a topic is not configured, a peer's behavior in that
+topic will not contribute to their score. If a peer is in multiple configured topics, each topic
+will contribute to their total score according to the `TopicWeight` parameter.
+
+| Parameter                         | Type     | Description                                                           | Constraints                                                           |
+|-----------------------------------|----------|-----------------------------------------------------------------------|-----------------------------------------------------------------------|
+| `TopicWeight`                     | Weight   | How much does behavior in this topic contribute to the overall score? |                                                                       |
+| **`P₁`**                          |          | **Time in Mesh**                                                      |                                                                       |
+| `TimeInMeshWeight`                | Weight   | Weight of `P₁`.                                                       | Should be a small positive value.                                     |
+| `TimeInMeshQuantum`               | Duration | Time a peer must be in mesh to accrue one "point" for `P₁`.           |                                                                       |
+| `TimeInMeshCap`                   | Float    | Maximum value for `P₁`.                                               | Should be a small positive value.                                     |
+| **``P₂``**                        |          | **First Message Deliveries**                                          |                                                                       |
+| `FirstMessageDeliveriesWeight`    | Weight   | Weight of `P₂`.                                                       | Should be positive, to reward fast peers.                             |
+| `FirstMessageDeliveriesDecay`     | Float    | Decay factor for `P₂`.                                                |                                                                       |
+| `FirstMessageDeliveriesCap`       | Float    | Maximum value for `P₂`.                                               |                                                                       |
+| **`P₃`**                          |          | **Mesh Message Delivery Rate**                                        |                                                                       |
+| `MeshMessageDeliveriesWeight`     | Weight   | Weight of `P₃`.                                                       | Should be negative, to penalize peers below threshold.                |
+| `MeshMessageDeliveriesDecay`      | Float    | Decay factor  for `P₃`.                                               |                                                                       |
+| `MeshMessageDeliveriesThreshold`  | Float    | Value for `P₃` below which we start penalizing peers.                 | Should be positive. Value depends on expected message rate for topic. |
+| `MeshMessageDeliveriesCap`        | Float    | Maximum value for `P₃`.                                               | Must be >= `MeshMessageDeliveriesThreshold`.                          |
+| `MeshMessageDeliveriesActivation` | Duration | Time a peer must be in the mesh before we start applying `P₃` score.  |                                                                       |
+| `MeshMessageDeliveryWindow`       | Duration | Time after first delivery that is considered "near-first".            | Should be small, e.g. 1-5 ms.                                         |
+| **`P₃b`**                         |          | **Mesh Message Delivery Failures**                                    |                                                                       |
+| `MeshFailurePenaltyWeight`        | Weight   | Weight of `P₃b`.                                                      | Should be negative, to penalize failed deliveries.                    |
+| `MeshFailurePenaltyDecay`         | Float    | Decay factor for `P₃b`.                                               |                                                                       |
+| **`P₄`**                          |          | **Invalid Messages**                                                  |                                                                       |
+| `InvalidMessageDeliveriesWeight`  | Weight   | Weight of`P₄`.                                                        | Should be negative, to penalize invalid messages.                     |
+| `InvalidMessageDeliveriesDecay`   | Float    | Decay factor for `P₄`.                                                |                                                                       |
+
 ### Peer Exchange on PRUNE
 
 Gossipsub relies on ambient peer discovery in order to find peers within a topic of interest.
@@ -66,9 +144,10 @@ set of nodes, without relying on an external peer discovery service.
 
 Peer Exchange (PX) kicks in when pruning a mesh because of oversubscription. Instead of simply
 telling the pruned peer to go away, the pruning peer _may_ provide a set of other peers where the
-pruned peer can connect to reform its mesh (see Peer Scoring below).
+pruned peer can connect to reform its mesh (see [Peer Scoring](#peer-scoring) below).
+
 In addition, both the pruned and the pruning peer add a backoff period from each other, within which
-they will not try to regraft. Both the pruning and the pruned peer will immediate prune a `GRAFT`
+they will not try to regraft. Both the pruning and the pruned peer will immediately prune a `GRAFT`
 within the backoff period.
 The recommended duration for the backoff period is 1 minute, while the recommended number of peers
 to exchange is equal to `D` so that the pruned peer can form a full mesh.
@@ -83,7 +162,7 @@ the peer, eg the DHT.
 
 #### Protobuf
 
-The `ControlPrune` message is extended with a `peer` field as follows.
+The `ControlPrune` message is extended with a `peers` field as follows.
 
 ```protobuf
 message ControlPrune {
@@ -99,10 +178,15 @@ message PeerInfo {
 
 ### Flood Publishing
 
-In gossipsub v1.0 a freshly published message is propagated through the mesh or the fanout map
-if the publisher is not subscribed to the topic. In gossipsub v1.1 publishing is (optionally)
-done by publishing the message to all connected peers with a score above a publish threshold
-(see Peer Scoring below).
+In gossipsub v1.0, peers publish new messages to the members of their mesh if they are subscribed to
+the topic to which they're publishing. A peer can also publish to topics they are not subscribed
+to, in which case they will select peers from their fanout map.
+
+In gossipsub v1.1 publishing is (optionally) done by publishing the message to all connected peers
+with a score above a publish threshold (see [Peer Scoring](#peer-scoring) below). This applies
+regardless of whether the publisher is subscribed to the topic. With flood publishing enabled, the
+mesh is used when propagating messages from other peers, but a peer's own messages will always be
+published to all known peers in the topic.
 
 This behaviour is prescribed to counter eclipse attacks and ensure that a newly published message
 from a honest node will reach all connected honest nodes and get out to the network at large.
@@ -119,10 +203,10 @@ parameter. In gossipsub v1.1 the disemmination of gossip is adaptive; instead of
 to a fixed number of peers, we emit gossip to a percentage of our peers with a minimum of `D_lazy`
 peers.
 
-The parameter controlling the emission of gossip is called the gossip _factor_. When a node wants
-to emit gossip during the heartbeat, first it selects all peers with a peer score above a gossip
-threshold (see Peer Scoring below). From these peers, it randomly selects gossip factor peers with
-a minimum of `D_lazy`, and emits gossip to the selected peers.
+The parameter controlling the emission of gossip is called the gossip _factor_. When a node wants to
+emit gossip during the heartbeat, first it selects all peers with a peer score above a gossip
+threshold (see [Peer Scoring](#peer-scoring) below). From these peers, it randomly selects gossip
+factor peers with a minimum of `D_lazy`, and emits gossip to the selected peers.
 
 The recommended value for the gossip factor is `0.25`, which with the default of 3 rounds of gossip
 per message ensures that each peer has at least 50% chance of receiving gossip about a message.
@@ -187,34 +271,34 @@ Score(p) = Σtᵢ*(w₁(tᵢ)*P₁(tᵢ) + w₂(tᵢ)*P₂(tᵢ) + w₃(tᵢ)*P�
 where `tᵢ` is the topic weight for each topic where per topic parameters apply.
 
 The parameters are defined as follows:
-- P₁: time in mesh for a topic. This is the time a peer has been in the mesh, capped to a small value
+- `P₁`: **Time in Mesh** for a topic. This is the time a peer has been in the mesh, capped to a small value
   and mixed with a small positive weight. This is intended to boost peers already in the mesh so that
   they are not prematurely pruned because of oversubscription.
-- P₂: first message deliveries for a topic. This is the number of message first delivered by the peer
+- `P₂`: **First Message Deliveries** for a topic. This is the number of message first delivered by the peer
   in the topic, mixed with a positive weight. This is intended to reward peers who first forward a
   valid message.
-- P₃: mesh message delivery rate for a topic. This parameter is a threshold for the expected message
+- `P₃`: **Mesh Message Delivery Rate** for a topic. This parameter is a threshold for the expected message
   delivery rate within the mesh in the topic. If the number of deliveries is above the threshold,
   then the value is 0. If the number is below the threshold, then the value of the parameter is
   the square of the deficit.
   This is intended to penalize peers in the mesh who are not delivering the expected
   number of messages so that they can be removed from the mesh. The parameter is mixed with a negative
   weight.
-- P₃b: mesh message delivery failures for a topic. This is a sticky parameter that counts the number
+- `P₃b`: **Mesh Message Delivery Failures** for a topic. This is a sticky parameter that counts the number
   of mesh message delivery failures. Whenever a peer is pruned with a negative score, the parameter
   is augmented by the rate deficit at the time of prune. This is intended to keep history of prunes
   so that a peer that was pruned because of underdelivery cannot quickly get regrafted into the
   mesh. The parameter is mixed with negative weight.
-- P₄: invalid messages for a topic. This is he number of invalid messages delivered in the topic.
+- `P₄`: **Invalid Messages** for a topic. This is he number of invalid messages delivered in the topic.
   This is intended to penalize peers who transmit invalid messages, according to application specific
   validation rules. It is mixed with a negative weight.
-- P₅: application specific score. This is the score component assigned to the peer by the application
+- `P₅`: **Application Specific** score. This is the score component assigned to the peer by the application
   itself, using application specific rules. The weight is positive, but the parameter itself has an
   arbitrary real value, so that the application can signal misbehaviour with a negative score or gate
   peers before an application specific handshake is completed.
-- P₆: IP colocation factor. This parameter is a threshold for the number of peers using the same IP
+- `P₆`: **IP Colocation Factor**. This parameter is a threshold for the number of peers using the same IP
   address. If the number of peers in the same IP exceeds the threshold, then the value is the square
-  of the surpluss, otherwise it is 0. This is intended to make it difficult to carry out sybil attacks
+  of the surplus, otherwise it is 0. This is intended to make it difficult to carry out sybil attacks
   by using a small number of IPs. The parameter is mixed with a negative weight.
 
 #### Topic Parameter Calculation and Decay
@@ -224,12 +308,33 @@ whenever an event of interest occurs. The counters _decay_ periodically so that 
 not continuously increasing and ensure that a large positive or negative score isn't sticky for
 the lifetime of the peer.
 
+The decay interval is configurable by the application, with shorter intervals resulting in faster
+decay.
+
+Each decaying parameter can have it's own decay _factor_, which is a configurable parameter that
+controls how much the parameter will decay each decay period.
+
+The decay factor is a float in the range of (0.0, 1.0) that will be multiplied with the current
+parameter value at each decay interval update. For example, suppose the value for `P₂` (First
+Message Deliveries) is `120`, with a decay factor `FirstMessageDeliveriesDecay = 0.97`. At the decay
+interval, the value will be updated to `120 * 0.97 == 110.4`.
+
+The decay factor and interval together determine the absolute rate of decay for each parameter. With
+a decay interval of 1 second and a decay factor of `0.97`, a parameter will decrease by 3% every
+second, while `0.90` would cause it lose 10%/sec, etc.
+
+
 ##### P₁: Time in Mesh
 
-In order to compute P₁, the router records the time when the peer is GRAFTed. The time in mesh
+In order to compute `P₁`, the router records the time when the peer is GRAFTed. The time in mesh
 is calculated lazily during the decay update to avoid a large number of calls to `gettimeofday`.
-The parameter value is the division of the time ellapsed since the GRAFT with an application
+The parameter value is the division of the time elapsed since the GRAFT with an application
 configurable quantum.
+
+For example, with a quantum of one second, a peer's `P₁` value will be equal to the number of
+seconds elapsed since they were GRAFTed onto the mesh. With a quantum of 5 minutes, the `P₁` value
+will be the number of 5 minute intervals elapsed since GRAFTing. The `P₁` value will be capped to an
+application configurable maximum.
 
 In pseudo-go:
 ```go
@@ -249,7 +354,7 @@ if p1 > TimeInMeshCap {
 
 ##### P₂: First Message Deliveries
 
-In order to compute P₂, the router maintains a counter that increments whenever a message
+In order to compute `P₂`, the router maintains a counter that increments whenever a message
 is first delivered in the topic by the peer. The parameter has a cap that applies at the time
 of increment.
 
@@ -273,8 +378,8 @@ p2 := firstMessageDeliveries
 
 ##### P₃ and P₃b: Mesh Message Delivery
 
-In order to compute P₃, the router maintains a counter that increments whenever a first
-or near-first message delivery occurs in the topic by a peer in the mesh.  A near-first message
+In order to compute `P₃`, the router maintains a counter that increments whenever a first
+or _near-first_ message delivery occurs in the topic by a peer in the mesh.  A near-first message
 delivery is a message delivery that occurs while a message has been first received and is being
 validated or it has been received within a configurable window of validation of first message
 delivery. The window is configurable but should be small (in the order of milliseconds) to avoid
@@ -332,7 +437,7 @@ p3b := meshFailurePenalty
 
 ##### P₄: Invalid Messages
 
-In order to compute P₄, the router maintains a counter that increments whenever a message fails
+In order to compute `P₄`, the router maintains a counter that increments whenever a message fails
 validation. The counter is uncapped.
 
 In pseudo-go:
@@ -349,7 +454,7 @@ p4 := invalidMessageDeliveries
 
 ##### Parameter Decay
 
-The counters associated with P₂, P₃, P₃b, and P₄ decay periodically by multiplying with a configurable
+The counters associated with `P₂`, `P₃`, `P₃b`, and `P₄` decay periodically by multiplying with a configurable
 decay factor. When the value drops below a threshold it is considered zero.
 
 In pseudo-go:
