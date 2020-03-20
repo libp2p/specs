@@ -23,6 +23,8 @@ Legend: ✅ = complete, 🏗 = in progress, ❕ = not started yet
 | [go-libp2p-pubsub (Golang)](https://github.com/libp2p/go-libp2p-pubsub/blob/master/gossipsub.go) |   ✅  |   ✅  |
 | [gossipsub-js (JavaScript)](https://github.com/ChainSafeSystems/gossipsub-js)                    |   ✅  |   ❕  |
 | [rust-libp2p (Rust)](https://github.com/libp2p/rust-libp2p/tree/master/protocols/gossipsub)      |   🏗  |   ❕  |
+| [py-libp2p (Python)](https://github.com/libp2p/py-libp2p/tree/master/libp2p/pubsub)              |   ✅  |   ❕  |
+| [jvm-libp2p (Java/Kotlin)](https://github.com/libp2p/jvm-libp2p/tree/develop/src/main/kotlin/io/libp2p/pubsub) |   ✅  |   ❕  |
 
 Additional tooling:
 
