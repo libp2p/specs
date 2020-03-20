@@ -66,9 +66,10 @@ set of nodes, without relying on an external peer discovery service.
 
 Peer Exchange (PX) kicks in when pruning a mesh because of oversubscription. Instead of simply
 telling the pruned peer to go away, the pruning peer _may_ provide a set of other peers where the
-pruned peer can connect to reform its mesh (see Peer Scoring below).
+pruned peer can connect to reform its mesh (see [Peer Scoring](#peer-scoring) below).
+
 In addition, both the pruned and the pruning peer add a backoff period from each other, within which
-they will not try to regraft. Both the pruning and the pruned peer will immediate prune a `GRAFT`
+they will not try to regraft. Both the pruning and the pruned peer will immediately prune a `GRAFT`
 within the backoff period.
 The recommended duration for the backoff period is 1 minute, while the recommended number of peers
 to exchange is equal to `D` so that the pruned peer can form a full mesh.
@@ -83,7 +84,7 @@ the peer, eg the DHT.
 
 #### Protobuf
 
-The `ControlPrune` message is extended with a `peer` field as follows.
+The `ControlPrune` message is extended with a `peers` field as follows.
 
 ```protobuf
 message ControlPrune {
@@ -119,10 +120,10 @@ parameter. In gossipsub v1.1 the disemmination of gossip is adaptive; instead of
 to a fixed number of peers, we emit gossip to a percentage of our peers with a minimum of `D_lazy`
 peers.
 
-The parameter controlling the emission of gossip is called the gossip _factor_. When a node wants
-to emit gossip during the heartbeat, first it selects all peers with a peer score above a gossip
-threshold (see Peer Scoring below). From these peers, it randomly selects gossip factor peers with
-a minimum of `D_lazy`, and emits gossip to the selected peers.
+The parameter controlling the emission of gossip is called the gossip _factor_. When a node wants to
+emit gossip during the heartbeat, first it selects all peers with a peer score above a gossip
+threshold (see [Peer Scoring](#peer-scoring) below). From these peers, it randomly selects gossip
+factor peers with a minimum of `D_lazy`, and emits gossip to the selected peers.
 
 The recommended value for the gossip factor is `0.25`, which with the default of 3 rounds of gossip
 per message ensures that each peer has at least 50% chance of receiving gossip about a message.
@@ -187,34 +188,34 @@ Score(p) = Σtᵢ*(w₁(tᵢ)*P₁(tᵢ) + w₂(tᵢ)*P₂(tᵢ) + w₃(tᵢ)*P�
 where `tᵢ` is the topic weight for each topic where per topic parameters apply.
 
 The parameters are defined as follows:
-- P₁: time in mesh for a topic. This is the time a peer has been in the mesh, capped to a small value
+- `P₁`: **Time in Mesh** for a topic. This is the time a peer has been in the mesh, capped to a small value
   and mixed with a small positive weight. This is intended to boost peers already in the mesh so that
   they are not prematurely pruned because of oversubscription.
-- P₂: first message deliveries for a topic. This is the number of message first delivered by the peer
+- `P₂`: **First Message Deliveries** for a topic. This is the number of message first delivered by the peer
   in the topic, mixed with a positive weight. This is intended to reward peers who first forward a
   valid message.
-- P₃: mesh message delivery rate for a topic. This parameter is a threshold for the expected message
+- `P₃`: **Mesh Message Delivery Rate** for a topic. This parameter is a threshold for the expected message
   delivery rate within the mesh in the topic. If the number of deliveries is above the threshold,
   then the value is 0. If the number is below the threshold, then the value of the parameter is
   the square of the deficit.
   This is intended to penalize peers in the mesh who are not delivering the expected
   number of messages so that they can be removed from the mesh. The parameter is mixed with a negative
   weight.
-- P₃b: mesh message delivery failures for a topic. This is a sticky parameter that counts the number
+- `P₃b`: **Mesh Message Delivery Failures** for a topic. This is a sticky parameter that counts the number
   of mesh message delivery failures. Whenever a peer is pruned with a negative score, the parameter
   is augmented by the rate deficit at the time of prune. This is intended to keep history of prunes
   so that a peer that was pruned because of underdelivery cannot quickly get regrafted into the
   mesh. The parameter is mixed with negative weight.
-- P₄: invalid messages for a topic. This is he number of invalid messages delivered in the topic.
+- `P₄`: **Invalid Messages** for a topic. This is he number of invalid messages delivered in the topic.
   This is intended to penalize peers who transmit invalid messages, according to application specific
   validation rules. It is mixed with a negative weight.
-- P₅: application specific score. This is the score component assigned to the peer by the application
+- `P₅`: **Application Specific** score. This is the score component assigned to the peer by the application
   itself, using application specific rules. The weight is positive, but the parameter itself has an
   arbitrary real value, so that the application can signal misbehaviour with a negative score or gate
   peers before an application specific handshake is completed.
-- P₆: IP colocation factor. This parameter is a threshold for the number of peers using the same IP
+- `P₆`: **IP Colocation Factor**. This parameter is a threshold for the number of peers using the same IP
   address. If the number of peers in the same IP exceeds the threshold, then the value is the square
-  of the surpluss, otherwise it is 0. This is intended to make it difficult to carry out sybil attacks
+  of the surplus, otherwise it is 0. This is intended to make it difficult to carry out sybil attacks
   by using a small number of IPs. The parameter is mixed with a negative weight.
 
 #### Topic Parameter Calculation and Decay
@@ -226,10 +227,15 @@ the lifetime of the peer.
 
 ##### P₁: Time in Mesh
 
-In order to compute P₁, the router records the time when the peer is GRAFTed. The time in mesh
+In order to compute `P₁`, the router records the time when the peer is GRAFTed. The time in mesh
 is calculated lazily during the decay update to avoid a large number of calls to `gettimeofday`.
-The parameter value is the division of the time ellapsed since the GRAFT with an application
+The parameter value is the division of the time elapsed since the GRAFT with an application
 configurable quantum.
+
+For example, with a quantum of one second, a peer's `P₁` value will be equal to the number of
+seconds elapsed since they were GRAFTed onto the mesh. With a quantum of 5 minutes, the `P₁` value
+will be the number of 5 minute intervals elapsed since GRAFTing. The `P₁` value will be capped to an
+application configurable maximum.
 
 In pseudo-go:
 ```go
@@ -249,7 +255,7 @@ if p1 > TimeInMeshCap {
 
 ##### P₂: First Message Deliveries
 
-In order to compute P₂, the router maintains a counter that increments whenever a message
+In order to compute `P₂`, the router maintains a counter that increments whenever a message
 is first delivered in the topic by the peer. The parameter has a cap that applies at the time
 of increment.
 
@@ -273,8 +279,8 @@ p2 := firstMessageDeliveries
 
 ##### P₃ and P₃b: Mesh Message Delivery
 
-In order to compute P₃, the router maintains a counter that increments whenever a first
-or near-first message delivery occurs in the topic by a peer in the mesh.  A near-first message
+In order to compute `P₃`, the router maintains a counter that increments whenever a first
+or _near-first_ message delivery occurs in the topic by a peer in the mesh.  A near-first message
 delivery is a message delivery that occurs while a message has been first received and is being
 validated or it has been received within a configurable window of validation of first message
 delivery. The window is configurable but should be small (in the order of milliseconds) to avoid
@@ -332,7 +338,7 @@ p3b := meshFailurePenalty
 
 ##### P₄: Invalid Messages
 
-In order to compute P₄, the router maintains a counter that increments whenever a message fails
+In order to compute `P₄`, the router maintains a counter that increments whenever a message fails
 validation. The counter is uncapped.
 
 In pseudo-go:
@@ -349,7 +355,7 @@ p4 := invalidMessageDeliveries
 
 ##### Parameter Decay
 
-The counters associated with P₂, P₃, P₃b, and P₄ decay periodically by multiplying with a configurable
+The counters associated with `P₂`, `P₃`, `P₃b`, and `P₄` decay periodically by multiplying with a configurable
 decay factor. When the value drops below a threshold it is considered zero.
 
 In pseudo-go:
