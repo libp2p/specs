@@ -425,6 +425,7 @@ The following parameters apply globally:
 | `PruneBackoff` | Duration         | Time after pruning a mesh peer before we consider grafting them again. | `1 minute`         |
 | `FloodPublish` | Boolean          | Whether to enable flood publishing                                     | `true`             |
 | `GossipFactor` | Float [0.0, 1.0] | % of peers to send gossip to, if we have more than `D_lazy` available  | `0.25`             |
+| `D_score`      | Integer          | Number of peers to retain by score when pruning because of oversubscription | 4 or 5 for a `D` of 6. |
 
 
 The remaining parameters apply to [Peer Scoring](#peer-scoring). Because many parameters are
