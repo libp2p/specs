@@ -16,8 +16,7 @@ Interest Group: [@yusefnapora], [@raulk], [@whyrusleeping], [@Stebalien], [@davi
 [@Stebalien]: https://github.com/Stebalien
 [@daviddias]: https://github.com/daviddias
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
-and spec status.
+See the [lifecycle document][lifecycle-spec] for context about maturity level and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
 
@@ -55,10 +54,6 @@ bootstrapping and protocol attack resistance. The extensions change the algorith
 prescribe local peer behaviour and are fully backwards compatible with v1.0 of the protocol.
 Peers that implement these extensions, advertise v1.1 of the protocol using `/meshsub/1.1.0`
 as the protocol string.
-
-## Attack Considerations
-
-`To be written`
 
 ## Protocol extensions
 
@@ -100,7 +95,6 @@ message PeerInfo {
 	optional bytes peerID = 1;
 	optional bytes signedPeerRecord = 2;
 }
-
 ```
 
 ### Flood Publishing
@@ -390,7 +384,7 @@ if invalidMessageDeliveries < DecayToZero {
 
 #### Guidelines for Tuning the Scoring Function
 
-TBD
+`TBD`: We are currently developing a multiple types of simulations that will inform us on how to best recommend tunning the Scoring function. We will update this section once that work is complete
 
 ### Spam Protection Measures
 
