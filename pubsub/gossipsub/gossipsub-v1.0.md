@@ -1,14 +1,12 @@
-# gossipsub: An extensible baseline pubsub protocol
+# gossipsub v1.0: An extensible baseline pubsub protocol
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r1, 2018-08-29  |
-
+| 3A              | Recommendation | Active | r2, 2020-03-12  |
 
 Authors: [@vyzo]
-
-Interest Group: [@yusefnapora], [@raulk], [@whyrusleeping], [@Stebalien],
-[@jamesray1], [@vasco-santos]
+Editor: [@yusefnapora]
+Interest Group: [@yusefnapora], [@raulk], [@whyrusleeping], [@Stebalien], [@jamesray1], [@vasco-santos], [@daviddias], [@yiannisbot]
 
 [@whyrusleeping]: https://github.com/whyrusleeping
 [@yusefnapora]: https://github.com/yusefnapora
@@ -96,11 +94,11 @@ The floodsub routing strategy has the following highly desirable properties:
   long as the overlay is sufficiently well connected.
 - It is highly robust; there is very little maintenance logic or state to
   manage.
-  
+
 The problem however is that messages don't just follow the minimum latency
 paths; they follow all edges, thus creating a flood. The outbound degree of the
 network is unbounded, whereas we want it to be bounded in order to reduce
-bandwidth requirements and increase decentralization and scalability. 
+bandwidth requirements and increase decentralization and scalability.
 
 This unbounded outbound degree creates a problem for individual densely
 connected nodes, as they may have a large number of connected peers and cannot
@@ -499,7 +497,7 @@ for tuning the tradeoff between eager and lazy transmission of messages.
 
 The gossipsub protocol extends the [existing `RPC` message
 structure][pubsub-spec-rpc] with a new field, `control`. This is an instance of
-`ControlMessage` which may contain one or more control messages. 
+`ControlMessage` which may contain one or more control messages.
 
 The four control messages are `ControlIHave` for [`IHAVE`](#ihave) messages,
 `ControlIWant` for [`IWANT`](#iwant) messages, `ControlGraft` for
