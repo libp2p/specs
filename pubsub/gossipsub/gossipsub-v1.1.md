@@ -25,9 +25,10 @@ See the [lifecycle document][lifecycle-spec] for context about maturity level an
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+
 - [Overview](#overview)
-- [Attack Considerations](#attack-considerations)
 - [Protocol extensions](#protocol-extensions)
+  - [Overview of New Parameters](#overview-of-new-parameters)
   - [Peer Exchange on PRUNE](#peer-exchange-on-prune)
     - [Protobuf](#protobuf)
   - [Flood Publishing](#flood-publishing)
