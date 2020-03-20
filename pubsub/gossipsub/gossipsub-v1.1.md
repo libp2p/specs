@@ -100,10 +100,15 @@ message PeerInfo {
 
 ### Flood Publishing
 
-In gossipsub v1.0 a freshly published message is propagated through the mesh or the fanout map
-if the publisher is not subscribed to the topic. In gossipsub v1.1 publishing is (optionally)
-done by publishing the message to all connected peers with a score above a publish threshold
-(see Peer Scoring below).
+In gossipsub v1.0, peers publish new messages to the members of their mesh if they are subscribed to
+the topic to which they're publishing. A peer can also publish to topics they are not subscribed
+to, in which case they will select peers from their fanout map.
+
+In gossipsub v1.1 publishing is (optionally) done by publishing the message to all connected peers
+with a score above a publish threshold (see [Peer Scoring](#peer-scoring) below). This applies
+regardless of whether the publisher is subscribed to the topic. With flood publishing enabled, the
+mesh is used when propagating messages from other peers, but a peer's own messages will always be
+published to all known peers in the topic.
 
 This behaviour is prescribed to counter eclipse attacks and ensure that a newly published message
 from a honest node will reach all connected honest nodes and get out to the network at large.
@@ -224,6 +229,22 @@ The topic parameters are implemented using counters maintained internally by the
 whenever an event of interest occurs. The counters _decay_ periodically so that their values are
 not continuously increasing and ensure that a large positive or negative score isn't sticky for
 the lifetime of the peer.
+
+The decay interval is configurable by the application, with shorter intervals resulting in faster
+decay.
+
+Each decaying parameter can have it's own decay _factor_, which is a configurable parameter that
+controls how much the parameter will decay each decay period.
+
+The decay factor is a float in the range of (0.0, 1.0) that will be multiplied with the current
+parameter value at each decay interval update. For example, suppose the value for `P₂` (First
+Message Deliveries) is `120`, with a decay factor `FirstMessageDeliveriesDecay = 0.97`. At the decay
+interval, the value will be updated to `120 * 0.97 == 110.4`.
+
+The decay factor and interval together determine the absolute rate of decay for each parameter. With
+a decay interval of 1 second and a decay factor of `0.97`, a parameter will decrease by 3% every
+second, while `0.90` would cause it lose 10%/sec, etc.
+
 
 ##### P₁: Time in Mesh
 
