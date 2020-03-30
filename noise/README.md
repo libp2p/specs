@@ -5,7 +5,7 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r1, 2020-01-20  |
+| 1A              | Working Draft | Active | r2, 2020-03-30  |
 
 Authors: [@yusefnapora]
 
@@ -36,36 +36,39 @@ and spec status.
 
 ## Table of Contents
 
-- [noise-libp2p - Secure Channel Handshake](#noise-libp2p---secure-channel-handshake)
-  - [Table of Contents](#table-of-contents)
-  - [Overview](#overview)
-  - [Negotiation](#negotiation)
-  - [The Noise Handshake](#the-noise-handshake)
-    - [Static Key Authentication](#static-key-authentication)
-    - [libp2p Data in Handshake Messages](#libp2p-data-in-handshake-messages)
-      - [The libp2p Handshake Payload](#the-libp2p-handshake-payload)
-    - [Supported Handshake Patterns](#supported-handshake-patterns)
-      - [XX](#xx)
-    - [Optimistic 0-RTT with Noise Pipes](#optimistic-0-rtt-with-noise-pipes)
-      - [IK](#ik)
-      - [XXfallback](#xxfallback)
-      - [Noise Pipes Message Flow](#noise-pipes-message-flow)
-  - [Cryptographic Primitives](#cryptographic-primitives)
-  - [Valid Noise Protocol Names](#valid-noise-protocol-names)
-  - [Wire Format](#wire-format)
-    - [Encrypted Payloads](#encrypted-payloads)
-  - [Encryption and I/O](#encryption-and-io)
-  - [libp2p Interfaces and API](#libp2p-interfaces-and-api)
-    - [Initialization](#initialization)
-    - [Secure Transport Interface](#secure-transport-interface)
-      - [NoiseConnection](#noiseconnection)
-      - [SecureOutbound](#secureoutbound)
-      - [SecureInbound](#secureinbound)
-  - [Design Considerations](#design-considerations)
-    - [No Negotiation of Noise Protocols](#no-negotiation-of-noise-protocols)
-    - [Why ChaChaPoly?](#why-chachapoly)
-    - [Distinct Noise and Identity Keys](#distinct-noise-and-identity-keys)
-    - [Why Not Noise Signatures?](#why-not-noise-signatures)
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Overview](#overview)
+- [Negotiation](#negotiation)
+- [The Noise Handshake](#the-noise-handshake)
+  - [Static Key Authentication](#static-key-authentication)
+  - [libp2p Data in Handshake Messages](#libp2p-data-in-handshake-messages)
+    - [The libp2p Handshake Payload](#the-libp2p-handshake-payload)
+  - [Handshake Pattern](#handshake-pattern)
+    - [XX](#xx)
+- [Cryptographic Primitives](#cryptographic-primitives)
+- [Noise Protocol Name](#noise-protocol-name)
+- [Wire Format](#wire-format)
+- [Encryption and I/O](#encryption-and-io)
+- [libp2p Interfaces and API](#libp2p-interfaces-and-api)
+  - [Initialization](#initialization)
+  - [Secure Transport Interface](#secure-transport-interface)
+    - [NoiseConnection](#noiseconnection)
+    - [SecureOutbound](#secureoutbound)
+    - [SecureInbound](#secureinbound)
+- [Design Considerations](#design-considerations)
+  - [No Negotiation of Noise Protocols](#no-negotiation-of-noise-protocols)
+  - [Why the XX handshake pattern?](#why-the-xx-handshake-pattern)
+  - [Why ChaChaPoly?](#why-chachapoly)
+  - [Distinct Noise and Identity Keys](#distinct-noise-and-identity-keys)
+  - [Why Not Noise Signatures?](#why-not-noise-signatures)
+- [Changelog](#changelog)
+  - [r1 - 2020-01-20](#r1---2020-01-20)
+  - [r2 - 2020-03-30](#r2---2020-03-30)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Overview
 
@@ -98,9 +101,8 @@ responding peer, or in libp2p terms, a dialer and a listener. Over the course of
 the handshake, peers exchange public keys and perform Diffie-Hellman exchanges
 to arrive at a pair of symmetric keys that can be used to efficiently encrypt
 traffic. The [Noise Handshake section](#the-noise-handshake) describes the
-[supported handshake patterns](#supported-handshake-patterns) and [how
-libp2p-specific data is exchanged during the
-handshake](#libp2p-data-in-handshake-messages). 
+[handshake pattern](#handshake-pattern) and [how libp2p-specific data is
+exchanged during the handshake](#libp2p-data-in-handshake-messages).
 
 During the handshake, the static DH key used for Noise is authenticated using
 the libp2p identity keypair, as described in the [Static Key Authentication
@@ -141,13 +143,7 @@ primitives](#cryptographic-primitives) used to construct it.
 This section covers the method of [authenticating the Noise static
 key](#static-key-authentication), the [libp2p-specific
 data](#libp2p-data-in-handshake-messages) that is exchanged in handshake message
-payloads, and the set of [supported handshake
-patterns](#supported-handshake-patterns).
-
-A brief overview of the payload security and identity hiding properties of each
-handshake pattern is included in the description of each pattern, however,
-readers are strongly encouraged to refer to the [Noise spec][npf] for a full
-understanding.
+payloads, and the [supported handshake pattern](#handshake-pattern).
 
 ### Static Key Authentication
 
@@ -169,15 +165,13 @@ identity keypair to use Noise, noise-libp2p uses a separate static keypair for
 Noise that is distinct from the peer's identity keypair.
 
 A given libp2p peer will have one or more static Noise keypairs throughout its
-lifetime. Implementations MAY allow persisting static Noise keys across process
-restarts, or they may generate new static Noise keys when initializing the
-noise-libp2p module. 
-
-Systems which enable the [Noise Pipes
-pattern](#optimistic-0-rtt-with-noise-pipes) are likely to benefit from a longer
-lifetime for static Noise keys, as the static key is used in the optimistic
-case. Other systems may prefer to cycle static Noise keys frequently to reduce
-exposure.
+lifetime. Because the static key is authenticated using the libp2p identity key,
+it is not necessary for the key to actually be "static" in the traditional
+sense, and implementations MAY generate a new static Noise keypair for each new
+session. Alternatively, a single static keypair may be generated when
+noise-libp2p is initialized and used for all sessions. Implementations SHOULD
+NOT store the static Noise key to disk, as there is no benefit and a hightened
+risk of exposure.
 
 To authenticate the static Noise key used in a handshake, noise-libp2p includes
 a signature of the static Noise public key in a [handshake
@@ -206,9 +200,10 @@ libp2p components after the handshake is complete and the payload signature has
 been validated. If the handshake fails for any reason, the early data payload
 MUST be discarded immediately.
 
-Any early data provided to noise-libp2p MUST be included in the [handshake payload](#the-libp2p-handshake-payload) as a byte string
-without alteration by the noise-libp2p implementation, and a valid signature of
-the early data MUST be included as described below.
+Any early data provided to noise-libp2p MUST be included in the [handshake
+payload](#the-libp2p-handshake-payload) as a byte string without alteration by
+the noise-libp2p implementation, and a valid signature of the early data MUST be
+included as described below.
 
 #### The libp2p Handshake Payload
 
@@ -221,25 +216,12 @@ messages. We leverage this construct to transmit:
    userland. Examples of usage include streamlining muxer selection.
 
 These payloads MUST be inserted into the first message of the handshake pattern
-**that guarantees secrecy**.
+**that guarantees secrecy**. In practice, this means that the initiator must not
+send a payload in their first message. Instead, the initiator will send its
+payload in message 3 (closing message), whereas the responder will send theirs
+in message 2 (their only message).
 
-* In XX-initiated handshakes, the initiator will send its payload in message 3
-  (closing message), whereas the responder will send theirs in message 2 (their
-  only message).
-* In IK-initiated handshakes, the initiator will optimistically send its payload
-  in message 1 (as it satisfies the guarantee). Next, this case bifurcates:
-    * If the responder continues the IK handshake, it will send its payload in
-      message 2. The handshake ends.
-    * If the responder fall backs to `XXfallback`, it will have failed to
-      decrypt the payload in message 1. A retransmission from the initiator with
-      the fresh cryptographic material is necessary. This is performed in
-      message 3.
-
-When decrypted, the payload has the structure described in [Encrypted
-Payloads](#encrypted-payloads), consisting of a length-prefixed `body` field
-followed by optional padding.
-
-The `body` of the payload contains a serialized [protobuf][protobuf]
+When decrypted, the payload contains a serialized [protobuf][protobuf]
 `NoiseHandshakePayload` message with the following schema:
 
 ``` protobuf
@@ -268,7 +250,7 @@ Upon receiving the handshake payload, peers MUST decode the public key from the
 the `identity_sig` field against the static Noise key received in the handshake.
 If the signature is invalid, the connection MUST be terminated immediately.
 
-### Supported Handshake Patterns
+### Handshake Pattern
 
 Noise defines twelve [fundamental interactive handshake
 patterns][npf-fundamental-patterns] for exchanging public keys between parties
@@ -276,21 +258,13 @@ and performing Diffie-Hellman computations. The patterns are named according to
 whether static keypairs are used, and if so, by what means each party gains
 knowledge of the other's static public key.
 
-noise-libp2p supports two fundamental handshake patterns, one of which is
-optional and may be enabled for efficiency.
+`noise-libp2p` supports the [XX handshake pattern](#xx), which provides mutual
+authentication and encryption of static keys and handshake payloads and is
+resistant to replay attacks. 
 
-The [XX handshake pattern](#xx) provides mutual authentication and encryption of
-static keys and handshake payloads and is resistant to replay attacks. It is
-the most "expensive" handshake, requiring 1.5 round trips in order to be sound,
-however, the cost of sending the final handshake message may be amortized by
-sending the initiator's first transport message within the same transmission
-unit as the final handshake message. Implementations MUST support the XX
-handshake pattern.
-
-The [IK handshake pattern](#ik) is used in the context of [Optimistic 0-RTT with
-Noise Pipes](#optimistic-0-rtt-with-noise-pipes) and is described in that
-section along with the [`XXfallback`](#xxfallback) variation on the `XX`
-pattern.
+Prior revisions of this spec included a compound protocol involving the `IK` and
+`XXfallback `patterns, but this was [removed](#why-the-xx-handshake-pattern) due
+to the benefits not justifying the considerable additional complexity.
 
 #### XX
 
@@ -315,161 +289,6 @@ internal libp2p data.
 
 The XX handshake MUST be supported by noise-libp2p implementations.
 
-A variation on the `XX` handshake, [`XXfallback`](#xxfallback) can be optionally
-enabled to support [Optimistic 0-RTT with Noise
-Pipes](#optimistic-0-rtt-with-noise-pipes) and is described in that context
-below.
-
-### Optimistic 0-RTT with Noise Pipes
-
-The Noise spec describes a [compound protocol][npf-compound-protocols] called
-[Noise Pipes][npf-noise-pipes], which enables 0-RTT encryption in the optimistic
-case, while allowing peers to fallback to a different Noise protocol if their
-initial handshake attempt fails.
-
-The Noise Pipes protocol consists of the [`XX`](#xx) and [`IK`](#ik) handshake
-patterns, as well as a variation on `XX` called [`XXfallback`](#xxfallback).
-
-The `XX` pattern is used for a **full handshake** when two peers have not
-communicated using Noise before. Once the handshake completes, Alice can cache
-Bob's static Noise key.
-
-Later, Alice can open a new Noise connection to Bob using the `IK` pattern. This
-is a **zero-RTT handshake** that uses the cached static key to encrypt the
-initial handshake message.
-
-If Alice attempts an `IK` handshake but Bob has changed his static Noise key,
-Bob will fail to decrypt the handshake message. However, Bob may use the
-ephemeral key from Alice's `IK` message to initiate a **switch handshake** with
-Alice using the `XXfallback` pattern. Bob effectively treats Alice's `IK`
-message _as if_ it were the first message in an `XX` handshake and proceeds
-accordingly.
-
-The handshake patterns unique to Noise Pipes, `IK` and `XXfallback`, are
-described below. Noise Pipes is an optional feature of noise-libp2p, and
-implementations that do support it SHOULD offer a single configuration option to
-enable Noise Pipes, rather than separate options for enabling `IK` and
-`XXfallback`.
-
-#### IK
-
-
-``` 
-IK:
-      <- s
-      ...
-      -> e, es, s, ss
-      <- e, ee, se
-```
-
-In the `IK` handshake pattern, the initiator has prior knowledge of the
-responder's static Noise public key, indicated by the `<- s` token prior to the
-`...` separator. This allows the initial handshake payload to be encrypted using
-the known static key, and hides the identity of the initiator from passive
-observers.
-
-If the responder is unable to complete the `IK` handshake because their static
-key has changed, they may initiate an [`XXfallback`](#xxfallback) handshake,
-using the ephemeral public key from the failed `IK` handshake message as
-pre-message knowledge.
-
-Each handshake message will include a [libp2p handshake
-payload](#the-libp2p-handshake-payload) that identifies the sender and
-authenticates the static Noise key.
-
-#### XXfallback
-
-``` 
-XXfallback:
-  -> e
-  ...
-  <- e, ee, s, es
-  -> s, se
-```
-
-The `XXfallback` handshake pattern is used when a peer fails to decrypt an
-incoming `IK` handshake message that was prepared using a static Noise public
-key that is no longer valid.
-
-The *responder* for a failed `IK` handshake becomes the *initiator* of the
-subsequent `XXfallback` handshake. For example, if Alice initiated an `IK`
-handshake that Bob was unable to decrypt, Bob will initiate the `XXfallback`
-handshake to Alice. This is reflected in the arrow direction above; fallback
-handshake patterns are notated in the [so-called][npf-alice-and-bob]
-"Bob-initiated form," with arrows reversed from the canonical (Alice-initiated)
-form.
-
-The handshake pattern is the same as in `XX`, however, Alice's ephemeral public
-key is obtained from her initial `IK` message, moving it to the pre-message
-section of the handshake pattern. Essentially, the failed `IK` message serves
-the same role as the first handshake message in the standard `XX` pattern.
-
-Each handshake message will include a [libp2p handshake
-payload](#the-libp2p-handshake-payload) that identifies the sender and
-authenticates the static Noise key.
-
-#### Noise Pipes Message Flow
-
-Noise Pipes is a compound protocol, and peers supporting Noise pipes need to be
-able to distinguish between handshake messages from each pattern. We also wish
-to impose no additional overhead on peers that do not support Noise Pipes.
-
-There are four cases to support:
-
-- Neither party supports Noise Pipes.
-- Alice and Bob both support Noise Pipes.
-- Bob supports Noise Pipes but Alice does not.
-- Alice supports Noise Pipes but Bob does not.
-
-If **neither party supports Noise Pipes**, they both use the `XX` handshake and
-life is easy.
-
-If **Alice and Bob both support Noise Pipes**, Alice's initial handshake message
-to Bob may be either an `XX` or `IK` message. Bob, supporting Noise Pipes, will
-attempt to handle _all_ initial handshake messages as `IK` messages.
-
-If Alice sends an `IK` message to Bob to initiate a **zero-RTT handshake** and
-Bob has not changed his static Noise key, Bob will successfully decrypt the
-initial message and will respond with the next message in the `IK` sequence.
-
-If Alice sends an `XX` message to initiate a **full handshake**, or if Bob's
-static key has changed, Bob will fail to decrypt the initial message as an `IK`
-message. Bob will then re-initialize his Noise handshake state using the
-`XXfallback` pattern, using the ephemeral key from the initial message as
-pre-message knowledge. This is semantically equivalent to re-initializing with
-the `XX` pattern and re-processing Alice's message as the first in the `XX`
-sequence.
-
-If Alice sends an `XX` message, she will always receive an `XX`-compatible
-response. However, if Alice sends an `IK` message, Bob may reply with either the
-second `IK` message, or the first message in the `XXfallback` sequence (aka the
-second message in `XX`). 
-
-Alice will always attempt to process Bob's response to an `IK` handshake attempt
-as an `IK` response. If this succeeds, the handshake is complete. If Alice fails
-to decrypt Bob's response as an `IK` message, she will re-initialize her Noise
-handshake state using the `XXfallback` pattern and re-process Bob's reply. She
-will then respond with the final message in the `XXfallback` pattern, which also
-corresponds to the final message in `XX`.
-
-If **Bob supports Noise Pipes but Alice does not**, Alice's initial handshake
-message will always be an `XX` message. Bob will first attempt to decrypt the
-initial message as an `IK` message, which will fail. He will then re-initialize
-his Noise state and respond with the first message in `XXfallback`, which is
-equivalent to the second `XX` message that Alice was expecting. Alice will
-complete the handshake by sending the final message in the `XX` sequence.
-
-If **Alice supports Noise Pipes but Bob does not**, Alice may send an initial
-`IK` message to Bob. Bob, not knowing anything about Noise Pipes, will treat
-this as the initial message in the `XX` sequence. This will succeed, because the
-only required information from the initial `XX` message is the ephemeral public
-key, which is also present in the `IK` message. Bob's response will be the
-second message in the `XX` sequence. Alice will first try to decrypt this as an
-`IK` response, which will fail. She then re-initializes her Noise state to use
-`XXfallback` as in the case where Bob also supports Noise Pipes but cannot
-complete an `IK` handshake. She then completes the handshake by sending the
-third message in the `XX` sequence that Bob was expecting.
-
 ## Cryptographic Primitives
 
 The Noise framework allows protocol designers to choose from a small set of
@@ -482,23 +301,12 @@ noise-libp2p implementations MUST support the [25519 DH
 functions][npf-dh-25519], [ChaChaPoly cipher functions][npf-cipher-chachapoly],
 and [SHA256 hash function][npf-hash-sha256] as defined in the Noise spec.
 
-## Valid Noise Protocol Names
+## Noise Protocol Name
 
-This section lists the [Noise protocol names][npf-protocol-names] that are valid
-according to the definitions in this spec.
-
-Because only a single set of cryptographic primitives is supported, the Noise
-protocol name depends on the handshake pattern in use.
-
-The `Noise_XX_25519_ChaChaPoly_SHA256` protocol MUST be supported by all
-implementations.
-
-Implementations that support Noise Pipes will also support the following Noise
-protocols:
-
-- `Noise_IK_25519_ChaChaPoly_SHA256`
-- `Noise_XXfallback_25519_ChaChaPoly_SHA256`
-
+A Noise `HandshakeState` is initialized with the hash of a [Noise protocol
+name][npf-protocol-names], which defines the handshake pattern and cipher suite
+used. Because `noise-libp2p` supports a single cipher suite and handshake
+pattern, the Noise protocol name MUST be: `Noise_XX_25519_ChaChaPoly_SHA256`.
 
 ## Wire Format
 
@@ -524,38 +332,13 @@ section](#encrypted-payloads).
 
 After the handshake completes, `noise_message` will be a Noise transport
 message, which is defined as an AEAD ciphertext consisting of an encrypted
-payload plus 16 bytes of authentication data. The decrypted plaintext of the
-encrypted payload will have the structure described in the [Encrypted Payloads
-section](#encrypted-payloads).
-
-### Encrypted Payloads
-
-All Noise transport messages have a single encrypted payload. Noise handshake
-messages may or may not have an encrypted payload.
-
-Once decrypted, the plaintext of an encrypted payload will have this structure:
-
-| `body_len` | `body`          | `padding`       |
-|------------|-----------------|-----------------|
-| 2 bytes    | variable length | variable length |
-
-The `body_len` field stores the length in bytes of the `body` field as an
-unsigned 16-bit big-endian integer.
-
-All data following the `body` field consists of padding bytes, which must be
-ignored by the recipient. Senders SHOULD use a source of random data to populate
-the padding field and may use any length of padding that does not cause the
-total length of the Noise message to exceed 65535 bytes.
+payload plus 16 bytes of authentication data.
 
 ## Encryption and I/O
 
 During the handshake phase, the initiator (Alice) will initialize a Noise
-[`HandshakeState` object][npf-handshake-state] with their preferred [concrete
-Noise protocol](#valid-noise-protocol-names). 
-
-If Alice does not support [Noise Pipes](#optimistic-0-rtt-with-noise-pipes),
-this will be `Noise_XX_25519_ChaChaPoly_SHA256`. With Noise pipes, the initial
-protocol may use the `IK` handshake pattern instead of `XX`.
+[`HandshakeState` object][npf-handshake-state] with the [Noise protocol
+name](#noise-protocol-name) `Noise_XX_25519_ChaChaPoly_SHA256`. 
 
 Alice and Bob exchange handshake messages, during which they [authenticate each
 other's static Noise keys](#static-key-authentication). Handshake messages are
@@ -574,11 +357,6 @@ transport message, which is an AEAD ciphertext consisting of an encrypted
 payload plus 16 bytes of authentication data, as [defined in the Noise
 spec][npf-message-format].
 
-When decrypted, the payload of a Noise transport message will have the structure
-described in [Encrypted Payloads](#encrypted-payloads). Receivers MUST decode
-the `body_len` field from the decrypted payload, and MUST ignore any additional
-padding following the `body` field.
-
 In the unlikely event that peers exchange more than `2^64 - 1` messages, they
 MUST terminate the connection to avoid reusing nonces, in accordance with the
 [Noise spec][npf-security].
@@ -596,8 +374,6 @@ The noise-libp2p module accepts the following inputs at initialization.
 
 - The private libp2p identity key
 - [optional] An early data payload to be sent in handshake messages
-- [optional] The private Noise static key
-- [optional] If Noise Pipes is supported, a flag to enable at runtime
 
 The private libp2p identity key is required for [static key
 authentication](#static-key-authentication) and signing of early data (if
@@ -609,13 +385,6 @@ initialization time, rather than accepting an early data payload for each new
 connection. This ensures that no user or connection-specific data can be present
 in the early data payload.
 
-If a noise-libp2p implementation supports persisting the static Noise key, the
-constructor for the noise-libp2p module must accept a stored key.
-
-If a noise-libp2p implementation supports [Noise
-Pipes](#optimistic-0-rtt-with-noise-pipes), they may expose a configuration flag
-to selectively enable Noise Pipes at runtime.
-
 A minimal constructor could look like:
 
 ``` 
@@ -625,8 +394,7 @@ init(libp2pKey: PrivateKey) -> NoiseLibp2p
 While one supporting all options might look like:
 
 ```
-init(libp2pKey: PrivateKey, noiseKey: ByteString, earlyData: ByteString,
-useNoisePipes: bool) -> NoiseLibp2p
+init(libp2pKey: PrivateKey, earlyData: ByteStringl) -> NoiseLibp2p
 ```
 
 ### Secure Transport Interface
@@ -674,11 +442,6 @@ identity sent by the remote peer during the handshake. If a remote peer sends a
 public key that is not capable of deriving their expected peer id, the
 connection MUST be aborted.
 
-Note that the interface does not allow the user to choose the Noise handshake
-pattern. Implementations that support Noise Pipes must decide whether to use an
-`XX` or `IK` handshake based on whether they possess a cached static Noise key
-for the remote peer.
-
 #### SecureInbound
 
 ```
@@ -700,6 +463,17 @@ infrequently enough to be a non-issue.
 
 Users who require cipher agility are encouraged to adopt TLS 1.3, which supports
 negotiation of cipher suites.
+
+### Why the XX handshake pattern?
+
+An earlier draft of this spec included a compound protocol called [Noise
+Pipes][npf-noise-pipes] that uses the `IK` and `XXfallback` handshake patterns
+to enable a slightly more efficient handshake when the remote peer's static
+Noise key is known _a priori_. During development of the Go and JavaScript
+implementations, this was determined to add too much complexity to be worth the
+benfit, and the benefit turned out to be less than originally hoped. See [the
+discussion on github][issue-rm-noise-pipes] for more context.
+
 
 ### Why ChaChaPoly?
 
@@ -743,6 +517,19 @@ to complete a Noise Signatures handshake. Also, only Ed25519 signatures are
 currently supported by the spec, while libp2p identity keys may be of other
 unsupported types like RSA.
 
+## Changelog
+
+### r1 - 2020-01-20
+
+- Renamed protobuf fields
+- Edited for clarity
+
+### r2 - 2020-03-30
+
+- Removed Noise Pipes and related handshake patterns
+- Removed padding within encrypted payloads
+
+
 [peer-id-spec]: ../peer-ids/peer-ids.md
 [peer-id-spec-signing-rules]: ../peer-ids/peer-ids.md#how-keys-are-encoded-and-messages-signed
 
@@ -772,3 +559,4 @@ unsupported types like RSA.
 [protobuf]: https://developers.google.com/protocol-buffers/
 [noise-socket-spec]: https://github.com/noisesocket/spec
 [noise-signatures-spec]: https://github.com/noiseprotocol/noise_sig_spec/blob/master/output/noise_sig.pdf
+[issue-rm-noise-pipes]: https://github.com/libp2p/specs/issues/249
