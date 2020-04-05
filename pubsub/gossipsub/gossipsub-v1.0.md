@@ -15,9 +15,10 @@ Interest Group: [@yusefnapora], [@raulk], [@whyrusleeping], [@Stebalien], [@jame
 [@Stebalien]: https://github.com/Stebalien
 [@jamesray1]: https://github.com/jamesray1
 [@vasco-santos]: https://github.com/vasco-santos
+[@daviddias]: https://github.com/daviddias
+[@yiannisbot]: https://github.com/yiannisbot
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
-and spec status.
+See the [lifecycle document][lifecycle-spec] for context about maturity level and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
 
