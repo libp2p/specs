@@ -453,7 +453,7 @@ The following peer scoring parameters apply globally to all peers and topics:
 The remaining peer score parameters affect how scores are computed for each peer based on their
 observed behavior.
 
-Parameters with type `Weight` are floats in the range [0.0, 1.0] that determine
+Parameters with type `Weight` are floats that determine
 how much a score parameter contributes to the overall score for a peer. See [The Score
 Function](#the-score-function) for details.
 
