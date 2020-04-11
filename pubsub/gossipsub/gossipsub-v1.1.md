@@ -71,9 +71,9 @@ pruned peer can connect to reform its mesh (see [Peer Scoring](#peer-scoring) be
 
 In addition, both the pruned and the pruning peer add a backoff period from each other, within which
 they will not try to regraft. Both the pruning and the pruned peer will immediately prune a `GRAFT`
-within the backoff period.
+within the backoff period and extend it.
 The recommended duration for the backoff period is 1 minute, while the recommended number of peers
-to exchange is equal to `D` so that the pruned peer can form a full mesh.
+to exchange is larger than `D_hi` so that the pruned peer can reliably form a full mesh.
 
 In order to implement PX, we extend the `PRUNE` control message to include an optional set of
 peers the pruned peer can connect to. This set of peers includes the Peer ID and a [_signed_ peer
