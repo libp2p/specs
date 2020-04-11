@@ -28,6 +28,7 @@ See the [lifecycle document][lifecycle-spec] for context about maturity level an
 
 - [Overview](#overview)
 - [Protocol extensions](#protocol-extensions)
+  - [Direct Peering Agreements](#direct-peering-agreements)
   - [Peer Exchange on PRUNE](#peer-exchange-on-prune)
     - [Protobuf](#protobuf)
   - [Flood Publishing](#flood-publishing)
@@ -35,6 +36,7 @@ See the [lifecycle document][lifecycle-spec] for context about maturity level an
   - [Peer Scoring](#peer-scoring)
     - [Score Thresholds](#score-thresholds)
     - [Heartbeat Maintenance](#heartbeat-maintenance)
+    - [Opportunistic Grafting](#opportunistic-grafting)
     - [The Score Function](#the-score-function)
     - [Topic Parameter Calculation and Decay](#topic-parameter-calculation-and-decay)
       - [P₁: Time in Mesh](#p%E2%82%81-time-in-mesh)
