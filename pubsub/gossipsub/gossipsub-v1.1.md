@@ -193,7 +193,7 @@ The score is checked explicitly during heartbeat maintenance such that:
 The score function is a weighted mix of parameters, 4 of them per topic and 2 of them globally
 applicable.
 ```
-Score(p) = Σtᵢ*(w₁(tᵢ)*P₁(tᵢ) + w₂(tᵢ)*P₂(tᵢ) + w₃(tᵢ)*P₃(tᵢ) + w₃b(tᵢ)*P₃b(tᵢ) + w₄(tᵢ)*P₄(tᵢ)) + w₅*P₅ + w₆*P₆
+Score(p) = TopicCap(Σtᵢ*(w₁(tᵢ)*P₁(tᵢ) + w₂(tᵢ)*P₂(tᵢ) + w₃(tᵢ)*P₃(tᵢ) + w₃b(tᵢ)*P₃b(tᵢ) + w₄(tᵢ)*P₄(tᵢ))) + w₅*P₅ + w₆*P₆
 ```
 where `tᵢ` is the topic weight for each topic where per topic parameters apply.
 
@@ -227,6 +227,9 @@ The parameters are defined as follows:
   address. If the number of peers in the same IP exceeds the threshold, then the value is the square
   of the surplus, otherwise it is 0. This is intended to make it difficult to carry out sybil attacks
   by using a small number of IPs. The parameter is mixed with a negative weight.
+
+The `TopicCap` function allows the application to specify an optional cap to the contribution to the
+score across all topics.
 
 #### Topic Parameter Calculation and Decay
 
@@ -416,7 +419,7 @@ if invalidMessageDeliveries < DecayToZero {
 
 #### Guidelines for Tuning the Scoring Function
 
-`TBD`: We are currently developing a multiple types of simulations that will inform us on how to best recommend tunning the Scoring function. We will update this section once that work is complete
+`TBD`: We are currently developing multiple types of simulations that will inform us on how to best recommend tunning the Scoring function. We will update this section once that work is complete
 
 ### Overview of New Parameters
 
