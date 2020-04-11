@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 1A              | Draft          | Active | r1, 2020-03-20  |
+| 1A              | Draft          | Active | r2, 2020-04-11  |
 
 
 Authors: [@vyzo]
@@ -173,6 +173,10 @@ More specifically, the following thresholds apply:
   less than or equal to the gossip threshold.
 - `graylistThreshold`: when a peer's score drops below this threshold, the peer is graylisted and
   its RPCs are ignored. This threshold must be negative, and less than the gossip/publish threshold.
+- `acceptPXThreshold`: when a peer sends us PX information with a prune, we only accept it and connect
+  to the supplied peers if the originating peer's score exceeds this threshold. This threshold should
+  be non-negative and for increased security a large positive score attainable only by bootstrappers
+  and other trusted well-connected peers.
 
 #### Heartbeat Maintenance
 
@@ -441,6 +445,7 @@ The following peer scoring parameters apply globally to all peers and topics:
 | `GossipThreshold`   | Float    | No gossip emitted to peers below threshold; incoming gossip is ignored. | Must be < 0                  |
 | `PublishThreshold`  | Float    | No self-published messages are sent to peers below threshold.           | Must be < `GossipThreshold`  |
 | `GraylistThreshold` | Float    | All RPC messages are ignored from peers below threshold.                | Must be < `PublishThreshold` |
+| `AcceptPXThreshold` | Float    | PX information by peers below this threshold is ignored.                | Must be >= 0                 |
 | `DecayInterval`     | Duration | Interval at which parameter decay is calculated.                        |                              |
 | `DecayToZero`       | Float    | Limit below which we consider a decayed param to be "zero".             | Should be close to 0.0       |
 | `RetainScore`       | Duration | Time to remember peer scores after a peer disconnects.                  |                              |
