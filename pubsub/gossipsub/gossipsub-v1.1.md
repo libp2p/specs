@@ -193,6 +193,10 @@ More specifically, the following thresholds apply:
   to the supplied peers if the originating peer's score exceeds this threshold. This threshold should
   be non-negative and for increased security a large positive score attainable only by bootstrappers
   and other trusted well-connected peers.
+- `opportunisticGraftThreshold`: when the median peer score in the mesh drops below this value, the
+  router may select more peers with score above the median to opportunistically graft on the mesh
+  (see Opportunistic Grafting below). This threshold should be positive, with a relatively small value
+  compared to scores achievable through topic contributions.
 
 #### Heartbeat Maintenance
 
@@ -203,6 +207,33 @@ The score is checked explicitly during heartbeat maintenance such that:
   and ensures that the best scoring peers are kept in the mesh. At the same time, we do keep some
   peers as random so that the protocol is responsive to new peers joining the mesh.
 - When selecting peers to graft because of undersubscription, peers with a negative score are ignored.
+
+#### Opportunistic Grafting
+
+It may be possible that the router gets stuck with a mesh of poorly performing peers, either due to
+churn of good peers or because of a successful large scale cold boot or covert flash attack.
+When this happens, the router will normally react through mesh failure penalties (see The Score
+Function below), but this reaction time may be slow: the peers selected to replace the negative
+scoring peers are selected at random among the non-negative scoring peers, which may result in multiple
+rounds of selections amongst a sybil poisoned pool. Furthermore, the population of sybils may be so
+large that the sticky mesh failure penalties completely decay before any good peers are selected, thus
+making sybils re-eligible for grafting.
+
+In order to recover from such disaster scenarios and generally adaptively optimize the mesh over time,
+gossipsub v1.1 introduces an opportunistic grafting mechanism.
+Periodically, the router checks the median score of peers in the mesh against the `opportunisticGrafThreshold`.
+If the median score is below the threshold, the the router opportunistically grafts (at least) two peers
+with score above the median in the mesh.
+This improves an underperforming mesh by introducing good scoring peers that may have been gossiping
+at us.
+This also allows the router to get out of sticky disaster situations by replacing sybils attempting
+an eclipse with peers which have actually forwarded messages through gossip recently.
+
+The recommended period for opportunistic grafting is 1 minute, while the router should graft 2 peers
+(with the default parameters) so that it has the opportunity to become a conduit between them and
+establish a score in the mesh. Nonetheless, the number of peers that are opportunistically grafted is
+controlled by the application. It may be desirable to graft more peers if the application has
+configured a larger mesh than the default parameters.
 
 #### The Score Function
 
@@ -465,6 +496,7 @@ The following peer scoring parameters apply globally to all peers and topics:
 | `PublishThreshold`  | Float    | No self-published messages are sent to peers below threshold.           | Must be < `GossipThreshold`  |
 | `GraylistThreshold` | Float    | All RPC messages are ignored from peers below threshold.                | Must be < `PublishThreshold` |
 | `AcceptPXThreshold` | Float    | PX information by peers below this threshold is ignored.                | Must be >= 0                 |
+| `OpportunisticGraftThreshold` | Float | If the median score in the mesh drops below this threshold, then the router may opportunistically graft better scoring peers. | Must be >= 0 |
 | `DecayInterval`     | Duration | Interval at which parameter decay is calculated.                        |                              |
 | `DecayToZero`       | Float    | Limit below which we consider a decayed param to be "zero".             | Should be close to 0.0       |
 | `RetainScore`       | Duration | Time to remember peer scores after a peer disconnects.                  |                              |
