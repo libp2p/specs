@@ -28,7 +28,7 @@ See the [lifecycle document][lifecycle-spec] for context about maturity level an
 
 - [Overview](#overview)
 - [Protocol extensions](#protocol-extensions)
-  - [Direct Peering Agreements](#direct-peering-agreements)
+  - [Explicit Peering Agreements](#explicit-peering-agreements)
   - [Peer Exchange on PRUNE](#peer-exchange-on-prune)
     - [Protobuf](#protobuf)
   - [Flood Publishing](#flood-publishing)
@@ -60,20 +60,20 @@ as the protocol string.
 
 ## Protocol extensions
 
-### Direct Peering Agreements
+### Explicit Peering Agreements
 
-The protocol now supports direct peering agreements between node operators. With direct peering,
+The protocol now supports explict peering agreements between node operators. With explicit peering,
 the application can specify a list of peers to remain connected to and unconditionally forward
 messages to each other outside of the vagaries of the peer scoring system and other defensive
 measures.
 
-For every direct peer, the router must establish and maintain a connection. The connections
+For every explicit peer, the router must establish and maintain a connection. The connections
 are initially established when the router boots, and are periodically checked for connectivity
 and reconnect if the connectivity is lost. The recommended period for connectivity checks is 5 minutes.
 
 Peering agreements are established out of band and reciprocal.
-Direct peers exist outside the mesh: every new valid incoming message is forwarded to the direct
-peers, and incoming RPCs are always accepted from them. It is an error to GRAFT on a direct peer,
+explicit peers exist outside the mesh: every new valid incoming message is forwarded to the direct
+peers, and incoming RPCs are always accepted from them. It is an error to GRAFT on a explicit peer,
 and such an attempt should be logged and rejected with a PRUNE.
 
 ### Peer Exchange on PRUNE
