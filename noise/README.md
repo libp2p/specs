@@ -202,8 +202,7 @@ MUST be discarded immediately.
 
 Any early data provided to noise-libp2p MUST be included in the [handshake
 payload](#the-libp2p-handshake-payload) as a byte string without alteration by
-the noise-libp2p implementation, and a valid signature of the early data MUST be
-included as described below.
+the noise-libp2p implementation.
 
 #### The libp2p Handshake Payload
 
