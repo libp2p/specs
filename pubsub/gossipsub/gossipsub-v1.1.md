@@ -477,7 +477,7 @@ The pubsub subsystem incorporates application-specific message validators so tha
 signal invalid message delivery, and trigger the P₄ penalty.
 However, It is possible to have circumstances where a message should not be delivered to the application
 or forwarded to the network, but without triggering the P₄ penalty.
-This might arise in the case of duplicate beacon messages or while an application is syncing its blockchain, in which case it would be unable to ascertain the validity of new messages.
+A known use-case where this need exists is in the case of duplicate beacon messages or while an application is syncing its blockchain, in which case it would be unable to ascertain the validity of new messages.
 
 In order to address this situation, all gossipsub v1.1 implementations _must_ support extended validators with a ternary decision interface.
 The outcome of extended validation can be one of three things:
