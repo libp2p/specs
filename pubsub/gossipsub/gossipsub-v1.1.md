@@ -479,11 +479,11 @@ However, It is possible to have circumstances where a message should not be deli
 or forwarded to the network, but without triggering the P₄ penalty.
 A known use-case where this need exists is in the case of duplicate beacon messages or while an application is syncing its blockchain, in which case it would be unable to ascertain the validity of new messages.
 
-In order to address this situation, all gossipsub v1.1 implementations _must_ support extended validators with a ternary decision interface.
-The outcome of extended validation can be one of three things:
+In order to address this situation, all gossipsub v1.1 implementations _must_ support extended validators with an enumerated decision interface.
+The outcome of extended validation can be at a minimum one of three things:
 - Accept message; in this case the message is considered valid, and it should be delivered and forwarded to the network.
 - Reject message; in this case the message is considered invalid, and it should be rejected and trigger the P₄ penalty.
-- Drop message; in this case the message is neither delivered nor forwarded to the network, but the router does not trigger the P₄ penalty.
+- Ignore message; in this case the message is neither delivered nor forwarded to the network, but the router does not trigger the P₄ penalty.
 
 ### Overview of New Parameters
 
