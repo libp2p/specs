@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 1A              | Draft          | Active | r2, 2020-04-11  |
+| 1A              | Draft          | Active | r3, 2028-04-11  |
 
 
 Authors: [@vyzo]
@@ -45,6 +45,7 @@ See the [lifecycle document][lifecycle-spec] for context about maturity level an
       - [P₄: Invalid Messages](#p%E2%82%84-invalid-messages)
       - [Parameter Decay](#parameter-decay)
     - [Guidelines for Tuning the Scoring Function](#guidelines-for-tuning-the-scoring-function)
+    - [Extended Validators](#extended-validators)
   - [Overview of New Parameters](#overview-of-new-parameters)
   - [Spam Protection Measures](#spam-protection-measures)
 
@@ -469,6 +470,20 @@ if invalidMessageDeliveries < DecayToZero {
 #### Guidelines for Tuning the Scoring Function
 
 `TBD`: We are currently developing multiple types of simulations that will inform us on how to best recommend tunning the Scoring function. We will update this section once that work is complete
+
+#### Extended Validators
+
+The pubsub subsystem incorporates application-specific message validators so that the application can
+signal invalid message delivery, and trigger the P₄ penalty.
+However, It is possible to have circumstances where a message should not be delivered to the application
+or forwarded to the network, but without triggering the P₄ penalty.
+This might arise in the case of duplicate beacon messages or while an application is syncing its blockchain, in which case it would be unable to ascertain the validity of new messages.
+
+In order to address this situation, all gossipsub v1.1 implementations _must_ support extended validators with a ternary decision interface.
+The outcome of extended validation can be one of three things:
+- Accept message; in this case the message is considered valid, and it should be delivered and forwarded to the network.
+- Reject message; in this case the message is considered invalid, and it should be rejected and trigger the P₄ penalty.
+- Drop message; in this case the message is neither delivered nor forwarded to the network, but the router does not trigger the P₄ penalty.
 
 ### Overview of New Parameters
 
