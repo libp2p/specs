@@ -475,7 +475,7 @@ if invalidMessageDeliveries < DecayToZero {
 
 The pubsub subsystem incorporates application-specific message validators so that the application can
 signal invalid message delivery, and trigger the P₄ penalty.
-However, It is possible to have circumstances where a message should not be delivered to the application
+However, it is possible to have circumstances where a message should not be delivered to the application
 or forwarded to the network, but without triggering the P₄ penalty.
 A known use-case where this need exists is in the case of duplicate beacon messages or while an application is syncing its blockchain, in which case it would be unable to ascertain the validity of new messages.
 
