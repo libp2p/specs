@@ -29,7 +29,7 @@ See the [lifecycle document][lifecycle-spec] for context about maturity level an
 - [Overview](#overview)
 - [Protocol extensions](#protocol-extensions)
   - [Explicit Peering Agreements](#explicit-peering-agreements)
-  - [Peer Exchange on PRUNE](#peer-exchange-on-prune)
+  - [PRUNE Backoff and Peer Exchange](#prune-backoff-and-peer-exchange)
     - [Protobuf](#protobuf)
   - [Flood Publishing](#flood-publishing)
   - [Adaptive Gossip Dissemination](#adaptive-gossip-dissemination)
