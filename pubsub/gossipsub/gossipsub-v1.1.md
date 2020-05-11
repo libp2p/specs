@@ -77,7 +77,7 @@ explicit peers exist outside the mesh: every new valid incoming message is forwa
 peers, and incoming RPCs are always accepted from them. It is an error to GRAFT on a explicit peer,
 and such an attempt should be logged and rejected with a PRUNE.
 
-### Peer Exchange on PRUNE
+### PRUNE Backoff and Peer Exchange
 
 Gossipsub relies on ambient peer discovery in order to find peers within a topic of interest.
 This puts pressure to the implementation of a scalable peer discovery service that
@@ -91,8 +91,13 @@ pruned peer can connect to reform its mesh (see [Peer Scoring](#peer-scoring) be
 In addition, both the pruned and the pruning peer add a backoff period from each other, within which
 they will not try to regraft. Both the pruning and the pruned peer will immediately prune a `GRAFT`
 within the backoff period and extend it.
+When a peer tries to regraft too early, the pruning peer may apply a behavioural penalty
+for the action, and penalize the peer through P₇ (see [Peer Scoring](#peer-scoring) below).
+
 The recommended duration for the backoff period is 1 minute, while the recommended number of peers
 to exchange is larger than `D_hi` so that the pruned peer can reliably form a full mesh.
+In order to correctly synchronize the two peers, the pruning peer should include the backoff period
+in the PRUNE message.
 
 In order to implement PX, we extend the `PRUNE` control message to include an optional set of
 peers the pruned peer can connect to. This set of peers includes the Peer ID and a [_signed_ peer
@@ -110,6 +115,7 @@ The `ControlPrune` message is extended with a `peers` field as follows.
 message ControlPrune {
 	optional string topicID = 1;
 	repeated PeerInfo peers = 2; // gossipsub v1.1 PX
+	optional uint64 backoff = 3; // gossipsub v1.1 backoff time (in seconds)
 }
 
 message PeerInfo {
