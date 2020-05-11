@@ -249,7 +249,7 @@ configured a larger mesh than the default parameters.
 The score function is a weighted mix of parameters, 4 of them per topic and 2 of them globally
 applicable.
 ```
-Score(p) = TopicCap(Σtᵢ*(w₁(tᵢ)*P₁(tᵢ) + w₂(tᵢ)*P₂(tᵢ) + w₃(tᵢ)*P₃(tᵢ) + w₃b(tᵢ)*P₃b(tᵢ) + w₄(tᵢ)*P₄(tᵢ))) + w₅*P₅ + w₆*P₆
+Score(p) = TopicCap(Σtᵢ*(w₁(tᵢ)*P₁(tᵢ) + w₂(tᵢ)*P₂(tᵢ) + w₃(tᵢ)*P₃(tᵢ) + w₃b(tᵢ)*P₃b(tᵢ) + w₄(tᵢ)*P₄(tᵢ))) + w₅*P₅ + w₆*P₆ + w₇*P₇
 ```
 where `tᵢ` is the topic weight for each topic where per topic parameters apply.
 
@@ -272,7 +272,7 @@ The parameters are defined as follows:
   is augmented by the rate deficit at the time of prune. This is intended to keep history of prunes
   so that a peer that was pruned because of underdelivery cannot quickly get regrafted into the
   mesh. The parameter is mixed with negative weight.
-- `P₄`: **Invalid Messages** for a topic. This is he number of invalid messages delivered in the topic.
+- `P₄`: **Invalid Messages** for a topic. This is the number of invalid messages delivered in the topic.
   This is intended to penalize peers who transmit invalid messages, according to application specific
   validation rules. It is mixed with a negative weight.
 - `P₅`: **Application Specific** score. This is the score component assigned to the peer by the application
@@ -283,6 +283,10 @@ The parameters are defined as follows:
   address. If the number of peers in the same IP exceeds the threshold, then the value is the square
   of the surplus, otherwise it is 0. This is intended to make it difficult to carry out sybil attacks
   by using a small number of IPs. The parameter is mixed with a negative weight.
+- `P₇`: **Behavioural Penalty**. This parameter captures penalties applied for misbehaviour. The
+  parameter has an associated (decaying) counter, which is explicitly incremented by the router on
+  specific events. The value of the parameter is the square of the counter and is mixed with a negative
+  weight.
 
 The `TopicCap` function allows the application to specify an optional cap to the contribution to the
 score across all topics.
@@ -424,7 +428,7 @@ p3b := meshFailurePenalty
 ##### P₄: Invalid Messages
 
 In order to compute `P₄`, the router maintains a counter that increments whenever a message fails
-validation. The counter is uncapped.
+validation. The value of the parameter is the square of the counter, which is uncapped.
 
 In pseudo-go:
 ```go
@@ -435,7 +439,7 @@ var invalidMessageDeliveries float64
 invalidMessageDeliveries += 1
 
 // P₄
-p4 := invalidMessageDeliveries
+p4 := invalidMessageDeliveries * invalidMessageDeliveries
 ```
 
 ##### Parameter Decay
@@ -539,6 +543,8 @@ which topics they are subscribed to:
 | `AppSpecificWeight`           | Weight | Weight of `P₅`, the application-specific score.       | Must be positive, however score values may be negative.       |
 | `IPColocationFactorWeight`    | Weight | Weight of `P₆`, the IP colocation score.              | Must be negative, to penalize peers with multiple IPs.        |
 | `IPColocationFactorThreshold` | Float  | Number of IPs a peer may have before being penalized. | Must be at least 1. Values above threshold will be penalized. |
+| `BehaviourPenaltyWeight`      | Weight | Weight of `P₇`, the behaviour penalty.                | Must be negative to penalize peers for misbehaviour. |
+| `BehaviourPenaltyDecay`       | Float  | Decay factor for `P₇`.                                | Must be between 0 and 1. |
 
 The remaining parameters are applied to a peer's behavior within a single topic. Implementations
 should be able to accept configurations for multiple topics, keyed by topic ID string. Each topic
