@@ -587,6 +587,16 @@ In order counter spam that elicits responses and consumes resources, some measur
   in gossipsub v1.0 the router always responds to `IWANT` messages when the message in the cache.
   In gossipsub v1.1 the router responds a limited number of times to each peer so that `IWANT` spam
   does not cause a signficant drain of resources.
+- `IHAVE` messages are capped to a certain number of `IHAVE` messages and aggregate number of message
+  IDs advertised per heartbeat, in order to reduce the exposure to floods. If more `IHAVE` advertisements
+  are received than the limit (or more messages are advertised than the limit), then additional `IHAVE`
+  messages are ignored.
+- In flight `IWANT` requests, sent as a response to an `IHAVE` advertisement, are probabilistically tracked.
+  For each `IHAVE` advertisement which elicits an `IWANT` request, the router tracks a random message ID
+  within the advertised set. If the message is not received (from any peer) within a period of time, then
+  a behavioural penalty is applied to the advertising peer through `P₇`.
+  This measure helps protect against spam `IHAVE` floods by quickly flagging and graylisting peers
+  who advertise bogus message IDs and/or do not follow up to the `IWANT` requests.
 - Invalid message spam, either directly transmitted or as a response to an `IHAVE` message is
   penalized by the score function. A peer transmitting lots of spam will quickly get graylisted,
   reducing the surface of spam-induced computation (eg validation). The application can take
