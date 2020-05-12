@@ -266,7 +266,7 @@ The parameters are defined as follows:
   is augmented by the rate deficit at the time of prune. This is intended to keep history of prunes
   so that a peer that was pruned because of underdelivery cannot quickly get regrafted into the
   mesh. The parameter is mixed with negative weight.
-- `P₄`: **Invalid Messages** for a topic. This is he number of invalid messages delivered in the topic.
+- `P₄`: **Invalid Messages** for a topic. This is the number of invalid messages delivered in the topic.
   This is intended to penalize peers who transmit invalid messages, according to application specific
   validation rules. It is mixed with a negative weight.
 - `P₅`: **Application Specific** score. This is the score component assigned to the peer by the application
