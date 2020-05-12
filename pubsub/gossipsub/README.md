@@ -10,7 +10,7 @@ If you are new to Gossipsub and/or PubSub in general, we recommend you to first:
 
 ## Specification
 
-- [gossipsub-v1.0](gossipsub-v1.0.md): v1.0 of the gossipsub protocol. This is a revised specification, to use a more normative language. The original v1.0 specification is [here](gossippsub-v1.0-old.md), still a good read.
+- [gossipsub-v1.0](gossipsub-v1.0.md): v1.0 of the gossipsub protocol. This is a revised specification, to use a more normative language. The original v1.0 specification is [here](gossipsub-v1.0-old.md), still a good read.
 - [gossipsub-v1.1](gossipsub-v1.1.md): v1.1 of the gossipsub protocol.
 - [(not in use) episub](episub.md): a research note on a protocol building on top of gossipsub to implement [epidemic broadcast trees](https://www.gsd.inesc-id.pt/~ler/reports/srds07.pdf).
 
