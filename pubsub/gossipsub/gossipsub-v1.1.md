@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 1A              | Draft          | Active | r3, 2020-04-28  |
+| 1A              | Draft          | Active | r4, 2020-05-11  |
 
 
 Authors: [@vyzo]
@@ -29,7 +29,7 @@ See the [lifecycle document][lifecycle-spec] for context about maturity level an
 - [Overview](#overview)
 - [Protocol extensions](#protocol-extensions)
   - [Explicit Peering Agreements](#explicit-peering-agreements)
-  - [Peer Exchange on PRUNE](#peer-exchange-on-prune)
+  - [PRUNE Backoff and Peer Exchange](#prune-backoff-and-peer-exchange)
     - [Protobuf](#protobuf)
   - [Flood Publishing](#flood-publishing)
   - [Adaptive Gossip Dissemination](#adaptive-gossip-dissemination)
@@ -77,7 +77,7 @@ explicit peers exist outside the mesh: every new valid incoming message is forwa
 peers, and incoming RPCs are always accepted from them. It is an error to GRAFT on a explicit peer,
 and such an attempt should be logged and rejected with a PRUNE.
 
-### Peer Exchange on PRUNE
+### PRUNE Backoff and Peer Exchange
 
 Gossipsub relies on ambient peer discovery in order to find peers within a topic of interest.
 This puts pressure to the implementation of a scalable peer discovery service that
@@ -91,8 +91,15 @@ pruned peer can connect to reform its mesh (see [Peer Scoring](#peer-scoring) be
 In addition, both the pruned and the pruning peer add a backoff period from each other, within which
 they will not try to regraft. Both the pruning and the pruned peer will immediately prune a `GRAFT`
 within the backoff period and extend it.
+When a peer tries to regraft too early, the pruning peer may apply a behavioural penalty
+for the action, and penalize the peer through P₇ (see [Peer Scoring](#peer-scoring) below).
+
 The recommended duration for the backoff period is 1 minute, while the recommended number of peers
 to exchange is larger than `D_hi` so that the pruned peer can reliably form a full mesh.
+In order to correctly synchronize the two peers, the pruning peer should include the backoff period
+in the PRUNE message. The peer has to wait the full backoff period before attempting to graft again,
+otherwise it risks getting its graft rejected and being penalized in its score if it attempts to
+graft too early.
 
 In order to implement PX, we extend the `PRUNE` control message to include an optional set of
 peers the pruned peer can connect to. This set of peers includes the Peer ID and a [_signed_ peer
@@ -110,6 +117,7 @@ The `ControlPrune` message is extended with a `peers` field as follows.
 message ControlPrune {
 	optional string topicID = 1;
 	repeated PeerInfo peers = 2; // gossipsub v1.1 PX
+	optional uint64 backoff = 3; // gossipsub v1.1 backoff time (in seconds)
 }
 
 message PeerInfo {
@@ -243,7 +251,7 @@ configured a larger mesh than the default parameters.
 The score function is a weighted mix of parameters, 4 of them per topic and 2 of them globally
 applicable.
 ```
-Score(p) = TopicCap(Σtᵢ*(w₁(tᵢ)*P₁(tᵢ) + w₂(tᵢ)*P₂(tᵢ) + w₃(tᵢ)*P₃(tᵢ) + w₃b(tᵢ)*P₃b(tᵢ) + w₄(tᵢ)*P₄(tᵢ))) + w₅*P₅ + w₆*P₆
+Score(p) = TopicCap(Σtᵢ*(w₁(tᵢ)*P₁(tᵢ) + w₂(tᵢ)*P₂(tᵢ) + w₃(tᵢ)*P₃(tᵢ) + w₃b(tᵢ)*P₃b(tᵢ) + w₄(tᵢ)*P₄(tᵢ))) + w₅*P₅ + w₆*P₆ + w₇*P₇
 ```
 where `tᵢ` is the topic weight for each topic where per topic parameters apply.
 
@@ -277,6 +285,10 @@ The parameters are defined as follows:
   address. If the number of peers in the same IP exceeds the threshold, then the value is the square
   of the surplus, otherwise it is 0. This is intended to make it difficult to carry out sybil attacks
   by using a small number of IPs. The parameter is mixed with a negative weight.
+- `P₇`: **Behavioural Penalty**. This parameter captures penalties applied for misbehaviour. The
+  parameter has an associated (decaying) counter, which is explicitly incremented by the router on
+  specific events. The value of the parameter is the square of the counter and is mixed with a negative
+  weight.
 
 The `TopicCap` function allows the application to specify an optional cap to the contribution to the
 score across all topics.
@@ -418,7 +430,7 @@ p3b := meshFailurePenalty
 ##### P₄: Invalid Messages
 
 In order to compute `P₄`, the router maintains a counter that increments whenever a message fails
-validation. The counter is uncapped.
+validation. The value of the parameter is the square of the counter, which is uncapped.
 
 In pseudo-go:
 ```go
@@ -429,7 +441,7 @@ var invalidMessageDeliveries float64
 invalidMessageDeliveries += 1
 
 // P₄
-p4 := invalidMessageDeliveries
+p4 := invalidMessageDeliveries * invalidMessageDeliveries
 ```
 
 ##### Parameter Decay
@@ -533,6 +545,8 @@ which topics they are subscribed to:
 | `AppSpecificWeight`           | Weight | Weight of `P₅`, the application-specific score.       | Must be positive, however score values may be negative.       |
 | `IPColocationFactorWeight`    | Weight | Weight of `P₆`, the IP colocation score.              | Must be negative, to penalize peers with multiple IPs.        |
 | `IPColocationFactorThreshold` | Float  | Number of IPs a peer may have before being penalized. | Must be at least 1. Values above threshold will be penalized. |
+| `BehaviourPenaltyWeight`      | Weight | Weight of `P₇`, the behaviour penalty.                | Must be negative to penalize peers for misbehaviour. |
+| `BehaviourPenaltyDecay`       | Float  | Decay factor for `P₇`.                                | Must be between 0 and 1. |
 
 The remaining parameters are applied to a peer's behavior within a single topic. Implementations
 should be able to accept configurations for multiple topics, keyed by topic ID string. Each topic
@@ -575,6 +589,16 @@ In order counter spam that elicits responses and consumes resources, some measur
   in gossipsub v1.0 the router always responds to `IWANT` messages when the message in the cache.
   In gossipsub v1.1 the router responds a limited number of times to each peer so that `IWANT` spam
   does not cause a signficant drain of resources.
+- `IHAVE` messages are capped to a certain number of `IHAVE` messages and aggregate number of message
+  IDs advertised per heartbeat, in order to reduce the exposure to floods. If more `IHAVE` advertisements
+  are received than the limit (or more messages are advertised than the limit), then additional `IHAVE`
+  messages are ignored.
+- In flight `IWANT` requests, sent as a response to an `IHAVE` advertisement, are probabilistically tracked.
+  For each `IHAVE` advertisement which elicits an `IWANT` request, the router tracks a random message ID
+  within the advertised set. If the message is not received (from any peer) within a period of time, then
+  a behavioural penalty is applied to the advertising peer through `P₇`.
+  This measure helps protect against spam `IHAVE` floods by quickly flagging and graylisting peers
+  who advertise bogus message IDs and/or do not follow up to the `IWANT` requests.
 - Invalid message spam, either directly transmitted or as a response to an `IHAVE` message is
   penalized by the score function. A peer transmitting lots of spam will quickly get graylisted,
   reducing the surface of spam-induced computation (eg validation). The application can take
