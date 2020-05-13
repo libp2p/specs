@@ -248,7 +248,7 @@ configured a larger mesh than the default parameters.
 
 #### The Score Function
 
-The score function is a weighted mix of parameters, 4 of them per topic and 2 of them globally
+The score function is a weighted mix of parameters, 4 of them per topic and 3 of them globally
 applicable.
 ```
 Score(p) = TopicCap(Σtᵢ*(w₁(tᵢ)*P₁(tᵢ) + w₂(tᵢ)*P₂(tᵢ) + w₃(tᵢ)*P₃(tᵢ) + w₃b(tᵢ)*P₃b(tᵢ) + w₄(tᵢ)*P₄(tᵢ))) + w₅*P₅ + w₆*P₆ + w₇*P₇
