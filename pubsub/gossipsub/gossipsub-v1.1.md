@@ -97,7 +97,9 @@ for the action, and penalize the peer through P₇ (see [Peer Scoring](#peer-sco
 The recommended duration for the backoff period is 1 minute, while the recommended number of peers
 to exchange is larger than `D_hi` so that the pruned peer can reliably form a full mesh.
 In order to correctly synchronize the two peers, the pruning peer should include the backoff period
-in the PRUNE message.
+in the PRUNE message. The peer has to wait the full backoff period before attempting to graft again,
+otherwise it risks getting its graft rejected and being penalized in its score if it attempts to
+graft too early.
 
 In order to implement PX, we extend the `PRUNE` control message to include an optional set of
 peers the pruned peer can connect to. This set of peers includes the Peer ID and a [_signed_ peer
