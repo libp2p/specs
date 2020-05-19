@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 1A              | Draft          | Active | r4, 2020-05-11  |
+| 1A              | Draft          | Active | r5, 2020-05-18  |
 
 
 Authors: [@vyzo]
@@ -33,6 +33,7 @@ See the [lifecycle document][lifecycle-spec] for context about maturity level an
     - [Protobuf](#protobuf)
   - [Flood Publishing](#flood-publishing)
   - [Adaptive Gossip Dissemination](#adaptive-gossip-dissemination)
+  - [Outbound Mesh Quotas](#outbound-mesh-quotas)
   - [Peer Scoring](#peer-scoring)
     - [Score Thresholds](#score-thresholds)
     - [Heartbeat Maintenance](#heartbeat-maintenance)
@@ -167,6 +168,25 @@ a `0.578125` probability.
 This behaviour is prescribed to counter sybil attacks and ensures that a message from a honest
 node propagates in the network with high probability.
 
+### Outbound Mesh Quotas
+
+In gossipsub v1.0 mesh peers are randomly selected, without any weight given to the direction
+of the conneciton. In contrast, gossipsub v1.1 implements oubout connection quotas, so that
+a peer tries to always maintain a number of outbound connections in the mesh.
+
+Specifically, we define a new overlay parameter `D_out`, which must be set below `D_lo` and
+at most `D/2`, such that:
+- When the peer prunes because of oversubscription, it selects survivor peers under the constraint
+  that at least `D_out` peers are outbound connections;  see also [Peer Scoring](#peer-scoring) below.
+- When the peer receives a GRAFT while oversubscribed (with mesh degree at `D_hi` or higher), it only
+  accepts the new peer in the mesh if it is an outbound connection.
+- During heartbeat maintainance, if the peer already has at least `D_lo` peers in the mesh but not
+  enough outbound connections, then it selects as many needed peers to fill the quota and grafts them
+  in the mesh.
+
+This behaviour is presrcibed to counter sybil attacks and ensures that a coordinated inbound attack can
+never fully take over the mesh of a target peer.
+
 ### Peer Scoring
 
 In gossipsub v1.1 we introduce a peer scoring component: each individual peer maintains a score
@@ -217,6 +237,9 @@ The score is checked explicitly during heartbeat maintenance such that:
   selects the remaining peers to keep at random. This protects the mesh from takeover attacks
   and ensures that the best scoring peers are kept in the mesh. At the same time, we do keep some
   peers as random so that the protocol is responsive to new peers joining the mesh.
+  The selection is done under the constraint that `D_out` peers are outbound connections; if the
+  scoring plus random selection does not result in enough outbound connections, then we replace
+  the random and lower scoring peers in the selection with outboud connection peers.
 - When selecting peers to graft because of undersubscription, peers with a negative score are ignored.
 
 #### Opportunistic Grafting
@@ -510,7 +533,7 @@ The following parameters apply globally:
 | `FloodPublish` | Boolean          | Whether to enable flood publishing                                     | `true`             |
 | `GossipFactor` | Float [0.0, 1.0] | % of peers to send gossip to, if we have more than `D_lazy` available  | `0.25`             |
 | `D_score`      | Integer          | Number of peers to retain by score when pruning because of oversubscription | 4 or 5 for a `D` of 6. |
-
+| `D_out`        | Integer          | Number of outbound connections to keep in the mesh. Must be less than `D_lo` and at most `D/2`  | 2 for a `D` of 6        |
 
 The remaining parameters apply to [Peer Scoring](#peer-scoring). Because many parameters are
 inter-related and may be application-specific, reasonable defaults are not shown here. See
