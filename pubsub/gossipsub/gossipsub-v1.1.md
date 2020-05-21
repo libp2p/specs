@@ -634,7 +634,7 @@ An important issue to consider when deploying gossipsub is the peer discovery me
 which must provide a secure way of discovering new peers.
 Prior to gossipsub v1.1, operators were required to utilize an external peer discovery
 mechanism to locate peers meshing in particular topics; with gossipsub v1.1 this is now entirely optional and the network can bootstrap
-purely through a small set of network entry points (bootstrappers) by utilizing Peer Exchange.
+purely through a small set of network entry points (bootstrappers) by utilizing Peer Exchange. In other words, gossipsub 1.1 is now self-sufficient in this regard, as long as the node manages to find at least one peer meshing in the topic of interest.
 
 In order to successfully bootstrap the network without a discovery service, network operators
 should
