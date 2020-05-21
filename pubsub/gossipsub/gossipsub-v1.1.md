@@ -649,6 +649,6 @@ the formation and maintenance of the network.
 Note that the score function is still present in the bootstrappers, which ensures that invalid
 messages, colocation, and behavioural penalties apply to misbehaving nodes such that they do
 not receive PX or are advertised to the rest of the network.
-In addition, network operators may configure the application specific scoring function such
+In addition, network operators may configure the application-specific scoring function such
 that the bootstrappers enforce further constraints into accepting new nodes (eg protocol
 handshakes, staked participation, and so on).
