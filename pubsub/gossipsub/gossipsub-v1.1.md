@@ -642,7 +642,7 @@ should
 - The bootstrappers should be configured without a mesh (ie set `D=Dlo=Dhi=Dout=0`)
   and with Peer Exchange enabled, utilizing Signed Peer Records.
 - The application should assign a high application-specific score to the bootstrappers and
-  set the `AcceptPXThreshold` to a high enough value attainable only by the bootstrappers.
+  set `AcceptPXThreshold` to a high enough value attainable only by the bootstrappers.
 
 In this manner, the bootstrappers act purely as gossip and peer exchange nodes that facilitate
 the formation and maintenance of the network.
