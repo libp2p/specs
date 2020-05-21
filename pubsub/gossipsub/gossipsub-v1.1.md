@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 1A              | Draft          | Active | r5, 2020-05-18  |
+| 1A              | Draft          | Active | r6, 2020-05-21  |
 
 
 Authors: [@vyzo]
@@ -49,6 +49,7 @@ See the [lifecycle document][lifecycle-spec] for context about maturity level an
     - [Extended Validators](#extended-validators)
   - [Overview of New Parameters](#overview-of-new-parameters)
   - [Spam Protection Measures](#spam-protection-measures)
+  - [Recommendations for Network Operators](#recommendations-for-network-operators)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -626,3 +627,28 @@ In order counter spam that elicits responses and consumes resources, some measur
   penalized by the score function. A peer transmitting lots of spam will quickly get graylisted,
   reducing the surface of spam-induced computation (eg validation). The application can take
   further steps and blacklist the peer if the spam persists after the negative score decays.
+
+### Recommendations for Network Operators
+
+An important issue to consider when deploying gossipsub is the peer discovery mechanism,
+which must provide a secure way of discovering new peers.
+Prior to gossipsub v1.1, operators were required to utilize an external peer discovery
+mechanism; with gossipsub v1.1 this is now entirely optional and the network can bootstrap
+purely through a small set of network entry points (bootstrappers) by utilizing Peer Exchange.
+
+In order to successfully bootstrap the network without a discovery service, network operators
+should
+- Create and operate a set of bootstrapper nodes, that are known within client software.
+- The bootstrappers should be configured without a mesh (ie set `D=Dlo=Dhi=Dout=0`)
+  and with Peer Exchange enabled, utilizing Signed Peer Records.
+- Client software should assign a high application specific score to the bootstrappers and
+  set the `AcceptPXThreshold` to a high enough value attainable only by the bootstrappers.
+
+In this manner, the bootstrappers act purely as gossip and peer exchange nodes that facilitate
+the formation and maintenance of the network.
+Note that the score function is still present in the bootstrappers, which ensures that invalid
+messages, colocation, and behavioural penalties apply to misbehaving nodes such that they do
+not receive PX or are advertised to the rest of the network.
+In addition, network operators may configure the application specific scoring function such
+that the bootstrappers enforce further constraints into accepting new nodes (eg protocol
+handshakes, staked participation, and so on).
