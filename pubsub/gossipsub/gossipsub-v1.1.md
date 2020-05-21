@@ -633,7 +633,7 @@ In order counter spam that elicits responses and consumes resources, some measur
 An important issue to consider when deploying gossipsub is the peer discovery mechanism,
 which must provide a secure way of discovering new peers.
 Prior to gossipsub v1.1, operators were required to utilize an external peer discovery
-mechanism; with gossipsub v1.1 this is now entirely optional and the network can bootstrap
+mechanism to locate peers meshing in particular topics; with gossipsub v1.1 this is now entirely optional and the network can bootstrap
 purely through a small set of network entry points (bootstrappers) by utilizing Peer Exchange.
 
 In order to successfully bootstrap the network without a discovery service, network operators
