@@ -652,3 +652,12 @@ not receive PX or are advertised to the rest of the network.
 In addition, network operators may configure the application-specific scoring function such
 that the bootstrappers enforce further constraints into accepting new nodes (eg protocol
 handshakes, staked participation, and so on).
+
+It should be emphasized that the security of the peer discovery service affects the ability
+of the system to bootstrap securely and recover from large-scale attacks.
+Network operators must take care to ensure that whichever peer discovery mechanism they opt
+to utilize is resilient to attacks and can always return some honest peers so that connections
+between honest peers can be established.
+Furthermore, it is strongly recommended that any external discovery service is augmented by
+bootstrappers/directory nodes configured with Peer Exchange and high application specific scores,
+as outlined above.
