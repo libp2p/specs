@@ -2,8 +2,7 @@
 
 | Lifecycle Stage | Maturity                  | Status | Latest Revision |
 |-----------------|---------------------------|--------|-----------------|
-| 2A              | Candidate Recommendation  | Active | r6, 2020-05-21  |
-
+| 2A              | Candidate Recommendation  | Active | r7, 2020-05-30  |
 
 Authors: [@vyzo]
 
@@ -108,8 +107,7 @@ peers the pruned peer can connect to. This set of peers includes the Peer ID and
 record](https://github.com/libp2p/specs/pull/217) for each peer exchanged.
 In order to facilitate the transition to the usage of signed peer records within the libp2p ecosystem,
 the emitting peer is allowed to omit the signed peer record if it doesn't have one.
-In this case, the pruned peer will have to utilize an external service to discover addresses for
-the peer, eg the DHT.
+In this case, the pruned peer will have to rely on the ambient peer discovery service (if set up) to discover the addresses for the peer.
 
 #### Protobuf
 
@@ -652,3 +650,12 @@ not receive PX or are advertised to the rest of the network.
 In addition, network operators may configure the application-specific scoring function such
 that the bootstrappers enforce further constraints into accepting new nodes (eg protocol
 handshakes, staked participation, and so on).
+
+It should be emphasized that the security of the peer discovery service affects the ability
+of the system to bootstrap securely and recover from large-scale attacks.
+Network operators must take care to ensure that whichever peer discovery mechanism they opt
+to utilize is resilient to attacks and can always return some honest peers so that connections
+between honest peers can be established.
+Furthermore, it is strongly recommended that any external discovery service is augmented by
+bootstrappers/directory nodes configured with Peer Exchange and high application specific scores,
+as outlined above.
