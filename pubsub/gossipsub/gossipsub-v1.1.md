@@ -108,8 +108,7 @@ peers the pruned peer can connect to. This set of peers includes the Peer ID and
 record](https://github.com/libp2p/specs/pull/217) for each peer exchanged.
 In order to facilitate the transition to the usage of signed peer records within the libp2p ecosystem,
 the emitting peer is allowed to omit the signed peer record if it doesn't have one.
-In this case, the pruned peer will have to utilize an external service to discover addresses for
-the peer, eg the DHT.
+In this case, the pruned peer will have to rely on the ambient peer discovery service (if set up) to discover the addresses for the peer.
 
 #### Protobuf
 
