@@ -171,8 +171,7 @@ present and is not specified as part of pubsub itself.
 ### Ambient Peer Discovery
 
 Before peers can exchange pubsub messages, they must first become aware of each
-others' existence. There are several practical peer discovery mechanisms that
-can be employed, for example, randomly walking a DHT, rendezvous protocols, etc.
+others' existence. There are several peer discovery mechanisms available, for example: MulticastDNS for local area networks, random-walks through the libp2p-kad-dht, rendezvous protocols, and any other that conforms with the Peer Discovery interface for libp2p.
 
 As peer discovery is broadly useful and not specific to pubsub, neither the
 [pubsub interface spec][pubsub-interface-spec] nor this document prescribe a
