@@ -1,6 +1,10 @@
 # gossipsub: An extensible baseline pubsub protocol
 
-![](https://gateway.ipfs.io/ipfs/Qmbox17N8YF5GxVaM6u2c2quokg4brqxMZGzSMfibQ2nw1)
+<p align="center">
+  <img src="https://ipfs.io/ipfs/QmYNfVR1yRKG7TJtCRpbXRcxrmDMLbn6frKRUKQFoVFpan/PNG/Gossipsub_fullcolor_transparent_bg.png" alt="Gossipsub logo" width="400" />
+</p>
+
+![]()
 
 Gossipsub is an extensible baseline pubsub protocol, based on randomized topic meshes and gossip. It is a general purpose pubsub protocol with moderate amplification factors and good scaling properties. The protocol is designed to be extensible by more specialized routers, which may add protocol messages and gossip in order to provide behaviour optimized for specific application profiles.
 
