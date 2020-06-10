@@ -1,7 +1,7 @@
 # gossipsub: An extensible baseline pubsub protocol
 
 <p align="center">
-  <img src="https://ipfs.io/ipfs/QmYNfVR1yRKG7TJtCRpbXRcxrmDMLbn6frKRUKQFoVFpan/PNG/Gossipsub_fullcolor_transparent_bg.png" alt="Gossipsub logo" width="400" />
+  <img src="https://ipfs.io/ipfs/QmVSk8VvxWExnYCjqg7TNW2aBnN8Wr7SzkawLUyocWq96p/Gossipsub_fullcolor.png" alt="Gossipsub logo" width="400" />
 </p>
 
 ![]()
