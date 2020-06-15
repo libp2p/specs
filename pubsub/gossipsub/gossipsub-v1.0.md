@@ -338,7 +338,7 @@ included topic id.
 
 ### IHAVE
 
-The `IHAVE` message is [emitted as gossip](gossip-emission). It provides the
+The `IHAVE` message is [emitted as gossip](#gossip-emission). It provides the
 remote peer with a list of messages that were recently seen by the local router.
 The remote peer may then request the full message content with an [`IWANT` message](#iwant).
 
