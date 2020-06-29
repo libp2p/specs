@@ -1,9 +1,8 @@
 # gossipsub v1.1: Security extensions to improve on attack resilience and bootstrapping
 
-| Lifecycle Stage | Maturity       | Status | Latest Revision |
-|-----------------|----------------|--------|-----------------|
-| 1A              | Draft          | Active | r7, 2020-05-30  |
-
+| Lifecycle Stage | Maturity                  | Status | Latest Revision |
+|-----------------|---------------------------|--------|-----------------|
+| 2A              | Candidate Recommendation  | Active | r7, 2020-05-30  |
 
 Authors: [@vyzo]
 
