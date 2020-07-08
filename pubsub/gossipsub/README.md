@@ -26,9 +26,9 @@ Legend: ✅ = complete, 🏗 = in progress, ❕ = not started yet
 |--------------------------------------------------------------------------------------------------|:-----:|:-----:|
 | [go-libp2p-pubsub (Golang)](https://github.com/libp2p/go-libp2p-pubsub/blob/master/gossipsub.go) |   ✅  |   ✅  |
 | [js-libp2p-gossipsub (JavaScript)](https://github.com/ChainSafe/js-libp2p-gossipsub)                    |   ✅  |   🏗  |
-| [rust-libp2p (Rust)](https://github.com/libp2p/rust-libp2p/tree/master/protocols/gossipsub)      |   🏗  |   ❕  |
-| [py-libp2p (Python)](https://github.com/libp2p/py-libp2p/tree/master/libp2p/pubsub)              |   ✅  |   ❕  |
-| [jvm-libp2p (Java/Kotlin)](https://github.com/libp2p/jvm-libp2p/tree/develop/src/main/kotlin/io/libp2p/pubsub) |   ✅  |   ❕  |
+| [rust-libp2p (Rust)](https://github.com/libp2p/rust-libp2p/tree/master/protocols/gossipsub)      |   🏗  |   🏗  |
+| [py-libp2p (Python)](https://github.com/libp2p/py-libp2p/tree/master/libp2p/pubsub)              |   ✅  |   🏗  |
+| [jvm-libp2p (Java/Kotlin)](https://github.com/libp2p/jvm-libp2p/tree/develop/src/main/kotlin/io/libp2p/pubsub) |   ✅  |   🏗  |
 | [nim-libp2p (Nim)](https://github.com/status-im/nim-libp2p/blob/master/libp2p/protocols/pubsub/gossipsub.nim) |   ✅  |   🏗  |
 
 Additional tooling:
