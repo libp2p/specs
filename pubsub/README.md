@@ -99,8 +99,7 @@ false signifies 'unsubscribe'.
 
 ## The Message
 
-The RPC message can contain zero or more messages of type 'Message' (perhaps
-this should be named better?). The Message protobuf looks like this:
+The RPC message can contain zero or more messages of type 'Message'. The Message protobuf looks like this:
 
 ```protobuf
 message Message {
