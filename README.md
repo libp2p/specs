@@ -68,6 +68,8 @@ and are used throughout the system.
 These specs define wire protocols that are used by libp2p for connectivity,
 security, multiplexing, and other purposes.
 
+The protocols described below all use [protocol buffers](https://developers.google.com/protocol-buffers/docs/proto?hl=en) (aka protobuf) to define message schemas. Version `proto2` is used unless stated otherwise.
+
 - [identify][spec_identify] -  Exchange keys and addresses with other peers
 - [mplex][spec_mplex] - The friendly stream multiplexer
 - [plaintext][spec_plaintext] - An insecure transport for non-production usage
