@@ -255,7 +255,7 @@ making sybils re-eligible for grafting.
 In order to recover from such disaster scenarios and generally adaptively optimize the mesh over time,
 gossipsub v1.1 introduces an opportunistic grafting mechanism.
 Periodically, the router checks the median score of peers in the mesh against the `opportunisticGrafThreshold`.
-If the median score is below the threshold, the the router opportunistically grafts (at least) two peers
+If the median score is below the threshold, the router opportunistically grafts (at least) two peers
 with score above the median in the mesh.
 This improves an underperforming mesh by introducing good scoring peers that may have been gossiping
 at us.
