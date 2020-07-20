@@ -6,7 +6,7 @@
 
 Authors: [@vyzo]
 
-Interest Group: [@daviddias], [@whyrusleeping], [@Stebalien], [@jacobheun], [@yusefnapora]
+Interest Group: [@daviddias], [@whyrusleeping], [@Stebalien], [@jacobheun], [@yusefnapora], [@vasco-santos]
 
 [@vyzo]: https://github.com/vyzo
 [@daviddias]: https://github.com/daviddias
@@ -204,6 +204,7 @@ message Message {
     optional string ns = 1;
     optional PeerInfo peer = 2;
     optional int64 ttl = 3; // in seconds
+    optional bytes signedPeerRecord = 4;
   }
 
   message RegisterResponse {
