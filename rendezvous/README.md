@@ -77,7 +77,7 @@ discovery within application specific namespaces. Peers connect to the
 rendezvous point and register their presence in one or more
 namespaces. It is not allowed to register arbitrary peers in a
 namespace; only the peer initiating the registration can register
-itself. The register message contains a serialized [signed peer record]()
+itself. The register message contains a serialized [signed peer record](https://github.com/libp2p/specs/blob/377f05a/RFC/0002-signed-envelopes.md)
 created by the peer, which can be validated by others.
 
 Peers registered with the rendezvous point can be discovered by other
