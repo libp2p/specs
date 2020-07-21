@@ -4,7 +4,7 @@
 - Related Issues:
   - [libp2p/issues/47](https://github.com/libp2p/libp2p/issues/47)
   - [go-libp2p/issues/436](https://github.com/libp2p/go-libp2p/issues/436)
-  
+
 ## Abstract
 
 This RFC proposes a method for distributing peer routing records, which contain
@@ -81,8 +81,8 @@ Here's a protobuf that might work:
 
 ```protobuf
 
-// RoutingState contains the listen addresses for a peer at a particular point in time.
-message RoutingState {
+// PeerRecord contains the listen addresses for a peer at a particular point in time.
+message PeerRecord {
   // AddressInfo wraps a multiaddr. In the future, it may be extended to
   // contain additional metadata, such as "routability" (whether an address is
   // local or global, etc).
@@ -92,12 +92,12 @@ message RoutingState {
 
   // the peer id of the subject of the record (who these addresses belong to).
   bytes peer_id = 1;
-  
+
   // A monotonically increasing sequence number, used for record ordering.
   uint64 seq = 2;
-  
+
   // All current listen addresses
-  repeated AddressInfo addresses = 4;
+  repeated AddressInfo addresses = 3;
 }
 ```
 
@@ -116,13 +116,12 @@ epoch time as the `seq` value, however they MUST NOT attempt to interpret a
   {
     peer_id: "QmAlice...",
     seq: 1570215229,
-      
     addresses: [
       {
-        addr: "/ip4/1.2.3.4/tcp/42/p2p/QmAlice",
+        multiaddr: "/ip4/1.2.3.4/tcp/42/p2p/QmAlice",
       },
       {
-        addr: "/ip4/10.0.1.2/tcp/42/p2p/QmAlice",
+        multiaddr: "/ip4/10.0.1.2/tcp/42/p2p/QmAlice",
       }
     ]
   }
@@ -188,7 +187,7 @@ We will need to add a few methods to the peer store:
     validate the envelope signature & store the envelope for future reference.
     If any certified addresses already exist for the peer, only accept the new
     envelope if it has a greater `seq` value than existing envelopes.
-    
+
 - `CertifiedAddrs(peer_id) -> Set<Multiaddr>`
   - return the set of self-certified addresses for the given peer id
 

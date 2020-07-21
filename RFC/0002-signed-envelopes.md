@@ -63,11 +63,11 @@ can use protobuf for this as well and easily embed the key in the envelope:
 
 
 ```protobuf
-message SignedEnvelope {
+message Envelope {
   PublicKey public_key = 1; // see peer id spec for definition
   bytes payload_type = 2;   // payload type indicator
   bytes payload = 3;        // opaque binary payload
-  bytes signature = 4;      // see below for signing rules
+  bytes signature = 5;      // see below for signing rules
 }
 ```
 
