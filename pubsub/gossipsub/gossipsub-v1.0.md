@@ -520,11 +520,11 @@ message ControlMessage {
 
 message ControlIHave {
 	optional string topicID = 1;
-	repeated string messageIDs = 2;
+	repeated bytes messageIDs = 2;
 }
 
 message ControlIWant {
-	repeated string messageIDs = 1;
+	repeated bytes messageIDs = 1;
 }
 
 message ControlGraft {
