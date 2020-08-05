@@ -3,9 +3,9 @@
 > A libp2p transport secure channel handshake built with the Noise Protocol
 > Framework.
 
-| Lifecycle Stage | Maturity      | Status | Latest Revision |
-|-----------------|---------------|--------|-----------------|
-| 3A              | Working Draft | Active | r2, 2020-03-30  |
+| Lifecycle Stage | Maturity       | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
+| 3A              | Recommendation | Active | r2, 2020-03-30  |
 
 Authors: [@yusefnapora]
 
