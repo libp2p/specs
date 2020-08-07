@@ -1,36 +1,35 @@
 @startuml
 
 entity Initiator
-entity Responder
+entity Receiver
 
-== Initial multistream handshake ==
+== Initial protocol handshake ==
 
-Responder -> Initiator: /multistream/1.0.0
-Initiator -> Responder: /multistream/1.0.0
+Initiator -> Receiver: /multistream/1.0.0
+Receiver -> Initiator: /multistream/1.0.0
 
 == Negotiate security protocol ==
 
-Initiator -> Responder: /tls/1.0.0
+Initiator -> Receiver: /tls/1.0.0
 note left: Initiator proposes TLS for security
 
-Responder -> Initiator: na
-note right: Responder does not support TLS yet
+Receiver -> Initiator: na
+note right: Receiver does not support TLS yet
 
-Initiator -> Responder: /secio/1.0.0
+Initiator -> Receiver: /secio/1.0.0
 note left: Initiator falls back to SECIO
 
-Responder -> Initiator: /secio/1.0.0
-note right: Responder supports SECIO, echoes back protocol id
+Receiver -> Initiator: /secio/1.0.0
+note right: Receiver supports SECIO, echoes back protocol id
 
 ... SECIO handshake ...
 
 == Negotiate stream multiplexer ==
 
-Initiator -> Responder: /mplex/1.0.0
+Initiator -> Receiver: /mplex/1.0.0
 note left: Initiator proposes mplex for stream multiplexing
 
-Responder -> Initiator: /mplex/1.0.0
-note right: Responder supports mplex, echoes back protocol id
-
+Receiver -> Initiator: /mplex/1.0.0
+note right: Receiver supports mplex, echoes back protocol id
 
 @enduml

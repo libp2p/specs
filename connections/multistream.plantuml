@@ -1,32 +1,32 @@
 @startuml
 
 entity Initiator
-entity Responder
-Initiator -> Responder: Open connection
+entity Receiver
+Initiator -> Receiver: Open connection
 
 == Establish that both sides support multistream-select ==
 
-note over Initiator, Responder: Both sides may send initial multistream id simultaneously
-Responder -> Initiator: Send multistream protocol id
-Initiator -> Responder: Send multistream protocol id
-note over Initiator, Responder: If anything other than multistream id is received, abort
+note over Initiator, Receiver: Utilizing the bootstrap protocol negociation
+
+Initiator -> Receiver: Send multistream protocol id
+Receiver -> Initiator: Send multistream protocol id
 
 
 == Negotiate protocol to use ==
 
 
 loop until success, or Initiator gives up and closes channel
-  Initiator -> Responder: Send protocol id for desired protocol
-  alt protocol is supported by Responder
-    Responder -> Initiator: Echo back protocol id to indicate agreement
+  Initiator -> Receiver: Send protocol id for desired protocol
+  alt protocol is supported by Receiver
+    Receiver -> Initiator: Echo back protocol id to indicate agreement
   else protocol is not supported
-    Responder -> Initiator: Send "na" (not available)
+    Receiver -> Initiator: Send "na" (not available)
   end
 end
 
 == Use negotiated protocol ==
 
-Initiator -> Responder: Send protocol-specific message
-Responder -> Initiator: Send protocol-specific reply
+Initiator -> Receiver: Send protocol-specific message
+Receiver -> Initiator: Send protocol-specific reply
 
 @enduml

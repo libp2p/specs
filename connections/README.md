@@ -1,14 +1,15 @@
-# Connection Establishment in libp2p
+# Connection Lifecycle in libp2p
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
 | 1A              | Working Draft | Active | r0, 2019-06-20  |
 
-Authors: [@yusefnapora]
+Authors: [@yusefnapora], [@shadowjonathan]
 
 Interest Group: [@JustMaier], [@vasco-santos] [@bigs], [@mgoelzer]
 
 [@yusefnapora]: https://github.com/yusefnapora
+[@shadowjonathan]: https://github.com/shadowjonathan
 [@JustMaier]: https://github.com/JustMaier
 [@vasco-santos]: https://github.com/vasco-santos
 [@bigs]: https://github.com/bigs
@@ -21,121 +22,163 @@ and spec status.
 
 ## Table of Contents
 
-- [Connection Establishment in libp2p](#connection-establishment-in-libp2p)
+- [Connection Lifecycle in libp2p](#connection-lifecycle-in-libp2p)
     - [Table of Contents](#table-of-contents)
     - [Overview](#overview)
     - [Definitions](#definitions)
-    - [Protocol Negotiation](#protocol-negotiation)
-        - [multistream-select](#multistream-select)
-    - [Upgrading Connections](#upgrading-connections)
-    - [Opening New Streams Over a Connection](#opening-new-streams-over-a-connection)
+    - [Connection Establishment](#connection-establishment)
+        - [Core Lifecycle](#core-lifecycle)
+        - [Bootstrap Protocol Negociation](#bootstrap-protocol-negociation)
+        - [Advanced Concepts and Manipulation](#advanced-concepts-and-manipulation)
+            - [Extended Protocol Negociation](#extended-protocol-negociation)
+            - [Securing Connections](#securing-connections)
+            - [Multiplexing Streams](#multiplexing-streams)
+        - [Upgrading](#upgrading)
     - [Practical Considerations](#practical-considerations)
-        - [Interoperability](#interoperability)
         - [State Management](#state-management)
             - [Peer Metadata Storage](#peer-metadata-storage)
             - [Connection Limits](#connection-limits)
         - [Connection Lifecycle Events](#connection-lifecycle-events)
     - [Future Work](#future-work)
+    - [Miscellaneous](#miscellaneous)
+        - [A Note about Interoperability](#a-note-about-interoperability)
+        - [Protocol IDs (Extended)](#protocol-ids-extended)
+    
 
 ## Overview
 
-This document describes the process of establishing connections to new peers in
-libp2p and, if necessary, adding security and stream multiplexing capabilities
-to "raw" connections provided by transport protocols.
+This document describes the process and anatomy of establishing connections to new peers in
+libp2p, alongside describing several fundamental aiding protocols and processes. 
 
-We also discuss opening new streams over an existing connection, and the
-protocol negotiation process that occurs to route traffic to the correct
-protocol handler.
+We also discuss the procol negociation processes that help set up sessions, and opening new additional connections over an existing connection.
 
-This document does not cover the establishment of "transport level" connections,
+This document does not cover the establishment of "transport level" connections, 
 for example opening "raw" TCP sockets, as those semantics are specific to each
 transport.
 
 What is covered here is the process that occurs after making the initial
-transport level connection, up to the point where "application level" streams
-are opened, and their protocols are identified and data is routed appropriately
+transport level connection, up to the point where "application level" connections
+are opened, and their protocols are identified, and data is routed appropriately
 to handler functions.
-
 
 ## Definitions
 
-A **connection** is a reliable, bidirectional communication channel between two
-libp2p peers that provides **security** and the ability to open multiple
-logically independent **streams**.
+### Protocol
 
-**Security** in this context means that all communications (after an initial
-handshake) are encrypted, and that the identity of each peer is cryptographically
-verifiable by the other peer.
+Protocols lay at the heart of libp2p, providing modularity by availability on both parties.
 
-**Streams** are reliable, bidirectional channels that are multiplexed over a
-libp2p connection. They must support backpressure, which prevents receivers from
-being flooded by data from eager senders. They can also be "half closed",
-meaning that a stream can be closed for writing data but still open to receiving
-data and vice versa.
+Protocols are abritrary processes on both ends of the libp2p [session] that write/read to the underlying [connection].
 
-Support for multiple streams ensures that a single connection between peers can
-support a wide variety of interactions, each with their own protocol. This is
-especially helpful if connections are difficult to establish due to NAT
-traversal issues or other connectivity barriers.
+Protocols can be pretty much anything, from HTTP to Identity exchange, from [multiplexing] to security.
 
-Connections take place over an underlying **transport**, for example TCP
-sockets, websockets, or various protocols layered over UDP.
+Protocols are identified by their **Protocol ID**. This can be any string, but convention is that protocols identify themselves by forward slashes ( `/` )
 
-While some transport protocols like [QUIC][quic-spec] have "built in" security
-and stream multiplexing, others such as TCP need to have those capabilities
-layered on top of the "raw" transport connection.
+For example, `/mplex/1.0.0` is the Protocol ID for the [ `mplex` stream-multiplexing protocol][mplex].
 
-When the base capabilities of security and stream multiplexing are not natively
-supported by the underlying transport protocol, a **connection upgrade** process
-occurs to augment the raw transport connection with the required features.
+*A recommended markup of Protocol IDs is: `/<corresponding propery>/<protocol name>/<semantic version>` , with `corresponding property` often dropped with core libp2p-backed protocols.*
 
-libp2p peers can both initiate connections to other peers and accept incoming
-connections. We use the term **dial** to refer to initiating outbound
-connections, and **listen** to refer to accepting inbound connections.
+An unique trait of protocols is that they're programmatically able to produce further agnostic [connections][connection] or [transports][transport], making it possible to stack features of protocols on top of eachother (see [Securing Connections](#securing-connections) and [Multiplexing Streams](#multiplexing-streams)).
 
-## Protocol Negotiation
+### Connection
+
+A connection is an abstract bi-directional pipe that carries a [protocol].
+
+The connection is responsible for writing, reading, and closing the connection for the protocol. The connection is agnostic to the underlying carrier, thus, the connection acts as a read/write/closer interface for that carrier.
+
+### Transport
+
+The exact definition of a Transport is twofold:
+
+In the general context of modular libp2p systems, a transport refers to the myriad of underlying carriers that libp2p can support, amongst them are TCP, UDP, Bluetooth for example. Note that this is not limited to internet transports, but that also more "high-level" carriers like QUIC and Websockets are deemed transports. Even "pseudo-transports" can exist in the form of the [ `relay` protocol][relay].
+
+In the context of libp2p sessions, a Transport is deemed the "root" of the [session], acting as the final pipeline a byte has to travel through before responsibility is handed over to other processes, protocols, or kernel threads.
+
+### Session
+
+A libp2p session is an arbitrarily-defined concept, but generally it refers to the state of all corresponding protocols and connections established over the course (possibly) an [upgrading](#upgrading) process.
+
+A session could refer to the entirety of protocols, connections, and transport(s) that connect to another peer, from the local peer, a session exists as long as one peer can still communicate with another peer (ommitting disruptions and possible attempts at recovery helped by a [protocol] or smart [transport].)
+
+### Receiver/Initiator
+
+These definitions are purely for simplicity, but a **Receiver** refers to the peer that receives a connection request (through a transport) from an **Initiator**, which initiated the connection.
+
+### Multiplexing
+
+A somewhat more abstract definition, Multiplexing is the act of splitting one connection into multiple connections, called **Streams** (though which still act as connections on their own)
+
+A multiplexer is generally a [protocol], though it is possible that an equipped [transport] itself can produce more than one connection upon request.
+
+[protocol]: #protocol
+[connection]: #connection
+[transport]: #transport
+[session]: #session
+[multiplexing]: #multiplexing
+
+## Connection Establishment
+
+### Core Lifecycle
+
+The core functionality of libp2p lays at stacking multiple protocols on top of eachother to provide a [session] with enough security and connections to adiquitely provide services to the application level of the stack.
+
+It starts with dialing **[transports][transport]**, the Initiator opens a transport to another peer, once the Receiver picks up, the connection is established, and the connection can be [bootstrapped](#bootstrap-protocol-negociation).
+
+Once a suitable [Protocol Negociation protocol](#extended-protocol-negociation) is found, the process can move further with an arbitrary number of steps, going through the [upgrading](#upgrading) process, adding security protocols, adding multiplexing protocols, identifying peers, etc.
+
+The established session exists till one of the following 2 conditions occur:
+
+* One side closes the transport gracefully.
+
+* The transport resets, ending the session without the possibility for graceful shutdown.
+
+### Bootstrap Protocol Negociation
+
+At its core, libp2p provides a way to have protocols operate abstractly over ambigious transports, and provides control over the majority of the process.
+
+However, after opening a transport, 2 libp2p peers need to standardize selection of this myriad of protocols, to provide a "bootstrap" where other selection protocols (or simply application protocols) can take advantage from the newly agreed-upon state of the connection, and take it further.
+
+Roughly, the state machine of this initial stage is this:
+
+``` 
+if this_node == initiator:
+    send null-terminated Protocol ID string
+    
+    wait for same string echoed back:
+        if malformed (sent-string != recv-string): close connection
+
+        if echoed (sent-string == recv-string):
+            proceed, further traffic is now protocol-specific
+
+elif this_node == receiver:
+    wait for protocol string
+
+    when null-terminator received; 
+        query corresponding protocol from received string
+
+    when corresponding protocol is not found:
+        close connection
+    else:
+        repeat protocol string with null-terminator
+        proceed, further traffic is now protocol-specific
+```
+
+This allows libp2p to act as a reliably springboard for further protocol negociation.
+
+*Backwards Compatibility Note: The previous specification locked the Bootstrap Protocol Negociation process into only recognising [multistream-select], `/multistream/1.0.0` , due to this lock-in, Receivers would echo that Protocol ID String to Initiators regardless if Initiators had already sent a null-terminated Protocol ID String*
+
+### Advanced Concepts and Manipulation
+
+#### Extended Protocol Negociation
 
 One of libp2p's core design goals is to be adaptable to many network
-environments, including those that don't yet exist. To provide this flexibility,
+environments, including those that don't yet exist. To provide this flexibility, 
 the connection upgrade process supports multiple protocols for connection
 security and stream multiplexing and allows peers to select which to use for
-each connection. 
+each connection.
 
-The process of selecting protocols is called **protocol negotiation**. In
-addition to its role in the connection upgrade process, protocol negotiation is
-also used whenever [a new stream is opened over an existing
-connection](#opening-new-streams-over-a-connection). This allows libp2p
-applications to route application-specific protocols to the correct handler
-functions.
-
-Each protocol supported by a peer is identified using a unique string called a
-**protocol id**. While any string can be used, the conventional format is a
-path-like structure containing a short name and a version number, separated by
-`/` characters. For example: `/mplex/1.0.0` identifies version 1.0.0 of the
-[`mplex` stream multiplexing protocol][mplex]. multistream-select itself has a
-protocol id of `/multistream/1.0.0`. 
-
-Including a version number in the protocol id simplifies the case where you want
-to concurrently support multiple versions of a protocol, perhaps a stable version
-and an in-development version. By default, libp2p will route each protocol id
-to its handler function using exact literal matching of the protocol id, so new
-versions will need to be registered separately. However, the handler function
-receives the protocol id negotiated for each new stream, so it's possible to
-register the same handler for multiple versions of a protocol and dynamically alter
-functionality based on the version in use for a given stream.
-
-### multistream-select
-
-libp2p uses a protocol called multistream-select for protocol negotiation. Below
+libp2p uses a protocol called multistream-select for extended protocol negotiation. Below
 we cover the basics of multistream-select and its use in libp2p. For more
 details, see [the multistream-select repository][mss].
-
-Before engaging in the multistream-select negotiation process, it is assumed
-that the peers have already established a bidirectional communication channel,
-which may or may not have the security and multiplexing capabilities of a libp2p
-connection. If those capabilities are missing, multistream-select is used in the
-[connection upgrade process](#upgrading-connections) to determine how to provide
-them.
 
 Messages are sent encoded as UTF-8 byte strings, and they are always followed by
 a `\n` newline character. Each message is also prefixed with its length in bytes
@@ -145,34 +188,29 @@ according to the rules of the [multiformats unsigned varint spec][uvarint].
 For example, the string `"na"` is sent as the following bytes (shown here in
 hex):
 
-```
+``` 
 0x036e610a
 ```
-The first byte is the varint-encoded length (`0x03`), followed by `na` (`0x6e 0x61`),
-then the newline (`0x0a`).
 
+The first byte is the varint-encoded length ( `0x03` ), followed by `na` ( `0x6e 0x61` ), 
+then the newline ( `0x0a` ).
 
 The basic multistream-select interaction flow looks like this:
 
 ![see multistream.plantuml for diagram source](multistream.svg)
 
-Let's walk through the diagram above. The peer initiating the connection is
-called the **Initiator**, and the peer accepting the connection is the
-**Responder**.
+Let's walk through the diagram above; 
 
-The Initiator first opens a channel to the Responder. This channel could either be a
+The Initiator first opens a channel to the Receiver. This channel could either be a
 new connection or a new stream multiplexed over an existing connection.
 
-Next, both peers will send the multistream protocol id to establish that they
-want to use multistream-select. Both sides may send the initial multistream
-protocol id simultaneously, without waiting to receive data from the other side.
-If either side receives anything other than the multistream protocol id as the
-first message, they abort the negotiation process.
+Next, both peers will use the core negociation protocol to establish that they
+want to use multistream-select.
 
 Once both peers have agreed to use multistream-select, the Initiator sends the
-protocol id for the protocol they would like to use. If the Responder supports
+protocol id for the protocol they would like to use. If the Receiver supports
 that protocol, it will respond by echoing back the protocol id, which signals
-agreement. If the protocol is not supported, the Responder will respond with the
+agreement. If the protocol is not supported, the Receiver will respond with the
 string `"na"` to indicate that the requested protocol is Not Available.
 
 If the peers agree on a protocol, multistream-select's job is done, and future
@@ -181,36 +219,73 @@ traffic over the channel will adhere to the rules of the agreed-upon protocol.
 If a peer receives a `"na"` response to a proposed protocol id, they can either
 try again with a different protocol id or close the channel.
 
+**Please note:** `multistream-select` is just a protocol for protocol negociation, it 
+is deliberately decoupled from the [bootstrap](#bootstrap-protocol-negociation) so that 
+future protocols can easily and modularly operate within an existing network of old and
+new methods of protocol negociation.
 
-## Upgrading Connections
+When registering protocol handlers, it could be possible to use a custom predicate or
+"match function", which will receive incoming protocol ids and return a boolean
+indicating whether the handler supports the protocol. This allows more flexible
+behavior than exact literal matching, which is the default behavior if no match
+function is provided.
+
+#### Securing Connections
+
+At the time of writing, the recommended baseline security protocol is
+[SECIO][secio-spec], which is supported in all current libp2p implementations.
+
+Note that while SECIO is also the current default security protocol, that is
+likely to change with the further adoption of [TLS][tls-libp2p]. However, 
+support for SECIO as a fallback will likely be recommended for some time after
+TLS becomes the default.
+
+#### Multiplexing Streams
+
+Once we've established a libp2p connection to another peer, new streams are
+multiplexed over the connection using the native facilities of the transport, or
+the stream multiplexer negotiated during the [upgrade process](#upgrading) if the transport lacks native multiplexing.
+Either peer can open a new stream to the other over an existing connection.
+
+When a new stream is opened, a protocol is negotiated using
+`multistream-select`. The protocol negotiation process
+for new streams is very similar to the one used for upgrading connections.
+Even though the security and stream multiplexing modules for connection
+upgrades are typically bundled libp2p framework components, the protocols negotiated for
+new streams can be easily defined by libp2p applications as well, providing extra interoperability if needed.
+
+The recommended baseline stream multiplexer is [mplex][mplex], which provides a
+very simple programmatic API and has the widest support amongst libp2p
+implementations.
+
+### Upgrading
 
 libp2p is designed to support a variety of transport protocols, including those
 that do not natively support the core libp2p capabilities of security and stream
-multiplexing. The process of layering capabilities onto "raw" transport
-connections is called "upgrading" the connection.
+multiplexing. The process of layering capabilities onto carrying
+transports is called "upgrading" the connection.
 
 Because there are many valid ways to provide the libp2p capabilities, the
-connection upgrade process uses protocol negotiation to decide which specific
+connection upgrade process uses protocol negotiation techniques to decide which specific
 protocols to use for each capability. The protocol negotiation process uses
-multistream-select as described in the [Protocol
-Negotiation](#protocol-negotiation) section.
+both [bootstrap protocol negociation](#bootstrap-protocol-negociation) and [extended protocol negociation](#extended-protocol-negociation) for this purpose.
 
-When raw connections need both security and multiplexing, security is always
+When connections need both security and multiplexing, security is always
 established first, and the negotiation for stream multiplexing takes place over
-the encrypted channel.
+the encrypted connection.
 
 Here's an example of the connection upgrade process:
 
 ![see conn-upgrade.plantuml for diagram source](conn-upgrade.svg)
 
-First, the peers both send the multistream protocol id to establish that they'll
+First, the peers bootstrap-negociate the multistream protocol to establish that they'll
 use multistream-select to negotiate protocols for the connection upgrade.
 
 Next, the Initiator proposes the [TLS protocol][tls-libp2p] for encryption, but
-the Responder rejects the proposal as they don't support TLS.
+the Receiver rejects the proposal as they don't support TLS.
 
 The Initiator then proposes the [SECIO protocol][secio-spec], which is supported by
-the Responder. The Listener echoes back the protocol id for SECIO to indicate
+the Receiver. The Listener echoes back the protocol id for SECIO to indicate
 agreement.
 
 At this point the SECIO protocol takes over, and the peers exchange the SECIO
@@ -221,67 +296,18 @@ connection upgrade process.
 
 Once security has been established, the peers negotiate which stream multiplexer
 to use. The negotiation process works in the same manner as before, with the
-dialing peer proposing a multiplexer by sending its protocol id, and the
-listening peer responding by either echoing back the supported id or sending
+Initiator proposing a multiplexer by sending its protocol id, and the
+Receiver responding by either echoing back the supported id or sending
 `"na"` if the multiplexer is unsupported.
 
 Once security and stream multiplexing are both established, the connection
 upgrade process is complete, and both peers are able to use the resulting libp2p
-connection to open new secure multiplexed streams.
-
-
-## Opening New Streams Over a Connection
-
-Once we've established a libp2p connection to another peer, new streams are
-multiplexed over the connection using the native facilities of the transport, or
-the stream multiplexer negotiated during the [upgrade
-process](#upgrading-connections) if the transport lacks native multiplexing.
-Either peer can open a new stream to the other over an existing connection.
-
-When a new stream is opened, a protocol is negotiated using
-`multistream-select`. The [protocol negotiation process](#protocol-negotiation)
-for new streams is very similar to the one used for upgrading connections.
-However, while the security and stream multiplexing modules for connection
-upgrades are typically libp2p framework components, the protocols negotiated for
-new streams can be easily defined by libp2p applications.
-
-Streams are routed to application-defined handler functions based on their
-protocol id string. Incoming stream requests will propose a protocol id to use
-for the stream using `multistream-select`, and the peer accepting the stream
-request will determine if there are any registered handlers capable of handling
-the protocol. If no handlers are found, the peer will respond to the proposal
-with `"na"`.
-
-When registering protocol handlers, it's possible to use a custom predicate or
-"match function", which will receive incoming protocol ids and return a boolean
-indicating whether the handler supports the protocol. This allows more flexible
-behavior than exact literal matching, which is the default behavior if no match
-function is provided.
+session to open new secure multiplexed connections.
 
 ## Practical Considerations
 
 This section will go over a few aspects of connection establishment and state
 management that are worth considering when implementing libp2p.
-
-### Interoperability
-
-Support for connection security protocols and stream multiplexers varies across
-libp2p implementations. 
-
-To support the widest variety of peers, implementations should support a
-baseline "stack" of security and multiplexing protocols.
-
-At the time of writing, the recommended baseline security protocol is
-[SECIO][secio-spec], which is supported in all current libp2p implementations.
-
-Note that while SECIO is also the current default security protocol, that is
-likely to change with the further adoption of [TLS][tls-libp2p]. However,
-support for SECIO as a fallback will likely be recommended for some time after
-TLS becomes the default.
-
-The recommended baseline stream multiplexer is [mplex][mplex], which provides a
-very simple programmatic API and is supported in all current libp2p
-implementations.
 
 ### State Management 
 
@@ -324,7 +350,7 @@ whatever prioritization system makes sense.
 
 ### Connection Lifecycle Events
 
-The establishment of new connections and streams is likely to be a
+The establishment of new connections is likely to be a
 "cross-cutting concern" that's of interest to various parts of your application
 (or parts of libp2p) besides the protocol handlers that directly deal with the
 traffic.
@@ -343,10 +369,8 @@ baseline would be:
 
 | Event        | Description                               |
 |--------------|-------------------------------------------|
-| Connected    | A new connection has been opened          |
-| Disconnected | A connection has closed                   |
-| OpenedStream | A new stream has opened over a connection |
-| ClosedStream | A stream has closed                       |
+| OpenedConn   | A new connection has been opened          |
+| ClosedConn   | A connection has closed                   |
 | Listen       | We've started listening on a new address  |
 | ListenClose  | We've stopped listening on an address     |
 
@@ -390,6 +414,30 @@ subsystems, and may possibly require libp2p implementations to provide an
 in-process event delivery system. If and when this occurs, this spec will be
 updated to incorporate the changes.
 
+## Miscellaneous
+
+### A Note about Interoperability
+
+Support for connection security protocols and stream multiplexers varies across
+libp2p implementations. 
+
+To support the widest variety of peers, implementations should support a
+baseline "stack" of security and multiplexing protocols.
+
+### Protocol IDs (Extended)
+
+To expand upon [connections][connection]; 
+
+Including a version number in the protocol id simplifies the case where you want
+to concurrently support multiple versions of a protocol, perhaps a stable version
+and an in-development version. By default, libp2p will route each protocol id
+to its protocol handler using exact literal matching of the protocol id, so new
+versions will need to be registered separately. However, the protocol handler
+receives the protocol id negotiated for each new connection, so it's possible to
+register the same handler for multiple versions of a protocol and dynamically alter
+functionality based on the version in use for a given connection.
+
+[relay]: ../relay/README.md
 [mss]: https://github.com/multiformats/multistream-select
 [uvarint]: https://github.com/multiformats/unsigned-varint
 [mplex]: ../mplex/README.md
