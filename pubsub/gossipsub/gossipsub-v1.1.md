@@ -191,7 +191,7 @@ never fully take over the mesh of a target peer.
 In gossipsub v1.1 we introduce a peer scoring component: each individual peer maintains a score
 for other peers. The score is locally computed by each individual peer based on observed behaviour
 and is not shared. The score is a real value, computed as weighted mix of parameters,
-with pluggable application specific scoring. The score is computed across all (configured) topics
+with pluggable application-specific scoring. The score is computed across all (configured) topics
 with a weighted mix, such that faulty behaviour in one topic percolates to other topics.
 Furthermore, the score is retained for some period of time when a peer disconnects, so that malicious
 peers cannot easily reset their score when it drops to negative and well behaving
@@ -254,7 +254,7 @@ making sybils re-eligible for grafting.
 
 In order to recover from such disaster scenarios and generally adaptively optimize the mesh over time,
 gossipsub v1.1 introduces an opportunistic grafting mechanism.
-Periodically, the router checks the median score of peers in the mesh against the `opportunisticGrafThreshold`.
+Periodically, the router checks the median score of peers in the mesh against the `opportunisticGraftThreshold`.
 If the median score is below the threshold, the router opportunistically grafts (at least) two peers
 with score above the median in the mesh.
 This improves an underperforming mesh by introducing good scoring peers that may have been gossiping
@@ -281,7 +281,7 @@ The parameters are defined as follows:
 - `P₁`: **Time in Mesh** for a topic. This is the time a peer has been in the mesh, capped to a small value
   and mixed with a small positive weight. This is intended to boost peers already in the mesh so that
   they are not prematurely pruned because of oversubscription.
-- `P₂`: **First Message Deliveries** for a topic. This is the number of message first delivered by the peer
+- `P₂`: **First Message Deliveries** for a topic. This is the number of messages first delivered by the peer
   in the topic, mixed with a positive weight. This is intended to reward peers who first forward a
   valid message.
 - `P₃`: **Mesh Message Delivery Rate** for a topic. This parameter is a threshold for the expected message
@@ -294,15 +294,15 @@ The parameters are defined as follows:
 - `P₃b`: **Mesh Message Delivery Failures** for a topic. This is a sticky parameter that counts the number
   of mesh message delivery failures. Whenever a peer is pruned with a negative score, the parameter
   is augmented by the rate deficit at the time of prune. This is intended to keep history of prunes
-  so that a peer that was pruned because of underdelivery cannot quickly get regrafted into the
+  so that a peer that was pruned because of underdelivery cannot quickly get re-grafted into the
   mesh. The parameter is mixed with negative weight.
 - `P₄`: **Invalid Messages** for a topic. This is the number of invalid messages delivered in the topic.
-  This is intended to penalize peers who transmit invalid messages, according to application specific
+  This is intended to penalize peers who transmit invalid messages, according to application-specific
   validation rules. It is mixed with a negative weight.
-- `P₅`: **Application Specific** score. This is the score component assigned to the peer by the application
-  itself, using application specific rules. The weight is positive, but the parameter itself has an
+- `P₅`: **Application-Specific** score. This is the score component assigned to the peer by the application
+  itself, using application-specific rules. The weight is positive, but the parameter itself has an
   arbitrary real value, so that the application can signal misbehaviour with a negative score or gate
-  peers before an application specific handshake is completed.
+  peers before an application-specific handshake is completed.
 - `P₆`: **IP Colocation Factor**. This parameter is a threshold for the number of peers using the same IP
   address. If the number of peers in the same IP exceeds the threshold, then the value is the square
   of the surplus, otherwise it is 0. This is intended to make it difficult to carry out sybil attacks
@@ -325,8 +325,8 @@ the lifetime of the peer.
 The decay interval is configurable by the application, with shorter intervals resulting in faster
 decay.
 
-Each decaying parameter can have it's own decay _factor_, which is a configurable parameter that
-controls how much the parameter will decay each decay period.
+Each decaying parameter can have its own decay _factor_, which is a configurable parameter that
+controls how much the parameter will decay during each decay period.
 
 The decay factor is a float in the range of (0.0, 1.0) that will be multiplied with the current
 parameter value at each decay interval update. For example, suppose the value for `P₂` (First
@@ -657,5 +657,5 @@ Network operators must take care to ensure that whichever peer discovery mechani
 to utilize is resilient to attacks and can always return some honest peers so that connections
 between honest peers can be established.
 Furthermore, it is strongly recommended that any external discovery service is augmented by
-bootstrappers/directory nodes configured with Peer Exchange and high application specific scores,
+bootstrappers/directory nodes configured with Peer Exchange and high application-specific scores,
 as outlined above.
