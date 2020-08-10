@@ -6,7 +6,7 @@
 
 Authors: [@vyzo]
 
-Interest Group: [@yusefnapora], [@raulk], [@whyrusleeping], [@Stebalien], [@daviddias]
+Interest Group: [@yusefnapora], [@raulk], [@whyrusleeping], [@Stebalien], [@daviddias], [@protolambda], [@djrtwo], [@dryajov], [@mpetrunic], [@AgeManning], [@Nashatyrev], [@mhchia]
 
 [@whyrusleeping]: https://github.com/whyrusleeping
 [@yusefnapora]: https://github.com/yusefnapora
@@ -14,6 +14,13 @@ Interest Group: [@yusefnapora], [@raulk], [@whyrusleeping], [@Stebalien], [@davi
 [@vyzo]: https://github.com/vyzo
 [@Stebalien]: https://github.com/Stebalien
 [@daviddias]: https://github.com/daviddias
+[@protolambda]: https://github.com/protolambda
+[@djrtwo]: https://github.com/djrtwo
+[@dryajov]: https://github.com/dryajov
+[@mpetrunic]: https://github.com/mpetrunic
+[@AgeManning]: https://github.com/AgeManning
+[@Nashatyrev]: https://github.com/Nashatyrev
+[@mhchia]: https://github.com/mhchia
 
 See the [lifecycle document][lifecycle-spec] for context about maturity level and spec status.
 
