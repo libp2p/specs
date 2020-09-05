@@ -704,9 +704,9 @@ The circuit breaker utilizes the following application configured parameters:
 | `GlobalDecayCoefficient` | linear decay coefficient for global stats | computed such that the counter decays to 1% after 2 minutes |
 | `SourceDecayCoefficient` | linear decay coefficient for per IP stats | computed such that the counter decays to 1% after 1 hour |
 | `QuietInterval` | interval of no dropped message events before turning off the circuit breaker | 1 minute |
-| `W_duplicate` | counter mixin weight for duplicate messages | `0.25` |
+| `W_duplicate` | counter mixin weight for duplicate messages | `0.125` |
 | `W_ignore` | counter mixin weight for ignored messages | `1.0` |
-| `W_reject` | coutner mixin weight for rejected messages | `4.0` |
+| `W_reject` | coutner mixin weight for rejected messages | `16.0` |
 | `RetentionPeriod` | duration of stats retention after disconnection | 6 hours |
 
 
