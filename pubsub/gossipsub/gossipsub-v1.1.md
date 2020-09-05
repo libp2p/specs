@@ -694,6 +694,10 @@ to varying network conditions.
 Also note that per IP statistics are retained for a configured period of time after disconnection, so
 that an attacker cannot easily clear traces of misbehaviour by disconnecting.
 
+Finally, the circuit breaker should allow the application to configure per topic accepted delivery
+weights, so that deliveries in priority topics can be given more weight.
+If a topic is not configured, then its delivery weight is 1.
+
 #### RED Parameters
 
 The circuit breaker utilizes the following application configured parameters:
