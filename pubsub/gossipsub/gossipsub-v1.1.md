@@ -701,7 +701,7 @@ The circuit breaker utilizes the following application configured parameters:
 | Parameter | Purpose | Default |
 |-----------|---------|---------|
 | `ActivationThreshold` | dropped to validated message ratio threshold for triggering the circuit breaker | `0.33` |
-| `GlobalDecayCoefficient` | linear decay coefficient for global stats | computed such that the counter decays to 1% after 10 minutes |
+| `GlobalDecayCoefficient` | linear decay coefficient for global stats | computed such that the counter decays to 1% after 2 minutes |
 | `SourceDecayCoefficient` | linear decay coefficient for per IP stats | computed such that the counter decays to 1% after 1 hour |
 | `QuietInterval` | interval of no dropped message events before turning off the circuit breaker | 1 minute |
 | `W_duplicate` | counter mixin weight for duplicate messages | `0.25` |
