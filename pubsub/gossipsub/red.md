@@ -43,7 +43,7 @@ This document specifies an extension to [gossipsub v1.1](gossipsub-v1.1.md) inte
 provide a circuit breaker so that routers can withstand concerted attacks targetting the
 validation queue with a flood of spam.
 This extension does not modify the protocol in any way and works in conjuction with the defensive
-mechanism of gossipsub v1.1
+mechanisms of gossipsub v1.1.
 
 ## Validation Queue Protection
 
@@ -61,7 +61,7 @@ an elevated rate of dropped messages, and makes decisions on whether to accept i
 validation based on the statistical performance of peers in the origin IP address. The decision is
 probabilistic and implements a Random Early Drop (RED) strategy that drops messages with a probability
 that depends on the acceptance rates for messages from the origin IP. This strategy can neuter
-attacks on the validation queue, because messages are no longer dropped indiscrimantly in a drop-tail
+attacks on the validation queue, because messages are no longer dropped indiscriminately in a drop-tail
 fashion.
 
 ## Random Early Drop Algorithm
@@ -71,8 +71,8 @@ The algorithm has two aspects:
 - The decision on whether to drop a message from an origin IP address.
 
 In order to trigger RED, the circuit breaker maintains the following queue statistics:
-- a (decaying) counter for the number of message validations.
-- a (decaying) counter for the number of dropped messages.
+- a _decaying_ counter for the number of message validations.
+- a _decaying_ counter for the number of dropped messages.
 
 The decision on triggering RED is based on comparing the ratio of dropped messages to validations.
 If the ratio exceeds an application configured threshold, then the RED algorithm
@@ -82,10 +82,10 @@ circuit breaker turns back off.
 
 In order to make the actual RED decision, the circuit breaker maintains the following statistics per
 IP:
-- a (decaying) counter for the number of accepted messages.
-- a (decaying) counter for the number of duplicate messages, mixed with a weight `W_duplicate`.
-- a (decaying) counter for the number of ignored messages, mixed with a weight `W_ignored`.
-- a (decaying) counter for the number of rejected messages, mixed with a weight `W_rejected`.
+- a _decaying_ counter for the number of accepted messages.
+- a _decaying_ counter for the number of duplicate messages, mixed with a weight `W_duplicate`.
+- a _decaying_ counter for the number of ignored messages, mixed with a weight `W_ignored`.
+- a _decaying_ counter for the number of rejected messages, mixed with a weight `W_rejected`.
 
 The router generates a random float `r` and accepts the message if and only if
 ```
@@ -120,3 +120,9 @@ The circuit breaker utilizes the following application configured parameters:
 | `W_ignore` | counter mixin weight for ignored messages | `1.0` |
 | `W_reject` | coutner mixin weight for rejected messages | `16.0` |
 | `RetentionPeriod` | duration of stats retention after disconnection | 6 hours |
+
+With the default parameters, we are rapidly penalising rejections, mildly penalising ignored messages,
+and softly weighting duplicate messages because they occur normally for mesh peers.
+The result is that clearly misbehaving peers whose messages lead to outright rejections, will make up
+for a substantial part of the decision to break the circuit, while underperforming peers will also
+factor in, but with less force.
