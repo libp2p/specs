@@ -1,4 +1,4 @@
-# gossipsub v1.1: Validation Queue Protection
+# gossipsub v1.1: Functional Extension for Validation Queue Protection
 
 | Lifecycle Stage | Maturity                  | Status | Latest Revision |
 |-----------------|---------------------------|--------|-----------------|
