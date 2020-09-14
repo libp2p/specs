@@ -37,6 +37,7 @@ See the [lifecycle document][lifecycle-spec] for context about maturity level an
   - [Explicit Peering Agreements](#explicit-peering-agreements)
   - [PRUNE Backoff and Peer Exchange](#prune-backoff-and-peer-exchange)
     - [Protobuf](#protobuf)
+  - [Signature policy](#signature-policy)
   - [Flood Publishing](#flood-publishing)
   - [Adaptive Gossip Dissemination](#adaptive-gossip-dissemination)
   - [Outbound Mesh Quotas](#outbound-mesh-quotas)
@@ -133,6 +134,29 @@ message PeerInfo {
 	optional bytes signedPeerRecord = 2;
 }
 ```
+
+### Signature policy
+
+The usage of the `signature`, `key`, `from`, and `seqno` fields in `Message` is now configurable.
+These fields may negatively affect privacy in content-addressed messaging,
+and may need to be strictly enforced in author-addressed messaging.
+
+In gossipsub v1.0, a "lax" signing policy is effective: verify signatures, and if not, only when present.
+In gossipsub v1.1, these fields are strictly present and verified, or completely omitted altogether.
+An implementation may choose to support the legacy v1.0 "lax" signing policy,
+ along with an explicit message authoring option. 
+
+Gossipsub v1.1 has two policies to choose from:
+- `StrictSign`:
+  - Produces the `signature`, `key` (`from` may be enough), `from` and `seqno` fields.
+  - Enforce the fields to be present, reject otherwise.
+  - Verify the signature, reject otherwise.
+  - Propagate the fields if valid.
+- `StrictNoSign`:
+  - Produces messages without the `signature`, `key`, `from` and `seqno` fields.
+    The corresponding protobuf key-value pairs are absent from the marshalled message, not just empty.
+  - Enforce the fields to be absent, reject otherwise.
+  - Propagate only if the fields are absent.
 
 ### Flood Publishing
 
