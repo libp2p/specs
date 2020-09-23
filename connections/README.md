@@ -67,11 +67,11 @@ to handler functions.
 
 Protocols lay at the heart of libp2p, providing modularity by availability on both parties.
 
-Protocols are abritrary processes on both ends of the libp2p [session] that write/read to the underlying [connection].
+Protocols are arbitrary processes on both ends of the libp2p [session] that write/read to the underlying [connection].
 
 Protocols can be pretty much anything, from HTTP to Identity exchange, from [multiplexing] to security.
 
-Protocols are identified by their **Protocol ID**. This can be any string, but convention is that protocols identify themselves by forward slashes ( `/` )
+Protocols are identified by their **Protocol ID**. This can be any string, but it's conventional for protocols to follow hierarchical naming, using forward slashes (`/`) for namespacing and/or to separate levels.
 
 For example, `/mplex/1.0.0` is the Protocol ID for the [ `mplex` stream-multiplexing protocol][mplex].
 
