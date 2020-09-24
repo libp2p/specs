@@ -112,11 +112,10 @@ section of the connection establishment spec][conn-spec-protocol-negotiation].
 
 ### Message Framing
 
-All [plaintext protocol specific messages](#messages) sent over the wire are
+All [handshake messages](#messages) sent over the wire are
 prefixed with the message length in bytes, encoded as an unsigned variable
 length integer as defined by the [multiformats unsigned-varint
-spec][uvarint-spec]. Data send via a negotiated plaintext protocol connection is
-not prefixed with the data length, but send as is.
+spec][uvarint-spec]. Actual payloads exchanged once the plaintext handshake has completed are NOT prefixed with their lengths, but sent as-is.
 
 ### Exchange
 
