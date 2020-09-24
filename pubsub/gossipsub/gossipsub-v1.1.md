@@ -37,7 +37,8 @@ See the [lifecycle document][lifecycle-spec] for context about maturity level an
   - [Explicit Peering Agreements](#explicit-peering-agreements)
   - [PRUNE Backoff and Peer Exchange](#prune-backoff-and-peer-exchange)
     - [Protobuf](#protobuf)
-  - [Signature policy](#signature-policy)
+  - [Signature Policy](#signature-policy)
+    - [Signature Policy Options](#signature-policy-options)
   - [Flood Publishing](#flood-publishing)
   - [Adaptive Gossip Dissemination](#adaptive-gossip-dissemination)
   - [Outbound Mesh Quotas](#outbound-mesh-quotas)
@@ -135,7 +136,7 @@ message PeerInfo {
 }
 ```
 
-### Signature policy
+### Signature Policy
 
 The usage of the `signature`, `key`, `from`, and `seqno` fields in `Message` is now configurable.
 Initially this could be configured globally, however, configuration on a per-topic basis will facilitate mixed protocols better.
@@ -146,7 +147,7 @@ the `seqno` and `from` fields form the `message_id`, and should be verified to a
 In content-stamped messaging, the fields may negatively affect privacy:
 revealing the relationship between `data` and `from`/`seqno`.
 
-#### Signature policy options
+#### Signature Policy Options
 
 In gossipsub v1.1, these fields are strictly present and verified, or completely omitted altogether:
 - `StrictSign`:

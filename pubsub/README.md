@@ -32,6 +32,7 @@ and spec status.
     - [The RPC](#the-rpc)
     - [The Message](#the-message)
     - [Message Signing](#message-signing)
+    - [Message Identification](#message-identification)
     - [The Topic Descriptor](#the-topic-descriptor)
         - [AuthOpts](#authopts)
             - [AuthMode 'NONE'](#authmode-none)
@@ -145,7 +146,7 @@ economics (see e.g.
 and
 [here](https://ethresear.ch/t/improving-the-ux-of-rent-with-a-sleeping-waking-mechanism/1480)).
 
-## Message identification
+## Message Identification
 
 To uniquely identify a message in a set of topics, a `message_id` is computed based on the message.
 This can be configured on the application layer, as `message_id_fn(*Message) => message_id`, 
