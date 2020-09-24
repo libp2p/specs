@@ -112,6 +112,9 @@ message Message {
 }
 ```
 
+The `optional` fields may be omitted, depending on the
+[signature policy](#message-signing) and [message ID function](#message-identification)
+
 The `from` field denotes the author of the message, note that this is not
 necessarily the peer who sent the RPC this message is contained in. This is
 done to allow content to be routed through a swarm of pubsubbing peers.
@@ -123,14 +126,7 @@ The `seqno` field is a 64-bit big-endian uint that is a linearly increasing
 number that is unique among messages originating from each given peer. No two
 messages on a pubsub topic from the same peer should have the same `seqno`
 value, however messages from different peers may have the same sequence number,
-so this number alone cannot be used to address messages. Notably the
-'timecache' in use by the go implementation contains a `message_id`,
-which is constructed from the concatenation of the `seqno` and the `from`
-fields. This `message_id` is then unique among messages. It was also proposed
-in [#116](https://github.com/libp2p/specs/issues/116) to use a `message_hash`,
-however, it was noted: "a potential caveat with using hashes instead of seqnos:
-the peer won't be able to send identical messages (e.g. keepalives) within the
-timecache interval, as they will get rejected as duplicates."
+so this number alone cannot be used to address messages by origin-stamping.
 
 The `topicIDs` field specifies a set of topics that this message is being
 published to.
@@ -149,6 +145,30 @@ economics (see e.g.
 and
 [here](https://ethresear.ch/t/improving-the-ux-of-rent-with-a-sleeping-waking-mechanism/1480)).
 
+## Message identification
+
+To uniquely identify a message in a set of topics, a `message_id` is computed based on the message.
+This can be configured on the application layer, as `message_id_fn(*Message) => message_id`, 
+which generally fits in two flavors:
+- **origin-stamped** messaging: the concatenation of the `seqno` and `from` fields
+  uniquely identifies a message based on the *author*.
+- **content-stamped** messaging: a message ID derived from the `data` field
+  uniquely identifies a message based on the *data*.
+
+If fabricated collisions are not a concern, or difficult enough within the window the message is relevant in,
+a `message_id` based on a short digest of inputs may benefit performance.
+
+Note that different specialized pubsub components, such as the 'timecache' used in the Go implementation,
+may use the `message_id` to key messages.
+
+It was also proposed in [#116](https://github.com/libp2p/specs/issues/116)
+to use a `message_hash`, however, it was noted:
+> a potential caveat with using hashes instead of seqnos:
+the peer won't be able to send identical messages (e.g. keepalives) within the
+timecache interval, as they will get rejected as duplicates.
+
+Some applications may not need keepalives, or choose to implement something more specific than a message hash. 
+
 ## Message Signing
 
 Messages can be optionally signed, and it is up to the peer whether to accept and forward
@@ -161,7 +181,7 @@ This optionality is configurable with the signature policy options starting from
 
 For signing purposes, the `signature` and `key` fields are used:
 - The `signature` field contains the signature.
-- The `key` field contains the signing key when it cannot be inlined in the source peer ID.
+- The `key` field contains the signing key when it cannot be inlined in the source peer ID (`from`).
   When present, it must match the peer ID.
 
 The signature is computed over the marshalled message protobuf _excluding_ the `signature` field itself.
