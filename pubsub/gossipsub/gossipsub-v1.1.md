@@ -138,7 +138,7 @@ message PeerInfo {
 
 ### Signature Policy
 
-The usage of the `signature`, `key`, `from`, and `seqno` fields in `Message` is now configurable.
+The usage of the `signature`, `key`, `from`, and `seqno` fields in `Message` is now configurable per topic, in the manners specified in this section.
 > [[ Implementation note ]]: At the time of writing this section, go-libp2p-pubsub (reference implementation of this spec) allows for configuring the signature policy at a global pubsub instance level. This needs to be pushed down to topic-level configuration. Other implementations are encouraged to support topic-level configuration, as the spec mandates.
 
 In the default origin-stamped messaging, the fields need to be strictly enforced:
