@@ -139,7 +139,7 @@ message PeerInfo {
 ### Signature Policy
 
 The usage of the `signature`, `key`, `from`, and `seqno` fields in `Message` is now configurable.
-Initially this could be configured globally, however, configuration on a per-topic basis will facilitate mixed protocols better.
+Initially this could be configured globally, however, because the policies are mutually incompatible, configuration on a per-topic basis will facilitate mixed protocols better.
 
 In the default origin-stamped messaging, the fields need to be strictly enforced:
 the `seqno` and `from` fields form the `message_id`, and should be verified to avoid `message_id` collisions.
