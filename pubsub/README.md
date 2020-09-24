@@ -153,17 +153,18 @@ and
 
 Messages can be optionally signed, and it is up to the peer whether to accept and forward
 unsigned messages.
-When the receiver expects unsigned content-based messages, and thus does not expect
+The default choice of origin-stamped messaging, the receiver should enforce signatures strictly (`StrictSign`).
+When the receiver expects unsigned content-stamped messages, and thus does not expect
 the `from`, `seqno`, `signature`, or `key` fields, it may reject the messages (`StrictNoSign`).
-And if not, the receiver may choose to enforce signatures strictly (`StrictSign`).
-This optionality is configurable with the signing policy options starting from `v1.1`. 
+
+This optionality is configurable with the signature policy options starting from gossipsub v1.1. 
 
 For signing purposes, the `signature` and `key` fields are used:
 - The `signature` field contains the signature.
 - The `key` field contains the signing key when it cannot be inlined in the source peer ID.
   When present, it must match the peer ID.
 
-The signature is computed over the marshalled message protobuf _excluding_ the key field.
+The signature is computed over the marshalled message protobuf _excluding_ the `signature` field itself.
 This includes any fields that are not recognized, but still included in the marshalled data.
 The protobuf blob is prefixed by the string `libp2p-pubsub:` before signing.
 

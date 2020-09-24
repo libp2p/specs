@@ -138,25 +138,46 @@ message PeerInfo {
 ### Signature policy
 
 The usage of the `signature`, `key`, `from`, and `seqno` fields in `Message` is now configurable.
-These fields may negatively affect privacy in content-addressed messaging,
-and may need to be strictly enforced in author-addressed messaging.
+Initially this could be configured globally, however, configuration on a per-topic basis will facilitate mixed protocols better.
 
-In gossipsub v1.0, a "lax" signing policy is effective: verify signatures, and if not, only when present.
-In gossipsub v1.1, these fields are strictly present and verified, or completely omitted altogether.
-An implementation may choose to support the legacy v1.0 "lax" signing policy,
- along with an explicit message authoring option. 
+In the default origin-stamped messaging, the fields need to be strictly enforced:
+the `seqno` and `from` fields form the `message_id`, and should be verified to avoid `message_id` collisions.
 
-Gossipsub v1.1 has two policies to choose from:
+In content-stamped messaging, the fields may negatively affect privacy:
+revealing the relationship between `data` and `from`/`seqno`.
+
+#### Signature policy options
+
+In gossipsub v1.1, these fields are strictly present and verified, or completely omitted altogether:
 - `StrictSign`:
-  - Produces the `signature`, `key` (`from` may be enough), `from` and `seqno` fields.
-  - Enforce the fields to be present, reject otherwise.
-  - Verify the signature, reject otherwise.
-  - Propagate the fields if valid.
+  - On the producing side:
+    - Build messages with the `signature`, `key` (`from` may be enough), `from` and `seqno` fields.
+  - On the consuming side:
+    - Enforce the fields to be present, reject otherwise.
+    - Propagate only if the fields are valid and signature can be verified, reject otherwise.
 - `StrictNoSign`:
-  - Produces messages without the `signature`, `key`, `from` and `seqno` fields.
-    The corresponding protobuf key-value pairs are absent from the marshalled message, not just empty.
-  - Enforce the fields to be absent, reject otherwise.
-  - Propagate only if the fields are absent.
+  - On the producing side:
+    - Build messages without the `signature`, `key`, `from` and `seqno` fields.
+    - The corresponding protobuf key-value pairs are absent from the marshalled message, not just empty.
+  - On the consuming side:
+    - Enforce the fields to be absent, reject otherwise.
+    - Propagate only if the fields are absent, reject otherwise.
+  - A `message_id` function will not be able to use the above fields, and may instead rely on the `data` field.
+
+In gossipsub v1.0, a legacy "lax" signing policy could be configured, to not verify signatures except when present:
+- `LaxSign`: *Defined for completeness, insecure*. Also known as authoring but not verifying.
+  - On the producing side:
+    - Build messages with the `signature`, `key` (`from` may be enough), `from` and `seqno` fields.
+  - On the consuming side:
+    - `signature` may be absent, and not verified.
+    - Verify `signature`, iff the `signature` is present, then reject if `signature` is invalid.
+- `LaxNoSign`: *Previous default for no-verification*
+  - On the producing side:
+    - Build messages without the `signature`, `key`, `from` and `seqno` fields.
+  - On the consuming side:
+    - Accept and propagate messages with above fields.
+    - Verify `signature`, iff the `signature` is present, then reject if `signature` is invalid.
+
 
 ### Flood Publishing
 
