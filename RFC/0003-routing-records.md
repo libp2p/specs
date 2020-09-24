@@ -142,30 +142,30 @@ This structure can be serialized and contained in a [signed
 envelope][envelope-rfc], which lets us issue "self-certified" address records
 that are signed by the peer that the addresses belong to.
 
-To produce a "self-certified" address, a peer will construct a `RoutingState`
+To produce a "self-certified" address, a peer will construct a `PeerRecord`
 containing their listen addresses and serialize it to a byte array using a
 protobuf encoder. The serialized records will then be wrapped in a [signed
 envelope][envelope-rfc], which is signed with the libp2p peer's private host
 key. The corresponding public key MUST be included in the envelope's
 `public_key` field.
 
-When receiving a `RoutingState` wrapped in a signed envelope, a peer MUST
-validate the signature before deserializing the `RoutingState` record. If the
+When receiving a `PeerRecord` wrapped in a signed envelope, a peer MUST
+validate the signature before deserializing the `PeerRecord`. If the
 signature is invalid, the envelope MUST be discarded without deserializing the
 envelope payload.
 
-Once the signature has been verified and the `RoutingState` has been
+Once the signature has been verified and the `PeerRecord` has been
 deserialized, the receiving peer MUST verify that the `peer_id` contained in the
-`RoutingState` matches the `public_key` from the envelope. If the public key in
-the envelope cannot derive the peer id contained in the routing state record,
-the `RoutingState` MUST be discarded.
+`PeerRecord` matches the `public_key` from the envelope. If the public key in
+the envelope cannot derive the peer id contained in the `PeerRecord`,
+the `PeerRecord` MUST be discarded.
 
 ### Signed Envelope Domain
 
 Signed envelopes require a "domain separation" string that defines the scope
 or purpose of a signature.
 
-When wrapping a `RoutingState` in a signed envelope, the domain string MUST be
+When wrapping a `PeerRecord` in a signed envelope, the domain string MUST be
 `libp2p-routing-state`.
 
 ### Signed Envelope Payload Type
@@ -201,17 +201,17 @@ And possibly:
   - has a particular address been self-certified by the given peer?
 
 
-We'll also need a method that constructs a new `RoutingState` containing our
+We'll also need a method that constructs a new `PeerRecord` containing our
 listen addresses and wraps it in a signed envelope. This may belong on the Host
 instead of the peer store, since it needs access to the private signing key.
 
 When adding records to the peerstore, a receiving peer MUST keep track of the
-latest `seq` value received for each peer and reject incoming `RoutingState`
+latest `seq` value received for each peer and reject incoming `PeerRecord`
 messages unless they contain a greater `seq` value than the last received.
 
-After integrating the information from the `RoutingState` into the peerstore,
+After integrating the information from the `PeerRecord` into the peerstore,
 implementations SHOULD retain the original signed envelope. This will allow
-other libp2p systems to share signed `RoutingState` records with other peers in
+other libp2p systems to share signed `PeerRecord`s with other peers in
 the network, preserving the signature of the issuing peer. The [Exchanging
 Records section](#exchanging-records) section lists some systems that would need
 to retrieve the original signed record from the peerstore.
@@ -263,7 +263,7 @@ multiaddrs.
 Another potentially useful extension would be a compact protocol table or bloom
 filter that could be used to test whether a peer supports a given protocol
 before interacting with them directly. This could be added as a new field in the
-`RoutingState` message.
+`PeerRecord` message.
 
 
 
