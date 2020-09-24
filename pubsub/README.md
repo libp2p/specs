@@ -149,12 +149,16 @@ and
 ## Message Identification
 
 To uniquely identify a message in a set of topics, a `message_id` is computed based on the message.
-This can be configured on the application layer, as `message_id_fn(*Message) => message_id`, 
-which generally fits in two flavors:
-- **origin-stamped** messaging: the concatenation of the `seqno` and `from` fields
+This can be configured on the application layer, as `message_id_fn(*Message) => message_id`.
+A `message_id_fn` may conditionally call different `message_id_fn` implementations per topic (or group thereof).
+
+The message ID approach generally fits in two flavors:
+- **origin-stamped** messaging: the combination of the `seqno` and `from` fields
   uniquely identifies a message based on the *author*.
 - **content-stamped** messaging: a message ID derived from the `data` field
   uniquely identifies a message based on the *data*.
+
+The default `message_id_fn` is origin-stamped, and defined as the string concatenation of `from` and `seqno`.
 
 If fabricated collisions are not a concern, or difficult enough within the window the message is relevant in,
 a `message_id` based on a short digest of inputs may benefit performance.
