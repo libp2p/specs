@@ -148,23 +148,24 @@ and
 
 ## Message Identification
 
-To uniquely identify a message in a set of topics, a `message_id` is computed based on the message.
-This can be configured on the application layer, as `message_id_fn(*Message) => message_id`.
-A `message_id_fn` may conditionally call different `message_id_fn` implementations per topic (or group thereof).
+To uniquely identify a message in a set of topics (for de-duplication, tracking, scoring and other purposes), a `message_id` is calculated based on the message.
+How the calculated happens can be configured on the application layer by supplying a function `message_id_fn`, such that `message_id_fn(*Message) => message_id`.
 
-The message ID approach generally fits in two flavors:
+> [[ Implementation note ]]: At the time of writing this section, go-libp2p-pubsub (reference implementation of this spec) only allows configuring a single top-level `message_id_fn`. This function may, however, vary its behaviour based on the topic (contained inside its `*Message`) argument. Thus, it's feasible to implement a per-topic policy using branch selection control flow logic. go-libp2p-pubsub plans to push down the configuration of the `message_id_fn` to the topic level. Other implementations are encouraged to do the same.
+
+The message ID calculation approach generally fits in two flavors:
 - **origin-stamped** messaging: the combination of the `seqno` and `from` fields
   uniquely identifies a message based on the *author*.
-- **content-stamped** messaging: a message ID derived from the `data` field
+- **content-addressed** messaging: a message ID derived from the `data` field
   uniquely identifies a message based on the *data*.
 
-The default `message_id_fn` is origin-stamped, and defined as the string concatenation of `from` and `seqno`.
+**The default `message_id_fn` is origin-stamped,** and defined as the string concatenation of `from` and `seqno`.
 
 If fabricated collisions are not a concern, or difficult enough within the window the message is relevant in,
-a `message_id` based on a short digest of inputs may benefit performance.
+a `message_id` based on a short digest of inputs may benefit performance. Whichever the choice, it is crucial that **all peers** participating in a topic implement the same message ID calculation logic, or the topic may function suboptimally.
 
-Note that different specialized pubsub components, such as the 'timecache' used in the Go implementation,
-may use the `message_id` to key messages.
+Note that different specialized pubsub components, such as the 'timecache' used in the Go implementation, scoring functions or circuit-breakers 
+may use the `message_id` to key and track messages.
 
 It was also proposed in [#116](https://github.com/libp2p/specs/issues/116)
 to use a `message_hash`, however, it was noted:
@@ -172,7 +173,7 @@ to use a `message_hash`, however, it was noted:
 the peer won't be able to send identical messages (e.g. keepalives) within the
 timecache interval, as they will get rejected as duplicates.
 
-Some applications may not need keepalives, or choose to implement something more specific than a message hash. 
+Some applications may not need keepalives, or choose to implement something more specific than a message hash. In those cases where duplicate payloads are not desirable, a `content-based` message ID function may be more appropriate.
 
 ## Message Signing
 
