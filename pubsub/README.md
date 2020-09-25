@@ -159,7 +159,7 @@ and
 ## Message Identification
 
 Pubsub requires to uniquely identify messages via a message ID. This enables
-a wide range of processes like for de-duplication, tracking, scoring,
+a wide range of processes like de-duplication, tracking, scoring,
 circuit-breaking, and others.
 
 **The `message_id` is calculated from the `Message` struct.**
