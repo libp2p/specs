@@ -4,9 +4,9 @@
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r2, 2019-02-01  |
+| 3A              | Recommendation | Active | r3, 2020-09-25  |
 
-Authors: [@whyrusleeping]
+Authors: [@whyrusleeping], [@protolambda], [@raulk], [@vyzo].
 
 Interest Group: [@yusefnapora], [@raulk], [@vyzo], [@Stebalien], [@jamesray1], [@vasco-santos]
 
@@ -17,6 +17,7 @@ Interest Group: [@yusefnapora], [@raulk], [@vyzo], [@Stebalien], [@jamesray1], [
 [@Stebalien]: https://github.com/Stebalien
 [@jamesray1]: https://github.com/jamesray1
 [@vasco-santos]: https://github.com/vasco-santos
+[@protolambda]: https://github.com/protolambda
 
 See the [lifecycle document][lifecycle-spec] for context about maturity level
 and spec status.
@@ -32,6 +33,7 @@ and spec status.
     - [The RPC](#the-rpc)
     - [The Message](#the-message)
     - [Message Signing](#message-signing)
+      - [Signature Policy](#signature-policy)
     - [Message Identification](#message-identification)
     - [The Topic Descriptor](#the-topic-descriptor)
         - [AuthOpts](#authopts)
@@ -114,25 +116,31 @@ message Message {
 ```
 
 The `optional` fields may be omitted, depending on the
-[signature policy](#message-signing) and [message ID function](#message-identification)
+[signature policy](#message-signing) and
+[message ID function](#message-identification).
 
-The `from` field denotes the author of the message, note that this is not
-necessarily the peer who sent the RPC this message is contained in. This is
-done to allow content to be routed through a swarm of pubsubbing peers.
+The `from` field denotes the author of the message. This is the peer who
+initially authored the message, and NOT the peer who propagated it. Thus, as
+the message is routed through a swarm of pubsubbing peers, the original
+authorship is preserved.
 
-The `data` field is an opaque blob of data, it can contain any data that the
-publisher wants it to.
+The `data` field is an opaque blob of data representing the payload. It can
+contain any data that the publisher wants it to.
 
 The `seqno` field is a 64-bit big-endian uint that is a linearly increasing
 number that is unique among messages originating from each given peer. No two
 messages on a pubsub topic from the same peer should have the same `seqno`
-value, however messages from different peers may have the same sequence number,
-so this number alone cannot be used to address messages by origin-stamping.
+value, however messages from different peers may (and likely will) have the same
+sequence number, so this number alone cannot be used to address messages by
+**origin-stamping**. In other words, this number is not globally unique. It is
+used in conjunction with `from` to derive a unique `message_id` (in the default
+configuration).
 
 The `topicIDs` field specifies a set of topics that this message is being
 published to.
 
-The `signature` and `key` fields are used for message signing, as explained below.
+The `signature` and `key` fields are used for message signing, if such feature
+is enabled, as explained below.
 
 The size of the `Message` should be limited, say to 1 MiB, but could also
 be configurable, for more information see
@@ -148,55 +156,170 @@ and
 
 ## Message Identification
 
-To uniquely identify a message in a set of topics (for de-duplication, tracking, scoring and other purposes), a `message_id` is calculated based on the message.
-How the calculated happens can be configured on the application layer by supplying a function `message_id_fn`, such that `message_id_fn(*Message) => message_id`.
+Pubsub requires to uniquely identify messages via a message ID. This enables
+a wide range of processes like for de-duplication, tracking, scoring,
+circuit-breaking, and others.
 
-> [[ Implementation note ]]: At the time of writing this section, go-libp2p-pubsub (reference implementation of this spec) only allows configuring a single top-level `message_id_fn`. This function may, however, vary its behaviour based on the topic (contained inside its `*Message`) argument. Thus, it's feasible to implement a per-topic policy using branch selection control flow logic. go-libp2p-pubsub plans to push down the configuration of the `message_id_fn` to the topic level. Other implementations are encouraged to do the same.
+**The `message_id` is calculated from the `Message` struct.**
 
-The message ID calculation approach generally fits in two flavors:
-- **origin-stamped** messaging: the combination of the `seqno` and `from` fields
-  uniquely identifies a message based on the *author*.
-- **content-addressed** messaging: a message ID derived from the `data` field
-  uniquely identifies a message based on the *data*.
+By default, **origin-stamping** is in force. This strategy relies on the string
+concatenation of the `from` and `seqno` fields, to uniquely identify a message
+based on the *author*.
 
-**The default `message_id_fn` is origin-stamped,** and defined as the string concatenation of `from` and `seqno`.
+Alternatively, a user-defined `message_id_fn` may be supplied, where 
+`message_id_fn(Message) => message_id`. Such a function could compute the hash
+of the `data` field within the `Message`, and thus one could reify
+**content-addressed messaging**.
 
-If fabricated collisions are not a concern, or difficult enough within the window the message is relevant in,
-a `message_id` based on a short digest of inputs may benefit performance. Whichever the choice, it is crucial that **all peers** participating in a topic implement the same message ID calculation logic, or the topic may function suboptimally.
+If fabricated collisions are not a concern, or difficult enough within the
+window the message is relevant in, a `message_id` based on a short digest of
+inputs may benefit performance.
 
-Note that different specialized pubsub components, such as the 'timecache' used in the Go implementation, scoring functions or circuit-breakers 
-may use the `message_id` to key and track messages.
+> **[[ Margin note ]]:** There's a potential caveat with using hashes instead of
+> seqnos: the peer won't be able to send identical messages (e.g. keepalives)
+> within the timecache interval, as they will get treated as duplicates. This
+> consequence may or may not be relevant to the application at hand.
+> Reference: [#116](https://github.com/libp2p/specs/issues/116).
 
-It was also proposed in [#116](https://github.com/libp2p/specs/issues/116)
-to use a `message_hash`, however, it was noted:
-> a potential caveat with using hashes instead of seqnos:
-the peer won't be able to send identical messages (e.g. keepalives) within the
-timecache interval, as they will get treated as duplicates.
+**Note that the availability of these fields on the `Message` object will depend
+on the [signature policy](#signature-policy) configured for the topic.**
 
-Some applications may not need keepalives, or choose to implement something more specific than a message hash. In those cases where duplicate payloads are not desirable, a `content-based` message ID function may be more appropriate.
+Whichever the choice, it is crucial that **all peers** participating in a topic
+implement identical message ID calculation logic, or the topic may function
+suboptimally.
+
+> **[[ Implementation note ]]:** At the time of writing this section,
+> go-libp2p-pubsub (reference implementation of this spec) only allows
+> configuring a single top-level `message_id_fn`. This function may, however,
+> vary its behaviour based on the topic (contained inside its `Message`)
+> argument. Thus, it's feasible to implement a per-topic policy using branch
+> selection control flow logic. In the near future, go-libp2p-pubsub plans to
+> push down the configuration of the `message_id_fn` to the topic level. Other
+> implementations are encouraged to do the same.
 
 ## Message Signing
 
-Messages can be optionally signed, and it is up to the peer whether to accept and forward
-unsigned messages.
-The default choice of origin-stamped messaging, the receiver should enforce signatures strictly (`StrictSign`).
-When the receiver expects unsigned content-stamped messages, and thus does not expect
-the `from`, `seqno`, `signature`, or `key` fields, it may reject the messages (`StrictNoSign`).
+Signature behavior is configured in two axes: signature creation, and signature
+verification.
 
-This optionality is configurable with the signature policy options starting from gossipsub v1.1. 
+**Signature creation.** There are two configurations possible:
+
+* `Sign`: when publishing a message, perform **origin-stamping** and produce a
+  signature.
+* `NoSign`: when publishing a message, do not perform **origin-stamping** and
+  do not produce a signature.
 
 For signing purposes, the `signature` and `key` fields are used:
 - The `signature` field contains the signature.
-- The `key` field contains the signing key when it cannot be inlined in the source peer ID (`from`).
-  When present, it must match the peer ID.
+- The `key` field contains the signing key when it cannot be inlined in
+  the source peer ID (`from`). When present, it must match the peer ID.
 
-The signature is computed over the marshalled message protobuf _excluding_ the `signature` field itself.
-This includes any fields that are not recognized, but still included in the marshalled data.
+The signature is computed over the marshalled message protobuf _excluding_ the
+`signature` field itself.
+
+This includes any fields that are not recognized, but still included in the
+marshalled data.
+
 The protobuf blob is prefixed by the string `libp2p-pubsub:` before signing.
 
+> **[[ Margin note: ]]** Protobuf serialization is non-deterministic/canonical,
+> and the same data structure may result in different, valid serialised bytes
+> across implementations, as well as other issues. In the near future, the
+> signature creation and verification algorithm will be made deterministic.
+
+**Signature verification.** There are two configurations possible:
+
+* `Strict`: either expect or not expect a signature.
+* `Lax` (legacy, insecure, underterministic, to be deprecated): accept a signed
+  message if the signature verification passes, or if it's unsigned.
+
 When signature validation fails for a signed message, the implementation must
-drop the message and omit propagation. Locally, it may treat this event in whichever
-manner it wishes (e.g. logging).
+drop the message and omit propagation. Locally, it may treat this event in
+whichever manner it wishes (e.g. logging, penalization, etc.).
+
+#### Signature Policy Options
+
+The usage of the `signature`, `key`, `from`, and `seqno` fields in `Message`
+is configurable per topic.
+
+> **[[ Implementation note ]]:** At the time of writing this section,
+> go-libp2p-pubsub (reference implementation of this spec) allows for
+> configuring the signature policy at the **global pubsub instance level**.
+> This needs to be pushed down to topic-level configuration.
+> Other implementations should support topic-level configuration, as this spec
+> mandates.
+
+The intersection of signing behaviours across the two axes (signature creation
+and signature verification) gives way to four signature policy options:
+ 
+* `StrictSign`, `StrictNoSign`. Deterministic, usage encouraged.
+* `LaxSign`, `LaxNoSign`. Non-deterministic, legacy, usage discouraged. Mostly
+  for backwards compatibility. Will be deprecated. If the implementation decides
+  to support these, their use should be discouraged through deprecation warnings.
+
+**`StrictSign` option**
+
+On the producing side:
+  - Build messages with the `signature`, `key` (`from` may be enough for
+    certain inlineable public key types), `from` and `seqno` fields.
+  
+On the consuming side:
+  - Enforce the fields to be present, reject otherwise.
+  - Propagate only if the fields are valid and signature can be verified,
+    reject otherwise.
+
+**`StrictNoSign` option**
+
+On the producing side:
+  - Build messages without the `signature`, `key`, `from` and `seqno` fields.
+  - The corresponding protobuf key-value pairs are absent from the marshalled
+    message, not just empty.
+  
+On the consuming side:
+  - Enforce the fields to be absent, reject otherwise.
+  - Propagate only if the fields are absent, reject otherwise.
+  - A `message_id` function will not be able to use the above fields, and should
+    instead rely on the `data` field. A commonplace strategy is to calculate
+    a hash.
+
+**`LaxSign` legacy option**
+
+_Not required for backwards-compatibility. Considered insecure, nevertheless
+defined for completeness._
+
+Always sign, and verify incoming signatures, and but accept unsigned messages.
+
+On the producing side:
+  - Build messages with the `signature`, `key` (`from` may be enough), `from`
+    and `seqno` fields.
+  
+On the consuming side:
+  - `signature` may be absent, and not verified.
+  - Verify `signature`, iff the `signature` is present, then reject if
+    `signature` is invalid.
+
+**`LaxNoSign` option**
+
+_Previous default_.
+
+Do not sign nor origin-stamp, but verify incoming signatures, and accept
+unsigned messages.
+
+On the producing side:
+  - Build messages without the `signature`, `key`, `from` and `seqno` fields.
+
+On the consuming side:
+  - Accept and propagate messages with above fields.
+  - Verify `signature`, iff the `signature` is present, then reject if
+    `signature` is invalid.
+
+> **[[ Margin note: ]]** For content-addressed messaging, `StrictNoSign` is the
+> most appropriate policy option, coupled with a user-defined `message_id_fn`, 
+> and a validator function to verify protocol-defined signatures.
+>
+> When publisher anonymity is being sought, `StrictNoSign` is also the most
+> appropriate policy, as it refrains from outputting the `from` and `seqno`
+> fields.
 
 ## The Topic Descriptor
 

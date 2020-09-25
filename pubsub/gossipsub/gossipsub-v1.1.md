@@ -37,8 +37,6 @@ See the [lifecycle document][lifecycle-spec] for context about maturity level an
   - [Explicit Peering Agreements](#explicit-peering-agreements)
   - [PRUNE Backoff and Peer Exchange](#prune-backoff-and-peer-exchange)
     - [Protobuf](#protobuf)
-  - [Signature Policy](#signature-policy)
-    - [Signature Policy Options](#signature-policy-options)
   - [Flood Publishing](#flood-publishing)
   - [Adaptive Gossip Dissemination](#adaptive-gossip-dissemination)
   - [Outbound Mesh Quotas](#outbound-mesh-quotas)
@@ -135,50 +133,6 @@ message PeerInfo {
 	optional bytes signedPeerRecord = 2;
 }
 ```
-
-### Signature Policy
-
-The usage of the `signature`, `key`, `from`, and `seqno` fields in `Message` is now configurable per topic, in the manners specified in this section.
-> [[ Implementation note ]]: At the time of writing this section, go-libp2p-pubsub (reference implementation of this spec) allows for configuring the signature policy at a global pubsub instance level. This needs to be pushed down to topic-level configuration. Other implementations are encouraged to support topic-level configuration, as the spec mandates.
-
-In the default origin-stamped messaging, the fields need to be strictly enforced:
-the `seqno` and `from` fields form the `message_id`, and should be verified to avoid `message_id` collisions.
-
-In content-stamped messaging, the fields may negatively affect privacy:
-revealing the relationship between `data` and `from`/`seqno`.
-
-#### Signature Policy Options
-
-In gossipsub v1.1, these fields are strictly present and verified, or completely omitted altogether:
-- `StrictSign`:
-  - On the producing side:
-    - Build messages with the `signature`, `key` (`from` may be enough for certain inlineable public key types), `from` and `seqno` fields.
-  - On the consuming side:
-    - Enforce the fields to be present, reject otherwise.
-    - Propagate only if the fields are valid and signature can be verified, reject otherwise.
-- `StrictNoSign`:
-  - On the producing side:
-    - Build messages without the `signature`, `key`, `from` and `seqno` fields.
-    - The corresponding protobuf key-value pairs are absent from the marshalled message, not just empty.
-  - On the consuming side:
-    - Enforce the fields to be absent, reject otherwise.
-    - Propagate only if the fields are absent, reject otherwise.
-  - A `message_id` function will not be able to use the above fields, and should instead rely on the `data` field. A commonplace strategy is to calculate a hash.
-
-In gossipsub v1.0, a legacy "lax" signing policy could be configured, to only verify signatures when present. For security reasons, this is strategy is discarded in subsequent versions, but MAY still be supported for backwards-compatibility. If so, its use should be discouraged through prominent deprecation warnings. These strategies will be entirely dropped in the future.
-- `LaxSign`: *this was never an original gossipsub 1.0 option, but it's defined here for completeness, and considered insecure*. Always sign, and verify incoming signatures, and but accept unsigned messages.
-  - On the producing side:
-    - Build messages with the `signature`, `key` (`from` may be enough), `from` and `seqno` fields.
-  - On the consuming side:
-    - `signature` may be absent, and not verified.
-    - Verify `signature`, iff the `signature` is present, then reject if `signature` is invalid.
-- `LaxNoSign`: *Previous default for no-verification*. Do not sign nor origin-stamp, but verify incoming signatures, and accept unsigned messages.
-  - On the producing side:
-    - Build messages without the `signature`, `key`, `from` and `seqno` fields.
-  - On the consuming side:
-    - Accept and propagate messages with above fields.
-    - Verify `signature`, iff the `signature` is present, then reject if `signature` is invalid.
-
 
 ### Flood Publishing
 
