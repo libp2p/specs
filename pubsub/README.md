@@ -171,7 +171,7 @@ It was also proposed in [#116](https://github.com/libp2p/specs/issues/116)
 to use a `message_hash`, however, it was noted:
 > a potential caveat with using hashes instead of seqnos:
 the peer won't be able to send identical messages (e.g. keepalives) within the
-timecache interval, as they will get rejected as duplicates.
+timecache interval, as they will get treated as duplicates.
 
 Some applications may not need keepalives, or choose to implement something more specific than a message hash. In those cases where duplicate payloads are not desirable, a `content-based` message ID function may be more appropriate.
 
