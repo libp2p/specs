@@ -124,17 +124,19 @@ initially authored the message, and NOT the peer who propagated it. Thus, as
 the message is routed through a swarm of pubsubbing peers, the original
 authorship is preserved.
 
-The `data` field is an opaque blob of data representing the payload. It can
-contain any data that the publisher wants it to.
-
 The `seqno` field is a 64-bit big-endian uint that is a linearly increasing
 number that is unique among messages originating from each given peer. No two
 messages on a pubsub topic from the same peer should have the same `seqno`
 value, however messages from different peers may (and likely will) have the same
-sequence number, so this number alone cannot be used to address messages by
-**origin-stamping**. In other words, this number is not globally unique. It is
-used in conjunction with `from` to derive a unique `message_id` (in the default
+sequence number. In other words, this number is not globally unique. It is used
+in conjunction with `from` to derive a unique `message_id` (in the default
 configuration).
+
+Henceforth, we define the term **origin-stamped messaging** to refer to messages
+whose `from` and `seqno` fields are populated.  
+
+The `data` field is an opaque blob of data representing the payload. It can
+contain any data that the publisher wants it to.
 
 The `topicIDs` field specifies a set of topics that this message is being
 published to.
