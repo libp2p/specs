@@ -119,30 +119,30 @@ The `optional` fields may be omitted, depending on the
 [signature policy](#message-signing) and
 [message ID function](#message-identification).
 
-The `from` field denotes the author of the message. This is the peer who
-initially authored the message, and NOT the peer who propagated it. Thus, as
+The `from` field (optional) denotes the author of the message. This is the peer
+who initially authored the message, and NOT the peer who propagated it. Thus, as
 the message is routed through a swarm of pubsubbing peers, the original
 authorship is preserved.
 
-The `seqno` field is a 64-bit big-endian uint that is a linearly increasing
-number that is unique among messages originating from each given peer. No two
-messages on a pubsub topic from the same peer should have the same `seqno`
-value, however messages from different peers may (and likely will) have the same
-sequence number. In other words, this number is not globally unique. It is used
-in conjunction with `from` to derive a unique `message_id` (in the default
+The `seqno` field (optional) is a 64-bit big-endian uint that is a linearly
+increasing number that is unique among messages originating from each given
+peer. No two messages on a pubsub topic from the same peer should have the same
+`seqno` value, however messages from different peers may have the same sequence
+number. In other words, this number is not globally unique. It is used in
+conjunction with `from` to derive a unique `message_id` (in the default
 configuration).
 
 Henceforth, we define the term **origin-stamped messaging** to refer to messages
 whose `from` and `seqno` fields are populated.  
 
-The `data` field is an opaque blob of data representing the payload. It can
-contain any data that the publisher wants it to.
+The `data` (optional) field is an opaque blob of data representing the payload.
+It can contain any data that the publisher wants it to.
 
 The `topicIDs` field specifies a set of topics that this message is being
 published to.
 
-The `signature` and `key` fields are used for message signing, if such feature
-is enabled, as explained below.
+The `signature` and `key` fields (optional) are used for message signing, if
+such feature is enabled, as explained below.
 
 The size of the `Message` should be limited, say to 1 MiB, but could also
 be configurable, for more information see
@@ -187,8 +187,7 @@ inputs may benefit performance.
 on the [signature policy](#signature-policy) configured for the topic.**
 
 Whichever the choice, it is crucial that **all peers** participating in a topic
-implement identical message ID calculation logic, or the topic may function
-suboptimally.
+implement identical message ID calculation logic, or the topic will malfunction.
 
 > **[[ Implementation note ]]:** At the time of writing this section,
 > go-libp2p-pubsub (reference implementation of this spec) only allows
@@ -302,7 +301,7 @@ On the consuming side:
 
 **`LaxNoSign` option**
 
-_Previous default_.
+_Previous default for 'no signature verification' mode_.
 
 Do not sign nor origin-stamp, but verify incoming signatures, and accept
 unsigned messages.
