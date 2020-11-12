@@ -217,7 +217,7 @@ state](#peering-state), and state related to the [message cache](#message-cache)
 
 ### Peering State
 
-Peering state is how the router keeps track of the pubsub-capable peers it's
+Peering state is how the router keeps track of the pubsub-capable peers its
 aware of and the relationship with each of them.
 
 There are three main pieces of peering state:
@@ -375,7 +375,7 @@ messages:
 - On receiving a [`PRUNE(topic)` message](#prune), the router will remove the
   sender from `mesh[topic]`.
 
-- On receiving an [`IHAVE(ids)` message](#ihave), the router will check it's
+- On receiving an [`IHAVE(ids)` message](#ihave), the router will check its
   `seen` cache. If the `IHAVE` message contains message IDs that have not been
   seen, the router will request them with an `IWANT` message.
 
