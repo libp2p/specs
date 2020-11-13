@@ -106,7 +106,7 @@ To verify, a peer will "inflate" the `public_key` into a domain object that can
 verify signatures, prepare a buffer as above and verify the `signature` field
 against it.
 
-[addr-records-rfc]: ./0003-address-records.md
+[addr-records-rfc]: ./0003-routing-records.md
 [peer-id-spec]: ../peer-ids/peer-ids.md
 [multicodec]: https://github.com/multiformats/multicodec
 [uvarint]: https://github.com/multiformats/unsigned-varint
