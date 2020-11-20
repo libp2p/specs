@@ -21,6 +21,19 @@ and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Use Cases](#use-cases)
+   - [Replacing ws-star-rendezvous](#replacing-ws-star-rendezvous)
+   - [Rendezvous and pubsub](#rendezvous-and-pubsub)
+- [The Protocol](#the-protocol)
+   - [Registration Lifetime](#registration-lifetime)
+   - [Interaction](#interaction)
+   - [Proof of Work](#proof-of-work)
+   - [Protobuf](#protobuf)
+- [Recommendations for Rendezvous Points configurations](#recommendations-for-rendezvous-points-configurations)
+
 ## Overview
 
 The protocol described in this specification is intended to provide a
@@ -93,6 +106,8 @@ progressively refresh their network view without overhead, which
 greatly simplifies real time discovery. It also allows for pagination
 of query responses, so that large numbers of peer registrations can be
 managed.
+
+The rendezvous protocol runs over libp2p streams using `/rendezvous/1.0.0`.
 
 ### Registration Lifetime
 
@@ -186,14 +201,14 @@ message Message {
   }
 
   enum ResponseStatus {
-    OK                  = 0;
-    E_INVALID_NAMESPACE = 100;
-    E_INVALID_PEER_INFO = 101;
-    E_INVALID_TTL       = 102;
-    E_INVALID_COOKIE    = 103;
-    E_NOT_AUTHORIZED    = 200;
-    E_INTERNAL_ERROR    = 300;
-    E_UNAVAILABLE       = 400;
+    OK                            = 0;
+    E_INVALID_NAMESPACE           = 100;
+    E_INVALID_SIGNED_PEER_RECORD  = 101;
+    E_INVALID_TTL                 = 102;
+    E_INVALID_COOKIE              = 103;
+    E_NOT_AUTHORIZED              = 200;
+    E_INTERNAL_ERROR              = 300;
+    E_UNAVAILABLE                 = 400;
   }
 
   message Register {
@@ -234,3 +249,17 @@ message Message {
   optional DiscoverResponse discoverResponse = 6;
 }
 ```
+
+## Recommendations for Rendezvous Points configurations
+
+Rendezvous points should have well defined configurations to enable libp2p nodes running the rendezvous protocol to have friendly defaults, as well as to guarantee the security and efficiency of a Rendezvous point. This will be particularly important in a federation, where rendezvous points should share the same expectations.
+
+Regarding the validation of registrations, rendezvous points should have:
+- a minimum acceptable **ttl** of `2H`
+- a maximum acceptable **ttl** of `72H`
+- a maximum **namespace** length of `255`
+
+Rendezvous points are also recommend to allow:
+- a maximum of `1000` registration for each peer
+  - defend against trivial DoS attacks
+- a maximum of `1000` peers should be returned per namespace query
