@@ -51,7 +51,7 @@ See the [lifecycle document][lifecycle-spec] for context about maturity level an
     - [Topic Parameter Calculation and Decay](#topic-parameter-calculation-and-decay)
       - [P₁: Time in Mesh](#p-time-in-mesh)
       - [P₂: First Message Deliveries](#p-first-message-deliveries)
-      - [P₃ and P₃b: Mesh Message Delivery](#p-and-p-mesh-message-delivery)
+      - [P₃ and P₃b: Mesh Message Delivery](#p-and-pb-mesh-message-delivery)
       - [P₄: Invalid Messages](#p-invalid-messages)
       - [Parameter Decay](#parameter-decay)
     - [Guidelines for Tuning the Scoring Function](#guidelines-for-tuning-the-scoring-function)
