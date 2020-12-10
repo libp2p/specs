@@ -31,6 +31,9 @@ See the [lifecycle document][lifecycle-spec] for context about maturity level an
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+<!-- (!!!) WARN: anchor links were monkey-patched to work around GitHub not encoding
+     subscripts properly.
+-->
 
 - [Overview](#overview)
 - [Protocol extensions](#protocol-extensions)
@@ -46,10 +49,10 @@ See the [lifecycle document][lifecycle-spec] for context about maturity level an
     - [Opportunistic Grafting](#opportunistic-grafting)
     - [The Score Function](#the-score-function)
     - [Topic Parameter Calculation and Decay](#topic-parameter-calculation-and-decay)
-      - [P₁: Time in Mesh](#p%E2%82%81-time-in-mesh)
-      - [P₂: First Message Deliveries](#p%E2%82%82-first-message-deliveries)
-      - [P₃ and P₃b: Mesh Message Delivery](#p%E2%82%83-and-p%E2%82%83b-mesh-message-delivery)
-      - [P₄: Invalid Messages](#p%E2%82%84-invalid-messages)
+      - [P₁: Time in Mesh](#p-time-in-mesh)
+      - [P₂: First Message Deliveries](#p-first-message-deliveries)
+      - [P₃ and P₃b: Mesh Message Delivery](#p-and-p-mesh-message-delivery)
+      - [P₄: Invalid Messages](#p-invalid-messages)
       - [Parameter Decay](#parameter-decay)
     - [Guidelines for Tuning the Scoring Function](#guidelines-for-tuning-the-scoring-function)
     - [Extended Validators](#extended-validators)
