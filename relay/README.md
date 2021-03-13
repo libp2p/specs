@@ -221,7 +221,7 @@ This is a table of status codes and sample messages that may occur during a rela
 
 | Code  | Message                                           | Meaning    |
 | ----- |:--------------------------------------------------|:----------:|
-| 100   | OK                                                | Relay was setup correctly |
+| 100   | "success"                                         | Relay was setup correctly |
 | 220   | "src address too long"                            | |
 | 221   | "dst address too long"                            | |
 | 250   | "failed to parse src addr: no such protocol ipfs" | The `<src>` multiaddr in the header was invalid |
