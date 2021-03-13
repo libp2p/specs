@@ -201,10 +201,10 @@ message CircuitRelay {
 - phase II: Open a stream to be relayed (R to B).
   - R opens a new stream `sRB` to B using protocol `/libp2p/circuit/relay/0.1.0`.
   - R sends a CircuitRelay message with `{ type: 'STOP', srcPeer: '/p2p/QmA', dstPeer: '/p2p/QmB' }` on `sRB`.
-  - R sends a CircuitRelay message with `{ type: 'STATUS', code: 'OK' }` on `sAR`.
+  - R sends a CircuitRelay message with `{ type: 'STATUS', code: 'SUCCESS' }` on `sAR`.
 - phase III: Streams are piped together, establishing a circuit
   - B receives stream `sRB` and reads the message from it
-  - B sends a CircuitRelay message with `{ type: 'STATUS', code: 'OK' }` on `sRB`.
+  - B sends a CircuitRelay message with `{ type: 'STATUS', code: 'SUCCESS' }` on `sRB`.
   - B passes stream to `NewConnHandler` to be handled like any other new incoming connection.
 
 ### Under the microscope
@@ -221,7 +221,7 @@ This is a table of status codes and sample messages that may occur during a rela
 
 | Code  | Message                                           | Meaning    |
 | ----- |:--------------------------------------------------|:----------:|
-| 100   | OK                                                | Relay was setup correctly |
+| 100   | "success"                                         | Relay was setup correctly |
 | 220   | "src address too long"                            | |
 | 221   | "dst address too long"                            | |
 | 250   | "failed to parse src addr: no such protocol ipfs" | The `<src>` multiaddr in the header was invalid |
