@@ -3,9 +3,12 @@
 > A stream security transport for libp2p. Streams wrapped by SECIO use secure
 > sessions to encrypt all traffic.
 
-| Lifecycle Stage | Maturity Level | Status | Latest Revision |
-|-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r0, 2019-05-27  |
+> SECIO is deprecated and we advise against using it. See [this blog
+> post](https://blog.ipfs.io/2020-08-07-deprecating-secio/) for details.
+
+| Lifecycle Stage | Maturity Level | Status     | Latest Revision |
+|-----------------|----------------|------------|-----------------|
+| 3D              | Recommendation | Deprecated | r1, 2021-03-26  |
 
 Authors: [@jbenet], [@bigs], [@yusefnapora]
 
