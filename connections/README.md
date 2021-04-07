@@ -404,3 +404,4 @@ updated to incorporate the changes.
 [go-eventbus]: https://github.com/libp2p/go-eventbus
 [go-net-notifee]: https://github.com/libp2p/go-libp2p-core/blob/master/network/notifee.go
 [identify/push]: ../identify/README.md#identify-push
+[resource-manager-issue]: https://github.com/libp2p/go-libp2p/issues/635
