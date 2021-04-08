@@ -252,7 +252,11 @@ message Message {
 
 ## Recommendations for Rendezvous Points configurations
 
-Rendezvous points should have well defined configurations to enable libp2p nodes running the rendezvous protocol to have friendly defaults, as well as to guarantee the security and efficiency of a Rendezvous point. This will be particularly important in a federation, where rendezvous points should share the same expectations.
+Rendezvous points should have well defined configurations to enable libp2p
+nodes running the rendezvous protocol to have friendly defaults, as well as to
+guarantee the security and efficiency of a Rendezvous point. This will be
+particularly important in a federation, where rendezvous points should share
+the same expectations.
 
 Regarding the validation of registrations, rendezvous points should have:
 - a minimum acceptable **ttl** of `2H`
