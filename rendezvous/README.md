@@ -107,7 +107,7 @@ greatly simplifies real time discovery. It also allows for pagination
 of query responses, so that large numbers of peer registrations can be
 managed.
 
-The rendezvous protocol runs over libp2p streams using `/rendezvous/1.0.0`.
+The rendezvous protocol runs over libp2p streams using the protocol id `/rendezvous/1.0.0`.
 
 ### Registration Lifetime
 
