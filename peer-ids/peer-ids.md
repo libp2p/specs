@@ -117,9 +117,10 @@ Four key types are supported:
  - Secp256k1
  - ECDSA
 
-Implementations MUST support RSA and Ed25519. Implementations MAY support
-Secp256k1 and ECDSA, but nodes using those keys may not be able to connect to
-all other nodes.
+Implementations MUST support Ed25519. Implementations SHOULD support RSA if they wish to
+interoperate with the mainline IPFS DHT and the default IPFS bootstrap nodes. Implementations MAY
+support Secp256k1 and ECDSA, but nodes using those keys may not be able to connect to all other
+nodes.
 
 In all cases, implementation MAY allow the user to enable/disable specific key
 types via configuration. Note that disabling support for compulsory key types
