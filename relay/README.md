@@ -26,6 +26,7 @@ and spec status.
 
 - [js-libp2p-circuit](https://github.com/libp2p/js-libp2p-circuit)
 - [go-libp2p-circuit](https://github.com/libp2p/go-libp2p-circuit)
+- [rust-libp2p-relay](https://github.com/libp2p/rust-libp2p/tree/master/protocols/relay)
 
 ## Table of Contents
 
