@@ -64,6 +64,7 @@ id = header >> 3
 
 - Implementations MUST support up to 28bit stream IDs (32bit headers pre-encoding, 5 bytes after varint encoding).
 - Implementations SHOULD support up to 60bit stream IDs (64bit headers pre-encoding, 9 bytes after varint encoding).
+- Implementations MUST terminate the underlying connection if they receive an invalid and/or unsupported header.
 
 ### Flag Values
 
