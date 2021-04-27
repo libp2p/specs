@@ -209,12 +209,12 @@ use multistream-select to negotiate protocols for the connection upgrade.
 Next, the Initiator proposes the [TLS protocol][tls-libp2p] for encryption, but
 the Responder rejects the proposal as they don't support TLS.
 
-The Initiator then proposes the [SECIO protocol][secio-spec], which is supported by
-the Responder. The Listener echoes back the protocol id for SECIO to indicate
+The Initiator then proposes the [Noise protocol][noise-spec], which is supported
+by the Responder. The Listener echoes back the protocol id for Noise to indicate
 agreement.
 
-At this point the SECIO protocol takes over, and the peers exchange the SECIO
-handshake to establish a secure channel. If the SECIO handshake fails, the
+At this point the Noise protocol takes over, and the peers exchange the Noise
+handshake to establish a secure channel. If the Noise handshake fails, the
 connection establishment process aborts. If successful, the peers will use the
 secured channel for all future communications, including the remainder of the
 connection upgrade process.
@@ -266,21 +266,14 @@ management that are worth considering when implementing libp2p.
 ### Interoperability
 
 Support for connection security protocols and stream multiplexers varies across
-libp2p implementations. 
+libp2p implementations. To support the widest variety of peers, implementations
+should support a baseline "stack" of security and multiplexing protocols.
 
-To support the widest variety of peers, implementations should support a
-baseline "stack" of security and multiplexing protocols.
+The recommended baseline **security** protocol is [Noise][noise-spec], which is
+supported in all current libp2p implementations.
 
-At the time of writing, the recommended baseline security protocol is
-[SECIO][secio-spec], which is supported in all current libp2p implementations.
-
-Note that while SECIO is also the current default security protocol, that is
-likely to change with the further adoption of [TLS][tls-libp2p]. However,
-support for SECIO as a fallback will likely be recommended for some time after
-TLS becomes the default.
-
-The recommended baseline stream multiplexer is [mplex][mplex], which provides a
-very simple programmatic API and is supported in all current libp2p
+The recommended baseline **stream multiplexer** is [mplex][mplex], which
+provides a very simple programmatic API and is supported in all current libp2p
 implementations.
 
 ### State Management 
@@ -393,7 +386,7 @@ updated to incorporate the changes.
 [mss]: https://github.com/multiformats/multistream-select
 [uvarint]: https://github.com/multiformats/unsigned-varint
 [mplex]: ../mplex/README.md
-[secio-spec]: ../secio/README.md
+[noise-spec]: ../noise/README.md
 [connmgr-v2-spec]: https://github.com/libp2p/specs/pull/161
 [connmgr-go-interface]: https://github.com/libp2p/go-libp2p-core/blob/master/connmgr/connmgr.go
 [tls-libp2p]: ../tls/tls.md
