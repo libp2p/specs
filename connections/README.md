@@ -35,6 +35,7 @@ and spec status.
             - [Peer Metadata Storage](#peer-metadata-storage)
             - [Connection Limits](#connection-limits)
         - [Connection Lifecycle Events](#connection-lifecycle-events)
+    - [Hole punching](#hole-punching)
     - [Future Work](#future-work)
 
 ## Overview
@@ -350,6 +351,10 @@ baseline would be:
 | Listen       | We've started listening on a new address  |
 | ListenClose  | We've stopped listening on an address     |
 
+## Hole punching
+
+See [hole punching][hole-punching] document.
+
 ## Future Work
 
 A replacement for multistream-select is [being discussed][mss-2-pr] which
@@ -405,3 +410,4 @@ updated to incorporate the changes.
 [go-net-notifee]: https://github.com/libp2p/go-libp2p-core/blob/master/network/notifee.go
 [identify/push]: ../identify/README.md#identify-push
 [resource-manager-issue]: https://github.com/libp2p/go-libp2p/issues/635
+[hole-punching]: ./hole-punching.md
