@@ -62,7 +62,7 @@ flag = header & 0x07
 id = header >> 3
 ```
 
-The maximum header length is 9 bytes (per the unsigned-varint spec). With 9 continuation bits and 3 message flag bits  the maximum stream ID is 60 bits (maximum value of `2^60 - 1`).
+The maximum header length is 9 bytes (per the unsigned-varint spec). With 9 continuation bits and 3 message flag bits the maximum stream ID is 60 bits (maximum value of `2^60 - 1`).
 
 ### Flag Values
 
