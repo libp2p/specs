@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity Level | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r1, 2019-08-15  |
+| 3A              | Recommendation | Active | r2, 2021-04-30  |
 
 **Authors**: [@mgoelzer], [@yusefnapora], [@lidel]
 
