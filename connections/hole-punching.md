@@ -178,7 +178,7 @@ stack, thus not allowing _insecure_ connections.
   `/ip4/.../tcp/.../p2p/QmRelay`) via some external mechanism.
 
   Note: Given that browser platforms do not allow insecure connections, the
-  relay server needs listen on TLS secured Websockets.
+  relay server needs to listen on TLS secured Websockets.
 
 - A discovers the relayed address of B through some external mechanism. Given
   B's relayed address A can establish a Websocket connection to the relay server
