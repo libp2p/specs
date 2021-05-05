@@ -56,7 +56,7 @@ experience in operating open relays in the wild.  The original
 protocol, while very flexible, has some limitations when it comes to
 the practicalities of relaying connections.
 
-The main problem is that is no mechanism to reserve resources in the
+The main problem is that v1 has no mechanism to reserve resources in the
 relay, which leads to continuoues oversubscription of relays and the
 necessity of (often inefective) heuristics for balancing resources.
 In practice, running a relay proved to be an expensive proposition
