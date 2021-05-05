@@ -73,7 +73,7 @@ deployment of an army of relays for extreme horizontal scaling without
 excessive bandwidth costs and dedicated hosts.
 
 Furthermore, the original decision to conflate circuit initiation and
-termination in the same protocol has made it very hard to on provide
+termination in the same protocol has made it very hard to provide
 relay service on demand, decoupled with whether _client_ functionality
 is supported by the host.
 
