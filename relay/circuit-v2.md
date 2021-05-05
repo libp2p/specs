@@ -81,7 +81,9 @@ In order to address this problem, we have splt the protocol into the
 `hop` and `stop` subprotocols. This allows us to always enable the
 client-side functionality in a host, while providing the option to
 later mount the relay service in public hosts, _after_ the
-reachability of the host has been determined through AutoNAT.
+reachability of the host has been determined through [AutoNAT].
+
+[AutoNAT]: https://github.com/libp2p/specs/issues/180
 
 ## The Protocol
 
