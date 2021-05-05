@@ -1,7 +1,5 @@
 # Circuit Relay v0.1.0
 
-> Circuit Switching for libp2p, also known as TURN or Relay in Networking literature.
-
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
 | 3A              | Recommendation | Active | r1, 2018-06-03  |
