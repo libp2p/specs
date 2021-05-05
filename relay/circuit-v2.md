@@ -114,7 +114,7 @@ protocol stream and sends a `CONNECT` message to the relay.  The relay
 verifies that it has a reservation and connection for _A_ and opens a
 `stop` protocol stream to _A_, sending a `CONNECT` message.
 
-Peer _A_ then responds to the relaywith a `STATUS:OK` message, which
+Peer _A_ then responds to the relay with a `STATUS:OK` message, which
 responds to _B_ with a `STATUS:OK` message in the open `hop` stream
 and then proceeds to bridge the two streams into a relayed connection.
 The relayed connection flows in the `hop` stream between the
