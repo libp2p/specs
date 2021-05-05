@@ -62,7 +62,7 @@ necessity of (often inefective) heuristics for balancing resources.
 In practice, running a relay proved to be an expensive proposition
 requiring dedicated hosts with significant hardware and bandwidth
 costs.  In addition, there is ongoing work in Hole Punching
-coordination for direction connection upgrade through relays, which
+coordination for direct connection upgrade through relays, which
 doesn't require an unlimited relay connection.
 
 In order to address the situation and seamlessly support pervasive
