@@ -40,7 +40,7 @@ peers is a responder or doesn't support the extension, then it responds with
 If both peers believe they are the initiator, then they both send
 `/libp2p/simultaneous-connect`. If this is the case, they enter an initiator
 selection phase, where one of the peers is selected to act as the initiator. In
-order to do so, they both generate a random 256-bit integer and send it as
+order to do so, they both generate a random 64-bit integer and send it as
 response to the `/libp2p/simultaneous-connect` directive, prefixed with the
 `select:` string. The integer is in big-endian format, encoded in base64. The
 peer with the highest integer is selected to act as the initator and sends an
