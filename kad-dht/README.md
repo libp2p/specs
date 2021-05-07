@@ -270,13 +270,17 @@ This process is repeated as many times per run as configuration parameter
 
 ## RPC messages
 
-See [protobuf
-definition](https://github.com/libp2p/go-libp2p-kad-dht/blob/master/pb/dht.proto)
+Remote procedure calls are performed by:
 
-On any error, the entire stream is reset. This is probably not the behavior we
-want.
+1. Opening a new stream.
+2. Sending the RPC request message.
+3. Listening for the RPC response message.
+4. Closing the stream.
+
+On any error, the stream is reset.
 
 All RPC messages conform to the following protobuf:
+
 ```protobuf
 // Record represents a dht record that contains a value
 // for a key value pair
@@ -358,10 +362,8 @@ message Message {
 }
 ```
 
-Any time a relevant `Peer` record is encountered, the associated multiaddrs
-are stored in the node's peerbook.
-
 These are the requirements for each `MessageType`:
+
 * `FIND_NODE`: `key` must be set in the request. `closerPeers` is set in the
 response; for an exact match exactly one `Peer` is returned; otherwise `ncp`
 (default: 6) closest `Peer`s are returned.
@@ -384,7 +386,10 @@ match the RPC sender's PeerID are recorded as providers.
 * `PING`: Target node responds with `PING`. Nodes should respond to this
 message but it is currently never sent.
 
-# Appendix A: differences in implementations
+Note: Any time a relevant `Peer` record is encountered, the associated
+multiaddrs are stored in the node's peerbook.
+
+## Appendix A: differences in implementations
 
 The `addProvider` handler behaves differently across implementations:
   * in js-libp2p-kad-dht, the sender is added as a provider unconditionally.
@@ -393,7 +398,7 @@ The `addProvider` handler behaves differently across implementations:
 
 ---
 
-# References
+## References
 
 [0]: Maymounkov, P., & Mazières, D. (2002). Kademlia: A Peer-to-Peer Information System Based on the XOR Metric. In P. Druschel, F. Kaashoek, & A. Rowstron (Eds.), Peer-to-Peer Systems (pp. 53–65). Berlin, Heidelberg: Springer Berlin Heidelberg. https://doi.org/10.1007/3-540-45748-8_5
 
