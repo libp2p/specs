@@ -229,6 +229,10 @@ Once security and stream multiplexing are both established, the connection
 upgrade process is complete, and both peers are able to use the resulting libp2p
 connection to open new secure multiplexed streams.
 
+Note: In the case where both peers initially act as initiators, e.g. during NAT
+hole punching, tie-breaking is done via the [multistream-select simultaneous
+open protocol extension][simopen].
+
 
 ## Opening New Streams Over a Connection
 
@@ -404,3 +408,4 @@ updated to incorporate the changes.
 [go-eventbus]: https://gihub.com/libp2p/go-eventbus
 [go-net-notifee]: https://github.com/libp2p/go-libp2p-core/blob/master/network/notifee.go
 [identify/push]: ../identify/README.md#identify-push
+[simopen]: ./simopen.md
