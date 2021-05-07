@@ -1,5 +1,24 @@
 # libp2p Kademlia DHT specification
 
+| Lifecycle Stage | Maturity       | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
+| 3A              | Recommendation | Active | r0, 2021-05-07  |
+
+Authors: [@raulk], [@jhiesey], [@mxinden]
+Interest Group:
+
+[@raulk]: https://github.com/raulk
+[@jhiesey]: https://github.com/jhiesey
+[@mxinden]: https://github.com/mxinden
+
+See the [lifecycle document][lifecycle-spec] for context about maturity level and spec status.
+
+[lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
+
+---
+
+## Overview
+
 The Kademlia Distributed Hash Table (DHT) subsystem in libp2p is a DHT
 implementation largely based on the Kademlia [0] whitepaper, augmented with
 notions from S/Kademlia [1], Coral [2] and mainlineDHT \[3\].
@@ -16,15 +35,6 @@ For everything else that isn't explicitly stated herein, it is safe to assume
 behaviour similar to Kademlia-based libraries.
 
 Code snippets use a Go-like syntax.
-
-## Authors
-
-* Protocol Labs.
-
-## Editors
-
-* [Raúl Kripalani](https://github.com/raulk)
-* [John Hiesey](https://github.com/jhiesey)
 
 ## Kademlia routing table
 
