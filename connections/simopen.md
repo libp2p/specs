@@ -66,10 +66,8 @@ A ---> B: initiator
 B ---> A: responder
 ```
 
-In the unlikely case where both peers selected the same integer, they
-generate a fresh one and enter another round of the protocol. If
-multiple rounds of the protocol result in the same integers, this is
-indicative of a bug and both peers should abort the connection.
+In the unlikely case where both peers selected the same integer, connection
+establishment fails.
 
 ## Implementation Considerations
 
