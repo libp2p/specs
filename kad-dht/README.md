@@ -11,7 +11,8 @@ Interest Group:
 [@jhiesey]: https://github.com/jhiesey
 [@mxinden]: https://github.com/mxinden
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level and spec status.
+See the [lifecycle document][lifecycle-spec] for context about maturity level
+and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
 
@@ -43,8 +44,8 @@ following the design outlined in the Kademlia paper [0]. The default value for
 `k` is 20, and the maximum bucket count matches the size of the SHA256 function,
 i.e. 256 buckets.
 
-The routing table is unfolded lazily, starting with a single bucket a position 0
-(representing the most distant peers), and splitting it subsequently as closer
+The routing table is unfolded lazily, starting with a single bucket at position
+0 (representing the most distant peers), and splitting it subsequently as closer
 peers are found, and the capacity of the nearmost bucket is exceeded.
 
 ## Alpha concurrency factor (α)
@@ -132,25 +133,34 @@ collaborating with one another.
 
 ### Algorithm
 
-Let's assume we’re looking for key `K`. We first try to fetch the value from the local store. If found, and `Q == { 0, 1 }`, the search is complete.
+Let's assume we’re looking for key `K`. We first try to fetch the value from the
+local store. If found, and `Q == { 0, 1 }`, the search is complete.
 
-Otherwise, the local result counts for one towards the search of `Q` values. We then enter an iterative network search.
+Otherwise, the local result counts for one towards the search of `Q` values. We
+then enter an iterative network search.
 
 We keep track of:
 
 * the number of values we've fetched (`cnt`).
 * the best value we've found (`best`), and which peers returned it (`Pb`)
-* the set of peers we've already queried (`Pq`) and the set of next query candidates sorted by distance from `K` in ascending order (`Pn`).
+* the set of peers we've already queried (`Pq`) and the set of next query
+  candidates sorted by distance from `K` in ascending order (`Pn`).
 * the set of peers with outdated values (`Po`). 
 
-**Initialization**: seed `Pn` with the `α` peers from our routing table we know are closest to `K`, based on the XOR distance function.
+**Initialization**: seed `Pn` with the `α` peers from our routing table we know
+are closest to `K`, based on the XOR distance function.
 
 **Then we loop:**
 
 *WIP (raulk): lookup timeout.*
 
-1. If we have collected `Q` or more answers, we cancel outstanding requests, return `best`, and we notify the peers holding an outdated value (`Po`) of the best value we discovered, by sending `PUT_VALUE(K, best)` messages. _Return._
-2. Pick as many peers from the candidate peers (`Pn`) as the `α` concurrency factor allows. Send each a `GET_VALUE(K)` request, and mark it as _queried_ in `Pq`.
+1. If we have collected `Q` or more answers, we cancel outstanding requests,
+   return `best`, and we notify the peers holding an outdated value (`Po`) of
+   the best value we discovered, by sending `PUT_VALUE(K, best)` messages.
+   _Return._
+2. Pick as many peers from the candidate peers (`Pn`) as the `α` concurrency
+   factor allows. Send each a `GET_VALUE(K)` request, and mark it as _queried_
+   in `Pq`.
 3. Upon a response:
 	1. If successful, and we receive a value:
 		1. If this is the first value we've seen, we store it in `best`, along
@@ -172,9 +182,10 @@ We keep track of:
 When constructing a DHT node, it is possible to supply a record `Validator`
 object conforming to this interface:
 
-``` // Validator is an interface that should be implemented by record
-validators. type Validator interface {
-
+``` go
+// Validator is an interface that should be implemented by record
+// validators.
+type Validator interface {
 	// Validate validates the given record, returning an error if it's
 	// invalid (e.g., expired, signed by the wrong key, etc.).
 	Validate(key string, value []byte) error
@@ -244,6 +255,7 @@ periodically, e.g. every hour.
 _WIP (raulk)._
 
 ## Bootstrap process
+
 The bootstrap process is responsible for keeping the routing table filled and
 healthy throughout time. It runs once on startup, then periodically with a
 configurable frequency (default: 5 minutes).
