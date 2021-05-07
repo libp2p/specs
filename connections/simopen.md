@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | DRAFT           |
+| 1A              | Working Draft | Active | r0, 2021-05-07  |
 
 Authors: [@vyzo]
 
