@@ -2,11 +2,31 @@
 
 > Circuit Switching for libp2p, also known as TURN or Relay in Networking literature.
 
+| Lifecycle Stage | Maturity       | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
+| 3A              | Recommendation | Active | r1, 2018-06-03  |
+
+Authors: [@daviddias]
+
+Interest Group: [@lgierth], [@hsanjuan], [@jamesray1], [@vyzo], [@yusefnapora]
+
+[@daviddias]: https://github.com/daviddias
+[@lgierth]: https://github.com/lgierth
+[@hsanjuan]: https://github.com/hsanjuan
+[@jamesray1]: https://github.com/jamesray1
+[@vyzo]: https://github.com/vyzo
+[@yusefnapora]: https://github.com/yusefnapora
+
+See the [lifecycle document][lifecycle-spec] for context about maturity level
+and spec status.
+
+[lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
+
 ## Implementations
 
 - [js-libp2p-circuit](https://github.com/libp2p/js-libp2p-circuit)
 - [go-libp2p-circuit](https://github.com/libp2p/go-libp2p-circuit)
-- [rust-libp2p](https://github.com/libp2p/rust-libp2p/tree/master/relay)
+- [rust-libp2p-relay](https://github.com/libp2p/rust-libp2p/tree/master/protocols/relay)
 
 ## Table of Contents
 
@@ -43,7 +63,8 @@ The circuit relay is both a tunneled transport and a mounted swarm protocol. The
 
 **Notes for the reader:**
 
-- We're using the `/p2p` multiaddr protocol instead of `/ipfs` in this document. `/ipfs` is currently the canonical way of addressing a libp2p or IPFS node, but given the growing non-IPFS usage of libp2p, we'll migrate to using `/p2p`.
+- In this document, we use `/p2p/Qm...` multiaddrs. Libp2p previously used `/ipfs/Qm...` for multiaddrs you'll likely see uses of this notation in the wild. `/ipfs` and `/p2p` multiaddrs are equivalent but `/ipfs` is deprecated `/p2p` should be preferred.
+- You may also see `/ipfs/Qm...` used for _file paths_ in IPFS. These are _not_ multiaddrs and this confusion is one of the many motivations for switching to `/p2p/Qm...` multiaddrs.
 
 ## Dramatization
 
@@ -181,10 +202,10 @@ message CircuitRelay {
 - phase II: Open a stream to be relayed (R to B).
   - R opens a new stream `sRB` to B using protocol `/libp2p/circuit/relay/0.1.0`.
   - R sends a CircuitRelay message with `{ type: 'STOP', srcPeer: '/p2p/QmA', dstPeer: '/p2p/QmB' }` on `sRB`.
-  - R sends a CircuitRelay message with `{ type: 'STATUS', code: 'OK' }` on `sAR`.
+  - R sends a CircuitRelay message with `{ type: 'STATUS', code: 'SUCCESS' }` on `sAR`.
 - phase III: Streams are piped together, establishing a circuit
   - B receives stream `sRB` and reads the message from it
-  - B sends a CircuitRelay message with `{ type: 'STATUS', code: 'OK' }` on `sRB`.
+  - B sends a CircuitRelay message with `{ type: 'STATUS', code: 'SUCCESS' }` on `sRB`.
   - B passes stream to `NewConnHandler` to be handled like any other new incoming connection.
 
 ### Under the microscope
@@ -201,7 +222,7 @@ This is a table of status codes and sample messages that may occur during a rela
 
 | Code  | Message                                           | Meaning    |
 | ----- |:--------------------------------------------------|:----------:|
-| 100   | OK                                                | Relay was setup correctly |
+| 100   | "success"                                         | Relay was setup correctly |
 | 220   | "src address too long"                            | |
 | 221   | "dst address too long"                            | |
 | 250   | "failed to parse src addr: no such protocol ipfs" | The `<src>` multiaddr in the header was invalid |

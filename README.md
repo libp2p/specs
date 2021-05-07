@@ -1,103 +1,116 @@
 # libp2p specification
 
+
 <h1 align="center">
   <img src="https://raw.githubusercontent.com/libp2p/libp2p/a13997787e57d40d6315b422afbe1ceb62f45511/logo/libp2p-logo.png" alt="libp2p logo"/>
 </h1>
 
-[![](https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square)](http://ipn.io)
-[![](https://img.shields.io/badge/project-libp2p-blue.svg?style=flat-square)](http://github.com/libp2p/libp2p)
-[![](https://img.shields.io/badge/freenode-%23ipfs-blue.svg?style=flat-square)](http://webchat.freenode.net/?channels=%23ipfs)
+<a href="http://protocol.ai"><img src="https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square" /></a>
+<a href="http://libp2p.io/"><img src="https://img.shields.io/badge/project-libp2p-yellow.svg?style=flat-square" /></a>
+<a href="http://webchat.freenode.net/?channels=%23libp2p"><img src="https://img.shields.io/badge/freenode-%23libp2p-yellow.svg?style=flat-square" /></a>
+<a href="https://discuss.libp2p.io"><img src="https://img.shields.io/discourse/https/discuss.libp2p.io/posts.svg" /></a>
 
-> This document presents `libp2p`, a modularized and extensible network stack to overcome the networking challenges faced when doing peer-to-peer applications. `libp2p` is used by IPFS as its networking library.
+## Overview
 
-Authors:
+This repository contains the specifications for [`libp2p`](https://libp2p.io), a
+framework and suite of protocols for building peer-to-peer network applications.
+libp2p has several [implementations][libp2p_implementations], with more in development.
 
-- [Juan Benet](https://github.com/jbenet)
-- [David Dias](https://github.com/diasdavid)
+The main goal of this repository is to provide accurate reference documentation
+for the aspects of libp2p that are independent of language or implementation.
+This includes wire protocols, addressing conventions, and other "network level"
+concerns.
 
-Reviewers:
+For user-facing documentation, please see https://docs.libp2p.io
 
-- `N/A`
+In addition to describing the current state of libp2p, the specs repository
+serves as a coordination point and a venue to drive future developments in
+libp2p. To participate in the evolution of libp2p via the specs process, please
+see the [Contributions section](#contributions).
 
-## Abstract
+## Status
 
-This describes the [IPFS](https://ipfs.io/) network protocol. The network layer provides point-to-point transports (reliable and unreliable) between any two IPFS nodes in the network.
+The specifications for libp2p are currently incomplete, and we are working to
+address this by revising existing specs to ensure correctness and writing new
+specifications to detail currently unspecified parts of libp2p.
 
-This document defines the spec implemented in `libp2p`.
+This document replaces an earlier RFC, which still contains much useful
+information and is helpful for understanding the libp2p design philosophy. It is
+avaliable at [_archive/README.md](./_archive/README.md).
 
-## Status of this spec ![](https://img.shields.io/badge/status-wip-orange.svg?style=flat-square)
+## Specification Index
 
-## Organization of this document
+This index contains links to all the spec documents that are currently merged.
+If documents are moved to new locations within the repository, this index will
+be updated to reflect the new locations.
 
-This RFC is organized by chapters described on the *Table of contents* section. Each of the chapters can be found in its own file.
+### Specs Framework
 
-## Table of contents
+These specs define processes for the specification framework itself, such as the
+expected lifecycle and document formatting.
 
-- [1 Introduction](1-introduction.md)
-  - [1.1 Motivation](1-introduction.md#11-motivation)
-  - [1.2 Goals](1-introduction.md#12-goals)
-- [2 An analysis the state of the art in network stacks](2-state-of-the-art.md)
-  - [2.1 The client-server model](2-state-of-the-art.md#21-the-client-server-model)
-  - [2.2 Categorizing the network stack protocols by solutions](2-state-of-the-art.md#22-categorizing-the-network-stack-protocols-by-solutions)
-  - [2.3 Current shortcomings](2-state-of-the-art.md#23-current-shortcomings)
-- [3 Requirements](3-requirements.md)
-  - [3.1 Transport agnostic](3-requirements.md#34-transport-agnostic)
-  - [3.2 Multi-multiplexing](3-requirements.md#35-multi-multiplexing)
-  - [3.3 Encryption](3-requirements.md#33-encryption)
-  - [3.4 NAT traversal](3-requirements.md#31-nat-traversal)
-  - [3.5 Relay](3-requirements.md#32-relay)
-  - [3.6 Enable several network topologies](3-requirements.md#36-enable-several-network-topologies)
-  - [3.7 Resource discovery](3-requirements.md#37-resource-discovery)
-  - [3.8 Messaging](3-requirements.md#38-messaging)
-  - [3.9 Naming](3-requirements.md#38-naming)
-- [4 Architecture](4-architecture.md)
-  - [4.1 Peer Routing](4-architecture.md#41-peer-routing)
-  - [4.2 Swarm](4-architecture.md#42-swarm)
-  - [4.3 Distributed Record Store](4-architecture.md#43-distributed-record-store)
-  - [4.4 Discovery](4-architecture.md#44-discovery)
-  - [4.5 Messaging](4-architecture.md#45-messaging)
-    - [4.5.1 PubSub](4-architecture.md#451-pubsub)
-  - [4.6 Naming](4-architecture.md#46-naming)
-    - [4.6.1 IPRS](4-architecture.md#461-iprs)
-    - [4.6.2 IPNS](4-architecture.md#462-ipns)
-- [5 Data structures](5-datastructures.md)
-- [6 Interfaces](6-interfaces.md)
-  - [6.1 libp2p](6-interfaces.md#61-libp2p)
-  - [6.1 Transport](6-interfaces.md)
-  - [6.2 Connection](6-interfaces.md)
-  - [6.3 Stream Multiplexer](6-interfaces.md)
-  - [6.3 Swarm](6-interfaces.md#63-swarm)
-  - [6.5 Peer Discovery](6-interfaces.md#65-peer-discovery)
-  - [6.2 Peer Routing](6-interfaces.md#62-peer-routing)
-  - [6.2 Content Routing](6-interfaces.md#62-peer-routing)
-    - [6.3.1 Distributed Record Store](6-interfaces.md#64-distributed-record-store)
-  - [6.6 libp2p interface and UX](6-interfaces.md#66-libp2p-interface-and-ux)
-- [7 Properties](7-properties.md)
-  - [7.1 Communication Model - Streams](7-properties.md#71-communication-model---streams)
-  - [7.2 Ports - Constrained Entrypoints](7-properties.md#72-ports---constrained-entrypoints)
-  - [7.3 Transport Protocol](7-properties.md#73-transport-protocols)
-  - [7.4 Non-IP Networks](7-properties.md#74-non-ip-networks)
-  - [7.5 On the wire](7-properties.md#75-on-the-wire)
-    - [7.5.1 Protocol-Multiplexing](7-properties.md#751-protocol-multiplexing)
-    - [7.5.2 multistream - self-describing protocol stream](7-properties.md#752-multistream---self-describing-protocol-stream)
-    - [7.5.3 multistream-selector - self-describing protocol stream selector](7-properties.md#753-multistream-selector---self-describing-protocol-stream-selector)
-    - [7.5.4 Stream Multiplexing](7-properties.md#754-stream-multiplexing)
-    - [7.5.5 Portable Encodings](7-properties.md#755-portable-encodings)
-    - [7.5.6 Secure Communications](7-properties.md#756-secure-communications)
-- [8 Implementations](8-implementations.md)
-- [9 References](9-references.md)
+- [Spec Lifecycle][spec_lifecycle] - The process for introducing, revising and
+  adopting specs.
+- [Document Header][spec_header] - A standard document header for libp2p specs.
 
-## Other specs that haven't made to the main document
+### Core Abstractions and Types
 
-- [Relay](/relay)
-- [PubSub](/pubsub)
+These specs define abstractions and data types that form the "core" of libp2p
+and are used throughout the system.
 
-## Contribute
+- [Connections and Upgrading][spec_connections] - Establishing secure,
+  multiplexed connections between peers, possibly over insecure, single stream transports.
+- [Peer Ids and Keys][spec_peerids] - Public key types & encodings, peer id calculation, and
+  message signing semantics
 
-Please contribute! [Dive into the issues](https://github.com/libp2p/specs/issues)!
+### Protocols
 
-Please be aware that all interactions related to multiformats are subject to the IPFS [Code of Conduct](https://github.com/ipfs/community/blob/master/code-of-conduct.md).
+These specs define wire protocols that are used by libp2p for connectivity,
+security, multiplexing, and other purposes.
 
-## License
+The protocols described below all use [protocol buffers](https://developers.google.com/protocol-buffers/docs/proto?hl=en) (aka protobuf) to define message schemas. Version `proto2` is used unless stated otherwise.
 
-[CC-BY-SA 3.0 License](https://creativecommons.org/licenses/by-sa/3.0/us/) © Protocol Labs Inc.
+- [identify][spec_identify] -  Exchange keys and addresses with other peers
+- [mplex][spec_mplex] - The friendly stream multiplexer
+- [plaintext][spec_plaintext] - An insecure transport for non-production usage
+- [pnet][spec_pnet] - Private networking in libp2p using pre-shared keys
+- [pubsub][spec_pubsub] - PubSub interface for libp2p
+  - [gossipsub][spec_gossipsub] - An extensible baseline PubSub protocol
+    - [episub][spec_episub] - Proximity Aware Epidemic PubSub for libp2p
+- [relay][spec_relay] - Circuit Switching for libp2p (similar to TURN)
+- [rendezvous][spec_rendezvous] - Rendezvous Protocol for generalized
+  peer discovery
+- [secio][spec_secio] - SECIO, a transport security protocol for libp2p
+- [tls][spec_tls] - The libp2p TLS Handshake (TLS 1.3+)
+
+
+## Contributions
+
+Thanks for your interest in improving libp2p! We welcome contributions from all
+interested parties. Please take a look at the [Spec Lifecycle][spec_lifecycle]
+document to get a feel for how the process works, and [open an
+issue](https://github.com/libp2p/specs/issues/new) if there's work you'd like to
+discuss.
+
+For discussions about libp2p that aren't specific to a particular spec, or if
+you feel an issue isn't the appropriate place for your topic, please join our
+[discussion forum](https://discuss.libp2p.io) and post a new topic in the
+[contributor's section](https://discuss.libp2p.io/c/contributors).
+
+
+[libp2p_implementations]: https://libp2p.io/implementations
+[spec_lifecycle]: 00-framework-01-spec-lifecycle.md
+[spec_header]: 00-framework-02-document-header.md
+[spec_identify]: ./identify/README.md
+[spec_mplex]: ./mplex/README.md
+[spec_pnet]: ./pnet/Private-Networks-PSK-V1.md
+[spec_pubsub]: ./pubsub/README.md
+[spec_gossipsub]: ./pubsub/gossipsub/README.md
+[spec_episub]: ./pubsub/gossipsub/episub.md
+[spec_relay]: ./relay/README.md
+[spec_rendezvous]: ./rendezvous/README.md
+[spec_secio]: ./secio/README.md
+[spec_tls]: ./tls/tls.md
+[spec_peerids]: ./peer-ids/peer-ids.md
+[spec_connections]: ./connections/README.md
+[spec_plaintext]: ./plaintext/README.md

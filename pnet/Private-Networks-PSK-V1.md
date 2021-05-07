@@ -1,6 +1,28 @@
-## Pre-shared Key Based Private Networks in IPFS
+## Pre-shared Key Based Private Networks in libp2p
 
-This document describes the first version of private networks (PN) featured in IPFS.
+| Lifecycle Stage | Maturity       | Status | Latest Revision |
+| --------------- | -------------- | ------ | --------------- |
+| 3A              | Recommendation | Active | r0, 2017-02-17  |
+
+
+Authors: [@Kubuxu]
+
+Interest Group: [@yusefnapora], [@jacobheun], [@lgierth], [@daviddias]
+
+[@Kubuxu]: https://github.com/Kubuxu
+[@yusefnapora]: https://github.com/yusefnapora
+[@jacobheun]: https://github.com/jacobheun
+[@lgierth]: https://github.com/lgierth
+[@daviddias]: https://github.com/daviddias
+
+See the [lifecycle document][lifecycle-spec] for context about maturity level
+and spec status.
+
+[lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
+
+---
+
+This document describes the first version of private networks (PN) featured in libp2p.
 
 For the first implementation, only pre-shared key (PSK) functionality is available, as the Public Key Infrastructure approach is much more complex and requires more technical preparation.
 
@@ -16,7 +38,7 @@ In the case of an IPFS node, this key is stored inside the IPFS repo in a file n
 
 #### Security Guarantees
 
-Nodes of different private networks must not be able to connect to each other. This extends to node in private network connecting to node in public network. This means that no information exchange, apart from the handshakeing required for private network authentication, should take place.
+Nodes of different private networks must not be able to connect to each other. This extends to node in private network connecting to node in public network. This means that no information exchange, apart from the handshakes required for private network authentication, should take place.
 
 These guarnetee is only provided when knowledge of private key is limited to trusted party. 
 
@@ -34,11 +56,11 @@ It is important to mention that traffic in a private network is encrypted twice,
 
 #### Choosing stream ciphers
 
-We considered three stream siphers: AES-CTR, Salsa20 and ChaCha. Salsa20 and ChaCha are very similar ciphers, as ChaCha is fully based on Salsa20. And unfortunately, due of ChaCha's lack of adoption, we were not able to find vetted implementations in relevant programming languages. Because of this, the final consideration was between AES-CTR and Salsa20.
+We considered three stream ciphers: AES-CTR, Salsa20 and ChaCha. Salsa20 and ChaCha are very similar ciphers, as ChaCha is fully based on Salsa20. And unfortunately, due of ChaCha's lack of adoption, we were not able to find vetted implementations in relevant programming languages. Because of this, the final consideration was between AES-CTR and Salsa20.
 
 There are three main reasons why we decided for Salsa20 over AES-CTR:
 
-1. We plan on using the same PSK among many nodes. This means that we need to randomize the nonce. For security the nonce collision should be a very unlikely event (frequently used value: 2<sup>-32</sup>). The Salsa20 family provides the XSalsa20 [[1][Xsalsa20]] stream cipher with a nonce of 192-bits. In comparison the usual mode of operation for AES-CTR usually operates with a 96-bit nonce. Which gives only possible different `1.7e24` nonces , and only `6.0e9` nonces form a birthday problem set with collision probablity higher than 2<sup>-32</sup>. In case of XSalsa20 to reach the same collision probability over `1e24` nnonces have to be generated.
+1. We plan on using the same PSK among many nodes. This means that we need to randomize the nonce. For security the nonce collision should be a very unlikely event (frequently used value: 2<sup>-32</sup>). The Salsa20 family provides the XSalsa20 [[1][Xsalsa20]] stream cipher with a nonce of 192-bits. In comparison the usual mode of operation for AES-CTR usually operates with a 96-bit nonce. Which gives only possible different `1.7e24` nonces , and only `6.0e9` nonces form a birthday problem set with collision probablity higher than 2<sup>-32</sup>. In case of XSalsa20 to reach the same collision probability over `1e24` nonces have to be generated.
 2.  The stream counter for the Salsa20 family is 64-bit long, and in composition with a 64 byte block size gives a total stream length of 2<sup>70</sup> bytes. This is more than will ever be transmitted through any connection (1ZiB). The AES-CTR (in its usual configuration of 96-bit nonce, 32-bit counter) with a block size of 16 bytes results in a stream length of 2<sup>36</sup>, which is only 64 GiB. It means that re-keying (re-nonceing in our case) would be necessary. As the nonce space is already much smaller for AES, re-nonceing would further increase nonce collision risk.
 3. The speed was the last factor which was very important. The encryption layer is an added additional overhead. From our benchmarks, Salsa20 performs two times better on recent Intel 6th Generation processors and on ARM based processors (800MB/s vs 400MB/s and 13.5MB/s vs 7MB/s).
 
