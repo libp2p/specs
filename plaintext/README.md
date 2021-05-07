@@ -1,6 +1,8 @@
-# Plaintext Connection Protocol
+# Plaintext Secure Channel
 
-> An insecure connection handshake for non-production environments.
+> An insecure connection handshake **for non-production environments.**
+
+> **⚠️ Intended only for debugging and interoperability testing purposes. ⚠️**
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
@@ -110,9 +112,11 @@ section of the connection establishment spec][conn-spec-protocol-negotiation].
 
 ### Message Framing
 
-All messages sent over the wire are prefixed with the message length in bytes,
-encoded as an unsigned variable length integer as defined by the [multiformats
-unsigned-varint spec][uvarint-spec].
+All [handshake messages](#messages) sent over the wire are prefixed with the
+message length in bytes, encoded as an unsigned variable length integer as
+defined by the [multiformats unsigned-varint spec][uvarint-spec]. Actual
+payloads exchanged once the plaintext handshake has completed are NOT prefixed
+with their lengths, but sent as-is.
 
 ### Exchange
 
@@ -153,6 +157,6 @@ the unsuitability of `/plaintext/2.0.0` for production usage.
 [uvarint-spec]: https://github.com/multiformats/unsigned-varint
 [multihash]: https://github.com/multiformats/multihash
 [conn-spec-conn-upgrade]: ../connections/README.md#connection-upgrade
-[conn-spec-protocol-negotiation]: ../connnection/README.md#protocol-negotiation
+[conn-spec-protocol-negotiation]: ../connections/README.md#protocol-negotiation
 [go-libp2p-peerstore]: https://github.com/libp2p/go-libp2p-peerstore
 [js-peer-book]: https://github.com/libp2p/js-peer-book

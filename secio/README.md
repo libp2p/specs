@@ -3,9 +3,12 @@
 > A stream security transport for libp2p. Streams wrapped by SECIO use secure
 > sessions to encrypt all traffic.
 
-| Lifecycle Stage | Maturity Level | Status | Latest Revision |
-|-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r0, 2019-05-27  |
+> SECIO is deprecated and we advise against using it. See [this blog
+> post](https://blog.ipfs.io/2020-08-07-deprecating-secio/) for details.
+
+| Lifecycle Stage | Maturity Level | Status     | Latest Revision |
+|-----------------|----------------|------------|-----------------|
+| 3D              | Recommendation | Deprecated | r1, 2021-03-26  |
 
 Authors: [@jbenet], [@bigs], [@yusefnapora]
 
@@ -124,8 +127,8 @@ negotiation.
 ### Message framing
 
 All messages sent over the wire are prefixed with the message length in bytes,
-encoded as an unsigned variable length integer as defined
-by the [multiformats unsigned-varint spec][unsigned-varint].
+encoded as an unsigned 32-bit Big Endian integer. The message length should always
+be inferior to 0x800000 (or 8MiB).
 
 ### Proposal Generation
 

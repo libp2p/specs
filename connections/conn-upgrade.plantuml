@@ -16,13 +16,13 @@ note left: Initiator proposes TLS for security
 Responder -> Initiator: na
 note right: Responder does not support TLS yet
 
-Initiator -> Responder: /secio/1.0.0
-note left: Initiator falls back to SECIO
+Initiator -> Responder: /noise
+note left: Initiator falls back to Noise
 
-Responder -> Initiator: /secio/1.0.0
-note right: Responder supports SECIO, echoes back protocol id
+Responder -> Initiator: /noise
+note right: Responder supports Noise, echoes back protocol id
 
-... SECIO handshake ...
+... Noise handshake ...
 
 == Negotiate stream multiplexer ==
 

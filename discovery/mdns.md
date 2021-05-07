@@ -4,7 +4,7 @@
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r1, 2019-05-05  |
+| 1A              | Working Draft  | Active | r1, 2019-05-05  |
 
 Authors: [@richardschneider]
 
@@ -170,5 +170,5 @@ _p2p._udp.local IN PTR `name`._p2p._udp.local
 
 #### Additional Records
 
-- `name`._p2p._udp.local IN TXT dnsaddr=/ip6/fe80::7573:b0a8:46b0:bfea/tcp/4001/ipfs/`id`
-- `name`._p2p._udp.local IN TXT dnsaddr=/ip4/192.168.178.21/tcp/4001/ipfs/'id'
+- `name`._p2p._udp.local IN TXT dnsaddr=/ip6/fe80::7573:b0a8:46b0:bfea/tcp/4001/p2p/`id`
+- `name`._p2p._udp.local IN TXT dnsaddr=/ip4/192.168.178.21/tcp/4001/p2p/'id'

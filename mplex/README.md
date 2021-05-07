@@ -54,13 +54,15 @@ Implementations in:
 
 Every communication in mplex consists of a header, and a length prefixed data segment.
 
-The header is an unsigned base128 varint, as defined in the [protocol buffers spec](https://developers.google.com/protocol-buffers/docs/encoding#varints). The lower three bits are the message flags, and the rest of the bits (shifted down by three bits) are the stream ID this message pertains to:
+The header is an [unsigned base128 varint](https://github.com/multiformats/unsigned-varint). The lower three bits are the message flags, and the rest of the bits (shifted down by three bits) are the stream ID this message pertains to:
 
 ```
 header = readUvarint()
 flag = header & 0x07
 id = header >> 3
 ```
+
+The maximum header length is 9 bytes (per the unsigned-varint spec). With 9 continuation bits and 3 message flag bits the maximum stream ID is 60 bits (maximum value of `2^60 - 1`).
 
 ### Flag Values
 
