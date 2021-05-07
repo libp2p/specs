@@ -6,11 +6,12 @@
 
 Authors: [@vyzo]
 
-Interest Group: [@raulk], [@stebalien]
+Interest Group: [@raulk], [@stebalien], [@mxinden]
 
 [@vyzo]: https://github.com/vyzo
 [@raulk]: https://github.com/raulk
 [@stebalien]: https://github.com/stebalien
+[@mxinden]: https://github.com/mxinden
 
 See the [lifecycle document][lifecycle-spec] for context about maturity level
 and spec status.
