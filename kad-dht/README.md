@@ -69,7 +69,7 @@ distance between the two keys is `XOR(sha256(key1), sha256(key2))`.
   accepts keys of the form `/pk/BINARY_PEER_ID` mapped the serialized public key
   associated with the peer ID in question.
 * For `ADD_PROVIDER` and `GET_PROVIDERS`, `key` is interpreted and validated as
-a CID.
+  a CID.
 * For `FIND_NODE`, `key` is a binary `PeerId`
 
 ## Interfaces
@@ -123,8 +123,8 @@ When looking up an entry in the DHT, the implementor should collect at least `Q`
 (quorum) responses from distinct nodes to check for consistency before returning
 an answer.
 
-Should the responses be different, the `Validator.Select()` function is used to
-resolve the conflict and select the _best_ result.
+Should the responses be different, the implementation should use some validation
+mechanism to resolve the conflict and select the _best_ result.
 
 **Entry correction.** Nodes that returned _worse_ records are updated via a
 direct `PUT_VALUE` RPC call when the lookup completes. Thus the DHT network
@@ -165,8 +165,8 @@ are closest to `K`, based on the XOR distance function.
 	1. If successful, and we receive a value:
 		1. If this is the first value we've seen, we store it in `best`, along
            with the peer who sent it in `Pb`.
-		2. Otherwise, we resolve the conflict by calling `Validator.Select(best,
-           new)`:
+		2. Otherwise, we resolve the conflict by e.g. calling
+           `Validator.Select(best, new)`:
 			1. If the new value wins, store it in `best`, and mark all formerly
                “best" peers (`Pb`) as _outdated peers_ (`Po`). The current peer
                becomes the new best peer (`Pb`).
@@ -179,8 +179,9 @@ are closest to `K`, based on the XOR distance function.
 
 ## Entry validation
 
-When constructing a DHT node, it is possible to supply a record `Validator`
-object conforming to this interface:
+Implementations should validate DHT entries during retrieval and before storage
+e.g. by allowing to supply a record `Validator` when constructing a DHT node.
+Below is a sample interface of such a `Validator`:
 
 ``` go
 // Validator is an interface that should be implemented by record
@@ -201,13 +202,13 @@ type Validator interface {
 `Validate()` is a pure function that reports the validity of a record. It may
 validate a cryptographic signature, or else. It is called on two occasions:
 
-1. To validate incoming values in response to `GET_VALUE` calls.
-2. To validate outgoing values before storing them in the network via
-   `PUT_VALUE` calls.
+1. To validate values retrieved in a `GET_VALUE` query.
+2. To validate values received in a `PUT_VALUE` query before storing them in the
+   local data store.
 
 Similarly, `Select()` is a pure function that returns the best record out of 2
 or more candidates. It may use a sequence number, a timestamp, or other
-heuristic to make the decision.
+heuristic of the value to make the decision.
 
 ## Public key records
 
@@ -220,8 +221,8 @@ DHT implementations may optimise public key lookups by providing a
 the key exists in the local peerstore.
 
 The lookup for public key entries is identical to a standard entry lookup,
-except that a custom `Validator` strategy is applied. It checks that equality
-`SHA256(value) == peerID` stands when:
+except that a custom entry validation strategy is applied. It checks that
+equality `SHA256(value) == peerID` stands when:
 
 1. Receiving a response from a `GET_VALUE` lookup.
 2. Storing a public key in the DHT via `PUT_VALUE`.
