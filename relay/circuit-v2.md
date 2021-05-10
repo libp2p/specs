@@ -123,15 +123,178 @@ the relay and the connection termination point.
 
 ### Hop Protocol
 
-TBD
+The Hop protocol governs interaction between clients and the relay;
+it uses the protocol ID `/libp2p/circuit/relay/0.2.0/hop`.
+
+There are two parts of the protocol:
+- reservation, by peers that wish to receive relay service
+- connection initiation, by peers that wish to connect to a peer through the relay.
+
+#### Reservation
+
+In order to make a reservation, a peer opens a connection to the relay and sends a `HopMessage` with
+`type = RESERVE`:
+
+```
+HopMessage {
+  type = RESERVE
+}
+```
+
+The relay responds with a `HopMessage` of `type = STATUS`, indicating whether the reservation has
+been accepted.
+
+If the reservation is accepted, then the message has the following form:
+```
+HopMessage {
+  type = STATUS
+  status = OK
+  reservation = Reservation {...}
+  limit = Limit {...}
+}
+```
+
+The `reservation` field provides information about the reservation itself; the struct has the following fields:
+```
+Reservation {
+   expire = ...
+   addrs = [...]
+   voucher = ...
+}
+```
+
+- the `expire` field contains the expiration time as a UTC UNIX time. The reservation becomes invalid after this time and it's the responsibility of the client to refresh.
+- the `addrs` fields contains the all public relay addrs, including the peer ID but not the
+  trailing `p2p-circuit` part; the client can use this list to constrct its
+  own `p2p-circuit` relay addrs for advertising by encapsulating
+ `p2p-circuit/p2p/QmPeer` where `QmPeer` is its peer ID.
+- the `voucher` is the binary representation of the reservation voucher -- see [Reservation Vouchers](#reservation-vouchers) for details.
+
+The `limit` field, if present, provides information about the limits applied by the relay in relayed connection. When omitted, it indicates that the relay does not apply any limits.
+The struct has the following fields:
+```
+Limit {
+  duration = ...
+  data = ...
+```
+- the `duration` field indicates the maximum duration of a relayed connection in seconds; if 0, there is no limit applied.
+- the `data` field indicates the maximum number of bytes allowed to be transmitted in each direction; if 0 there is no limit applied.
+
+Note that the reservation remains valid until its expiration, as long
+as there is an active connection from the peer to the relay. If the
+peer disconnects, the reservation is no longer valid.
+
+If the reservation is rejected, the relay responds with a `HopMessage` of the form
+```
+Reservation {
+  type = STATUS
+  status = ...
+}
+```
+where the `status` field has a value other than `OK`. Common rejection status codes are:
+- `PERMISSION_DENIED` if the reservation is rejected because of peer filtering using ACLs.
+- `RESERVATION_REFUSED` if the reservation is rejected for some other reason, eg because there are too
+  many reservations.
+
+#### Connection Initiation
+
+In order to initiate a connection to a peer through a relay, the initiator opens a connection and sends a `HopMessage` of `type = CONNECT`:
+```
+HopMessage {
+  type = CONNECT
+  peer = Peer {...}
+}
+```
+
+The `peer` field contains the peer `ID` of the target peer and optionally the address of that peer for the case of active relay:
+```
+Peer {
+  id = ...
+  addrs = [...]
+```
+
+Note that active relay functionality is considered deprecated for security reasons, at least in public relays.
+However, the protocol reserves the slot to support the functionality for the rare cases where it is actually desirable to use active relay functionality in a controlled environment.
+
+If the relay has a reservation (and thus an active connection) from the peer, then it opens the second hop of the connection using the `stop` protocol; the details are not relevant for the `hop` protocol and the only thing that matters is whether it succeeds in opening the relay connection or not.
+If the relayed connection is successfully established, then the relay responds with `HopMessage` with `type = STATUS` and `status = OK`:
+```
+HopMessage {
+  type = STATUS
+  sgtatus = OK
+  limit = Limit {...}
+}
+```
+at this point the original `hop` stream becomes the relayed connection.
+The `limit` field, if present, communicates to the initiator the
+limits applied to the relayed connection with the semantics described
+[above](#reservation).
+
+If the relayed connection cannot be established, then the relay responds with a `HopMessage` of `type = STATUS` and the `status` field having a value other than `OK`.
+Common failure status codes are:
+- `PERMISSION_DENIED` if the connection is rejected because of peer filtering using ACLs.
+- `NO_RESERVATION` if there is no active reservation for the target peer
+- `RESOURCE_LIMIT_EXCEEDED` if there are two many relayed connections from the initiator or to the target peer.
+- `CONNECTION_FAILED` if the relay failed to terminate the connection to the target peer.
+
 
 ### Stop Protocol
 
-TBD
+The Stop protocol governs connection termination between the relay and the target peer;
+it uses the protocol ID `/libp2p/circuit/relay/0.2.0/stop`.
+
+In order to terminate a relayed connection, the relay opens a stream
+using an existing connection to the target peer. If there is no
+existing connection, an active relay may attempt to open one using the
+initiator supplied address, but as discussed in the previous section
+this functionality is generally deprecated.
+
+The relay sends a `StopMessage` with `type = CONNECT` and the following form:
+```
+StopMessage {
+  type = CONNECT
+  peer = Peer { ID = ...}
+  limit = Limit { ...}
+}
+```
+- the `peer` field contains a `Peer` struct with the peer `ID` of the connection initiator.
+- the `limit` field, if present, conveys the limits applied to the relayed connection with the semantics described [above](#reservation).
+
+If the target peer accepts the connection it responds to the relay with a `StopMessage` of `type = STATUS` and `status = OK`:
+```
+StopMessage {
+  type = STATUS
+  status = OK
+}
+```
+
+If the target fails to terminate the connection for some reason, then it responds to the relay with a `StopMessage` of `type = STATUS` and the `status` code set to something other than `OK`.
+Common failure status codes are:
+- `CONNECTION_FAILED` if the target internally failed to create the relayed connection for some reason.
 
 ### Reservation Vouchers
 
-TBD
+Successful relay slot reservations come with _Reservation Vouchers_.
+These are cryptographic certificates signed by the relay that testify that it is willing to provide
+service to the reserving peer.
+The intention is to eventually require the use of reservation vouchers for dialing relay addresses,
+but this is not currently enforced so the vouchers are only advisory.
+
+The voucher itself is a [Signed Envelope](../RFC/0002-signed-envelopes.md).
+The payload of the envelope has the following form, in canonicalized protobuf format:
+```
+message Voucher {
+  required bytes relay = 1;
+  required bytes peer = 2;
+  required uint64 expiration = 3;
+}
+```
+- the `relay` field is the peer ID of the relay.
+- the `peer` field is the peer ID of the reserving peer.
+- the `expiration` field is the UNIX UTC expiration time for the reservation.
+
+The wire representation is cononicalized, where elements of the message are written in field id order.
+
 
 ## Protobuf
 
@@ -172,14 +335,14 @@ message Peer {
 }
 
 message Reservation {
-  optional int64 expire = 1;  // Unix expiration time (UTC)
+  optional uint64 expire = 1; // Unix expiration time (UTC)
   repeated bytes addrs = 2;   // relay addrs for reserving peer
   optional bytes voucher = 3; // reservation voucher
 }
 
 message Limit {
-  optional int32 duration = 1; // seconds
-  optional int64 data = 2;     // bytes
+  optional uint32 duration = 1; // seconds
+  optional uint64 data = 2;     // bytes
 }
 
 enum Status {
