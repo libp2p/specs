@@ -4,7 +4,7 @@ This is the version 2 of the libp2p Circuit Relay protocol.
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 1A              | DRAFT          | Active | r1, 2021-05-05  |
+| 1A              | DRAFT          | Active | r0, 2021-05-05  |
 
 Authors: [@vyzo]
 
