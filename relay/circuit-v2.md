@@ -77,7 +77,7 @@ termination in the same protocol has made it very hard to provide
 relay service on demand, decoupled with whether _client_ functionality
 is supported by the host.
 
-In order to address this problem, we have splt the protocol into the
+In order to address this problem, we have split the protocol into the
 `hop` and `stop` subprotocols. This allows us to always enable the
 client-side functionality in a host, while providing the option to
 later mount the relay service in public hosts, _after_ the
