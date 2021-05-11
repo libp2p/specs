@@ -54,7 +54,7 @@ implementation controls the full transport security stack. Further more, unless
 run behind a Firewall or NAT, _non-browser_ platform hosts can be directly
 dialed through their publicly routable addresses.
 
-Contrary on _browser_ platforms a libp2p implementation does not manage the
+On the contrary, _browser_ platforms a libp2p implementation does not manage the
 network socket nor does it control the transport security stack. In addition to
 these restrictions, hosts running on _browser_ platforms can not be directly
 dialed.
@@ -138,8 +138,8 @@ them.
 - B uses the [AutoNat] protocol to determine whether it is running behind
   firewalls and/or NATs and in the latter case what type of NATs.
   
-  Note: Hole punching fails if either A or B runs behind a [symetric
-  NAT][symetric-nat].
+  Note: Hole punching fails if either A or B runs behind a [symmetric
+  NAT][symmetric-nat].
 
 - B establishes a TCP or QUIC connections to one or more relay servers and
   listens for incoming connection requests via the [circuit relay v2
@@ -152,7 +152,7 @@ them.
   server.
 
 - A discovers the relayed address of B through some external mechanism. Given
-  the relayed address A can establish a relayed connection to B via the [circuit
+  the relayed address, A can establish a relayed connection to B via the [circuit
   relay v2 protocol][circuit-relay-v2] protocol over TCP or QUIC. A and B can
   then run the [Direct Connection Upgrade through Relay][DCUTR] protocol over
   the relayed connection to coordinate TCP or QUIC hole punching in the best
@@ -173,7 +173,7 @@ stack, thus not allowing _insecure_ connections.
 
 - B establishes a TCP or QUIC connections to one or more relay servers and
   listens for incoming connection requests via the [circuit relay v2
-  protocol][circuit-relay-v2]. Once B established a reservation at one or more
+  protocol][circuit-relay-v2]. Once B establishes a reservation at one or more
   relay servers, B can advertise its relayed addresses (e.g.
   `/ip4/.../tcp/.../p2p/QmRelay`) via some external mechanism.
 
@@ -254,4 +254,4 @@ stack, thus not allowing _insecure_ connections.
 [circuit-relay-v2]: https://github.com/libp2p/specs/issues/314
 [DCUTR]: https://github.com/libp2p/specs/pull/173
 [project-flare]: https://github.com/protocol/web3-dev-team/pull/21
-[symetric-nat]: https://dh2i.com/kbs/kbs-2961448-understanding-different-nat-types-and-hole-punching/
+[symmetric-nat]: https://dh2i.com/kbs/kbs-2961448-understanding-different-nat-types-and-hole-punching/
