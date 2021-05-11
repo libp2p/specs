@@ -95,7 +95,47 @@ Peer _A_ is a private peer, which is not publicly reachable; it
 utilizes the services of peer _R_ as the relay.  Peer _B_ is another
 peer who wishes to connect to peer _A_ through _R_.
 
-![Circuit v2 Protocol Interaction](circuit-v2.png)
+![Circuit v2 Protocol Interaction](circuit-v2.svg)
+
+<details>
+  <summary>Instructions to reproduce diagram</summary>
+
+Use https://plantuml.com/ and the specification below to reproduce the diagram.
+
+```
+@startuml
+participant A
+participant R
+participant B
+
+skinparam sequenceMessageAlign center
+
+== Reservation ==
+
+A -> R: [hop] RESERVE
+R -> A: [hop] STATUS:OK
+
+hnote over A: Reservation timeout approaching.
+hnote over A: Refresh.
+
+A -> R: [hop] RESERVE
+R -> A: [hop] STATUS:OK
+
+hnote over A: ...
+
+== Circuit Establishment ==
+
+B -> R: [hop] CONNECT to A
+R -> A: [stop] CONNECT from B
+A -> R: [stop] STATUS:OK
+R -> B: [hop] STATUS:OK
+
+B <-> A: Connection
+@enduml
+```
+  
+</details>
+
 
 The first part of the interaction is _A_'s reservation of a relay slot
 in _R_.  This is accomplished by opening a connection to _R_ and
