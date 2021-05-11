@@ -164,7 +164,7 @@ Reservation {
 ```
 
 - the `expire` field contains the expiration time as a UTC UNIX time. The reservation becomes invalid after this time and it's the responsibility of the client to refresh.
-- the `addrs` fields contains the all public relay addrs, including the peer ID but not the
+- the `addrs` field contains all the public relay addrs, including the peer ID but not the
   trailing `p2p-circuit` part; the client can use this list to constrct its
   own `p2p-circuit` relay addrs for advertising by encapsulating
  `p2p-circuit/p2p/QmPeer` where `QmPeer` is its peer ID.
