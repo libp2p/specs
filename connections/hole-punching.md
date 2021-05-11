@@ -96,6 +96,19 @@ coordinate the hole punching process. Examples of coordination protocols are the
 [Session Description Protocol (SDP)][SDP] and [Direct Connection Upgrade through
 Relay][DCUTR].
 
+### Discovery mechanism
+
+A discovery mechanism allows a node to discover peers in the network. A node can
+use such mechanism e.g. to find peers at random, to learn external addresses of
+peers, or more targeted to discover peers that provide a specific service. Among
+others one can build a discovery mechanism on top of the libp2p [Kademlia] and
+[Gossipsub] protocol. The [IPFS's usage of a Kademlia DHT][ipfs-kademlia] is a
+good example of a discovery mechanism.
+
+Further details on discovery mechanisms are out of scope for this document. The
+descriptions below will assume a generic _external discovery mechanism_ to be
+available.
+
 ## Vision
 
 When it comes to establishing direct connections one needs to differentiate by
@@ -255,3 +268,6 @@ stack, thus not allowing _insecure_ connections.
 [DCUTR]: https://github.com/libp2p/specs/pull/173
 [project-flare]: https://github.com/protocol/web3-dev-team/pull/21
 [symmetric-nat]: https://dh2i.com/kbs/kbs-2961448-understanding-different-nat-types-and-hole-punching/
+[ipfs-kademlia]: https://docs.ipfs.io/concepts/dht/
+[Kademlia]: https://github.com/libp2p/specs/pull/108/
+[Gossipsub]: ../pubsub/gossipsub/README.md
