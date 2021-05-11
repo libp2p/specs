@@ -314,7 +314,7 @@ Common failure status codes are:
 
 ### Reservation Vouchers
 
-Successful relay slot reservations come with _Reservation Vouchers_.
+Successful relay slot reservations should come with _Reservation Vouchers_.
 These are cryptographic certificates signed by the relay that testify that it is willing to provide
 service to the reserving peer.
 The intention is to eventually require the use of reservation vouchers for dialing relay addresses,
