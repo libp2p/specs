@@ -58,7 +58,7 @@ the practicalities of relaying connections.
 
 The main problem is that v1 has no mechanism to reserve resources in the
 relay, which leads to continuoues oversubscription of relays and the
-necessity of (often inefective) heuristics for balancing resources.
+necessity of (often ineffective) heuristics for balancing resources.
 In practice, running a relay proved to be an expensive proposition
 requiring dedicated hosts with significant hardware and bandwidth
 costs.  In addition, there is ongoing work in Hole Punching
