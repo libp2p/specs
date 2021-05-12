@@ -40,14 +40,14 @@ long term vision. To gain an overview of the status quo, see [issue #312].
 
 ## Definitions
 
-### Routability
+### Reachability
 
-This document distinguishes between two types of hosts: publicly routable and
-non-publicly routable hosts. Addresses of the former type of hosts can be
+This document distinguishes between two types of hosts: publicly reachable and
+non-publicly reachable hosts. Addresses of the former type of hosts can be
 directly dialed on the public Internet. Addresses of the latter type of hosts
 can only be dialed through a relay protocol, or through some means of hole
-punching. The document refers to publicly routable hosts as _public_ and
-non-publicly routable hosts as _private_.
+punching. The document refers to publicly reachable hosts as _public_ and
+non-publicly reachable hosts as _private_.
 
 ### Platforms
 
@@ -57,7 +57,7 @@ On _non-browser_ platforms a libp2p implementation has extensive control over
 the (TCP or UDP) network socket, e.g. controlling port-reuse. The libp2p
 implementation controls the full transport security stack. Further more, unless
 run behind a Firewall or NAT, _non-browser_ platform hosts can be directly
-dialed through their publicly routable addresses.
+dialed through their publicly reachable addresses.
 
 On the contrary, _browser_ platforms a libp2p implementation does not manage the
 network socket nor does it control the transport security stack. In addition to
@@ -129,12 +129,12 @@ communicate directly.
 
 ### Private Non-Browser (A) to Public Non-Browser (B)
 
-Given that B is publicly routable, A can establish a direct TCP or QUIC
+Given that B is publicly reachable, A can establish a direct TCP or QUIC
 connection to B.
 
 ### Private Browser (A) to Public Non-Browser (B)
 
-Given that B is publicly routable A can establish a direct connection, though
+Given that B is publicly reachable A can establish a direct connection, though
 multiple restrictions are imposed by the browser platform type of A:
 
 - The only transport protocol allowing direct connections on browser platforms
