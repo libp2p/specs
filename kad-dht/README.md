@@ -37,18 +37,23 @@ behaviour similar to Kademlia-based libraries.
 
 Code snippets use a Go-like syntax.
 
+## Replication parameter (`k`)
+
+The amount of replication is governed by the replication parameter `k`. The
+default value for `k` is 20.
+
 ## Kademlia routing table
 
 The data structure backing this system is a k-bucket routing table, closely
-following the design outlined in the Kademlia paper [0]. The default value for
-`k` is 20, and the maximum bucket count matches the size of the SHA256 function,
-i.e. 256 buckets.
+following the design outlined in the Kademlia paper [0]. The bucket size is
+equal to the replication paramter `k`, and the maximum bucket count matches the
+size of the SHA256 function, i.e. 256 buckets.
 
 The routing table is unfolded lazily, starting with a single bucket at position
 0 (representing the most distant peers), and splitting it subsequently as closer
 peers are found, and the capacity of the nearmost bucket is exceeded.
 
-## Alpha concurrency factor (α)
+## Alpha concurrency parameter (`α`)
 
 The concurrency of node and value lookups are limited by parameter `α`, with a
 default value of 3. This implies that each lookup process can perform no more
@@ -133,7 +138,11 @@ collaborating with one another.
 
 ### Algorithm
 
-Let's assume we’re looking for key `K`. We first try to fetch the value from the
+The below is one possible algorithm to lookup a value on the DHT.
+Implementations may diverge from this base algorithm as long as they continue to
+adhere to the wire format.
+
+Let's assume we’re looking for key `Key`. We first try to fetch the value from the
 local store. If found, and `Q == { 0, 1 }`, the search is complete.
 
 Otherwise, the local result counts for one towards the search of `Q` values. We
@@ -144,22 +153,20 @@ We keep track of:
 * the number of values we've fetched (`cnt`).
 * the best value we've found (`best`), and which peers returned it (`Pb`)
 * the set of peers we've already queried (`Pq`) and the set of next query
-  candidates sorted by distance from `K` in ascending order (`Pn`).
+  candidates sorted by distance from `Key` in ascending order (`Pn`).
 * the set of peers with outdated values (`Po`). 
 
 **Initialization**: seed `Pn` with the `α` peers from our routing table we know
-are closest to `K`, based on the XOR distance function.
+are closest to `Key`, based on the XOR distance function.
 
 **Then we loop:**
 
-*WIP (raulk): lookup timeout.*
-
 1. If we have collected `Q` or more answers, we cancel outstanding requests,
    return `best`, and we notify the peers holding an outdated value (`Po`) of
-   the best value we discovered, by sending `PUT_VALUE(K, best)` messages.
+   the best value we discovered, by sending `PUT_VALUE(Key, best)` messages.
    _Return._
 2. Pick as many peers from the candidate peers (`Pn`) as the `α` concurrency
-   factor allows. Send each a `GET_VALUE(K)` request, and mark it as _queried_
+   factor allows. Send each a `GET_VALUE(Key)` request, and mark it as _queried_
    in `Pq`.
 3. Upon a response:
 	1. If successful, and we receive a value:
@@ -172,7 +179,7 @@ are closest to `K`, based on the XOR distance function.
                becomes the new best peer (`Pb`).
 			2. If the new value loses, we add the current peer to `Po`.
 	2. If successful without a value, the response will contain the closest
-       nodes the peer knows to the key `K`. Add them to the candidate list `Pn`,
+       nodes the peer knows to the key `Key`. Add them to the candidate list `Pn`,
        except for those that have already been queried.
 	3. If an error or timeout occurs, discard it.
 4. Go to 1.
@@ -253,7 +260,39 @@ periodically, e.g. every hour.
 
 ## Node lookups
 
-_WIP (raulk)._
+The below is one possible algorithm to lookup a node closest to a given key on
+the DHT. Implementations may diverge from this base algorithm as long as they
+continue to adhere to the wire format.
+
+Let's assume we’re looking for nodes closest to key `Key`. We then enter an
+iterative network search.
+
+We keep track of:
+
+* the set of peers we've already queried (`Pq`) and the set of next query
+  candidates sorted by distance from `Key` in ascending order (`Pn`).
+
+**Initialization**: seed `Pn` with the `α` peers from our routing table we know
+are closest to `Key`, based on the XOR distance function.
+
+**Then we loop:**
+
+1. > The lookup terminates when the initiator has queried and gotten responses
+   from the k (see [#replication-parameter-k]) closest nodes it has seen.
+
+   (See Kademlia paper [0].)
+
+   The lookup might terminate early in case the local node queried all known
+   nodes, with the number of nodes being smaller than `k`.
+2. Pick as many peers from the candidate peers (`Pn`) as the `α` concurrency
+   factor allows. Send each a `FIND_NODE(Key)` request, and mark it as _queried_
+   in `Pq`.
+3. Upon a response:
+	2. If successful the response will contain the `k` closest nodes the peer
+       knows to the key `Key`. Add them to the candidate list `Pn`, except for
+       those that have already been queried.
+	3. If an error or timeout occurs, discard it.
+4. Go to 1.
 
 ## Bootstrap process
 
