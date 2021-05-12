@@ -20,7 +20,7 @@ and spec status.
 
 This document describes the process of **establishing direct connections between
 two libp2p peers in which one or both are behind firewalls and/or NATs**. The
-document derives many concepts from the _Interactive Connectivity Establishment
+document derives many concepts from the _Interactive Connectivity Establishment_
 (ICE) standard. The most notable deviation from ICE is the goal of hole punching
 in a decentralized fashion.
 
@@ -190,8 +190,9 @@ stack, thus not allowing _insecure_ connections.
   relay servers, B can advertise its relayed addresses (e.g.
   `/ip4/.../tcp/.../p2p/QmRelay`) via some external mechanism.
 
-  Note: Given that browser platforms do not allow insecure connections, the
-  relay server needs to listen on TLS secured Websockets.
+  Note: Given that browser platforms do not allow insecure connections
+  to non-localhost addresses, the relay server needs to listen on
+  TLS secured Websockets (`/ip4/.../tcp/.../wss/p2p/QmRelay`).  
 
 - A discovers the relayed address of B through some external mechanism. Given
   B's relayed address A can establish a Websocket connection to the relay server
@@ -229,9 +230,9 @@ stack, thus not allowing _insecure_ connections.
   for incoming connection requests via the [circuit relay v2
   protocol][circuit-relay-v2]. Once B established a reservation at one or more
   relay servers, B can advertise its relayed addresses (e.g.
-  `/ip4/.../tcp/.../p2p/QmRelay`) via some external mechanism.
+  `/ip4/.../tcp/.../wss/p2p/QmRelay`) via some external mechanism.
 
-- A discovers the relayed address of B through some external mechanism. Given
+- A discovers the relayed `/wss/` address of B through some external mechanism. Given
   B's relayed address A can establish a Websocket connection to the relay server
   of B. With the help of the [circuit relay v2 protocol][circuit-relay-v2]
   protocol A and B can exchange [SDP] messages eventually allowing A B and to
