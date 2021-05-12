@@ -49,6 +49,11 @@ can only be dialed through a relay protocol, or through some means of hole
 punching. The document refers to publicly reachable hosts as _public_ and
 non-publicly reachable hosts as _private_.
 
+Note: (For now) this document ignores the case where two hosts are not publicly
+reachable, but operate within the same local layer 2 or layer 3 network.
+Oftentimes in such cases direct connections between the two hosts can be
+established without prior hole punching.
+
 ### Platforms
 
 We differentiate two types of platforms: _browser_ and _non-browser_.
