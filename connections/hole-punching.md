@@ -7,9 +7,14 @@
 
 Authors: [@mxinden]
 
-Interest Group:
+Interest Group: [@vyzo], [@vasco], [@stebalien], [@aarsh], [@raulk]
 
+[@aarsh]: https://github.com/aarsh
 [@mxinden]: https://github.com/mxinden
+[@raulk]: https://github.com/raulk
+[@stebalien]: https://github.com/stebalien
+[@vasco]: https://github.com/vasco
+[@vyzo]: https://github.com/vyzo
 
 See the [lifecycle document][lifecycle-spec] for context about maturity level
 and spec status.
