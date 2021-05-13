@@ -60,11 +60,11 @@ We differentiate two types of platforms: _browser_ and _non-browser_.
 
 On _non-browser_ platforms a libp2p implementation has extensive control over
 the (TCP or UDP) network socket, e.g. controlling port-reuse. The libp2p
-implementation controls the full transport security stack. Further more, unless
+implementation controls the full transport security stack. Furthermore, unless
 run behind a Firewall or NAT, _non-browser_ platform hosts can be directly
 dialed through their publicly reachable addresses.
 
-On the contrary, _browser_ platforms a libp2p implementation does not manage the
+On the contrary, on _browser_ platforms a libp2p implementation does not manage the
 network socket nor does it control the transport security stack. In addition to
 these restrictions, hosts running on _browser_ platforms can not be directly
 dialed.
@@ -112,7 +112,7 @@ A discovery mechanism allows a node to discover peers in the network. A node can
 use such mechanism e.g. to find peers at random, to learn external addresses of
 peers, or more targeted to discover peers that provide a specific service. Among
 others one can build a discovery mechanism on top of the libp2p [Kademlia] and
-[Gossipsub] protocol. The [IPFS's usage of a Kademlia DHT][ipfs-kademlia] is a
+[Gossipsub] protocol. [IPFS's usage of a Kademlia DHT][ipfs-kademlia] is a
 good example of a discovery mechanism.
 
 Further details on discovery mechanisms are out of scope for this document. The
