@@ -399,8 +399,10 @@ These are the requirements for each `MessageType`:
   `key` is a valid CID, all `providerPeers` that match the RPC sender's PeerID
   are recorded as providers.
 
-* `PING`: Target node responds with `PING`. Nodes should respond to this message
-  but it is currently never sent.
+* `PING`: Deprecated message type replaced by the dedicated [ping
+  protocol][ping]. Implementations may still handle incoming `PING` requests for
+  backwards compatibility. Implementations must not actively send `PING`
+  requests.
 
 Note: Any time a relevant `Peer` record is encountered, the associated
 multiaddrs are stored in the node's peerbook.
@@ -418,3 +420,5 @@ multiaddrs are stored in the node's peerbook.
 [bittorrent]: http://bittorrent.org/beps/bep_0005.html
 
 [uvarint-spec]: https://github.com/multiformats/unsigned-varint
+
+[ping]: https://github.com/libp2p/specs/issues/183
