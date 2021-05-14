@@ -51,10 +51,6 @@ following the design outlined in the Kademlia paper [0]. The bucket size is
 equal to the replication paramter `k`, and the maximum bucket count matches the
 size of the SHA256 function, i.e. 256 buckets.
 
-The routing table is unfolded lazily, starting with a single bucket at position
-0 (representing the most distant peers), and splitting it subsequently as closer
-peers are found, and the capacity of the nearmost bucket is exceeded.
-
 ### Alpha concurrency parameter (`α`)
 
 The concurrency of node and value lookups are limited by parameter `α`, with a
