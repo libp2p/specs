@@ -5,6 +5,7 @@
 | 3A              | Recommendation | Active | r0, 2021-05-07  |
 
 Authors: [@raulk], [@jhiesey], [@mxinden]
+
 Interest Group:
 
 [@raulk]: https://github.com/raulk
@@ -305,12 +306,14 @@ message Record {
 	bytes value = 2;
 
 	// Note: These fields were removed from the Record message
-	// hash of the authors public key
-	//optional string author = 3;
+    //
+	// Hash of the authors public key
+	// optional string author = 3;
 	// A PKI signature for the key+value+author
-	//optional bytes signature = 4;
+	// optional bytes signature = 4;
 
 	// Time the record was received, set by receiver
+    // Formatted according to https://datatracker.ietf.org/doc/html/rfc3339
 	string timeReceived = 5;
 };
 
