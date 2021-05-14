@@ -288,6 +288,14 @@ Remote procedure calls are performed by:
 
 On any error, the stream is reset.
 
+Implementations may choose to re-use streams by sending one or more RPC request
+messages on a single outgoing stream before closing it. Implementations must
+handle additional RPC request messages on an incoming stream.
+
+All RPC messages sent over a stream are prefixed with the message length in
+bytes, encoded as an unsigned variable length integer as defined by the
+[multiformats unsigned-varint spec][uvarint-spec].
+
 All RPC messages conform to the following protobuf:
 
 ```protobuf
@@ -421,3 +429,5 @@ The `addProvider` handler behaves differently across implementations:
 [3]: [bep_0005.rst_post](http://bittorrent.org/beps/bep_0005.html)
 
 [5]: [GitHub - multiformats/multihash: Self describing hashes - for future proofing](https://github.com/multiformats/multihash)
+
+[uvarint-spec]: https://github.com/multiformats/unsigned-varint
