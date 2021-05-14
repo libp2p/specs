@@ -89,15 +89,13 @@ continue to adhere to the wire format.
 Let's assume we’re looking for nodes closest to key `Key`. We then enter an
 iterative network search.
 
-We keep track of:
+We keep track of the set of peers we've already queried (`Pq`) and the set of
+next query candidates sorted by distance from `Key` in ascending order (`Pn`).
+At initialization `Pn` is seeded with the `α` peers from our routing table we
+know are closest to `Key`, based on the XOR distance function (see [distance
+definition](#distance)).
 
-* the set of peers we've already queried (`Pq`) and the set of next query
-  candidates sorted by distance from `Key` in ascending order (`Pn`).
-
-**Initialization**: seed `Pn` with the `α` peers from our routing table we know
-are closest to `Key`, based on the XOR distance function.
-
-**Then we loop:**
+Then we loop:
 
 1. > The lookup terminates when the initiator has queried and gotten responses
    from the k (see [#replication-parameter-k]) closest nodes it has seen.
@@ -110,10 +108,10 @@ are closest to `Key`, based on the XOR distance function.
    factor allows. Send each a `FIND_NODE(Key)` request, and mark it as _queried_
    in `Pq`.
 3. Upon a response:
-	2. If successful the response will contain the `k` closest nodes the peer
+	1. If successful the response will contain the `k` closest nodes the peer
        knows to the key `Key`. Add them to the candidate list `Pn`, except for
        those that have already been queried.
-	3. If an error or timeout occurs, discard it.
+	2. If an error or timeout occurs, discard it.
 4. Go to 1.
 
 ### Value routing
@@ -138,9 +136,9 @@ The record is rejected if the validation fails.
 
 #### Putting values
 
-To _put_ a value the DHT finds the `k` closest peers to the key of the value
-using the `FIND_NODE` RPC (see [peer routing section](#peer-routing)), and then sends
-a `PUT_VALUE` RPC message with the record value to each of the `k` peers.
+To _put_ a value the DHT finds `k` or less closest peers to the key of the value
+using the `FIND_NODE` RPC (see [peer routing section](#peer-routing)), and then
+sends a `PUT_VALUE` RPC message with the record value to each of the peers.
 
 #### Getting values
 
@@ -148,10 +146,11 @@ When _gettting_ a value in the DHT, the implementor should collect at least `Q`
 (quorum) responses from distinct nodes to check for consistency before returning
 an answer.
 
-Should the responses be different, the implementation should use some validation
-mechanism to resolve the conflict and select the _best_ result.
+Entry validation: Should the responses from different peers diverge, the
+implementation should use some validation mechanism to resolve the conflict and
+select the _best_ result (see [entry validation section](#entry-validation)).
 
-**Entry correction.** Nodes that returned _worse_ records are updated via a
+Entry correction: Nodes that returned _worse_ records are updated via a
 direct `PUT_VALUE` RPC call when the lookup completes. Thus the DHT network
 eventually converges to the best value for each record, as a result of nodes
 collaborating with one another.
@@ -174,10 +173,10 @@ We keep track of:
   candidates sorted by distance from `Key` in ascending order (`Pn`).
 * the set of peers with outdated values (`Po`).
 
-**Initialization**: seed `Pn` with the `α` peers from our routing table we know
+At initialization we seed `Pn` with the `α` peers from our routing table we know
 are closest to `Key`, based on the XOR distance function.
 
-**Then we loop:**
+Then we loop:
 
 1. If we have collected `Q` or more answers, we cancel outstanding requests,
    return `best`, and we notify the peers holding an outdated value (`Po`) of
@@ -243,13 +242,13 @@ These records are managed through the `ADD_PROVIDER` and `GET_PROVIDERS`
 messages.
 
 When the local node wants to indicate that it provides the value for a given
-key, the DHT finds the closest peers to `key` using the `FIND_NODE` RPC (see
-[peer routing section](#peer-routing)), and then sends a `ADD_PROVIDER` RPC with
+key, the DHT finds the closest peers to the key using the `FIND_NODE` RPC (see
+[peer routing section](#peer-routing)), and then sends an `ADD_PROVIDER` RPC with
 its own `PeerInfo` to each of these peers.
 
 Each peer that receives the `ADD_PROVIDER` RPC should validate that the
 received `PeerInfo` matches the sender's `peerID`, and if it does, that peer
-must store a record in its datastore the received `PeerInfo` record.
+must store the `PeerInfo` in its datastore.
 
 _Getting_ the providers for a given key is done in the same way as _getting_ a
 value for a given key (see [getting values section](#getting-values)) expect
