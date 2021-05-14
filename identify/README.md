@@ -120,3 +120,9 @@ observable source address.
 ### protocols
 
 This is a list of protocols supported by the peer.
+
+Note on asymmetrical protocols: Assume an asymmetrical request-response style
+protocol `foo` where some clients only support initiating requests while some
+servers (only) support responding to requests. To prevent clients from
+initiating requests to other clients, which given them being clients they fail
+to respond, clients should not list `foo` in their `protocols` list.
