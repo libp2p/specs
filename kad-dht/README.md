@@ -22,7 +22,7 @@ and spec status.
 
 The Kademlia Distributed Hash Table (DHT) subsystem in libp2p is a DHT
 implementation largely based on the Kademlia [0] whitepaper, augmented with
-notions from S/Kademlia [1], Coral [2] and mainlineDHT \[3\].
+notions from S/Kademlia [1], Coral [2] and the [BitTorrent DHT][bittorrent].
 
 This specification assumes the reader has prior knowledge of those systems. So
 rather than explaining DHT mechanics from scratch, we focus on differential
@@ -425,8 +425,6 @@ The `addProvider` handler behaves differently across implementations:
 
 [2]: Freedman, M. J., & Mazières, D. (2003). Sloppy Hashing and Self-Organizing Clusters. In IPTPS. Springer Berlin / Heidelberg. Retrieved from www.coralcdn.org/docs/coral-iptps03.ps
 
-[3]: [bep_0005.rst_post](http://bittorrent.org/beps/bep_0005.html)
-
-[5]: [GitHub - multiformats/multihash: Self describing hashes - for future proofing](https://github.com/multiformats/multihash)
+[bittorrent]: http://bittorrent.org/beps/bep_0005.html
 
 [uvarint-spec]: https://github.com/multiformats/unsigned-varint
