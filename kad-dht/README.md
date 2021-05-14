@@ -196,9 +196,9 @@ are closest to `Key`, based on the XOR distance function.
                “best" peers (`Pb`) as _outdated peers_ (`Po`). The current peer
                becomes the new best peer (`Pb`).
 			2. If the new value loses, we add the current peer to `Po`.
-	2. If successful without a value, the response will contain the closest
-       nodes the peer knows to the key `Key`. Add them to the candidate list `Pn`,
-       except for those that have already been queried.
+	2. If successful with or without a value, the response will contain the
+       closest nodes the peer knows to the key `Key`. Add them to the candidate
+       list `Pn`, except for those that have already been queried.
 	3. If an error or timeout occurs, discard it.
 4. Go to 1.
 
