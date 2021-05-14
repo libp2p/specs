@@ -178,10 +178,11 @@ are closest to `Key`, based on the XOR distance function.
 
 Then we loop:
 
-1. If we have collected `Q` or more answers, we cancel outstanding requests,
-   return `best`, and we notify the peers holding an outdated value (`Po`) of
-   the best value we discovered, by sending `PUT_VALUE(Key, best)` messages.
-   _Return._
+1. If we have collected `Q` or more answers, we cancel outstanding requests and
+   return `best`. If there are no outstanding requests and `Pn` is empty we
+   terminate early and return `best`. In either case we notify the peers holding
+   an outdated value (`Po`) of the best value we discovered, by sending
+   `PUT_VALUE(Key, best)` messages.
 2. Pick as many peers from the candidate peers (`Pn`) as the `α` concurrency
    factor allows. Send each a `GET_VALUE(Key)` request, and mark it as _queried_
    in `Pq`.
