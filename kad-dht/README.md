@@ -267,7 +267,7 @@ healthy throughout time. It runs once on startup, then periodically with a
 configurable frequency (default: 5 minutes).
 
 On every run, we generate a random peer ID and we look it up via the process
-defined in [*Node lookups*](#node-lookups). Peers encountered throughout the
+defined in [peer routing](#peer-routing). Peers encountered throughout the
 search are inserted in the routing table, as per usual business.
 
 This process is repeated as many times per run as configuration parameter
