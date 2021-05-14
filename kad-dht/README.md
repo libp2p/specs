@@ -408,13 +408,6 @@ These are the requirements for each `MessageType`:
 Note: Any time a relevant `Peer` record is encountered, the associated
 multiaddrs are stored in the node's peerbook.
 
-## Appendix A: differences in implementations
-
-The `addProvider` handler behaves differently across implementations:
-  * in js-libp2p-kad-dht, the sender is added as a provider unconditionally.
-  * in go-libp2p-kad-dht, it is added once per instance of that peer in the
-    `providerPeers` array.
-
 ---
 
 ## References
