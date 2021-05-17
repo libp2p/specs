@@ -149,7 +149,8 @@ multiple restrictions are imposed by the browser platform type of A:
   have a valid TLS certificate to offer secure Websocket communication.
 
 In cases where B does not fulfill both of these requirements, additional steps
-as detailed in [#private-browser-a-to-private-non-browser-b] are necessary.
+as detailed in [Private Browser (A) to Private Non-Browser
+(B)][#private-browser-a-to-private-non-browser-b] are necessary.
 
 ### Public or Private Non-Browser (A) to Private Non-Browser (B)
 
