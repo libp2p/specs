@@ -150,7 +150,7 @@ multiple restrictions are imposed by the browser platform type of A:
 
 In cases where B does not fulfill both of these requirements, additional steps
 as detailed in [Private Browser (A) to Private Non-Browser
-(B)][#private-browser-a-to-private-non-browser-b] are necessary.
+(B)](#private-browser-a-to-private-non-browser-b) are necessary.
 
 ### Public or Private Non-Browser (A) to Private Non-Browser (B)
 
