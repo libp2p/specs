@@ -97,7 +97,8 @@ v2][circuit-relay-v2].
 STUN-like protocols allow a host to detect whether they are running behind a
 firewall and/or NAT and if so they enable a host to discover their perceived
 public IP addresses as well as their port mapping. Examples of STUN-like
-protocols are [STUN] (hence the name) and [AutoNAT].
+protocols are [STUN] (hence the name) and [AutoNAT] in combination with
+[Identify].
 
 #### Coordination
 
@@ -159,8 +160,9 @@ means of firewall / NAT hole punching. Given the permissiveness of non-browser
 platforms there are many ways to achieve this goal, with the below being one of
 them.
 
-- B uses the [AutoNat] protocol to determine whether it is running behind
-  firewalls and/or NATs and in the latter case what type of NATs.
+- B uses the observed addresses from the [Identify] protocol in combination with
+  the [AutoNAT] protocol to determine whether it is running behind firewalls
+  and/or NATs and in the latter case what type of NATs.
   
   Note: Hole punching fails if either A or B runs behind a [symmetric
   NAT][symmetric-nat].
@@ -274,6 +276,7 @@ stack, thus not allowing _insecure_ connections.
 [TURN]: https://en.wikipedia.org/wiki/Traversal_Using_Relays_around_NAT
 [STUN]: https://en.wikipedia.org/wiki/STUN
 [AutoNAT]: https://github.com/libp2p/specs/issues/180
+[Identify]: ../identify/README.md
 [SDP]: https://en.wikipedia.org/wiki/Session_Description_Protocol
 [circuit-relay-v1]: https://github.com/libp2p/specs/tree/master/relay
 [circuit-relay-v2]: https://github.com/libp2p/specs/issues/314
