@@ -37,7 +37,8 @@ This is the specification of v2 of the p2p-circuit relay protocol.
 
 Compared to the first version of the protocol, there are some significant departures:
 - The protocol has been split into two subprotocols, `hop` and `stop`
-  - The `hop` protocol governs the behaviour of relays; it is used for
+  - The `hop` protocol is client-initiated, and is used when clients send commands
+    to relays; it is used for
     reserving resources in the relay and opening a switched connection
     to a peer through the relay.
   - The `stop` protocol governs the termination of circuit switched
