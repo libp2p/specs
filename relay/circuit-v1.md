@@ -270,7 +270,7 @@ fund NewCircuitRelay(h p2phost.Host)
 
 ### Removing existing relay protocol in Go
 
-Note that there is an existing swarm protocol colloqiually called relay. It lives in the go-libp2p package and is named `/ipfs/relay/line/0.1.0`.
+Note that there is an existing swarm protocol colloquially called relay. It lives in the go-libp2p package and is named `/ipfs/relay/line/0.1.0`.
 
 - Introduced in ipfs/go-ipfs#478 (28-Dec-2014).
 - No changes except for ipfs/go-ipfs@de50b2156299829c000b8d2df493b4c46e3f24e9.
