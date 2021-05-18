@@ -122,7 +122,7 @@ Specify a relay:
 - `/ip4/../tcp/../p2p/QmRelay/p2p-circuit/p2p/QmTwo`
   - Dial QmTwo, through QmRelay.
   - Includes info for connecting to QmRelay.
-  - The relay node will use peer routing to find an address for QmTwo.
+  - The relay node will use peer routing to find an address for QmTwo, if not already connected.
 
 Double relay:
 
