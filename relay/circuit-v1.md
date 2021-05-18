@@ -48,7 +48,7 @@ Apart from that, this relayed connection behaves just like a regular connection 
 
 Relayed connections are end-to-end encrypted just like regular connections.
 
-The circuit relay is both a tunneled transport and a mounted swarm protocol. The transport is the means of ***establishing*** and ***accepting*** connections, and the swarm protocol is the means to ***relaying*** connections.
+The circuit relay consists of both a (tunneled) libp2p transport and a libp2p protocol, mounted on the host. The libp2p transport is the means of ***establishing*** and ***accepting*** connections, and the libp2p protocol is the means to ***relaying*** connections.
 
 ```
 +-----+    /ip4/.../tcp/.../ws/p2p/QmRelay    +-------+    /ip4/.../tcp/.../p2p/QmTwo       +-----+
