@@ -151,7 +151,7 @@ has obtained a circuit multiaddr for _A_ of the form
 `/p2p/QmR/p2p-circuit/p2p/QmA` out of band using some peer discovery
 service (eg. the DHT or a rendezvous point).
 
-In order to connect to _A_, _B_ then conncts to _R_, opens a `hop`
+In order to connect to _A_, _B_ then connects to _R_, opens a `hop`
 protocol stream and sends a `CONNECT` message to the relay.  The relay
 verifies that it has a reservation and connection for _A_ and opens a
 `stop` protocol stream to _A_, sending a `CONNECT` message.
