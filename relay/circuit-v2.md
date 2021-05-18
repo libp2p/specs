@@ -141,7 +141,9 @@ The first part of the interaction is _A_'s reservation of a relay slot
 in _R_.  This is accomplished by opening a connection to _R_ and
 sending a `RESERVE` message in the `hop` protocol; if the reservation
 is successful, the relay responds with a `STATUS:OK` message and
-provides _A_ with a reservation voucher. _A_ keeps the connection to _R_ alive for the duration of the reservation, refreshing the reservation as needed.
+provides _A_ with a reservation voucher. _A_ keeps the connection to 
+_R_ alive for the duration of the reservation, refreshing the
+reservation as needed.
 
 The second part of the interaction is the establishment of a circuit
 switch connection from _B_ to _A_ through _R_.  It is assumed that _B_
