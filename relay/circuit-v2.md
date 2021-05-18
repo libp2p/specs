@@ -337,7 +337,7 @@ message Voucher {
 - the `peer` field is the peer ID of the reserving peer.
 - the `expiration` field is the UNIX UTC expiration time for the reservation.
 
-The wire representation is cononicalized, where elements of the message are written in field id order.
+The wire representation is canonicalized, where elements of the message are written in field id order, with no unknown fields.
 
 
 ## Protobuf
