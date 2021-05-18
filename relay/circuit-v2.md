@@ -237,7 +237,7 @@ Reservation {
 ```
 where the `status` field has a value other than `OK`. Common rejection status codes are:
 - `PERMISSION_DENIED` if the reservation is rejected because of peer filtering using ACLs.
-- `RESERVATION_REFUSED` if the reservation is rejected for some other reason, eg because there are too
+- `RESERVATION_REFUSED` if the reservation is rejected for some other reason, e.g. because there are too
   many reservations.
 
 #### Connection Initiation
