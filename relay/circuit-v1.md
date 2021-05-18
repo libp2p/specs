@@ -90,7 +90,7 @@ Scene 2:
 
 As with all other multiaddrs, encapsulation of different protocols determines which metaphorical tubes to connect to each other.
 
-A `/p2p-circuit` circuit address, is formated following:
+A `/p2p-circuit` circuit address, is formatted as following:
 
 `[<relay peer multiaddr>]/p2p-circuit/<destination peer multiaddr>`
 
