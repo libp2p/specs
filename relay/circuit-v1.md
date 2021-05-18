@@ -40,7 +40,7 @@ and spec status.
 
 The circuit relay is a means to establish connectivity between libp2p nodes (e.g. IPFS nodes) that wouldn't otherwise be able to establish a direct connection to each other.
 
-Relay is needed in situations where nodes are behind NAT, reverse proxies, firewalls and/or simply don't support the same transports (e.g. go-ipfs vs. browser-ipfs). Even though libp2p has modules for NAT traversal ([go-libp2p-nat](https://github.com/libp2p/go-libp2p-nat)), piercing through NATs isn't always an option. The circuit relay protocol exists to overcome those scenarios.
+Relay is needed in situations where nodes are behind NAT, reverse proxies, firewalls and/or simply don't support the same transports (e.g. go-ipfs vs. browser-ipfs). Even though libp2p has modules for NAT port mapping ([go-libp2p-nat](https://github.com/libp2p/go-libp2p-nat)), this isn't always an option, nor does it always work (e.g. non-residential routers, hotspots, etc.). The circuit relay protocol exists to overcome those scenarios.
 
 Unlike a transparent **tunnel**, where a libp2p peer would just proxy a communication stream to a destination (the destination being unaware of the original source), a circuit relay makes the destination aware of the original source and the circuit followed to establish communication between the two. This provides the destination side with full knowledge of the circuit which, if needed, could be rebuilt in the opposite direction. As a word of caution, dialing a peer back on its source addr:port usually won't work. However, most libp2p implementations (e.g. go-libp2p) enable `SO_REUSEPORT` and `SO_REUSEADDR`, and use the listening address as the local address when dialing, to facilitate this connection reversability.
 
