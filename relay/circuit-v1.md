@@ -129,7 +129,7 @@ Double relay:
 - `/p2p-circuit/p2p/QmTwo/p2p-circuit/p2p/QmThree`
   - Dial QmThree, through a relayed connection to QmTwo.
   - The relay nodes will use peer routing to find an address for QmTwo and QmThree.
-  - We'll **not support nested relayed connections for now**, see [Future Work](#future-work) section.
+  - go-libp2p (reference implementation) **does not support nested relayed connections for now**, see [Future Work](#future-work) section.
 
 ## Wire format
 
