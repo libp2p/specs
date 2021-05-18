@@ -246,7 +246,7 @@ This is a table of status codes and sample messages that may occur during a rela
 
 As explained above, the relay is both a transport (`tpt.Transport`) and a mounted stream protocol (`p2pnet.StreamHandler`). In addition it provides a means of specifying relay nodes to listen/dial through.
 
-Note: the usage of p2pnet.StreamHandler is a little bit off, but it gets the point across.
+Note: the usage of `p2pnet.StreamHandler` is a little bit off herein, but it gets the point across.
 
 ```go
 import (
