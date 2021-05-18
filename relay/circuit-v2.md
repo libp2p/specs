@@ -269,7 +269,7 @@ HopMessage {
   limit = Limit {...}
 }
 ```
-at this point the original `hop` stream becomes the relayed connection.
+At this point the original `hop` stream becomes the relayed connection.
 The `limit` field, if present, communicates to the initiator the
 limits applied to the relayed connection with the semantics described
 [above](#reservation).
