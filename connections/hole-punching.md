@@ -190,7 +190,7 @@ For more details see the [Project Flare][project-flare] project proposal.
 
 As mentioned above browser platforms (1) do not allow libp2p implementations to
 manage the network sockets nor (2) do they allow managing the transport security
-stack, thus not allowing _insecure_ connections.
+stack, thus not allowing _insecure_ connections from [secure contexts].
 
 - Both A and B discover [STUN] servers through some external mechanism. Given
   that two hosts do not need to share the same [STUN] server to establish a
@@ -286,3 +286,4 @@ stack, thus not allowing _insecure_ connections.
 [ipfs-kademlia]: https://docs.ipfs.io/concepts/dht/
 [Kademlia]: https://github.com/libp2p/specs/pull/108/
 [Gossipsub]: ../pubsub/gossipsub/README.md
+[secure contexts]: https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts
