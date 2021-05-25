@@ -121,8 +121,10 @@ observable source address.
 
 This is a list of protocols supported by the peer.
 
-Note on asymmetrical protocols: Assume an asymmetrical request-response style
-protocol `foo` where some clients only support initiating requests while some
-servers (only) support responding to requests. To prevent clients from
-initiating requests to other clients, which given them being clients they fail
-to respond, clients should not list `foo` in their `protocols` list.
+A node should only advertise a protocol if it's willing to receive inbound
+streams on that protocol. This is relevant for asymmetrical protocols. For
+example assume an asymmetrical request-response style protocol `foo` where some
+clients only support initiating requests while some servers (only) support
+responding to requests. To prevent clients from initiating requests to other
+clients, which given them being clients they fail to respond, clients should not
+advertise `foo` in their `protocols` list.
