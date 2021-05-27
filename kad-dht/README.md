@@ -249,7 +249,7 @@ received `PeerInfo` matches the sender's `peerID`, and if it does, that peer
 must store the `PeerInfo` in its datastore.
 
 _Getting_ the providers for a given key is done in the same way as _getting_ a
-value for a given key (see [getting values section](#getting-values)) expect
+value for a given key (see [getting values section](#getting-values)) except
 that instead of using the `GET_VALUE` RPC message the `GET_PROVIDERS` RPC
 message is used.
 
