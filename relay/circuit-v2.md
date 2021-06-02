@@ -134,7 +134,7 @@ R -> B: [hop] STATUS:OK
 B <-> A: Connection
 @enduml
 ```
-  
+
 </details>
 
 
@@ -142,7 +142,7 @@ The first part of the interaction is _A_'s reservation of a relay slot
 in _R_.  This is accomplished by opening a connection to _R_ and
 sending a `RESERVE` message in the `hop` protocol; if the reservation
 is successful, the relay responds with a `STATUS:OK` message and
-provides _A_ with a reservation voucher. _A_ keeps the connection to 
+provides _A_ with a reservation voucher. _A_ keeps the connection to
 _R_ alive for the duration of the reservation, refreshing the
 reservation as needed.
 
@@ -240,6 +240,8 @@ where the `status` field has a value other than `OK`. Common rejection status co
 - `RESERVATION_REFUSED` if the reservation is rejected for some other reason, e.g. because there are too
   many reservations.
 
+***Note: implementations _should not_ accept reservations over already relayed connections***
+
 #### Connection Initiation
 
 In order to initiate a connection to a peer through a relay, the initiator opens a connection and sends a `HopMessage` of `type = CONNECT`:
@@ -281,6 +283,7 @@ Common failure status codes are:
 - `RESOURCE_LIMIT_EXCEEDED` if there are two many relayed connections from the initiator or to the target peer.
 - `CONNECTION_FAILED` if the relay failed to terminate the connection to the target peer.
 
+***Note: implementations _should not_ accept connection initiations over already relayed connections***
 
 ### Stop Protocol
 
