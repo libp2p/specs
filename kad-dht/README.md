@@ -107,7 +107,7 @@ iterative network search.
 
 We keep track of the set of peers we've already queried (`Pq`) and the set of
 next query candidates sorted by distance from `Key` in ascending order (`Pn`).
-At initialization `Pn` is seeded with the `α` peers from our routing table we
+At initialization `Pn` is seeded with the `k` peers from our routing table we
 know are closest to `Key`, based on the XOR distance function (see [distance
 definition](#distance)).
 
