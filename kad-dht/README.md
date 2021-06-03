@@ -45,23 +45,28 @@ Code snippets use a Go-like syntax.
 The amount of replication is governed by the replication parameter `k`. The
 default value for `k` is 20.
 
+### Distance
+
+In all cases, the distance between two keys is `XOR(sha256(key1),
+sha256(key2))`.
+
 ### Kademlia routing table
 
-The data structure backing this system is a k-bucket routing table, closely
-following the design outlined in the Kademlia paper [0]. The bucket size is
-equal to the replication paramter `k`, and the maximum bucket count matches the
-size of the SHA256 function, i.e. 256 buckets.
+An implementation of this specification must try to maintain `k` peers with
+shared key prefix of length `L`, for every `L` in `[0..(keyspace-length - 1)]`,
+in its routing table. Given the keyspace length of 256 through the sha256 hash
+function, `L` can take values between 0 (inclusive) and 255 (inclusive). The
+local node shares a prefix length of 256 with its own key only.
+
+Implementations may use any data structure to maintain their routing table.
+Examples are the k-bucket data structure outlined in the Kademlia paper [0] or
+XOR-tries (see [go-libp2p-xor]).
 
 ### Alpha concurrency parameter (`α`)
 
 The concurrency of node and value lookups are limited by parameter `α`, with a
 default value of 3. This implies that each lookup process can perform no more
 than 3 inflight requests, at any given time.
-
-### Distance
-
-In all cases, the distance between two keys is `XOR(sha256(key1),
-sha256(key2))`.
 
 ## DHT operations
 
@@ -425,3 +430,5 @@ multiaddrs are stored in the node's peerbook.
 [uvarint-spec]: https://github.com/multiformats/unsigned-varint
 
 [ping]: https://github.com/libp2p/specs/issues/183
+
+[go-libp2p-xor]: https://github.com/libp2p/go-libp2p-xor
