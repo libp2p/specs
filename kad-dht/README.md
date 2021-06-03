@@ -70,15 +70,29 @@ than 3 inflight requests, at any given time.
 
 ## DHT operations
 
-The libp2p Kademlia DHT offers the following types of routing operations:
+The libp2p Kademlia DHT offers the following types of operations:
 
-- **Peer routing** - _Finding_ the closest nodes to a given key (`FIND_NODE`).
-- **Value routing** - _Putting_ a value to the nodes closest to the value's key
-  (`PUT_VALUE`) and _getting_ a value by its key from the nodes closest to that
-  key (`GET_VALUE`).
-- **Content routing** - _Adding_ oneself to the list of providers for a given
-  key at the nodes closest to that key (`ADD_PROVIDER`) and _getting_ providers
-  for a given key from the nodes closest to that key (`GET_PROVIDERS`).
+- **Peer routing**
+
+  - Finding the closest nodes to a given key via `FIND_NODE`.
+
+- **Value storage and retrieval**
+
+  - Storing a value on the nodes closest to the value's key by looking up the
+    closest nodes via `FIND_NODE` and then putting the value to those nodes via
+    `PUT_VALUE`.
+
+  - Getting a value by its key from the nodes closest to that key via
+    `GET_VALUE`.
+
+- **Content provider advertisement and discovery**
+
+  - Adding oneself to the list of providers for a given key at the nodes closest
+    to that key by finding the closest nodes via `FIND_NODE` and then adding
+    oneself via `ADD_PROVIDER`.
+
+  - Getting providers for a given key from the nodes closest to that key via
+    `GET_PROVIDERS`.
 
 In addition the libp2p Kademlia DHT offers the auxiliary _bootstrap_ operation.
 
@@ -116,7 +130,7 @@ Then we loop:
 	2. If an error or timeout occurs, discard it.
 4. Go to 1.
 
-### Value routing
+### Value storage and retrieval
 
 Value routing can be used both to (1) _put_ and _get_ arbitrary values and (2)
 to _put_ and _get_ the public keys of nodes. Node public keys are stored in
@@ -136,13 +150,13 @@ equality `SHA256(value) == peerID` stands when:
 
 The record is rejected if the validation fails.
 
-#### Putting values
+#### Value storage
 
 To _put_ a value the DHT finds `k` or less closest peers to the key of the value
 using the `FIND_NODE` RPC (see [peer routing section](#peer-routing)), and then
 sends a `PUT_VALUE` RPC message with the record value to each of the peers.
 
-#### Getting values
+#### Value retrieval
 
 When _gettting_ a value in the DHT, the implementor should collect at least `Q`
 (quorum) responses from distinct nodes to check for consistency before returning
@@ -237,12 +251,14 @@ Similarly, `Select()` is a pure function that returns the best record out of 2
 or more candidates. It may use a sequence number, a timestamp, or other
 heuristic of the value to make the decision.
 
-### Content routing
+### Content provider advertisement and discovery
 
 Nodes must keep track of which nodes advertise that they provide a given key
 (CID). These provider advertisements should expire, by default, after 24 hours.
 These records are managed through the `ADD_PROVIDER` and `GET_PROVIDERS`
 messages.
+
+#### Content provider advertisement
 
 When the local node wants to indicate that it provides the value for a given
 key, the DHT finds the closest peers to the key using the `FIND_NODE` RPC (see
@@ -252,6 +268,8 @@ its own `PeerInfo` to each of these peers.
 Each peer that receives the `ADD_PROVIDER` RPC should validate that the
 received `PeerInfo` matches the sender's `peerID`, and if it does, that peer
 must store the `PeerInfo` in its datastore.
+
+#### Content provider discovery
 
 _Getting_ the providers for a given key is done in the same way as _getting_ a
 value for a given key (see [getting values section](#getting-values)) except
