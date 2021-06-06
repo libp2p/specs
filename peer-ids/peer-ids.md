@@ -202,7 +202,7 @@ Specifically, to compute a peer ID of a key:
    followed][multihash] (byte plus varint plus serialized bytes). The idea
    here is that if the serialized byte array is short enough, we can fit it in
    a multihash verbatim without having to condense it using a hash function.
-5. If the length is greater than 42, then hash it using it using the SHA256
+5. If the length is greater than 42, then hash it using the SHA256
    multihash.
 
 ### String representation
