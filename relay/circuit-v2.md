@@ -41,7 +41,7 @@ Compared to the first version of the protocol, there are some significant depart
     to relays; it is used for
     reserving resources in the relay and opening a switched connection
     to a peer through the relay.
-  - The `stop` protocol governs the termination of circuit switched
+  - The `stop` protocol governs the endpoints of circuit switched
     connections.
 - The concept of resource reservation has been introduced, whereby
   peers wishing to use a relay explicitly reserve resources and obtain
