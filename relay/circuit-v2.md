@@ -197,6 +197,19 @@ HopMessage {
 }
 ```
 
+If the reservation is rejected, the relay responds with a `HopMessage` of the form
+```
+Reservation {
+  type = STATUS
+  status = ...
+}
+```
+where the `status` field has a value other than `OK`. Common rejection status codes are:
+- `PERMISSION_DENIED` if the reservation is rejected because of peer filtering using ACLs.
+- `RESERVATION_REFUSED` if the reservation is rejected for some other reason, e.g. because there are too
+  many reservations.
+
+
 The `reservation` field provides information about the reservation itself; the struct has the following fields:
 ```
 Reservation {
@@ -228,17 +241,13 @@ Note that the reservation remains valid until its expiration, as long
 as there is an active connection from the peer to the relay. If the
 peer disconnects, the reservation is no longer valid.
 
-If the reservation is rejected, the relay responds with a `HopMessage` of the form
-```
-Reservation {
-  type = STATUS
-  status = ...
-}
-```
-where the `status` field has a value other than `OK`. Common rejection status codes are:
-- `PERMISSION_DENIED` if the reservation is rejected because of peer filtering using ACLs.
-- `RESERVATION_REFUSED` if the reservation is rejected for some other reason, e.g. because there are too
-  many reservations.
+The server may drop a connection according to its connection
+management policy after all reservations expired.  The expectation is
+that the server will make a best effort attempt to maintain the
+connection for the duration of any reservations and tag it to prevent
+accidental termination according to its connection management policy.
+If a relay server becomes oerloaded however, it may still drop a
+connection with reservations in order to maintain its resource quotas.
 
 ***Note: implementations _should not_ accept reservations over already relayed connections***
 
@@ -314,6 +323,8 @@ StopMessage {
   status = OK
 }
 ```
+
+At this point the original `stop` stream becomes the relayed connection.
 
 If the target fails to terminate the connection for some reason, then it responds to the relay with a `StopMessage` of `type = STATUS` and the `status` code set to something other than `OK`.
 Common failure status codes are:
