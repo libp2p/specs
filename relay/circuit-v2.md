@@ -339,6 +339,8 @@ The intention is to eventually require the use of reservation vouchers for diali
 but this is not currently enforced so the vouchers are only advisory.
 
 The voucher itself is a [Signed Envelope](../RFC/0002-signed-envelopes.md).
+The envelope domain is `libp2p-relay-rsvp` and uses the multicodec code `0x0302`.
+
 The payload of the envelope has the following form, in canonicalized protobuf format:
 ```
 message Voucher {
