@@ -98,9 +98,10 @@ In addition the libp2p Kademlia DHT offers the auxiliary _bootstrap_ operation.
 
 ### Peer routing
 
-The below is one possible algorithm to find nodes closest to a given key on
-the DHT. Implementations may diverge from this base algorithm as long as they
-continue to adhere to the wire format.
+The below is one possible algorithm to find nodes closest to a given key on the
+DHT. Implementations may diverge from this base algorithm as long as they adhere
+to the wire format and make progress towards the target key.
+
 
 Let's assume we’re looking for nodes closest to key `Key`. We then enter an
 iterative network search.
@@ -172,8 +173,8 @@ eventually converges to the best value for each record, as a result of nodes
 collaborating with one another.
 
 The below is one possible algorithm to lookup a value on the DHT.
-Implementations may diverge from this base algorithm as long as they continue to
-adhere to the wire format.
+Implementations may diverge from this base algorithm as long as they adhere to
+the wire format and make progress towards the target key.
 
 Let's assume we’re looking for key `Key`. We first try to fetch the value from the
 local store. If found, and `Q == { 0, 1 }`, the search is complete.
