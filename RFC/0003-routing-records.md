@@ -275,3 +275,4 @@ before interacting with them directly. This could be added as a new field in the
 [autonat]: https://github.com/libp2p/specs/issues/180
 [envelope-rfc]: ./0002-signed-envelopes.md
 [eip-778]: https://eips.ethereum.org/EIPS/eip-778
+[dht-spec]: https://github.com/libp2p/specs/pull/108/
