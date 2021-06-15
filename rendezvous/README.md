@@ -284,7 +284,7 @@ message Message {
   }
   
   message ProofOfWork {
-    repeated bytes hash = 1;
+    optional bytes hash = 1;
     optional int64 nonce = 2;
   }
 
