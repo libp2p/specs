@@ -186,7 +186,46 @@ register under a namespace of interest (eg: the relay namespace). This
 can be mitigated by requiring a Proof of Work scheme for client
 registrations.
 
-This is TBD before finalizing the spec.
+If a rendezvous node decides that Proof of Work is required to complete
+a registration, it will send a response with the status code `E_POW_REQUIRED`
+together with a `challenge`.
+
+A client is then expected to follow up with a `ProofOfWork` message, computing
+a hash by concatenating the following:
+
+- The UTF8 bytes of the string `libp2p-rendezvous-pow`
+- The contents of `challenge`
+- The `ns` field
+- The `signedPeerRecord` field
+- The `PeerId` of the rendezvous point we are registering with
+- The `nonce` field
+
+The resulting byte buffer is hashed using SHA256.
+
+We define "difficulty" as the number of zero bytes at the front of the
+hash assuming a big endian encoding. If a rendezvous point considers
+the difficulty too low, it will decline a `ProofOfWork` message with
+a `RegisterResponse` and the status code set to `E_POW_DIFFICULTY_TOO_LOW` together
+with a new `challenge`.
+
+Once the difficulty requirement is met, a rendezvous point will respond with a
+status code of `OK`.
+
+To vary the difficulty, a client can manipulate the `nonce` field.
+It is purposely unspecified, what the required difficulty for a
+rendezvous point is. This allows rendezvous points to vary the difficulty
+based on current load.
+
+Example:
+
+```
+A -> R: REGISTER{my-app, {QmA, AddrA}}
+R -> A: {E_POW_REQUIRED, challenge: 0xDEADBEEFDEADBEEF}
+A -> R: PROOF_OF_WORK{0x00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, nonce: 3123452}
+R -> A: {E_DIFFICULTY_TOO_LOW, challenge: 0xBEEFDEADBEEFDEAD}
+A -> R: PROOF_OF_WORK{0x000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, nonce: 8572945}
+R -> A: {OK}
+```
 
 ### Protobuf
 
@@ -206,6 +245,8 @@ message Message {
     E_INVALID_SIGNED_PEER_RECORD  = 101;
     E_INVALID_TTL                 = 102;
     E_INVALID_COOKIE              = 103;
+    E_POW_REQUIRED                = 104;
+    E_DIFFICULTY_TOO_LOW          = 105;
     E_NOT_AUTHORIZED              = 200;
     E_INTERNAL_ERROR              = 300;
     E_UNAVAILABLE                 = 400;
@@ -221,6 +262,7 @@ message Message {
     optional ResponseStatus status = 1;
     optional string statusText = 2;
     optional int64 ttl = 3; // in seconds
+    optional bytes challenge = 4;
   }
 
   message Unregister {
@@ -239,6 +281,11 @@ message Message {
     optional bytes cookie = 2;
     optional ResponseStatus status = 3;
     optional string statusText = 4;
+  }
+  
+  message ProofOfWork {
+    repeated bytes hash = 1;
+    optional int64 nonce = 2;
   }
 
   optional MessageType type = 1;
@@ -267,3 +314,8 @@ Rendezvous points are also recommend to allow:
 - a maximum of `1000` registration for each peer
   - defend against trivial DoS attacks
 - a maximum of `1000` peers should be returned per namespace query
+
+Whilst the exact details in regard to PoW difficulty are unspecified, rendezvous
+points are expected to scale the difficulty with the number of registrations for
+an individual peer. For example by setting required difficulty to the active number
+of registrations of a given peer.
