@@ -294,6 +294,7 @@ message Message {
   optional Unregister unregister = 4;
   optional Discover discover = 5;
   optional DiscoverResponse discoverResponse = 6;
+  optional ProofOfWork proofOfWork = 7;
 }
 ```
 
