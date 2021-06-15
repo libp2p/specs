@@ -80,23 +80,31 @@ additional metadata in the future. Some thoughts along these lines are in the
 Here's a protobuf that might work:
 
 ```protobuf
+syntax = "proto3";
 
-// PeerRecord contains the listen addresses for a peer at a particular point in time.
+package peer.pb;
+
+// PeerRecord messages contain information that is useful to share with other peers.
+// Currently, a PeerRecord contains the public listen addresses for a peer, but this
+// is expected to expand to include other information in the future.
+//
+// PeerRecords are designed to be serialized to bytes and placed inside of
+// SignedEnvelopes before sharing with other peers.
 message PeerRecord {
-  // AddressInfo wraps a multiaddr. In the future, it may be extended to
-  // contain additional metadata, such as "routability" (whether an address is
-  // local or global, etc).
+
+  // AddressInfo is a wrapper around a binary multiaddr. It is defined as a
+  // separate message to allow us to add per-address metadata in the future.
   message AddressInfo {
     bytes multiaddr = 1;
   }
 
-  // the peer id of the subject of the record (who these addresses belong to).
+  // peer_id contains a libp2p peer id in its binary representation.
   bytes peer_id = 1;
 
-  // A monotonically increasing sequence number, used for record ordering.
+  // seq contains a monotonically-increasing sequence counter to order PeerRecords in time.
   uint64 seq = 2;
 
-  // All current listen addresses
+  // addresses is a list of public listen addresses for the peer.
   repeated AddressInfo addresses = 3;
 }
 ```
