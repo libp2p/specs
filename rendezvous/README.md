@@ -186,9 +186,12 @@ register under a namespace of interest (eg: the relay namespace). This
 can be mitigated by requiring a Proof of Work scheme for client
 registrations.
 
+We define "difficulty" as the number of zero bytes at the front of the
+hash assuming a big endian encoding.
+
 If a rendezvous node decides that Proof of Work is required to complete
 a registration, it will send a response with the status code `E_POW_REQUIRED`
-together with a `challenge`.
+together with a `challenge` and the `target_difficulty`.
 
 A client is then expected to follow up with a `ProofOfWork` message, computing
 a hash by concatenating the following:
@@ -202,30 +205,36 @@ a hash by concatenating the following:
 
 The resulting byte buffer is hashed using SHA256.
 
-We define "difficulty" as the number of zero bytes at the front of the
-hash assuming a big endian encoding. If a rendezvous point considers
-the difficulty too low, it will decline a `ProofOfWork` message with
-a `RegisterResponse` and the status code set to `E_POW_DIFFICULTY_TOO_LOW` together
-with a new `challenge`.
+If a rendezvous point considers the difficulty too low, it will decline a
+`ProofOfWork` message with a `RegisterResponse` and the status code set to
+`E_POW_DIFFICULTY_TOO_LOW` together with a new `challenge` and the `target_difficulty`.
 
 Once the difficulty requirement is met, a rendezvous point will respond with a
 status code of `OK`.
 
-To vary the difficulty, a client can manipulate the `nonce` field.
-It is purposely unspecified, what the required difficulty for a
-rendezvous point is. This allows rendezvous points to vary the difficulty
-based on current load.
+To compute the PoW, a client picks a `nonce`, hashes the above buffer and checks
+the resulting hash for its difficulty. If the requirement is met, the hash can
+be sent to the server. If the requirement is not met, a new `nonce` needs to be
+picked and the whole process is repeated. How the `nonce` is picked - be it by
+iterating from i64::MIN to i64::MAX or choosing randomly doesn't matter.
 
 Example:
 
 ```
 A -> R: REGISTER{my-app, {QmA, AddrA}}
-R -> A: {E_POW_REQUIRED, challenge: 0xDEADBEEFDEADBEEF}
-A -> R: PROOF_OF_WORK{0x00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, nonce: 3123452}
-R -> A: {E_DIFFICULTY_TOO_LOW, challenge: 0xBEEFDEADBEEFDEAD}
+R -> A: {E_POW_REQUIRED, challenge: 0xDEADBEEFDEADBEEF, target_difficulty: 3}
+A -> R: PROOF_OF_WORK{0x00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, nonce: 3123452} (client ignores `target difficulty`)
+R -> A: {E_DIFFICULTY_TOO_LOW, challenge: 0xBEEFDEADBEEFDEAD, target_difficulty: 3}
 A -> R: PROOF_OF_WORK{0x000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, nonce: 8572945}
 R -> A: {OK}
 ```
+
+It is worth noting that the `target_difficulty` can change between the initial `E_POW_REQUIRED`
+and submitting the PoW. Henceforth, a client must be prepared to receive a `E_DIFFICULTY_TOO_LOW`
+message even if they adhered to the previously sent `target_difficulty`.
+
+A client is free to consider a `target_difficulty` too high and may abandon a registration
+at any point by simply closing the substream.
 
 ### Protobuf
 
@@ -263,6 +272,7 @@ message Message {
     optional string statusText = 2;
     optional int64 ttl = 3; // in seconds
     optional bytes challenge = 4;
+    optional uint32 target_difficulty = 5;
   }
 
   message Unregister {
