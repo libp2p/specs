@@ -63,11 +63,33 @@ can use protobuf for this as well and easily embed the key in the envelope:
 
 
 ```protobuf
+syntax = "proto3";
+
+package record.pb;
+
+// Envelope encloses a signed payload produced by a peer, along with the public
+// key of the keypair it was signed with so that it can be statelessly validated
+// by the receiver.
+//
+// The payload is prefixed with a byte string that determines the type, so it
+// can be deserialized deterministically. Often, this byte string is a
+// multicodec.
 message Envelope {
-  PublicKey public_key = 1; // see peer id spec for definition
-  bytes payload_type = 2;   // payload type indicator
-  bytes payload = 3;        // opaque binary payload
-  bytes signature = 5;      // see below for signing rules
+  // public_key is the public key of the keypair the enclosed payload was
+  // signed with.
+  PublicKey public_key = 1;
+
+  // payload_type encodes the type of payload, so that it can be deserialized
+  // deterministically.
+  bytes payload_type = 2;
+
+  // payload is the actual payload carried inside this envelope.
+  bytes payload = 3;
+
+  // signature is the signature produced by the private key corresponding to
+  // the enclosed public key, over the payload, prefixing a domain string for
+  // additional security.
+  bytes signature = 5;
 }
 ```
 
