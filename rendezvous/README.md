@@ -214,13 +214,13 @@ message Message {
   message Register {
     optional string ns = 1;
     optional bytes signedPeerRecord = 2;
-    optional int64 ttl = 3; // in seconds
+    optional uint64 ttl = 3; // in seconds
   }
 
   message RegisterResponse {
     optional ResponseStatus status = 1;
     optional string statusText = 2;
-    optional int64 ttl = 3; // in seconds
+    optional uint64 ttl = 3; // in seconds
   }
 
   message Unregister {
