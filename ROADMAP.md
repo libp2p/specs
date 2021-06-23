@@ -19,12 +19,12 @@ third-party ownership of data.
         - [🚑 Self-healing networks](#🚑-self-healing-networks)
         - [📮 Offline message queue / postbox](#📮-offline-message-queue--postbox)
         - [🤖 libp2p as a WASM library](#🤖-libp2p-as-a-wasm-library)
-        - [⚙️ libp2p as a kernel module](#⚙️-libp2p-as-a-kernel-module)
         - [♻️ Packet switching](#♻️-packet-switching)
     - [Evolve](#evolve)
         - [🤝 Low latency, efficient connection handshake](#🤝-low-latency-efficient-connection-handshake)
         - [🕸 Unprecedented global connectivity](#🕸-unprecedented-global-connectivity)
         - [Standardized interaction of different protocols via Smart Records](#standardized-interaction-of-different-protocols-via-smart-records)
+        - [Peer Routing Records](#peer-routing-records)
         - [💣 Attack resistance, threat models and security](#💣-attack-resistance-threat-models-and-security)
         - [📈 Proving we are scalable and interoperable](#📈-proving-we-are-scalable-and-interoperable)
         - [🌐 Browser use cases](#🌐-browser-use-cases)
@@ -217,24 +217,6 @@ model.
 **Links:**
 
 - [WASM support in rust-libp2p](https://github.com/libp2p/rust-libp2p/issues/23).
-
-### ⚙️ libp2p as a kernel module
-
-**What?** Native libp2p implementations are proliferating, maturing and
-gaining adoption in different languages. This is arguably a sign that
-developers accept the concepts, semantics and APIs that libp2p
-introduces. If we stay on track, libp2p may become the de-facto standard
-library for P2P networking.
-
-When that happens, it'll make sense to push our constructions down one level
-into OS kernels. This can entail first incubating external modules, to
-eventually propose merging them into the main codebases of kernels like Linux.
-An intermediary step would be to run libp2p as a daemon, providing peer-to-peer
-network capabilities to all processes on a machine.
-
-**Why?** To ship libp2p as the default P2P network API inside future
-operating systems. Actually, taking it one step further, make the libp2p
-stack *THE default* networking stack.
 
 ### ♻️ Packet switching
 
