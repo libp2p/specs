@@ -39,11 +39,11 @@ third-party ownership of data.
 
 **Our long term roadmap**.
 
-This is the stuff that moves libp2p from "a networking
-toolbox to build P2P applications" to the thing that fundamentally reshapes the
-architecture of the Internet; our dreams and aspirations, the North star we
-should always keep in sight; this is what motivates us and it's speaks
-intimately to our mission statement; the libp2p analogy of IPFS working on Mars
+This is the stuff that moves libp2p from "a networking toolbox to build P2P
+applications" to the thing that fundamentally reshapes the architecture of the
+Internet; our dreams and aspirations, the North star we should always keep in
+sight; this is what motivates us and it's speaks intimately to our mission
+statement; the libp2p analogy of IPFS working on Mars
 
 ### 🖧 Decentralizing networks
 
@@ -81,10 +81,12 @@ the way for IPFS to evolve in that direction.*
 
 ### 🤫 A spyproof libp2p
 
-**What? Why?** Supporting transports like cjdns, I2P and Tor (see
+**What?** Supporting transports like cjdns, I2P and Tor (see
 [OpenBazaar/go-onion-transport](https://github.com/OpenBazaar/go-onion-transport))
-helps create resilient, privacy-centric communications, and moves the
-needle forward towards censorship-resistant networks.
+helps create resilient, privacy-centric communications, and moves the needle
+forward towards censorship-resistant networks. As an intermediary step, we
+should improve our existing transport stack, e.g. preventing downgrade attacks
+when securing connections.
 
 ### 📱 libp2p in mobile devices
 
