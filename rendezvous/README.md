@@ -230,7 +230,7 @@ message Message {
 
   message Discover {
     optional string ns = 1;
-    optional int64 limit = 2;
+    optional uint64 limit = 2;
     optional bytes cookie = 3;
   }
 
