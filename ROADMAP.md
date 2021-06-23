@@ -308,7 +308,7 @@ have the highest probability of being able to establish a direct connections.
 Mechanisms we wish to add include:
 
 - Project Flare stack (via *Circuit Relay v2*, *Direct Connection Upgrade
-  through Relay*, *AutoNAT*, ...)
+  through Relay*, *AutoNAT*, *Stream Migration*, ...)
 
 - WebRTC
 
@@ -468,7 +468,7 @@ protocol](https://github.com/multiformats/multigram/tree/draft1).
 
 Progressing with this work entails designing the abstractions, and
 implementing, at least, a UDP transport, [as the community has
-demanded]](https://github.com/libp2p/go-libp2p/issues/353).
+demanded](https://github.com/libp2p/go-libp2p/issues/353).
 
 **Why?** Current the libp2p API precludes us from modelling
 message-oriented transports like UDP or Bluetooth.
