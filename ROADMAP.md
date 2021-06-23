@@ -336,6 +336,25 @@ protocols) to store arbitrary data.
 **Why?** We currently don't have a standardized, shared, public medium decoupled
 from the transport protocol for the interaction of different protocols.
 
+### Peer Routing Records
+
+**What?** Methods such as DHT traversal depend on potentially untrustworthy
+third parties to relay address information. Peer Routing Records provide a means
+of distributing verifiable address records, which we can prove originated from
+the addressed peer itself.
+
+**Why?** Being able to prove the authenticity of addresses discovered through
+some mechanism prevents address spoofing as well as attacks enabled through
+address spoofing.
+
+Peer Routing Records are defined in [RFC 0003]. They are used in combination
+with Signed Envelopes which are defined in [RFC 0002]. While the specification
+work is done, existing discovery mechanisms such as the Kademlia DHT need to
+support advertising signed Peer Routing Records.
+
+[RFC 0003]: https://github.com/libp2p/specs/blob/master/RFC/0003-routing-records.md
+[RFC 0002]: https://github.com/libp2p/specs/blob/master/RFC/0002-signed-envelopes.md
+
 ### 💣 Attack resistance, threat models and security
 
 **What?** This is an overarching element of the roadmap, and it affects
