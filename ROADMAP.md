@@ -554,6 +554,14 @@ network for UX reasons (if we\'re in the same room, we should be able to
 share files with each-other). [This ties into offline and decentralised
 networks.](#kix.xlvu7ikvo1jg)
 
+**Links**
+
+- https://github.com/libp2p/notes/issues/3
+
+- https://github.com/libp2p/notes/issues/7
+
+- https://github.com/libp2p/specs/issues/222
+
 ### 🏹 RPC and other common node communication patterns
 
 **What?** Make it easy for developers to communicate between libp2p
