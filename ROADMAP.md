@@ -97,7 +97,7 @@ use cases we are targeting at Protocol Labs.
 
 This implies building/supporting Java/Kotlin and Swift implementations
 -- either fully-fledged or trimmed-down versions that do the minimum
-necessary to enable other visionary goals.
+necessary or wrap existing implementations like rust-libp2p.
 
 **Why?** Bringing libp2p natively to mobile devices is an enabler for
 offline-first use cases.
