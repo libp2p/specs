@@ -578,3 +578,10 @@ like RPC to developers they should be able to more efficiently develop
 their projects. Additionally, easy to use high level communication
 frameworks should allow developers not very familiar with low-level
 networking to get started with libp2p.
+
+**Links**
+
+- See Rust's [libp2p-request-response] as one possible communication pattern
+  abstraction.
+
+[libp2p-request-response]: https://docs.rs/libp2p-request-response/0.11.0/libp2p_request_response/
