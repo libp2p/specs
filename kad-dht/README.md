@@ -390,8 +390,8 @@ message Message {
 These are the requirements for each `MessageType`:
 
 * `FIND_NODE`: In the request `key` must be set to the binary `PeerId` of the
-  node to be found. `closerPeers` is set in the response; for an exact match
-  exactly one `Peer` is returned; otherwise `k` closest `Peer`s are returned.
+  node to be found. In the response `closerPeers` is set to the `k` closest
+  `Peer`s.
 
 * `GET_VALUE`: In the request `key` is an unstructured array of bytes. `record`
   is set to the value for the given key (if found in the datastore) and
