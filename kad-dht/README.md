@@ -141,9 +141,11 @@ sends a `PUT_VALUE` RPC message with the record value to each of the peers.
 
 #### Value retrieval
 
-When _gettting_ a value in the DHT, the implementor should collect at least `Q`
-(quorum) responses from distinct nodes to check for consistency before returning
-an answer.
+When _getting_ a value from the DHT, implementions may use a mechanism like
+quorums to define confidence in the values found on the DHT, put differently a
+mechanism to determine when a query is _finished_. E.g. with quorums one would
+collect at least `Q` (quorum) responses from distinct nodes to check for
+consistency before returning an answer.
 
 Entry validation: Should the responses from different peers diverge, the
 implementation should use some validation mechanism to resolve the conflict and
