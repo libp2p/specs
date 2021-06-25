@@ -249,9 +249,11 @@ key, the DHT finds the closest peers to the key using the `FIND_NODE` RPC (see
 [peer routing section](#peer-routing)), and then sends an `ADD_PROVIDER` RPC with
 its own `PeerInfo` to each of these peers.
 
-Each peer that receives the `ADD_PROVIDER` RPC should validate that the
-received `PeerInfo` matches the sender's `peerID`, and if it does, that peer
-must store the `PeerInfo` in its datastore.
+Each peer that receives the `ADD_PROVIDER` RPC should validate that the received
+`PeerInfo` matches the sender's `peerID`, and if it does, that peer should store
+the `PeerInfo` in its datastore. Implementations may choose to not store the
+addresses of the providing peer e.g. to reduce the amount of required storage or
+to prevent storing potentially outdated address information.
 
 #### Content provider discovery
 
