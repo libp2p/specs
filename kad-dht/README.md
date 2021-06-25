@@ -43,7 +43,7 @@ Code snippets use a Go-like syntax.
 ### Replication parameter (`k`)
 
 The amount of replication is governed by the replication parameter `k`. The
-default value for `k` is 20.
+recommended value for `k` is 20.
 
 ### Distance
 
