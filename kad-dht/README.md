@@ -266,9 +266,6 @@ When a node receives a `GET_PROVIDERS` RPC, it must look up the requested
 key in its datastore, and respond with any corresponding records in its
 datastore, plus a list of closer peers in its routing table.
 
-For performance reasons, a node may prune expired advertisements only
-periodically, e.g. every hour.
-
 ### Bootstrap process
 
 The bootstrap process is responsible for keeping the routing table filled and
