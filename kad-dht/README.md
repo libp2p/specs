@@ -224,8 +224,8 @@ type Validator interface {
 }
 ```
 
-`Validate()` is a pure function that reports the validity of a record. It may
-validate a cryptographic signature, or else. It is called on two occasions:
+`Validate()` should be a pure function that reports the validity of a record. It
+may validate a cryptographic signature, or else. It is called on two occasions:
 
 1. To validate values retrieved in a `GET_VALUE` query.
 2. To validate values received in a `PUT_VALUE` query before storing them in the
