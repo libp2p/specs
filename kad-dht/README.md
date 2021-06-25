@@ -151,10 +151,11 @@ Entry validation: Should the responses from different peers diverge, the
 implementation should use some validation mechanism to resolve the conflict and
 select the _best_ result (see [entry validation section](#entry-validation)).
 
-Entry correction: Nodes that returned _worse_ records are updated via a
-direct `PUT_VALUE` RPC call when the lookup completes. Thus the DHT network
-eventually converges to the best value for each record, as a result of nodes
-collaborating with one another.
+Entry correction: Nodes that returned _worse_ records and nodes that returned no
+record but where among the closest to the key, are updated via a direct
+`PUT_VALUE` RPC call when the lookup completes. Thus the DHT network eventually
+converges to the best value for each record, as a result of nodes collaborating
+with one another.
 
 The below is one possible algorithm to lookup a value on the DHT.
 Implementations may diverge from this base algorithm as long as they adhere to
