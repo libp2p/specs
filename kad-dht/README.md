@@ -133,24 +133,6 @@ Then we loop:
 
 ### Value storage and retrieval
 
-Value routing can be used both to (1) _put_ and _get_ arbitrary values and (2)
-to _put_ and _get_ the public keys of nodes. Node public keys are stored in
-records under the `/pk` namespace. That is, the entry `/pk/<peerID>` will store
-the public key of peer `peerID`.
-
-DHT implementations may optimise public key lookups by providing a
-`GetPublicKey(peer.ID) (ci.PubKey)` method, that, for example, first checks if
-the key exists in the local peerstore.
-
-The lookup for public key values is identical to the lookup of arbitrary values,
-except that a custom value validation strategy is applied. It checks that
-equality `SHA256(value) == peerID` stands when:
-
-1. Receiving a response from a `GET_VALUE` lookup.
-2. Storing a public key in the DHT via `PUT_VALUE`.
-
-The record is rejected if the validation fails.
-
 #### Value storage
 
 To _put_ a value the DHT finds `k` or less closest peers to the key of the value
@@ -408,11 +390,9 @@ These are the requirements for each `MessageType`:
   node to be found. `closerPeers` is set in the response; for an exact match
   exactly one `Peer` is returned; otherwise `k` closest `Peer`s are returned.
 
-* `GET_VALUE`: In the request `key` is an unstructured array of bytes. If `key`
-  is a public key (begins with `/pk/`) and the key is known, the response has
-  `record` set to that key. Otherwise, `record` is set to the value for the
-  given key (if found in the datastore) and `closerPeers` is set to the `k`
-  closest peers.
+* `GET_VALUE`: In the request `key` is an unstructured array of bytes. `record`
+  is set to the value for the given key (if found in the datastore) and
+  `closerPeers` is set to the `k` closest peers.
 
 * `PUT_VALUE`: In the request `key` is an unstructured array of bytes. The
   target node validates `record`, and if it is valid, it stores it in the
