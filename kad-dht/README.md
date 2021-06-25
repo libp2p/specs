@@ -276,9 +276,12 @@ On every run, we generate a random peer ID and we look it up via the process
 defined in [peer routing](#peer-routing). Peers encountered throughout the
 search are inserted in the routing table, as per usual business.
 
-This process is repeated as many times per run as configuration parameter
-`QueryCount` (default: 1). Every repetition is subject to a `QueryTimeout`
-(default: 10 seconds), which upon firing, aborts the run.
+This is repeated as many times per run as configuration parameter `QueryCount`
+(default: 1). In addition, to improve awareness of nodes close to oneself,
+implementations should include a lookup for their own peer ID.
+
+Every repetition is subject to a `QueryTimeout` (default: 10 seconds), which
+upon firing, aborts the run.
 
 ## RPC messages
 
