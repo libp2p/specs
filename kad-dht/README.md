@@ -272,12 +272,16 @@ datastore, plus a list of closer peers in its routing table.
 ### Bootstrap process
 
 The bootstrap process is responsible for keeping the routing table filled and
-healthy throughout time. It runs once on startup, then periodically with a
-configurable frequency (default: 5 minutes).
+healthy throughout time. The below is one possible algorithm to bootstrap.
+Implementations may diverge from this base algorithm as long as they adhere to
+the wire format and keep their routing table up-to-date, especially with peers
+closest to themselves.
 
-On every run, we generate a random peer ID and we look it up via the process
-defined in [peer routing](#peer-routing). Peers encountered throughout the
-search are inserted in the routing table, as per usual business.
+The process runs once on startup, then periodically with a configurable
+frequency (default: 5 minutes). On every run, we generate a random peer ID and
+we look it up via the process defined in [peer routing](#peer-routing). Peers
+encountered throughout the search are inserted in the routing table, as per
+usual business.
 
 This is repeated as many times per run as configuration parameter `QueryCount`
 (default: 1). In addition, to improve awareness of nodes close to oneself,
