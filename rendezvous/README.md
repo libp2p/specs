@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r1, 2019-01-18  |
+| 1A              | Working Draft | Active | r2, 2021-06-24  |
 
 Authors: [@vyzo]
 
@@ -214,13 +214,13 @@ message Message {
   message Register {
     optional string ns = 1;
     optional bytes signedPeerRecord = 2;
-    optional int64 ttl = 3; // in seconds
+    optional uint64 ttl = 3; // in seconds
   }
 
   message RegisterResponse {
     optional ResponseStatus status = 1;
     optional string statusText = 2;
-    optional int64 ttl = 3; // in seconds
+    optional uint64 ttl = 3; // in seconds
   }
 
   message Unregister {
@@ -230,7 +230,7 @@ message Message {
 
   message Discover {
     optional string ns = 1;
-    optional int64 limit = 2;
+    optional uint64 limit = 2;
     optional bytes cookie = 3;
   }
 
