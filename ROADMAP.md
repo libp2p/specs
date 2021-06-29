@@ -19,7 +19,6 @@ third-party ownership of data.
         - [🚑 Self-healing networks](#🚑-self-healing-networks)
         - [📮 Offline message queue / postbox](#📮-offline-message-queue--postbox)
         - [🤖 libp2p as a WASM library](#🤖-libp2p-as-a-wasm-library)
-        - [♻️ Packet switching](#♻️-packet-switching)
     - [Evolve](#evolve)
         - [🤝 Low latency, efficient connection handshake](#🤝-low-latency-efficient-connection-handshake)
         - [🕸 Unprecedented global connectivity](#🕸-unprecedented-global-connectivity)
@@ -218,34 +217,6 @@ model.
 
 - [WASM support in rust-libp2p](https://github.com/libp2p/rust-libp2p/issues/23).
 
-### ♻️ Packet switching
-
-**What?** A packet-switched libp2p is on the pathway to achieving
-decentralisation and seamless connectivity across heterogeneous networks
-across the globe, that are running on different transports and not
-necessarily connected to the Internet directly. Essentially it's a
-*global transit system* for libp2p traffic.
-
-For illustration, a TCP packet sent via an IP-based local LAN in
-the US connected to the Internet backbone (via a router) could travel
-through the libp2p network, taking multiple hops along the way based on
-routing decisions, and traversing various networks over different
-transports. Eventually it'll reach its destination in Nepal: a node in a
-mesh network, that's in turn connected to a community network with
-intermittent Internet connection via satellite.
-
-To build a reality like this entails doing away with the concept of
-Autonomous Systems (AS), and rethinking the Internet protocols and
-structures from the viewpoint of peer-to-peer: BGP, OSPF, peering,
-transit networks, multihoming, IANA, etc.
-
-**Why?** It's a crucial requirement in our visionary goal of
-decentralising networks. WIP.
-
-**Links:**
-
--   [On \"DialMe\", NAT traversal, Relay, line switching, packet switching
-    (libp2p protocols)](https://github.com/ipfs/notes/issues/110)
 
 ## Evolve
 
