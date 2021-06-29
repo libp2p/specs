@@ -24,12 +24,12 @@ third-party ownership of data.
         - [🕸 Unprecedented global connectivity](#🕸-unprecedented-global-connectivity)
         - [Standardized interaction of different protocols via Smart Records](#standardized-interaction-of-different-protocols-via-smart-records)
         - [Peer Routing Records](#peer-routing-records)
+        - [🗣️ Polite peering and wire protocol](#🗣️-polite-peering-and-wire-protocol)
         - [💣 Attack resistance, threat models and security](#💣-attack-resistance-threat-models-and-security)
         - [📈 Proving we are scalable and interoperable](#📈-proving-we-are-scalable-and-interoperable)
         - [🌐 Browser use cases](#🌐-browser-use-cases)
         - [🌡️ Opt-in telemetry protocol](#🌡️-opt-in-telemetry-protocol)
         - [📩 Message-oriented transports](#📩-message-oriented-transports)
-        - [🗣️ Polite peering and wire protocol](#🗣️-polite-peering-and-wire-protocol)
         - [☎️ Reducing the dial fail rate](#️-reducing-the-dial-fail-rate)
         - [🔀 Peer exchange protocol](#🔀-peer-exchange-protocol)
         - [🏹 RPC and other common node communication patterns](#🏹-rpc-and-other-common-node-communication-patterns)
@@ -217,7 +217,6 @@ model.
 
 - [WASM support in rust-libp2p](https://github.com/libp2p/rust-libp2p/issues/23).
 
-
 ## Evolve
 
 **Our short-term roadmap**.
@@ -307,6 +306,33 @@ support advertising signed Peer Routing Records.
 
 [RFC 0003]: https://github.com/libp2p/specs/blob/master/RFC/0003-routing-records.md
 [RFC 0002]: https://github.com/libp2p/specs/blob/master/RFC/0002-signed-envelopes.md
+
+### 🗣️ Polite peering and wire protocol
+
+**What?** Peers don't behave well with one another. They do not send
+DISCONNECT messages reporting the reason for disconnection, they do not
+warn when they're about to close a connection, they don't give peers a
+chance to keep important connections open, etc.
+
+Furthermore, IDENTIFY is an element that other parts of the system
+depend heavily on (e.g. AutoRelay, DHT, etc.), yet it does not have a
+special status. Similarly, PING is a housekeeping protocol.
+
+Grouping all these essential messages into a solid *Wire protocol* that
+covers connection lifecycle, heartbeats, health, status, diagnostics,
+identity, etc. may simplify things. An open question is where
+Multistream would fit into this model: could we conflate it into the
+Wire protocol?
+
+**Why?** Peers act haphazardly when observed from the outside, as they
+do not have the means to act more collaboratively. We are lacking a wire
+protocol that governs the connection between two peers. Negotiating lots
+of piecemeal protocols is inefficient, especially for essential stuff.
+
+**Links:**
+
+-   [Discuss: batch vs. on-demand connection
+    pruning](https://github.com/libp2p/go-libp2p-connmgr/issues/19).
 
 ### 💣 Attack resistance, threat models and security
 
@@ -444,34 +470,6 @@ demanded](https://github.com/libp2p/go-libp2p/issues/353).
 
 **Why?** Current the libp2p API precludes us from modelling
 message-oriented transports like UDP or Bluetooth.
-
-### 🗣️ Polite peering and wire protocol
-
-**What?** Peers don't behave well with one another. They do not send
-DISCONNECT messages reporting the reason for disconnection, they do not
-warn when they're about to close a connection, they don't give peers a
-chance to keep important connections open, etc.
-
-Furthermore, IDENTIFY is an element that other parts of the system
-depend heavily on (e.g. AutoRelay, DHT, etc.), yet it does not have a
-special status. Similarly, PING is a housekeeping protocol.
-
-Grouping all these essential messages into a solid *Wire protocol* that
-covers connection lifecycle, heartbeats, health, status, diagnostics,
-identity, etc. may simplify things. An open question is where
-Multistream would fit into this model: could we conflate it into the
-Wire protocol?
-
-**Why?** Peers act haphazardly when observed from the outside, as they
-do not have the means to act more collaboratively. We are lacking a wire
-protocol that governs the connection between two peers. Negotiating lots
-of piecemeal protocols is inefficient, especially for essential stuff.
-
-**Links:**
-
--   [Discuss: batch vs. on-demand connection
-    pruning](https://github.com/libp2p/go-libp2p-connmgr/issues/19).
-
 
 ### ☎️ Reducing the dial fail rate
 
