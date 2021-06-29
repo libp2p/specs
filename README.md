@@ -71,6 +71,7 @@ security, multiplexing, and other purposes.
 The protocols described below all use [protocol buffers](https://developers.google.com/protocol-buffers/docs/proto?hl=en) (aka protobuf) to define message schemas. Version `proto2` is used unless stated otherwise.
 
 - [identify][spec_identify] -  Exchange keys and addresses with other peers
+- [kademlia][spec_kademlia] - The Kademlia Distributed Hash Table (DHT) subsystem
 - [mplex][spec_mplex] - The friendly stream multiplexer
 - [plaintext][spec_plaintext] - An insecure transport for non-production usage
 - [pnet][spec_pnet] - Private networking in libp2p using pre-shared keys
@@ -102,6 +103,7 @@ you feel an issue isn't the appropriate place for your topic, please join our
 [spec_lifecycle]: 00-framework-01-spec-lifecycle.md
 [spec_header]: 00-framework-02-document-header.md
 [spec_identify]: ./identify/README.md
+[spec_kademlia]: ./kad-dht/README.md
 [spec_mplex]: ./mplex/README.md
 [spec_pnet]: ./pnet/Private-Networks-PSK-V1.md
 [spec_pubsub]: ./pubsub/README.md
