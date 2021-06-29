@@ -22,7 +22,6 @@ third-party ownership of data.
     - [Evolve](#evolve)
         - [🤝 Low latency, efficient connection handshake](#🤝-low-latency-efficient-connection-handshake)
         - [🕸 Unprecedented global connectivity](#🕸-unprecedented-global-connectivity)
-        - [Standardized interaction of different protocols via Smart Records](#standardized-interaction-of-different-protocols-via-smart-records)
         - [Peer Routing Records](#peer-routing-records)
         - [🗣️ Polite peering](#🗣️-polite-peering)
         - [🧱 Composable routing](#🧱-composable-routing)
@@ -275,19 +274,6 @@ rest of the system.
   vision](https://github.com/mxinden/specs/blob/hole-punching/connections/hole-punching.md).
 
 - [NAT traversal tracking issue](https://github.com/libp2p/specs/issues/312).
-
-### Standardized interaction of different protocols via Smart Records
-
-TODO: Extend
-
-Copied and adapted from: https://github.com/libp2p/go-smart-record/blob/4a1b33c6d7cb2fb38d166abc1023fbbbab33b60f/README.md
-
-**What?** With Smart Records (SRs) we generalize DHT's key/value put/get as a
-separate protocol that can be leveraged by any other protocol (including DHT
-protocols) to store arbitrary data.
-
-**Why?** We currently don't have a standardized, shared, public medium decoupled
-from the transport protocol for the interaction of different protocols.
 
 ### Peer Routing Records
 
