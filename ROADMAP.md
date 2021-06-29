@@ -307,33 +307,17 @@ support advertising signed Peer Routing Records.
 [RFC 0003]: https://github.com/libp2p/specs/blob/master/RFC/0003-routing-records.md
 [RFC 0002]: https://github.com/libp2p/specs/blob/master/RFC/0002-signed-envelopes.md
 
-### 🗣️ Polite peering and wire protocol
+### 🗣️ Polite peering
 
-**What?** Peers don't behave well with one another. They do not send
-DISCONNECT messages reporting the reason for disconnection, they do not
-warn when they're about to close a connection, they don't give peers a
+**What?** Peers don't behave well with one another. They do not send DISCONNECT
+messages reporting the reason (e.g. rate limiting) for disconnection, they do
+not warn when they're about to close a connection, they don't give peers a
 chance to keep important connections open, etc.
-
-Furthermore, IDENTIFY is an element that other parts of the system
-depend heavily on (e.g. AutoRelay, DHT, etc.), yet it does not have a
-special status. Similarly, PING is a housekeeping protocol.
-
-Grouping all these essential messages into a solid *Wire protocol* that
-covers connection lifecycle, heartbeats, health, status, diagnostics,
-identity, etc. may simplify things. An open question is where
-Multistream would fit into this model: could we conflate it into the
-Wire protocol?
 
 **Why?** Peers act haphazardly when observed from the outside, leading e.g. to
 unnecessary connection churn. They do not have the means to act more
 collaboratively. We are lacking a wire protocol that governs the connection
-between two peers. Negotiating lots of piecemeal protocols is inefficient,
-especially for essential stuff.
-
-**Links:**
-
--   [Discuss: batch vs. on-demand connection
-    pruning](https://github.com/libp2p/go-libp2p-connmgr/issues/19).
+between two peers.
 
 ### 💣 Attack resistance, threat models and security
 
