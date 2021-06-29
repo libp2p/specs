@@ -324,10 +324,11 @@ identity, etc. may simplify things. An open question is where
 Multistream would fit into this model: could we conflate it into the
 Wire protocol?
 
-**Why?** Peers act haphazardly when observed from the outside, as they
-do not have the means to act more collaboratively. We are lacking a wire
-protocol that governs the connection between two peers. Negotiating lots
-of piecemeal protocols is inefficient, especially for essential stuff.
+**Why?** Peers act haphazardly when observed from the outside, leading e.g. to
+unnecessary connection churn. They do not have the means to act more
+collaboratively. We are lacking a wire protocol that governs the connection
+between two peers. Negotiating lots of piecemeal protocols is inefficient,
+especially for essential stuff.
 
 **Links:**
 
