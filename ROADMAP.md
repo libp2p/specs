@@ -24,7 +24,8 @@ third-party ownership of data.
         - [🕸 Unprecedented global connectivity](#🕸-unprecedented-global-connectivity)
         - [Standardized interaction of different protocols via Smart Records](#standardized-interaction-of-different-protocols-via-smart-records)
         - [Peer Routing Records](#peer-routing-records)
-        - [🗣️ Polite peering and wire protocol](#🗣️-polite-peering-and-wire-protocol)
+        - [🗣️ Polite peering](#🗣️-polite-peering)
+        - [🧱 Composable routing](#🧱-composable-routing)
         - [💣 Attack resistance, threat models and security](#💣-attack-resistance-threat-models-and-security)
         - [📈 Proving we are scalable and interoperable](#📈-proving-we-are-scalable-and-interoperable)
         - [🌐 Browser use cases](#🌐-browser-use-cases)
@@ -318,6 +319,49 @@ chance to keep important connections open, etc.
 unnecessary connection churn. They do not have the means to act more
 collaboratively. We are lacking a wire protocol that governs the connection
 between two peers.
+
+### 🧱 Composable routing
+
+**What?** The composable routing framework has four "pillars**:
+
+* Routing syntax and language
+
+  The routing syntax is a common data model (with a user-facing syntactic
+  representation) for communicating routing-related information (requests and
+  responses). The [implementation of the routing
+  syntax](https://github.com/libp2p/go-routing-language/tree/master/syntax)
+  provides serialization and pretty printing of routing expressions.
+
+* Routing interface
+
+  A routing system processes routing requests and returns routing responses.
+  Routing requests and responses have semantics, which are unlike those of a
+  traditional request/response protocols, that implement function call arguments
+  and return values.
+
+* Smart Records
+
+  Smart Records (SR) is a technology that enables multiple decentralized parties
+  and protocols to randevouz and share information on a topic. Specifically, SR
+  is a key-value store service, which facilitates conflict-free updates to
+  values by multiple writers.
+
+* Subnets
+
+  At present, there is a single DHT network which spans across all IPFS nodes.
+  We would like to introduce a general standard for the co-existence of multiple
+  network instances with individual discovery, membership and content routing
+  semantics.
+
+**Why?** Enable interoperability of protocols and nodes with different versions
+and capabilities, developed by independent teams or organizations. As a
+consequence, it also enables middleware components (like caching, batching,
+predictive fetching, and so on** and the co-existence of different content
+finding protocols and subnetworks.
+
+**Links:**
+
+- [Tracking issue](https://github.com/libp2p/specs/issues/343)
 
 ### 💣 Attack resistance, threat models and security
 
