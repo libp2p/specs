@@ -81,7 +81,6 @@ The protocols described below all use [protocol buffers](https://developers.goog
 - [relay][spec_relay] - Circuit Switching for libp2p (similar to TURN)
 - [rendezvous][spec_rendezvous] - Rendezvous Protocol for generalized
   peer discovery
-- [secio][spec_secio] - SECIO, a transport security protocol for libp2p
 - [tls][spec_tls] - The libp2p TLS Handshake (TLS 1.3+)
 
 
