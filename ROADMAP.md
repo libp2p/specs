@@ -89,14 +89,12 @@ when securing connections.
 
 ### 📱 libp2p in mobile devices
 
-**What?** While js-libp2p technically works in mobile browsers, it is
-constrained by the web sandbox. First-class integration of native libp2p
-in mobile devices could be a prerequisite for the class of offline-first
-use cases we are targeting at Protocol Labs.
+**What?** First-class integration of libp2p in mobile devices is a prerequisite
+for the class of offline-first use cases we are targeting.
 
-This implies building/supporting Java/Kotlin and Swift implementations
--- either fully-fledged or trimmed-down versions that do the minimum
-necessary or wrap existing implementations like rust-libp2p.
+This implies building/supporting Java/Kotlin and Swift implementations -- either
+fully-fledged or trimmed-down versions that do the minimum necessary or wrap
+existing implementations like nim-libp2p or rust-libp2p.
 
 **Why?** Bringing libp2p natively to mobile devices is an enabler for
 offline-first use cases.
