@@ -497,10 +497,10 @@ areas.
    over public ones first. We may want to dial relay addresses last, dial newer
    addresses first, etc.
 
-   - Users should also have the capability to customise how addresses
-     are resolved, how dials are throttled, how connections are
-     selected if multiple dials succeeded, etc. In a nutshell, the
-     dialing behaviour should be fully customisable per host.
+   Users should also have the capability to customise how addresses are
+   resolved, how dials are throttled, how connections are selected if multiple
+   dials succeeded, etc. In a nutshell, the dialing behaviour should be fully
+   customisable per host.
 
 -  **Context-sensitive advertisement of self-addresses:** private
    addresses should not leak into public DHTs, both for connectivity
@@ -517,7 +517,8 @@ areas.
   [Improve NAT traversal](#improve-nat-traversal).
 
 **Why?** Dialing is a crucial function of our system and using a
-non-deterministic, scattershot approach is inefficient.
+non-deterministic, scattershot approach is inefficient both in regards to the
+number of failed dial attempts and the increased _time to first byte_.
 
 **Links:**
 
