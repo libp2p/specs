@@ -531,10 +531,10 @@ Copied and adapted from:
 also be nice if we could have a peer exchange protocol for discovering
 even more local peers.
 
-**Why?** (1) relying on the global DHT to discover local peers is
-problematic; (2) ideally, we want to connect to all peers on the local
-network for UX reasons (if we\'re in the same room, we should be able to
-share files with each-other). [This ties into offline and decentralised
+**Why?** (1) relying on the global DHT to discover local peers is problematic;
+(2) ideally, we want to be able to discover all peers on the local network. In
+case two devices are in the same room, they should be able to share files with
+each-other directly. [This ties into offline and decentralised
 networks.](#kix.xlvu7ikvo1jg)
 
 **Links**
