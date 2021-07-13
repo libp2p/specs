@@ -225,7 +225,7 @@ message Message {
 
   message Unregister {
     optional string ns = 1;
-    optional bytes id = 2;
+    // optional bytes id = 2; deprecated as per https://github.com/libp2p/specs/issues/335
   }
 
   message Discover {
