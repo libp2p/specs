@@ -32,15 +32,17 @@ and spec status.
     - [Introduction](#introduction)
         - [Improvements over _[Multistream Select]_](#improvements-over-_multistream-select_)
     - [High-Level Overview](#high-level-overview)
+        - [Basic Flow](#basic-flow)
         - [Secure Channel Selection](#secure-channel-selection)
         - [TCP Simultaneous Open](#tcp-simultaneous-open)
             - [Coordinated TCP Simultaneous Open](#coordinated-tcp-simultaneous-open)
             - [Uncoordinated TCP Simultaneous Open](#uncoordinated-tcp-simultaneous-open)
-        - [Stream Multiplexer Selection](#stream-multiplexer-selection)
-            - [Process](#process)
+        - [Connection Protocol Negotiation](#connection-protocol-negotiation)
             - [Early data optimization](#early-data-optimization)
-            - [Monoplexed connections](#monoplexed-connections)
             - [0-RTT](#0-rtt)
+        - [Stream Protocol Negotiation](#stream-protocol-negotiation)
+            - [Initiator](#initiator)
+            - [Listener](#listener)
     - [Transitioning from [Multistream Select]](#transitioning-from-multistream-select)
         - [Multiphase Rollout](#multiphase-rollout)
             - [Phase 1](#phase-1)
@@ -52,12 +54,11 @@ and spec status.
             - [QUIC](#quic)
             - [Protocol Differentiation](#protocol-differentiation)
     - [Protocol Specification](#protocol-specification)
-        - [Multiplexer Protocol Negotiation](#multiplexer-protocol-negotiation)
-        - [Stream Protocol Negotiation](#stream-protocol-negotiation)
-            - [Initiator](#initiator)
-            - [Listener](#listener)
-        - [Protocol Names vs. Protocol IDs](#protocol-names-vs-protocol-ids)
-            - [Migration from _Protocol Name_ to _Protocol ID_](#migration-from-_protocol-name_-to-_protocol-id_)
+        - [Protocol Evolution](#protocol-evolution)
+            - [Non-Breaking Changes](#non-breaking-changes)
+            - [Breaking Changes](#breaking-changes)
+    - [Extensions](#extensions)
+        - [Protocol IDs](#protocol-ids)
     - [FAQ](#faq)
 
 ## Introduction
@@ -377,75 +378,28 @@ Messages are encoded according to the Protobuf definition below using the
 encoded as an unsigned variable length integer as defined by the [multiformats
 unsigned-varint spec][uvarint-spec].
 
-The top level message type is `ProtoSelect`. With the current version of
-_Protocol Select_ detailed in this document, the `version` field of the
-`ProtocolSelect` message is set to `1`. Implementations MUST reject messages
+Messages are encoded via the `ProtoSelect` message type. With the current
+version of _Protocol Select_ detailed in this document, the `version` field of
+the `ProtocolSelect` message is set to `1`. Implementations MUST reject messages
 with a `version` other than the current version. See [Protocol
 Evolution](#Protocol-Evolution) for details. Both the `Offer` and the `Use`
 messages are wrapped with the `ProtocolSelect` message at all time.
 
 ```protobuf
-# Wraps every message
 message ProtoSelect {
     uint32 version = 1;
 
-    oneof message {
-        Offer offer = 2;
-        Use use = 3;
-    }
-}
-
-# Select a list of protocols.
-message Offer {
     message Protocol {
         oneof protocol {
             string name = 1;
-            uint64 id = 2;
         }
     }
-    repeated Protocol protocols = 1;
-}
-
-# Declare that a protocol is used on this stream.
-message Use {
-    message Protocol {
-        oneof protocol {
-            string name = 1;
-            uint64 id = 2;
-        }
-    }
-    Protocol protocol = 1;
+    repeated Protocol protocols = 2;
 }
 ```
 
-### Protocol Names vs. Protocol IDs
-
-Protocol Select allows to specify a protocol both by its _Protocol Name_ and
-_Protocol ID_. The former being human readable, the latter being bandwidth
-efficient. _Name_ and _ID_ of a protocol can be used interchangeably. The
-mapping between the two is defined in <PATH_TO_CSV_FILE>. Users might define
-their own _Protocol Name_ and _Protocol ID_ without updating <PATH_TO_CSV_FILE>,
-though, to prevent conflicts with future libp2p standard protocols, _ID_ above
-XXX SHOULD be chosen. Protocols negotiated via [Multistream Select] today should
-use the [Multistream Select] protocol name as the Protocol Select _Protocol
-Name_.
-
-#### Migration from _Protocol Name_ to _Protocol ID_
-
-To migrate protocols of a live network to be negotiated using their _Protocol
-IDs_ instead of _Protocol Names_ one might either:
-
-- Migrate along with the Protocol Select roll-out described in the
-  [Transitioning from Multistream
-  Select](#Transitioning-from-Multistream-Select) section.
-
-- Use a separate phased roll-out strategy similar to the one described in
-  described in the [Transitioning from Multistream
-  Select](#Transitioning-from-Multistream-Select) section.
-
-- Optimistically use _Protocol IDs_, retrying with _Protocol Names_ on failure.
-
-When not choosing the first, users likely want to combine the last two.
+<!-- TODO: Document what `name` is. E.g. UTF-8 and same as used in Multistream
+Select. -->
 
 ### Protocol Evolution
 
@@ -481,6 +435,48 @@ supporting both versions are able to differentiate an old and new version
 message. Implementations supporting only the old version would reject a new
 version message and fail the negotiation. Roll-out strategies need to cope with
 such negotiation failure, e.g. through retries with an older version.
+
+
+## Extensions
+
+### Protocol IDs
+
+The first version of _Protocol Select_ will allow specifying protocols by their
+_Protocol Name_, i.e. human readable string representation, only. In order to
+optimize on bandwidth, future versions might introduce alternative
+representations in a non-breaking manner.
+
+More specifically, this extension would allow specifying protocols by their
+_Protocol ID_. A _Protocol ID_ is a [Multicodec] or a combination of
+[Multicodec]s. Implementations can specify a protocol either via a _Protocol
+Name_ or a _Protocol ID_ by extending the `Protocol` message type definition as
+follows:
+
+```diff
+message Protocol {
+    oneof protocol {
+        string name = 1;
++       uint64 id = 2;
+    }
+}
+```
+
+_Protocol Name_ and _Protocol ID_ can be used interchangeably. To ease roll-out
+of a _Protocol ID_ for a protocol that has previously been negotiated via its
+_Protocol Name_, one might leverage one (or multiple) of the following
+mechanisms:
+
+- Extending the libp2p identify protocol, allowing nodes to announce their
+  supported protocols both by _Protocol Name_ and _Protocol ID_, thus signaling
+  the support for the _Protocol ID_ extension for the concrete protocols.
+
+- Including a protocol both by its _Protocol Name_ and _Protocol ID_ in the list
+  of supported protocols.
+
+  Note, when optimistically negotiating a stream protocol as an initiator, with a
+  remote which might or might not support a protocol's _Protocol ID_, one can
+  send a list containing both the _Protocol Name_ and the _Protocol ID_ for the
+  same protocol and directly optimistically send application data.
 
 ## FAQ
 
@@ -541,3 +537,4 @@ such negotiation failure, e.g. through retries with an older version.
 [uvarint-spec]: https://github.com/multiformats/unsigned-varint
 [dnsaddr]: https://github.com/multiformats/multiaddr/blob/master/protocols/DNSADDR.md
 [Updating a Message Type]: https://developers.google.com/protocol-buffers/docs/proto#updating
+[Multicodec]: https://github.com/multiformats/multicodec
