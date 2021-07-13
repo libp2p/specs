@@ -339,15 +339,21 @@ Messages are encoded according to the Protobuf definition below using the
 encoded as an unsigned variable length integer as defined by the [multiformats
 unsigned-varint spec][uvarint-spec].
 
-The top level message type is `ProtocolSelect`. Both the `Offer` and the `Use`
+The top level message type is `ProtoSelect`. With the current version of
+_Protocol Select_ detailed in this document, the `version` field of the
+`ProtocolSelect` message is set to `1`. Implementations MUST reject messages
+with a `version` other than the current version. See [Protocol
+Evolution](#Protocol-Evolution) for details. Both the `Offer` and the `Use`
 messages are wrapped with the `ProtocolSelect` message at all time.
 
 ```protobuf
 # Wraps every message
 message ProtoSelect {
+    uint32 version = 1;
+
     oneof message {
-        Offer offer = 1;
-        Use use = 2;
+        Offer offer = 2;
+        Use use = 3;
     }
 }
 
@@ -467,6 +473,41 @@ IDs_ instead of _Protocol Names_ one might either:
 
 When not choosing the first, users likely want to combine the last two.
 
+### Protocol Evolution
+
+While we can not foresee all future use-cases of _Protocol Select_, we can
+design _Protocol Select_ in a way to be easy to evolve, and thus be able to
+adapt _Protocol Select_ to support those unknown future use-cases.
+
+#### Non-Breaking Changes
+
+Non-breaking changes to the protocol can be done at the schema level, more
+specifically through the _Protocol Buffer_ framework. Instead of enumerating the
+various update mechanisms, we refer to the _[Updating a Message Type]_ section
+of the _Protocol Buffer_ specification.
+
+As an example for a non-breaking change, say we would like to exchange a made up
+name via the _Protocol Select_ protocol. We can simply extend the `ProtoSelect`
+message type by an `optional string name = 4;` field. Updated implementations
+would be able to extract the name from the payload, old implementations would
+simply ignore the new field.
+
+#### Breaking Changes
+
+When making breaking changes to the _Protocol Select_ protocol,
+implementations need to be able to differentiate the old and the new version on
+the wire. This is done via the `version` field in the `ProtoSelect` message,
+treated as an ordinal monotonically increasing number, with each increase
+identifying a new breaking version of the protocol.
+
+As an example for a made-up breaking change, say we would like the listed
+protocols in the `Offer` message to enumerate the protocols that the local node
+does *not* support. One would bump the `version` field by `1`. Implementations
+supporting both versions are able to differentiate an old and new version
+message. Implementations supporting only the old version would reject a new
+version message and fail the negotiation. Roll-out strategies need to cope with
+such negotiation failure, e.g. through retries with an older version.
+
 ## FAQ
 
 * _Why don't we define something more sophisticated for uncoordinated TCP
@@ -525,3 +566,4 @@ When not choosing the first, users likely want to combine the last two.
 [DCUtR]: https://github.com/libp2p/specs/pull/173
 [uvarint-spec]: https://github.com/multiformats/unsigned-varint
 [dnsaddr]: https://github.com/multiformats/multiaddr/blob/master/protocols/DNSADDR.md
+[Updating a Message Type]: https://developers.google.com/protocol-buffers/docs/proto#updating
