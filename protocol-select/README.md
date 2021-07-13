@@ -119,8 +119,8 @@ Select]_ protocol.
 
   **Protocol Select** will include the option to improve bandwidth efficiency
   e.g. around protocol names in the future. While _Protocol Select_ will not
-  solve this in the first iteration, the protocol should be designed with this
-  optimization in mind, and allow for a smooth upgrade in a future iteration.
+  solve this in the first iteration, the protocol is designed with this
+  optimization in mind, and allows for a smooth upgrade in a future iteration.
 
 ## High-Level Overview
 
@@ -129,9 +129,9 @@ Select]_ protocol.
 Both endpoints, client and server, send a list of supported protocols. Whether
 an endpoint sends its list before or after it has received the remote's list
 depends on the context and is detailed below. Nodes SHOULD order the list by
-preference. Once an endpoint receives the list, the protocol to be used on the
-connection or stream is determined by intersecting ones own and the remote list,
-as follows:
+preference. Once an endpoint receives a list from a remote, the protocol to be
+used on the connection or stream is determined by intersecting ones own and the
+remote list, as follows:
 
 1. All protocols that aren't supported by both endpoints are removed from the
    clients' list of protocols.
@@ -236,9 +236,9 @@ the handshake completes.
 
 When using 0-RTT session resumption as offered by TLS 1.3 and Noise, clients
 SHOULD remember the protocol they used before and optimistically offer that
-muxer only. A client can then optimistically send application data, not waiting
+protocol only. A client can then optimistically send application data, not waiting
 for the list of supported protocols by the server. If the server still supports
-the muxer, it will choose the muxer offered by the client when intersecting the
+the protocol, it will choose the protocol offered by the client when intersecting the
 two lists, and proceed with the connection. If not, the list intersection fails
 and the connection is closed, which needs to be handled by the upper protocols.
 
@@ -252,8 +252,8 @@ data first.
 Note: While libp2p currently does not support nested stream protocols, e.g. a
 compression protocol wrapping bitswap, future versions of libp2p might change
 that. The above assumption of the initiator being the endpoint to send data
-first, does not apply to protocol negotiations following the first negotiation
-on a stream.
+first, does not apply to protocol negotiations following the first negotiation -
+a nested negotiation - on a stream.
 
 #### Initiator
 
