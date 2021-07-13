@@ -171,27 +171,12 @@ The two nodes are assigned their role (client / server) out-of-band by the
 
 In the uncoordinated case, where two nodes coincidentally simultaneously dial
 each other, resulting in a TCP Simultaneous Open connection, the secure channel
-protocol (e.g. TLS) will fail, given that both nodes assume to be in the
-initiating / client role. Nodes SHOULD close the connection and back off for a
-random amount of time before trying to reconnect.
-
-<!--
-TLS as well as Noise will fail the handshake if both endpoints act as clients.
-In case of such a handshake failure, the two endpoints need to restart the
-handshake. Endpoints MUST NOT close the underlying TCP connection in this case.
-Implementations SHOULD NOT treat every handshake failure as a potential
-Simultaneous Open, but only errors that are indicative of this event.
-
-Every handshake protocol MUST specify how to deal with a simultaneous open
-(i.e., we will need to update the TLS 1.3 and Noise libp2p spec). In general, a
-resolution of the collision will result in one peer being assigned the role of
-the client and the other the role of the server.
-
-Note: We cannot assume that the remote peer knows our peer ID when it is dialing
-us. While this is true in *most* cases, it possible to dial a multiaddr without
-knowing the peer's ID, and derive the ID from the information presented during
-the handshake.
--->
+protocol handshake will fail, given that both nodes assume to be in the
+initiating / client role. E.g. in the case of TLS the protocol will report the
+receipt of a ClientHello while it expected a ServerHello. Once the security
+handshake failed due to TCP Simultaneous Open, i.e. due to both sides assuming
+to be the client, nodes SHOULD close the connection and back off for a random
+amount of time before trying to reconnect.
 
 ### Stream Multiplexer Selection
 
@@ -495,6 +480,14 @@ When not choosing the first, users likely want to combine the last two.
   strategy would be to re-dial the peer after a (randomized) exponential
   backoff.
 
+* _Why don't we use the peer IDs to break the tie on uncoordinated TCP
+  Simultaneous Open?_
+
+  We cannot assume that the remote peer knows our peer ID when it is dialing us.
+  While this is true in *most* cases, it is possible to dial a multiaddr without
+  knowing the peer's ID, and derive the ID from the information presented during
+  the handshake.
+
 * _Why don't we use the presence of a security protocol in the multiaddr to
   signal support for Protocol Select?_
 
@@ -504,7 +497,7 @@ When not choosing the first, users likely want to combine the last two.
   build logic to distinguish between multistream and Protocol Select anyway. We
   _could_ change the multicodec for QUIC, but that would be yet another change
   we'd tie into Protocol Select.
-  
+
 * _Why statically out-of-band specify Protocol Name and Protocol ID mapping, why
   not negotiate mapping in-band?_
 
@@ -513,7 +506,7 @@ When not choosing the first, users likely want to combine the last two.
   when replying with a `Use` specify a _Protocol Name_ _Protocol ID_ mapping.
   One could then use the _Protocol ID_ instead of the _Protocol Name_ for future
   negotiations on that same connection.
-  
+
   While this approach would reliev us of the need to specify the _Protocol Name_
   _Protocol ID_ mapping in e.g. libp2p/specs, it does add state to be kept
   across negotiations, thus complicating implementations and potentially
@@ -532,5 +525,3 @@ When not choosing the first, users likely want to combine the last two.
 [DCUtR]: https://github.com/libp2p/specs/pull/173
 [uvarint-spec]: https://github.com/multiformats/unsigned-varint
 [dnsaddr]: https://github.com/multiformats/multiaddr/blob/master/protocols/DNSADDR.md
-
-
