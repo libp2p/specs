@@ -336,6 +336,7 @@ Note that it takes one connection attempt to discover this failure and an
 additional attempt to perform the fallback. Thus this upgrade mechanism should
 only be used in addition to the above multiphase rollout to ease the transition.
 
+<!-- TODO Find a better name than `Heuristics` -->
 ### Heuristics
 
 When accepting a connection, an endpoint doesn't know whether the remote peer is
@@ -526,9 +527,9 @@ mechanisms:
   protocol, the effort to specify a _Protocol ID_ in addition thus seems
   negligible.
 
-* _Why not Offer and OfferMultiplexer?_
+* _Why not two messages, e.g. `Offer` and `Use`?_
 * _Why did you use proto2 and not proto3?_
-* _Why Protocol IDs_?
+* _Why not include Protocol IDs from the start_?
 
 [Multistream Select]: https://github.com/multiformats/multistream-select
 [Noise]: https://github.com/libp2p/specs/tree/master/noise
