@@ -123,6 +123,23 @@ Select]_ protocol.
 
 ## High-Level Overview
 
+### Basic Flow
+
+Both endpoints, client and server, send a list of supported protocols. Whether
+an endpoint sends its list before or after it has received the remote's list
+depends on the context and is detailed below. Nodes SHOULD order the list by
+preference. Once an endpoint receives the list, the protocol to be used on the
+connection or stream is determined by intersecting ones own and the remote list,
+as follows:
+
+1. All protocols that aren't supported by both endpoints are removed from the
+   clients' list of protocols.
+
+2. The protocol chosen is the first protocol of the client's list.
+
+If there is no overlap between the two lists, the two endpoints can not
+communicate and thus both endpoints MUST close the connection or stream.
+
 ### Secure Channel Selection
 
 Conversely to [Multistream Select], secure channel protocols are not dynamically
@@ -178,27 +195,15 @@ handshake failed due to TCP Simultaneous Open, i.e. due to both sides assuming
 to be the client, nodes SHOULD close the connection and back off for a random
 amount of time before trying to reconnect.
 
-### Stream Multiplexer Selection
+### Connection Protocol Negotiation
 
 This section only applies if Protocol Select is run over a transport that is not
 natively multiplexed. For transports that provide stream multiplexing on the
 transport layer (e.g. QUIC) this section should be ignored.
 
-#### Process
-
-First off, both endpoints, client and server, send a list of supported stream
-multiplexer protocols. Nodes SHOULD order the list by preference. Once an
-endpoint receives the list, the stream multiplexer to be used on the connection
-is determined by intersecting ones own and the remote list, as follows:
-
-1. All stream multiplexers that aren't supported by both endpoints are removed
-   from the clients' list of stream multiplexers.
-
-2. The stream multiplexer chosen is then the first protocol of the client's
-   list.
-
-If there is no overlap between the two lists, the two endpoints can not
-communicate and thus both endpoints MUST close the connection.
+While the first protocol to be negotiated on a non-multiplexed connection is
+currently always a multiplexer protocol, future libp2p versions might want to
+negotiate non-multiplexer protocols as the first protocol on a connection.
 
 #### Early data optimization
 
@@ -206,43 +211,76 @@ Some handshake protocols (TLS 1.3, Noise) support sending of *Early Data*. We
 use the term *Early Data* to mean any application data that is sent before the
 proper completion of the handshake.
 
-In Protocol Select endpoints make use of Early Data to speed up stream
-multiplexer selection. As soon as an endpoints reaches a state during the
-handshake where it can send encrypted application data, it sends a list of
-supported stream multiplexers. Note that depending on the handshake protocol
-used (and the optimisations implemented), either the client or the server might
-arrive at this state first.
+In _Protocol Select_ endpoints make use of Early Data to speed up protocol
+negotiation. As soon as an endpoints reaches a state during the handshake where
+it can send encrypted application data, it sends a list of supported protocols,
+no matter whether it is in the role of a client or server. Note that depending
+on the handshake protocol used (and the optimisations implemented), either the
+client or the server might arrive at this state first.
 
 When using TLS 1.3, the server can send Early Data after it receives the
 ClientHello. Early Data is encrypted, but at this point of the handshake the
 client's identity is not yet verified.
 
 While Noise in principle allows sending of unencrypted data, endpoints MUST NOT
-use this to send their list of stream multiplexers. An endpoint MAY send it as
-soon it is possible to send encrypted data, even if the peers' identity is not
-verified at that point.
+use this to send their list of protocols. An endpoint MAY send it as soon it is
+possible to send encrypted data, even if the peers' identity is not verified at
+that point.
 
 Handshake protocols (or implementations of handshake protocols) that don't
-support sending of Early Data will have to run the stream multiplexer selection
-after the handshake completes.
-
-#### Monoplexed connections
-
-This negotiation scheme allows peers to negotiate a "monoplexed" connection,
-i.e. a connection that doesn't use any stream multiplexer, if we decide to add
-support for this in the future. Endpoints can offer support for monoplexed
-connections by offering the `/monoplex` stream multiplexer.
+support sending of Early Data will have to run the protocol negotiation after
+the handshake completes.
 
 #### 0-RTT
 
 When using 0-RTT session resumption as offered by TLS 1.3 and Noise, clients
-SHOULD remember the stream multiplexer they used before and optimistically offer
-that muxer only. A client can then optimistically send application data, not
-waiting for the list of supported multiplexers by the server. If the server
-still supports the muxer, it will choose the muxer offered by the client when
-intersecting the two lists, and proceed with the connection. If not, the list
-intersection fails and the connection is closed, which needs to be handled by
-the upper protocols.
+SHOULD remember the protocol they used before and optimistically offer that
+muxer only. A client can then optimistically send application data, not waiting
+for the list of supported protocols by the server. If the server still supports
+the muxer, it will choose the muxer offered by the client when intersecting the
+two lists, and proceed with the connection. If not, the list intersection fails
+and the connection is closed, which needs to be handled by the upper protocols.
+
+### Stream Protocol Negotiation
+
+Contrary to the above [Connection Protocol
+Negotiation](#Connection-Protocol-Negotiation) and its early data optimization,
+we assume that the initiator of a stream is always the endpoint able to send
+data first.
+
+Note: While libp2p currently does not support nested stream protocols, e.g. a
+compression protocol wrapping bitswap, future versions of libp2p might change
+that. The above assumption of the initiator being the endpoint to send data
+first, does not apply to protocol negotiations following the first negotiation
+on a stream.
+
+#### Initiator
+
+The initiator of a new stream is the first endpoint to send a message. We
+differentiate in the following two scenarios.
+
+1. **Optimistic Protocol Negotiation**: The endpoint knows exactly which
+   protocol it wants to use. It then only sends this protocol. It MAY start
+   sending application data right after the _Protocol Select_ protobuf message.
+   Since it has not received confirmation from the remote peer for the protocol,
+   any such data might be lost in such case.
+
+2. **Multi Protocol Negotiation**: The endpoint wants to use any of a set of
+   protocols, and lets the remote peer decide which one. It then sends the list
+   of protocols. It MUST wait for the peer's protocol choice before sending
+   application data.
+
+An initiator MUST treat the receipt of an empty list of protocols in response to
+its list of protocols as a negotiation failure and thus a stream error.
+
+#### Listener
+
+The listening endpoint replies to a list of protocols from the initiator by
+either:
+
+- Sending back a single entry list with the protocol it would like to speak.
+
+- Rejecting all proposed protocols by replying with an empty list of protocols.
 
 ## Transitioning from [Multistream Select]
 
@@ -379,70 +417,6 @@ message Use {
     Protocol protocol = 1;
 }
 ```
-
-### Multiplexer Protocol Negotiation
-
-When negotiating a stream multiplexer protocol each endpoint MUST send the
-`Offer` message exactly once as the first message on a transport that does not
-support native stream multiplexing. This message MUST NOT be sent on transports
-that support native stream multiplexing (e.g. QUIC). Once an endpoint has both
-sent and received the `Offer` message, it determines the stream multiplexer to
-use on the connection as described in the [Stream Multiplexer
-Selection](#Stream-Multiplexer-Selection) section. From this moment on, it now
-has a multiplexed connection that can be used to exchange application data.
-
-Note that since depending on the handshake protocol in use, either peer may
-arrive at this point in the connectionfirst, this is the only occurrence in the
-protocol where both peers send an `Offer` message, and the `Use` message is not
-used.
-
-An endpoint MUST treat the receipt of an empty `Offer` message as a connection
-error.
-
-### Stream Protocol Negotiation
-
-
-#### Initiator
-
-As the initiator of a new stream an endpoint uses the `Offer` message to
-initiate a conversation on a new stream. The `Offer` message can be used in two
-distinct scenarios:
-
-1. **Optimistic Protocol Negotiation**: The endpoint knows exactly which
-   protocol it wants to use. It then only lists this protocol in the `Offer`
-   message. It MAY start sending application data right after the protobuf
-   message. Since it has not received confirmation via an `Use` message stating
-   whether the remote peer actually supports the protocol, any such data might
-   be lost in such case. This is also referred to as _Optimistic Protocol
-   Negotiation_.
-
-2. **Multi Protocol Negotiation**: The endpoint wants to use any of a set of
-   protocols, and lets the remote peer decide which one. It then lists the set
-   of protocols in the `Offer` message. It MUST wait for the peer's choice of
-   the application protocol via a `Use` message before sending application data.
-
-An endpoint MUST treat the receipt of a `Use` message before having sent an
-`Offer` message on the stream and an empty `Use` message as a connection error.
-
-#### Listener
-
-The `Use` message is sent in response to the `Offer` message by the listening
-endpoint of a new stream. If the listening endpoint supports none of the
-protocol(s) listed in the `Offer` message, the endpoint MUST reset both the
-send- and the receive-side of the stream.
-
-1. **Optimistic Protocol Negotiation**: If an endpoint receives an `Offer`
-   message that only offers a single protocol, it accepts this protocol by
-   sending a `Use` message with that protocol only.
-
-2. **Multi Protocol Negotiation**: If an endpoint receives an `Offer` message
-   that offers multiple protocols, it chooses an application protocol that it
-   would like to speak on this stream. It informs the peer about its choice by
-   sending its selection in the `protocol` field of the `Use` message.
-
-An endpoint MUST treat the receipt of an empty `Offer` message as an error and
-close the stream. To ease protocol evolution, an empty `Offer` message is not
-considered a connection error.
 
 ### Protocol Names vs. Protocol IDs
 
