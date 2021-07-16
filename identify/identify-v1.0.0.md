@@ -3,9 +3,9 @@
 > The identify protocol is used to exchange basic information with other peers
 > in the network, including addresses, public keys, and capabilities.
 
-| Lifecycle Stage | Maturity Level | Status | Latest Revision |
-|-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r0, 2019-05-01  |
+| Lifecycle Stage | Maturity Level | Status     | Latest Revision |
+|-----------------|----------------|------------|-----------------|
+| 3D              | Recommendation | Deprecated | r0, 2019-05-01  |
 
 Authors: [@vyzo]
 
