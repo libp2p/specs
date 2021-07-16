@@ -29,6 +29,7 @@ and spec status.
         - [`identify`](#identify)
         - [`identify/push`](#identifypush)
     - [The Identify Message](#the-identify-message)
+        - [Differences to `/ipfs/id/1.0.0`](#differences-to-ipfsid100)
         - [signedPeerRecords](#signedpeerrecords)
         - [observedAddr](#observedaddr)
         - [protocols](#protocols)
