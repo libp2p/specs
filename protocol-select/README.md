@@ -358,7 +358,7 @@ Select or [Multistream Select].
 
 #### QUIC
 
-Since QUIC neither negotiates a security nor a stream muxer protocol, we'll have
+Since QUIC neither negotiates a security nor a stream muxer protocol, we'll have to
 wait a bit longer before we can distinguish between [Multistream Select] and
 Protocol Select, namely until the client opens the first stream. Conversely,
 this means that a server won't be able to open a stream until it has determined
