@@ -430,7 +430,7 @@ treated as an ordinal monotonically increasing number, with each increase
 identifying a new breaking version of the protocol.
 
 As an example for a made-up breaking change, say we would like the listed
-protocols in the `Offer` message to enumerate the protocols that the local node
+protocols in the `ProtoSelect` message to enumerate the protocols that the local node
 does *not* support. One would bump the `version` field by `1`. Implementations
 supporting both versions are able to differentiate an old and new version
 message. Implementations supporting only the old version would reject a new
