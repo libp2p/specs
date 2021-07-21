@@ -87,12 +87,13 @@ require a 32 bit address. Similarly, `tcp` requires a 16 bit port number.
 
 Although we referred to `/ip4/7.7.7.7` and `/tcp/1234` as "components" of a
 larger TCP/IP address, each is actually a valid multiaddr according to the
-multiaddr spec. However, not every **syntactically valid multiaddr is a functional description of a process in the network**.
-through the network. As we've seen, even a simple TCP/IP connection requires
-composing two multiaddrs into one. See the section on [composing
-multiaddrs](#composing-multiaddrs) for information on how multiaddrs can be
-combined, and the [Transport multiaddrs section](#transport-multiaddrs) for the
-combinations that describe valid transport addresses.
+multiaddr spec. However, not every **syntactically valid multiaddr is a
+functional description of a process in the network**. As we've seen, even a
+simple TCP/IP connection requires composing two multiaddrs into one. See the
+section on [composing multiaddrs](#composing-multiaddrs) for information on how
+multiaddrs can be combined, and the
+[Transport multiaddrs section](#transport-multiaddrs) for the combinations that
+describe valid transport addresses.
 
 The [multiaddr protocol table][multiaddr-proto-table] contains all currently
 defined protocols and the length of their address components.
