@@ -98,12 +98,6 @@ describe valid transport addresses.
 The [multiaddr protocol table][multiaddr-proto-table] contains all currently
 defined protocols and the length of their address components.
 
-Some multiaddr protocols do not require any additional addressing information.
-For example, WebSockets are by definition encapsulated within TCP/IP, so the
-`/ws` multiaddr protocol is encapsulated within a TCP/IP multiaddr:
-`/ip4/7.7.7.7/tcp/1234/ws`. This address is composed of three distinct
-parts, `/ip4/7.7.7.7`, `/tcp/1234`, and `/ws`.
-
 ### Composing multiaddrs
 
 As shown above, protocol addresses can be composed within a multiaddr in a way
