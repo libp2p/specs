@@ -102,7 +102,7 @@ Some multiaddr protocols do not require any additional addressing information.
 For example, WebSockets are by definition encapsulated within TCP/IP, so the
 `/ws` multiaddr protocol is encapsulated within a TCP/IP multiaddr:
 `/ip4/7.7.7.7/tcp/1234/ws`. This address is composed of three distinct
-multiaddrs, `/ip4/7.7.7.7`, `/tcp/1234`, and `/ws`.
+parts, `/ip4/7.7.7.7`, `/tcp/1234`, and `/ws`.
 
 ### Composing multiaddrs
 
