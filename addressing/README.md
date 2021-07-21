@@ -301,8 +301,9 @@ The `<udp-port>` argument must be a 16-bit unsigned integer in network byte orde
 
 ### `p2p-circuit` Relay Addresses
 
-The libp2p [circuit relay protocol][relay-spec] allows a libp2p peer to relay
-traffic between two peers who could otherwise not communicate directly.
+The libp2p [circuit relay protocol][relay-spec] allows a libp2p peer A to
+communicate with another peer B via a third party C. This is useful for
+circumstances where A and B would be unable to communicate directly.
 
 Once a connection to the relay is established, peers can accept incoming connections
 through the relay, using a `p2p-circuit` address.
