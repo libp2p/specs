@@ -25,8 +25,9 @@ For user-facing documentation, please see https://docs.libp2p.io
 
 In addition to describing the current state of libp2p, the specs repository
 serves as a coordination point and a venue to drive future developments in
-libp2p. To participate in the evolution of libp2p via the specs process, please
-see the [Contributions section](#contributions).
+libp2p. For the short and long term roadmap see [ROADMAP.md](./ROADMAP.md). To
+participate in the evolution of libp2p via the specs process, please see the
+[Contributions section](#contributions).
 
 ## Status
 
