@@ -74,8 +74,7 @@ multiaddr](#the-p2p-multiaddr).
 
 ### multiaddr basics
 
-A multiaddr generally represents a path through a stack of successively
-"higher-level" protocols that can be traversed to some destination.
+A multiaddr sequence of instructions that can be traversed to some destination.
 
 For example, the `/ip4/7.7.7.7/tcp/1234` multiaddr starts with `ip4`, which is
 the lowest-level protocol that requires an address. The `tcp` protocol runs on
