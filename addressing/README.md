@@ -78,8 +78,8 @@ A multiaddr generally represents a path through a stack of successively
 "higher-level" protocols that can be traversed to some destination.
 
 For example, the `/ip4/7.7.7.7/tcp/1234` multiaddr starts with `ip4`, which is
-the lowest-level protocol that requires an address. The `tcp` protocol is
-encapsulated within `ip4`, so it comes next.
+the lowest-level protocol that requires an address. The `tcp` protocol runs on
+top of `ip4`, so it comes next.
 
 The multiaddr above consists of two components, the `/ip4/7.7.7.7` component,
 and the `/tcp/1234` component. It's not possible to split either one further;
