@@ -55,9 +55,9 @@ means that we can't assume that we'll even be using an IP-backed network at all.
 
 To support a growing set of transport protocols without special-casing each
 addressing scheme, libp2p uses [multiaddr][multiaddr-repo] to encode network
-addresses for all supported transport protocols.
+addresses for all supported transport protocols, in a self-describing manner.
 
-This document covers [how multiaddr is used in libp2p](#multiaddr-in-libp2p).
+This document does not cover the address format ([multiaddr][multiaddr-repo]), but rather [how multiaddr is used in libp2p](#multiaddr-in-libp2p). For details on the former, visit linked spec.
 For more information on other use cases, or to find links to multiaddr
 implementations in various languages, see the [mulitaddr
 repository][multiaddr-repo].
@@ -65,7 +65,7 @@ repository][multiaddr-repo].
 ## multiaddr in libp2p
 
 multiaddr is used throughout libp2p for encoding network addresses, and
-addresses are generally exchanged over the wire as binary-encoded multiaddrs in
+addresses are generally exchanged over the wire as binary-encoded multiaddrs in, when addresses need to be shared or exchanged between processes, they are encoded in the binary representation of multiaddr.
 libp2p's core protocols. 
 
 When exchanging addresses, peers send a multiaddr containing both their network
@@ -88,7 +88,7 @@ require a 32 bit address. Similarly, `tcp` requires a 16 bit port number.
 
 Although we referred to `/ip4/7.7.7.7` and `/tcp/1234` as "components" of a
 larger TCP/IP address, each is actually a valid multiaddr according to the
-multiaddr spec. However, not every valid multiaddr describes a complete path
+multiaddr spec. However, not every **syntactically valid multiaddr is a functional description of a process in the network**.
 through the network. As we've seen, even a simple TCP/IP connection requires
 composing two multiaddrs into one. See the section on [composing
 multiaddrs](#composing-multiaddrs) for information on how multiaddrs can be
@@ -135,7 +135,7 @@ two multiaddrs into a composite. For example, `/ip4/7.7.7.7` can encapsulate
 `/tcp/42` to become `/ip4/7.7.7.7/tcp/42`.
 
 Note that no "sanity checking" is performed when encapsulating multiaddrs, and
-it is possible to create valid but useless multiaddrs like `/tcp/42/udp/42`
+it is possible to create valid but unsound/dysfunctional multiaddrs like `/tcp/42/udp/42`
 through encapsulation.
 
 #### Decapsulation
@@ -187,7 +187,7 @@ and other core libp2p protocols.
 #### Historical Note: the `ipfs` multiaddr Protocol
 
 The `p2p` multiaddr protocol was originally named `ipfs`, and may be printed as
-`/ipfs/<peer-id>` instead of `/p2p/<peer-id>` depending on the implementation in
+`/ipfs/<peer-id>` instead of `/p2p/<peer-id>` in its string representation depending on the implementation in
 use. Both names resolve to the same protocol code, and they are equivalent in the
 binary form.
 
@@ -271,7 +271,7 @@ The `<tcp-port>` argument must be a 16-bit unsigned integer.
 WebSocket connections are encapsulated within TCP/IP sockets, and the WebSocket
 multiaddr format mirrors this arrangement.
 
-A libp2p WebSocket multiaddr is of the form `<tcp-multiaddr>/ws`, where
+A libp2p WebSocket multiaddr is of the form `<tcp-multiaddr>/ws` or `<tcp-multiaddr>/wss` (TLS-encrypted), where
 `<tcp-multiaddr`> is a valid mulitaddr for the TCP transport, as [described
 above](#tcp).
 
@@ -283,7 +283,7 @@ multiaddr format mirrors this arrangement.
 A libp2p QUIC multiaddr is of the form `<ip-multiaddr>/udp/<udp-port>/quic`,
 where `<ip-multiaddr>` is a multiaddr that resolves to an IP address, as
 described in the [IP and Name Resolution section](#ip-and-name-resolution). 
-The `<udp-port>` argument must be a 16-bit unsigned integer.
+The `<udp-port>` argument must be a 16-bit unsigned integer in network byte order.
 
 
 ### `p2p-circuit` Relay Addresses
@@ -291,7 +291,7 @@ The `<udp-port>` argument must be a 16-bit unsigned integer.
 The libp2p [circuit relay protocol][relay-spec] allows a libp2p peer to relay
 traffic between two peers who could otherwise not communicate directly.
 
-Once a relay connection is established, peers can accept incoming connections
+Once a connection to the relay is established, peers can accept incoming connections
 through the relay, using a `p2p-circuit` address.
 
 Like the `ws` WebSocket multiaddr protocol the `p2p-circuit` multiaddr does not
