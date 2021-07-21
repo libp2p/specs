@@ -186,10 +186,11 @@ and other core libp2p protocols.
 
 #### Historical Note: the `ipfs` multiaddr Protocol
 
-The `p2p` multiaddr protocol was originally named `ipfs`, and may be printed as
-`/ipfs/<peer-id>` instead of `/p2p/<peer-id>` in its string representation depending on the implementation in
-use. Both names resolve to the same protocol code, and they are equivalent in the
-binary form.
+The `p2p` multiaddr protocol was originally named `ipfs`, and we've been eliminating
+support for the ipfs string representation of this multiaddr component. It may be
+printed as `/ipfs/<peer-id>` instead of `/p2p/<peer-id>` in its string representation
+depending on the implementation in use. Both names resolve to the same protocol code,
+and they are equivalent in the binary form.
 
 
 ## Transport multiaddrs
