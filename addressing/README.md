@@ -3,14 +3,15 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r0, 2019-05-27  |
+| 1A              | Recommendation | Active | r0, 2021-07-222  |
 
 
 Authors: [@yusefnapora]
 
-Interest Group: TBD
+Interest Group: [@mxinden]
 
 [@yusefnapora]: https://github.com/yusefnapora
+[@mxinden]: https://github.com/mxinden/
 
 See the [lifecycle document][lifecycle-spec] for context about maturity level
 and spec status.
@@ -74,7 +75,7 @@ multiaddr](#the-p2p-multiaddr).
 
 ### multiaddr basics
 
-A multiaddr sequence of instructions that can be traversed to some destination.
+A multiaddr is a sequence of instructions that can be traversed to some destination.
 
 For example, the `/ip4/7.7.7.7/tcp/1234` multiaddr starts with `ip4`, which is
 the lowest-level protocol that requires an address. The `tcp` protocol runs on
@@ -124,13 +125,9 @@ progressively "inward". For example, in the address `/ip4/7.7.7.7/tcp/80/ws`,
 the outermost protocol is IPv4, which encapsulates TCP streams, which in turn
 encapsulate WebSockets.
 
-All multiaddr implementations provide an `Encapsulate` method, which combines
-two multiaddrs into a composite. For example, `/ip4/7.7.7.7` can encapsulate
+All multiaddr implementations provide a way to _encapsulate_ two multiaddrs into a composite.
+For example, `/ip4/7.7.7.7` can encapsulate
 `/tcp/42` to become `/ip4/7.7.7.7/tcp/42`.
-
-Note that no "sanity checking" is performed when encapsulating multiaddrs, and
-it is possible to create valid but unsound/dysfunctional multiaddrs like `/tcp/42/udp/42`
-through encapsulation.
 
 #### Decapsulation
 
@@ -159,8 +156,8 @@ multiaddr looks like this:
 /p2p/QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N
 ```
 
-Where `QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N` is the base58-encoded
-multihash of a peer's public key, also known as their peer id.
+Where `QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N` is the string representation
+of a peer's peer ID derived from its public key.
 
 By itself, a `p2p` address does not give you enough addressing information to
 locate a peer on the network; it is not a transport address. However, like the
@@ -310,8 +307,7 @@ A full `p2p-circuit` address that describes a relay circuit is of the form:
 `<relay-multiaddr>/p2p-circuit/<destination-multiaddr>`.
 
 `<relay-multiaddr>` is the full address for the peer relaying the traffic (the
-"relay node"), including both the transport address and the `p2p` address
-containing the relay node's peer id.
+"relay node").
 
 The details of the transport connection between the relay node and the
 destination peer are usually not relevant to other peers in the network, so
