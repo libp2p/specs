@@ -58,16 +58,17 @@ To support a growing set of transport protocols without special-casing each
 addressing scheme, libp2p uses [multiaddr][multiaddr-repo] to encode network
 addresses for all supported transport protocols, in a self-describing manner.
 
-This document does not cover the address format ([multiaddr][multiaddr-repo]), but rather [how multiaddr is used in libp2p](#multiaddr-in-libp2p). For details on the former, visit linked spec.
-For more information on other use cases, or to find links to multiaddr
-implementations in various languages, see the [mulitaddr
+This document does not cover the address format ([multiaddr][multiaddr-repo]),
+but rather [how multiaddr is used in libp2p](#multiaddr-in-libp2p). For details
+on the former, visit linked spec. For more information on other use cases, or to
+find links to multiaddr implementations in various languages, see the [mulitaddr
 repository][multiaddr-repo].
 
 ## multiaddr in libp2p
 
-multiaddrs are used throughout libp2p for encoding network addresses.
-When addresses need to be shared or exchanged between processes, they are
-encoded in the binary representation of multiaddr.
+multiaddrs are used throughout libp2p for encoding network addresses. When
+addresses need to be shared or exchanged between processes, they are encoded in
+the binary representation of multiaddr.
 
 When exchanging addresses, peers send a multiaddr containing both their network
 address and peer id, as described in [the section on the `p2p`
@@ -75,7 +76,8 @@ multiaddr](#the-p2p-multiaddr).
 
 ### multiaddr basics
 
-A multiaddr is a sequence of instructions that can be traversed to some destination.
+A multiaddr is a sequence of instructions that can be traversed to some
+destination.
 
 For example, the `/ip4/7.7.7.7/tcp/1234` multiaddr starts with `ip4`, which is
 the lowest-level protocol that requires an address. The `tcp` protocol runs on
@@ -125,26 +127,25 @@ progressively "inward". For example, in the address `/ip4/7.7.7.7/tcp/80/ws`,
 the outermost protocol is IPv4, which encapsulates TCP streams, which in turn
 encapsulate WebSockets.
 
-All multiaddr implementations provide a way to _encapsulate_ two multiaddrs into a composite.
-For example, `/ip4/7.7.7.7` can encapsulate
-`/tcp/42` to become `/ip4/7.7.7.7/tcp/42`.
+All multiaddr implementations provide a way to _encapsulate_ two multiaddrs into
+a composite. For example, `/ip4/7.7.7.7` can encapsulate `/tcp/42` to become
+`/ip4/7.7.7.7/tcp/42`.
 
 #### Decapsulation
 
-Decapsulation takes a composite multiaddr and removes an "inner"
-multiaddr from it, returning the result.
+Decapsulation takes a composite multiaddr and removes an "inner" multiaddr from
+it, returning the result.
 
 For example, if we start with `/ip4/7.7.7.7/tcp/1234/ws` and decapsulate `/ws`,
-the result is `/ip4/7.7.7.7/tcp/1234`. 
+the result is `/ip4/7.7.7.7/tcp/1234`.
 
-It's important to note that decapsulation returns the original multiaddr up
-to the last occurrence of the decapsulated multiaddr. This may remove more
-than just the decapsulated component itself if there are more protocols
-encapsulated within it. Using our example above, decapsulating either
-`/tcp/1234/ws` _or_ `/tcp/1234` from `/ip4/7.7.7.7/tcp/ws` will result in
-`/ip4/7.7.7.7`. This is unsurprising if you consider the utility of the
-`/ip4/7.7.7.7/ws` address that would result from simply removing the `tcp`
-component.
+It's important to note that decapsulation returns the original multiaddr up to
+the last occurrence of the decapsulated multiaddr. This may remove more than
+just the decapsulated component itself if there are more protocols encapsulated
+within it. Using our example above, decapsulating either `/tcp/1234/ws` _or_
+`/tcp/1234` from `/ip4/7.7.7.7/tcp/ws` will result in `/ip4/7.7.7.7`. This is
+unsurprising if you consider the utility of the `/ip4/7.7.7.7/ws` address that
+would result from simply removing the `tcp` component.
 
 ### The p2p multiaddr
 
@@ -275,9 +276,9 @@ The `<tcp-port>` argument must be a 16-bit unsigned integer.
 WebSocket connections are encapsulated within TCP/IP sockets, and the WebSocket
 multiaddr format mirrors this arrangement.
 
-A libp2p WebSocket multiaddr is of the form `<tcp-multiaddr>/ws` or `<tcp-multiaddr>/wss` (TLS-encrypted), where
-`<tcp-multiaddr`> is a valid mulitaddr for the TCP transport, as [described
-above](#tcp).
+A libp2p WebSocket multiaddr is of the form `<tcp-multiaddr>/ws` or
+`<tcp-multiaddr>/wss` (TLS-encrypted), where `<tcp-multiaddr`> is a valid
+mulitaddr for the TCP transport, as [described above](#tcp).
 
 ### QUIC
 
@@ -296,8 +297,8 @@ The libp2p [circuit relay protocol][relay-spec] allows a libp2p peer A to
 communicate with another peer B via a third party C. This is useful for
 circumstances where A and B would be unable to communicate directly.
 
-Once a connection to the relay is established, peers can accept incoming connections
-through the relay, using a `p2p-circuit` address.
+Once a connection to the relay is established, peers can accept incoming
+connections through the relay, using a `p2p-circuit` address.
 
 Like the `ws` WebSocket multiaddr protocol the `p2p-circuit` multiaddr does not
 carry any additional address information. Instead it is composed with two other
