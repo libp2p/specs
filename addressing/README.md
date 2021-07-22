@@ -65,9 +65,9 @@ repository][multiaddr-repo].
 
 ## multiaddr in libp2p
 
-multiaddr is used throughout libp2p for encoding network addresses, and
-addresses are generally exchanged over the wire as binary-encoded multiaddrs in, when addresses need to be shared or exchanged between processes, they are encoded in the binary representation of multiaddr.
-libp2p's core protocols. 
+multiaddrs are used throughout libp2p for encoding network addresses.
+When addresses need to be shared or exchanged between processes, they are
+encoded in the binary representation of multiaddr.
 
 When exchanging addresses, peers send a multiaddr containing both their network
 address and peer id, as described in [the section on the `p2p`
