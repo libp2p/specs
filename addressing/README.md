@@ -3,7 +3,7 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
-| 1A              | Recommendation | Active | r0, 2021-07-222  |
+| 1A              | Recommendation | Active | r0, 2021-07-22  |
 
 
 Authors: [@yusefnapora]
