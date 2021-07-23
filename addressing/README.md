@@ -8,7 +8,7 @@
 
 Authors: [@yusefnapora]
 
-Interest Group: [@mxinden]
+Interest Group: [@mxinden, @Stebalien, @raulk, @marten-seemann, @vyzo]
 
 [@yusefnapora]: https://github.com/yusefnapora
 [@mxinden]: https://github.com/mxinden/
