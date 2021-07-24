@@ -237,6 +237,9 @@ resolves to `1.2.3.4`, libp2p will resolve the address
 A libp2p-specific DNS-backed format, `/dnsaddr` resolves addresses from a `TXT`
 record associated with the `_dnsaddr` subdomain of a given domain.
 
+Note that this is different from [dnslink](https://dnslink.io/), which uses
+`TXT` records to reference content addressed objects.
+
 For example, resolving `/dnsaddr/libp2p.io` will perform a `TXT` lookup for
 `_dnsaddr.libp2p.io`. If the result contains entries of the form
 `dnsaddr=<multiaddr>`, the embedded multiaddrs will be parsed and used.
