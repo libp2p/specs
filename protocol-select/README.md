@@ -69,31 +69,11 @@ Select]_ protocol.
 
 ### Improvements over _[Multistream Select]_
 
-- **Downgrade attacks** and **censorship resistance**
-
-  Given that **[Multistream Select]** negotiates a connection's security
-  protocol unencrypted and unauthenticated it is prone to [downgrade attack]s.
-  In addition, a man-in-the-middle can detect that a given connection is used
-  to carry libp2p traffic, allowing attackers to censor such connections.
-
-  **Protocol Select** is combined with a change to the Multiaddr format,
-  advertising the secure channel protocol through the latter instead of
-  negotiating them in-band. Thus [Downgrade attack]s are no longer possible at
-  the protocol negotiation level and a man-in-the-middle can no longer detect
-  a connection being used for libp2p traffic through the negotation process.
-
-- **Connection establishment**
-
-  In addition to making us vulnerable to downgrade attacks, negotiating the
-  security protocol takes one round-trip in the common case with **[Multistream
-  Select]**. On top of that negotiating a stream multiplexer (on TCP) takes
-  another round-trip.
-
-  **Protocol Select** on the other hand depends on security protocols being
-  advertised, thereby eliminating the need for negotiating them. For optimized
-  implementations, stream muxer negotiation will take zero round-trips for the
-  client (depending on the details of the cryptographic handshake protocol). In
-  that case, the client will be able to immediately open a stream after
+- **Protocol Select** requires security protocols to be advertised, and doesn't 
+  allow negotiation them. For optimized implementations, stream muxer
+  negotiation will take zero round-trips for the client (depending on the
+  details of the cryptographic handshake protocol).
+  In that case, the client will be able to immediately open a stream after
   completing the cryptographic handshake. In addition the protocol supports
   zero-round-trip optimistic stream protocol negotiation when proposing a single
   protocol.
@@ -144,28 +124,8 @@ communicate and thus both endpoints MUST close the connection or stream.
 ### Secure Channel Selection
 
 Conversely to [Multistream Select], secure channel protocols are not dynamically
-negotiated in-band. Instead, they are announced upfront in the peer multiaddrs
-(**TODO**: add link to multiaddr spec). This way, implementations can jump
-straight into a cryptographic handshake, thus curtailing the possibility of
-packet-inspection-based censorship and dynamic downgrade attacks.
-
-Given that there is no in-band security protocol negotiation, nodes have to
-listen on different ports for each offered security protocol. As an example a
-node supporting both [Noise] and [TLS] over TCP will need to listen on two TCP
-ports e.g. `/ip6/2001:DB8::/tcp/9090/noise` and `/ip6/2001:DB8::/tcp/443/tls`.
-
-Advertising the secure channel protocol through the peer's Multiaddr instead of
-negotiating the protocol in-band forces users to advertise an updated Multiaddr
-when changing the secure channel protocol in use. This is especially cumbersome
-when using hardcoded Multiaddresses. Users may leverage the [dnsaddr] Multiaddr
-protocol as well as using a new UDP or TCP port for the new protocol to ease the
-transition.
-
-Note: A peer MAY advertise a Multiaddr that includes a secure channel handshake
-protocol like `/noise` even if it doesn't support Protocol Select. See
-[Heuristic section](#heuristic) below for details on how listeners can
-differentiate the negotiation protocol spoken by the dialer on incoming
-connections.
+negotiated in-band. Implementations MUST advertise multiaddr containing the
+security protocol, as described in the [multiaddr spec](https://github.com/libp2p/specs/pull/353).
 
 ### TCP Simultaneous Open
 
@@ -347,22 +307,17 @@ differentiated, followed by **how** one can differentiate the two.
 
 #### TCP
 
-Note: Since we decouple the multiaddr change (TODO: Be more specific. What is
-the multiaddr change?) from support for Protocol Select, dialing a TCP based
-address that contains the security handshake protocol *does not* imply that
-we'll speak Protocol Select.
-
 The first message received on a freshly established and secured TCP connection
 will be a message trying to negotiate the stream muxer using either Protocol
 Select or [Multistream Select].
 
 #### QUIC
 
-Since QUIC neither negotiates a security nor a stream muxer protocol, we'll have to
-wait a bit longer before we can distinguish between [Multistream Select] and
-Protocol Select, namely until the client opens the first stream. Conversely,
-this means that a server won't be able to open a stream until it has determined
-which protocol is used.
+Since QUIC provides native stream multiplexing, there's no need to negotiate
+a stream multiplexer. We therefore have to wait a bit longer before we can
+distinguish between [Multistream Select] and Protocol Select, namely until
+the client opens the first stream. Conversely, this means that a server won't
+be able to open a stream until it has determined which protocol is used.
 
 #### Protocol Differentiation
 
