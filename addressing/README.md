@@ -147,6 +147,33 @@ within it. Using our example above, decapsulating either `/tcp/1234/ws` _or_
 unsurprising if you consider the utility of the `/ip4/7.7.7.7/ws` address that
 would result from simply removing the `tcp` component.
 
+### The security multiaddr
+
+Peers MAY advertise their addresses without the security protocol, e.g.
+`/ip4/6.6.6.6/tcp/1234/` or `/ip4/6.6.6.6/udp/1234/quic`. The security handshake
+protocol is then negotiated using the [multistream](../multistream.md). This is
+the way the libp2p handshake worked until mid 2021.
+This poses a security problem, as the negotiation was not authenticated and
+therefore susceptible to man-in-the-middle attacks. A MITM could modify the list
+of supported handshake protocols, thereby forcing a downgrade to a (potentially)
+less secure handshake protocol. Note that since QUIC is standardized to use
+TLS 1.3, no handshake protocol needs to be negotiated when using QUIC.
+
+Peers SHOULD encapsulate the security protocol in the addresses they advertise,
+for example `/ip4/6.6.6.6/tcp/1234/tls` for a TLS 1.3 server listening on TCP
+port 1234 and `/ip4/6.6.6.6/tcp/1235/noise` for a Noise server listening on TCP
+port 1235. QUIC multiaddrs remain unchanged.
+The nodes jump straight into a cryptographic handshake, thus curtailing the
+possibility of packet-inspection-based censorship and dynamic downgrade attacks.
+This also applies to circuit addresses: the security protocol is encoded in the
+`<destination address>` as defined in [`p2p-circuit` Relay Addresses](#p2p-circuit-relay-addresses).
+
+Implementations using [Protocol Select](https://github.com/libp2p/specs/pull/349/)
+(**TODO**: update link) MUST encapsulate the security protocol in the multiaddr.
+Note that it’s valid to assume that any node that encapsulated the security
+protocol in their multiaddr also supports Protocol Select.
+
+
 ### The p2p multiaddr
 
 libp2p defines the `p2p` multiaddr protocol, whose address component is the
