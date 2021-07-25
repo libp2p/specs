@@ -100,11 +100,11 @@ Select]_ protocol.
 
 - **Data schema**
 
-  The **[Multistream Select]** protocol is defined as a plaintext protocol
-  with no strict schema definition, making both implementation and protocol
-  evolution time consuming and error-prone. See [rust-libp2p/1795] showcasing
-  complexity for implementors and [specs/196] to showcase difficulty evolving
-  protocol.
+  The **[Multistream Select]** protocol is defined as a bespoke format that
+  doesn't clearly delineate between different atomic messages,making both 
+  implementation and protocol evolution time consuming and error-prone.
+  See [rust-libp2p/1795] showcasing complexity for implementors and [specs/196]
+  to showcase difficulty evolving protocol.
 
   The **Protocol Select** protocol will use a binary data format defined in a
   machine parseable schema language allowing protocol evolution at the schema
