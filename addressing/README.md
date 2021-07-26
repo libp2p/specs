@@ -147,11 +147,11 @@ within it. Using our example above, decapsulating either `/tcp/1234/ws` _or_
 unsurprising if you consider the utility of the `/ip4/7.7.7.7/ws` address that
 would result from simply removing the `tcp` component.
 
-### The security multiaddr
+### The multiaddr security component
 
-Peers MAY advertise their addresses without the security protocol, e.g.
+Peers MAY advertise their addresses without a security protocol, e.g.
 `/ip4/6.6.6.6/tcp/1234/` or `/ip4/6.6.6.6/udp/1234/quic`. The security handshake
-protocol is then negotiated using the [multistream](../multistream.md). This is
+protocol is then negotiated using [multistream-select](../connections/README.md#multistream-select). This is
 the way the libp2p handshake worked until mid 2021.
 This poses a security problem, as the negotiation was not authenticated and
 therefore susceptible to man-in-the-middle attacks. A MITM could modify the list
