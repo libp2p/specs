@@ -168,6 +168,13 @@ possibility of packet-inspection-based censorship and dynamic downgrade attacks.
 This also applies to circuit addresses: the security protocol is encoded in the
 `<destination address>` as defined in [`p2p-circuit` Relay Addresses](#p2p-circuit-relay-addresses).
 
+Advertising the secure channel protocol through the peer's Multiaddr instead of
+negotiating the protocol in-band forces users to advertise an updated Multiaddr
+when changing the secure channel protocol in use. This is especially cumbersome
+when using hardcoded Multiaddresses. Users may leverage the [dnsaddr] Multiaddr
+protocol as well as using a new UDP or TCP port for the new protocol to ease the
+transition.
+
 Implementations using [Protocol Select](https://github.com/libp2p/specs/pull/349/)
 (**TODO**: update link) MUST encapsulate the security protocol in the multiaddr.
 Note that it’s not valid to assume that any node that encapsulated the security
