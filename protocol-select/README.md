@@ -69,7 +69,9 @@ Select]_ protocol.
 
 ### Improvements over _[Multistream Select]_
 
-- **Protocol Select** requires security protocols to be advertised, and doesn't 
+- **Connection establishment**
+  
+  **Protocol Select** requires security protocols to be advertised, and doesn't 
   allow negotiation them. For optimized implementations, stream muxer
   negotiation will take zero round-trips for the client (depending on the
   details of the cryptographic handshake protocol).
