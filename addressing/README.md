@@ -170,7 +170,7 @@ This also applies to circuit addresses: the security protocol is encoded in the
 
 Implementations using [Protocol Select](https://github.com/libp2p/specs/pull/349/)
 (**TODO**: update link) MUST encapsulate the security protocol in the multiaddr.
-Note that it’s valid to assume that any node that encapsulated the security
+Note that it’s not valid to assume that any node that encapsulated the security
 protocol in their multiaddr also supports Protocol Select.
 
 
