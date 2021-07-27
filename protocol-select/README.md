@@ -330,7 +330,11 @@ Messages are encoded via the `ProtoSelect` message type. With the current
 version of _Protocol Select_ detailed in this document, the `version` field of
 the `ProtocolSelect` message is set to `1`. Implementations MUST reject messages
 with a `version` other than the current version. See [Protocol
-Evolution](#Protocol-Evolution) for details.
+Evolution](#Protocol-Evolution) for details. The `Protocol` `name` field is a
+UTF-8 encoded string identifying a specific protocol, same as in _Multistream
+Select_. See [Protocol Negotiation
+section](../connections/README.md#protocol-negotiation) for libp2p specific
+_Protocol Name_ conventions such as path-like structure.
 
 ```protobuf
 syntax = "proto2";
@@ -346,9 +350,6 @@ message ProtoSelect {
     repeated Protocol protocols = 2;
 }
 ```
-
-<!-- TODO: Document what `name` is. E.g. UTF-8 and same as used in Multistream
-Select. -->
 
 ### Protocol Evolution
 
