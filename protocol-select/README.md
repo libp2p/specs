@@ -343,6 +343,8 @@ Evolution](#Protocol-Evolution) for details. Both the `Offer` and the `Use`
 messages are wrapped with the `ProtocolSelect` message at all time.
 
 ```protobuf
+syntax = "proto2";
+
 message ProtoSelect {
     uint32 version = 1;
 
@@ -495,6 +497,12 @@ mechanisms:
   type is used.
 
 * _Why did you use proto2 and not proto3?_
+
+  By default [all libp2p protocols use proto2 over
+  proto3](../README.md#protocols). In addition, to the best of our knowledge,
+  there are no proto3 features that the _Protocol Select_ protocol could benefit
+  off.
+
 * _Why not include Protocol IDs from the start_?
 
   _Protocol IDs_ are part of the initial _Protocol Select_ version to reduce
