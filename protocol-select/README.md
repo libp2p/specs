@@ -1,7 +1,3 @@
-<!-- mxinden TODO: Update
-https://github.com/libp2p/specs/tree/master/connections#protocol-negotiation in
-Protocol Select pull request. -->
-
 # Protocol Select
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
