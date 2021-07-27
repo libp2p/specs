@@ -2,9 +2,6 @@
 https://github.com/libp2p/specs/tree/master/connections#protocol-negotiation in
 Protocol Select pull request. -->
 
-<!-- mxinden TODO: Hole Punching is not only concerned with punching holes into
-NATs, but Firewalls and NATs. Should this fact be stressed in this document? -->
-
 <!-- mxinden TODO: Consistently use either dialer/listener or client/server -->
 
 # Protocol Select
@@ -444,13 +441,13 @@ mechanisms:
 * _Why don't we define something more sophisticated for uncoordinated TCP
   Simultaneous Open?_
 
-  We make use of TCP Simultaneous Open for NAT Traversal. In this situation, we
-  coordinate the roles of client and server using the DCUtR protocol, so there's
-  no need to do anything beyond that. The only situation where a Simultaneous
-  Open might otherwise occur in the wild is when two peers happen to dial each
-  other at the same time. This should occur rarely, and if it happens, a sane
-  strategy would be to re-dial the peer after a (randomized) exponential
-  backoff.
+  We make use of TCP Simultaneous Open for firewall and NAT Traversal. In this
+  situation, we coordinate the roles of client and server using the DCUtR
+  protocol, so there's no need to do anything beyond that. The only situation
+  where a Simultaneous Open might otherwise occur in the wild is when two peers
+  happen to dial each other at the same time. This should occur rarely, and if
+  it happens, a sane strategy would be to re-dial the peer after a (randomized)
+  exponential backoff.
 
 * _Why don't we use the peer IDs to break the tie on uncoordinated TCP
   Simultaneous Open?_
