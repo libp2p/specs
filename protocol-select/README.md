@@ -414,7 +414,7 @@ follows:
 message Protocol {
     oneof protocol {
         string name = 1;
-+       uint64 id = 2;
++       bytes id = 2;
     }
 }
 ```
