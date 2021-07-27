@@ -25,7 +25,7 @@ and spec status.
 - [Protocol Select](#protocol-select)
     - [Table of Contents](#table-of-contents)
     - [Introduction](#introduction)
-        - [Improvements over _[Multistream Select]_](#improvements-over-_multistream-select_)
+        - [Improvements over Multistream Select](#improvements-over-multistream-select)
     - [High-Level Overview](#high-level-overview)
         - [Basic Flow](#basic-flow)
         - [Secure Channel Selection](#secure-channel-selection)
@@ -38,7 +38,7 @@ and spec status.
         - [Stream Protocol Negotiation](#stream-protocol-negotiation)
             - [Initiator](#initiator)
             - [Listener](#listener)
-    - [Transitioning from [Multistream Select]](#transitioning-from-multistream-select)
+    - [Transitioning from Multistream Select](#transitioning-from-multistream-select)
         - [Multiphase Rollout](#multiphase-rollout)
             - [Phase 1](#phase-1)
             - [Phase 2](#phase-2)
@@ -62,7 +62,7 @@ _Protocol Select_ is a protocol negotiation protocol. It is aimed at negotiating
 libp2p protocols on connections and streams. It replaces the _[Multistream
 Select]_ protocol.
 
-### Improvements over _[Multistream Select]_
+### Improvements over Multistream Select
 
 - **Connection establishment**
   
@@ -239,7 +239,7 @@ either:
 
 - Rejecting all proposed protocols by replying with an empty list of protocols.
 
-## Transitioning from [Multistream Select]
+## Transitioning from Multistream Select
 
 Protocol Select is not compatible with [Multistream Select] both in its
 semantics as well as on the wire. Live libp2p-based networks, currently using
