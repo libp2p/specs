@@ -25,8 +25,9 @@ For user-facing documentation, please see https://docs.libp2p.io
 
 In addition to describing the current state of libp2p, the specs repository
 serves as a coordination point and a venue to drive future developments in
-libp2p. To participate in the evolution of libp2p via the specs process, please
-see the [Contributions section](#contributions).
+libp2p. For the short and long term roadmap see [ROADMAP.md](./ROADMAP.md). To
+participate in the evolution of libp2p via the specs process, please see the
+[Contributions section](#contributions).
 
 ## Status
 
@@ -58,6 +59,7 @@ expected lifecycle and document formatting.
 These specs define abstractions and data types that form the "core" of libp2p
 and are used throughout the system.
 
+- [Addressing][spec_addressing] - Working with addresses in libp2p.
 - [Connections and Upgrading][spec_connections] - Establishing secure,
   multiplexed connections between peers, possibly over insecure, single stream transports.
 - [Peer Ids and Keys][spec_peerids] - Public key types & encodings, peer id calculation, and
@@ -116,3 +118,4 @@ you feel an issue isn't the appropriate place for your topic, please join our
 [spec_peerids]: ./peer-ids/peer-ids.md
 [spec_connections]: ./connections/README.md
 [spec_plaintext]: ./plaintext/README.md
+[spec_addressing]: ./addressing/README.md

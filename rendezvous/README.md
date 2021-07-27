@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r2, 2021-06-24  |
+| 1A              | Working Draft | Active | r3, 2021-07-12  |
 
 Authors: [@vyzo]
 
@@ -122,7 +122,9 @@ an `E_INVALID_TTL` status.
 Peers can refresh their registrations at any time with a new
 `REGISTER` message; the TTL of the new message supersedes previous
 registrations. Peers can also cancel existing registrations at any
-time with an explicit `UNREGISTER` message.
+time with an explicit `UNREGISTER` message. An `UNREGISTER` message does
+**not** have an explicit response. `UNREGISTER` messages for a namespace
+that a client is currently not registered for should be treated as a no-op.
 
 The registration response includes the actual TTL of the registration,
 so that peers know when to refresh.
@@ -225,7 +227,7 @@ message Message {
 
   message Unregister {
     optional string ns = 1;
-    optional bytes id = 2;
+    // optional bytes id = 2; deprecated as per https://github.com/libp2p/specs/issues/335
   }
 
   message Discover {
