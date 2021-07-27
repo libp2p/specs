@@ -2,8 +2,6 @@
 https://github.com/libp2p/specs/tree/master/connections#protocol-negotiation in
 Protocol Select pull request. -->
 
-<!-- mxinden TODO: Consistently use either dialer/listener or client/server -->
-
 # Protocol Select
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
@@ -70,8 +68,8 @@ Select]_ protocol.
   
   **Protocol Select** requires security protocols to be advertised, and doesn't
   allow negotiation them. For optimized implementations, stream muxer
-  negotiation will take zero round-trips for the client (depending on the
-  details of the cryptographic handshake protocol). In that case, the client
+  negotiation will take zero round-trips for the dialer (depending on the
+  details of the cryptographic handshake protocol). In that case, the dialer
   will be able to immediately open a stream after completing the cryptographic
   handshake. In addition the protocol supports zero-round-trip optimistic stream
   protocol negotiation when proposing a single protocol.
@@ -104,7 +102,7 @@ Select]_ protocol.
 
 ### Basic Flow
 
-Both endpoints, client and server, send a list of supported protocols. Whether
+Both endpoints, dialer and listener, send a list of supported protocols. Whether
 an endpoint sends its list before or after it has received the remote's list
 depends on the context and is detailed below. Nodes SHOULD order the list by
 preference. Once an endpoint receives a list from a remote, the protocol to be
@@ -112,9 +110,9 @@ used on the connection or stream is determined by intersecting ones own and the
 remote list, as follows:
 
 1. All protocols that aren't supported by both endpoints are removed from the
-   clients' list of protocols.
+   dialer's list of protocols.
 
-2. The protocol chosen is the first protocol of the client's list.
+2. The protocol chosen is the first protocol of the dialer's list.
 
 If there is no overlap between the two lists, the two endpoints can not
 communicate and thus both endpoints MUST close the connection or stream.
@@ -130,8 +128,8 @@ security protocol, as described in the [multiaddr spec](https://github.com/libp2
 TCP allows the establishment of a single connection if two endpoints start
 initiating a connection at the same time. This is called _TCP Simultaneous
 Open_. Since many application protocols running on top of a connection (most
-notably the secure channel protocols e.g. TLS) assume their role (client /
-server) based on who initiated the connection, TCP Simultaneous Open connections
+notably the secure channel protocols e.g. TLS) assume their role (dialer /
+listener) based on who initiated the connection, TCP Simultaneous Open connections
 need special handling. This special handling is described below, differentiating
 between two cases of TCP Simultaneous Open: coordinated and uncoordinated.
 
@@ -140,7 +138,7 @@ between two cases of TCP Simultaneous Open: coordinated and uncoordinated.
 When doing Hole Punching over TCP, the [_Direct Connection Upgrade through
 Relay_][DCUTR] protocol coordinates the two nodes to _simultaneously_ dial each
 other, thus, when successful, resulting in a TCP Simultaneous Open connection.
-The two nodes are assigned their role (client / server) out-of-band by the
+The two nodes are assigned their role (dialer / listener) out-of-band by the
 [_Direct Connection Upgrade through Relay_][DCUTR] protocol.
 
 #### Uncoordinated TCP Simultaneous Open
@@ -148,10 +146,10 @@ The two nodes are assigned their role (client / server) out-of-band by the
 In the uncoordinated case, where two nodes coincidentally simultaneously dial
 each other, resulting in a TCP Simultaneous Open connection, the secure channel
 protocol handshake will fail, given that both nodes assume to be in the
-initiating / client role. E.g. in the case of TLS the protocol will report the
+initiating / dialer role. E.g. in the case of TLS the protocol will report the
 receipt of a ClientHello while it expected a ServerHello. Once the security
 handshake failed due to TCP Simultaneous Open, i.e. due to both sides assuming
-to be the client, nodes SHOULD close the connection and back off for a random
+to be the dialer, nodes SHOULD close the connection and back off for a random
 amount of time before trying to reconnect.
 
 ### Connection Protocol Negotiation
@@ -173,13 +171,13 @@ proper completion of the handshake.
 In _Protocol Select_ endpoints make use of Early Data to speed up protocol
 negotiation. As soon as an endpoints reaches a state during the handshake where
 it can send encrypted application data, it sends a list of supported protocols,
-no matter whether it is in the role of a client or server. Note that depending
+no matter whether it is in the role of a dialer or listener. Note that depending
 on the handshake protocol used (and the optimisations implemented), either the
-client or the server might arrive at this state first.
+dialer or the dialer might arrive at this state first.
 
-When using TLS 1.3, the server can send Early Data after it receives the
+When using TLS 1.3, the listener can send Early Data after it receives the
 ClientHello. Early Data is encrypted, but at this point of the handshake the
-client's identity is not yet verified.
+dialer's identity is not yet verified.
 
 While Noise in principle allows sending of unencrypted data, endpoints MUST NOT
 use this to send their list of protocols. An endpoint MAY send it as soon it is
@@ -192,11 +190,11 @@ the handshake completes.
 
 #### 0-RTT
 
-When using 0-RTT session resumption as offered by TLS 1.3 and Noise, clients
+When using 0-RTT session resumption as offered by TLS 1.3 and Noise, dialers
 SHOULD remember the protocol they used before and optimistically offer that
-protocol only. A client can then optimistically send application data, not waiting
-for the list of supported protocols by the server. If the server still supports
-the protocol, it will choose the protocol offered by the client when intersecting the
+protocol only. A dialer can then optimistically send application data, not waiting
+for the list of supported protocols by thelistener. If the listener still supports
+the protocol, it will choose the protocol offered by the dialer when intersecting the
 two lists, and proceed with the connection. If not, the list intersection fails
 and the connection is closed, which needs to be handled by the upper protocols.
 
@@ -314,7 +312,7 @@ Select or [Multistream Select].
 Since QUIC provides native stream multiplexing, there's no need to negotiate
 a stream multiplexer. We therefore have to wait a bit longer before we can
 distinguish between [Multistream Select] and Protocol Select, namely until
-the client opens the first stream. Conversely, this means that a server won't
+the dialer opens the first stream. Conversely, this means that a listener won't
 be able to open a stream until it has determined which protocol is used.
 
 #### Protocol Differentiation
@@ -442,7 +440,7 @@ mechanisms:
   Simultaneous Open?_
 
   We make use of TCP Simultaneous Open for firewall and NAT Traversal. In this
-  situation, we coordinate the roles of client and server using the DCUtR
+  situation, we coordinate the roles of dialer and listener using the DCUtR
   protocol, so there's no need to do anything beyond that. The only situation
   where a Simultaneous Open might otherwise occur in the wild is when two peers
   happen to dial each other at the same time. This should occur rarely, and if
