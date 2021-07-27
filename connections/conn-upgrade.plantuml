@@ -1,28 +1,16 @@
 @startuml
-
 entity Initiator
 entity Responder
+
+
+== Upgrade with security protocol from listener's multiaddr ==
+
+... Security handshake ...
 
 == Initial multistream handshake ==
 
 Responder -> Initiator: /multistream/1.0.0
 Initiator -> Responder: /multistream/1.0.0
-
-== Negotiate security protocol ==
-
-Initiator -> Responder: /tls/1.0.0
-note left: Initiator proposes TLS for security
-
-Responder -> Initiator: na
-note right: Responder does not support TLS yet
-
-Initiator -> Responder: /noise
-note left: Initiator falls back to Noise
-
-Responder -> Initiator: /noise
-note right: Responder supports Noise, echoes back protocol id
-
-... Noise handshake ...
 
 == Negotiate stream multiplexer ==
 
@@ -31,6 +19,4 @@ note left: Initiator proposes mplex for stream multiplexing
 
 Responder -> Initiator: /mplex/1.0.0
 note right: Responder supports mplex, echoes back protocol id
-
-
 @enduml

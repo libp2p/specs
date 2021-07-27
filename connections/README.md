@@ -99,10 +99,11 @@ connections, and **listen** to refer to accepting inbound connections.
 One of libp2p's core design goals is to be adaptable to many network
 environments, including those that don't yet exist. To provide this flexibility,
 the connection upgrade process supports multiple protocols for connection
-security and stream multiplexing and allows peers to select which to use for
-each connection. 
+security and stream multiplexing. While security protocols are specified
+out-of-band through a peer's multiaddr (see [addressing specification]), stream
+multiplexing protocols are selected in-band.
 
-The process of selecting protocols is called **protocol negotiation**. In
+The process of selecting protocols in-band is called **protocol negotiation**. In
 addition to its role in the connection upgrade process, protocol negotiation is
 also used whenever [a new stream is opened over an existing
 connection](#opening-new-streams-over-a-connection). This allows libp2p
@@ -133,10 +134,10 @@ details, see [the multistream-select repository][mss].
 
 Before engaging in the multistream-select negotiation process, it is assumed
 that the peers have already established a bidirectional communication channel,
-which may or may not have the security and multiplexing capabilities of a libp2p
-connection. If those capabilities are missing, multistream-select is used in the
-[connection upgrade process](#upgrading-connections) to determine how to provide
-them.
+which may or may not have the multiplexing capability of a libp2p connection. If
+that capability is missing, multistream-select is used in the [connection
+upgrade process](#upgrading-connections) to determine which multiplexing
+protocol to use on a given connection.
 
 Messages are sent encoded as UTF-8 byte strings, and they are always followed by
 a `\n` newline character. Each message is also prefixed with its length in bytes
@@ -190,11 +191,10 @@ that do not natively support the core libp2p capabilities of security and stream
 multiplexing. The process of layering capabilities onto "raw" transport
 connections is called "upgrading" the connection.
 
-Because there are many valid ways to provide the libp2p capabilities, the
-connection upgrade process uses protocol negotiation to decide which specific
-protocols to use for each capability. The protocol negotiation process uses
-multistream-select as described in the [Protocol
-Negotiation](#protocol-negotiation) section.
+The security protocol to be used on a connection is determined through the
+listeners multiaddr. The multiplexing protocol is determined using protocol
+negotiation. The protocol negotiation process uses multistream-select as
+described in the [Protocol Negotiation](#protocol-negotiation) section.
 
 When raw connections need both security and multiplexing, security is always
 established first, and the negotiation for stream multiplexing takes place over
@@ -204,23 +204,19 @@ Here's an example of the connection upgrade process:
 
 ![see conn-upgrade.plantuml for diagram source](conn-upgrade.svg)
 
-First, the peers both send the multistream protocol id to establish that they'll
-use multistream-select to negotiate protocols for the connection upgrade.
 
-Next, the Initiator proposes the [TLS protocol][tls-libp2p] for encryption, but
-the Responder rejects the proposal as they don't support TLS.
+The security protocol to be used on a connection is determined by the listener's
+multiaddr, see [addressing specification], in this case the Noise protocol. The
+peers exchange the Noise handshake to establish a secure channel. If the Noise
+handshake fails, the connection establishment process aborts. If successful, the
+peers will use the secured channel for all future communications, including the
+remainder of the connection upgrade process.
 
-The Initiator then proposes the [Noise protocol][noise-spec], which is supported
-by the Responder. The Listener echoes back the protocol id for Noise to indicate
-agreement.
+Once security has been established, the peers both send the multistream protocol
+id to establish that they'll use multistream-select to negotiate protocols for
+the connection upgrade.
 
-At this point the Noise protocol takes over, and the peers exchange the Noise
-handshake to establish a secure channel. If the Noise handshake fails, the
-connection establishment process aborts. If successful, the peers will use the
-secured channel for all future communications, including the remainder of the
-connection upgrade process.
-
-Once security has been established, the peers negotiate which stream multiplexer
+Then the peers negotiate which stream multiplexer
 to use. The negotiation process works in the same manner as before, with the
 dialing peer proposing a multiplexer by sending its protocol id, and the
 listening peer responding by either echoing back the supported id or sending
@@ -409,3 +405,4 @@ updated to incorporate the changes.
 [simopen]: ./simopen.md
 [resource-manager-issue]: https://github.com/libp2p/go-libp2p/issues/635
 [hole-punching]: ./hole-punching.md
+[addressing specification]: ../addressing/README.md
