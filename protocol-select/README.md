@@ -486,6 +486,14 @@ mechanisms:
   negligible.
 
 * _Why not two messages, e.g. `Offer` and `Use`?_
+
+  Differentiating the two roles of an endpoint offering a list of protocols and
+  an endpoint accepting a protocol at the type level through an `Offer` and a
+  `Use` message would increase type safety. At the same time, as described in
+  the [Basic Flow section](#basic-flow) whether there is a clear cut between the
+  two roles depends on the context. Thus, to reduce complexity a single message
+  type is used.
+
 * _Why did you use proto2 and not proto3?_
 * _Why not include Protocol IDs from the start_?
 
