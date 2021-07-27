@@ -330,8 +330,7 @@ Messages are encoded via the `ProtoSelect` message type. With the current
 version of _Protocol Select_ detailed in this document, the `version` field of
 the `ProtocolSelect` message is set to `1`. Implementations MUST reject messages
 with a `version` other than the current version. See [Protocol
-Evolution](#Protocol-Evolution) for details. Both the `Offer` and the `Use`
-messages are wrapped with the `ProtocolSelect` message at all time.
+Evolution](#Protocol-Evolution) for details.
 
 ```protobuf
 syntax = "proto2";
