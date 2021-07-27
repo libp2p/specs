@@ -71,22 +71,21 @@ Select]_ protocol.
 
 - **Connection establishment**
   
-  **Protocol Select** requires security protocols to be advertised, and doesn't 
+  **Protocol Select** requires security protocols to be advertised, and doesn't
   allow negotiation them. For optimized implementations, stream muxer
   negotiation will take zero round-trips for the client (depending on the
-  details of the cryptographic handshake protocol).
-  In that case, the client will be able to immediately open a stream after
-  completing the cryptographic handshake. In addition the protocol supports
-  zero-round-trip optimistic stream protocol negotiation when proposing a single
-  protocol.
+  details of the cryptographic handshake protocol). In that case, the client
+  will be able to immediately open a stream after completing the cryptographic
+  handshake. In addition the protocol supports zero-round-trip optimistic stream
+  protocol negotiation when proposing a single protocol.
 
 - **Data schema**
 
   The **[Multistream Select]** protocol is defined as a bespoke format that
-  doesn't clearly delineate between different atomic messages,making both 
-  implementation and protocol evolution time consuming and error-prone.
-  See [rust-libp2p/1795] showcasing complexity for implementors and [specs/196]
-  to showcase difficulty evolving protocol.
+  doesn't clearly delineate between different atomic messages,making both
+  implementation and protocol evolution time consuming and error-prone. See
+  [rust-libp2p/1795] showcasing complexity for implementors and [specs/196] to
+  showcase difficulty evolving protocol.
 
   The **Protocol Select** protocol will use a binary data format defined in a
   machine parseable schema language allowing protocol evolution at the schema
