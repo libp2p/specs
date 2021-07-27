@@ -489,6 +489,11 @@ mechanisms:
 * _Why did you use proto2 and not proto3?_
 * _Why not include Protocol IDs from the start_?
 
+  _Protocol IDs_ are part of the initial _Protocol Select_ version to reduce
+  complexity and thus ease the initial roll-out. As detailed above, introducing
+  _Protocol IDs_ at a later stage can be done with low coordination and
+  performance overhead.
+
 [Multistream Select]: https://github.com/multiformats/multistream-select
 [Noise]: https://github.com/libp2p/specs/tree/master/noise
 [TLS]: https://github.com/libp2p/specs/blob/master/tls/tls.md
