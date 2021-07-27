@@ -431,10 +431,12 @@ mechanisms:
 - Including a protocol both by its _Protocol Name_ and _Protocol ID_ in the list
   of supported protocols.
 
-  Note, when optimistically negotiating a stream protocol as an initiator, with a
-  remote which might or might not support a protocol's _Protocol ID_, one can
+  Note, when optimistically negotiating a stream protocol as an initiator, with
+  a remote which might or might not support a protocol's _Protocol ID_, one can
   send a list containing both the _Protocol Name_ and the _Protocol ID_ for the
-  same protocol and directly optimistically send application data.
+  same protocol and directly optimistically send application data. The remote
+  signals whether it supports the _Protocol Name_ or the _Protocol ID_ by
+  accepting either in their response.
 
 ## FAQ
 
