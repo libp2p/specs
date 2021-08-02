@@ -80,8 +80,8 @@ The public host key and the signature are ANS.1-encoded into the SignedKey data 
 
 ```asn1
 SignedKey ::= SEQUENCE {
-  publicKey BIT STRING,
-  signature BIT STRING 
+  publicKey OCTET STRING,
+  signature OCTET STRING 
 }
 ```
 
