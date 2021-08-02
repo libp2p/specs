@@ -218,9 +218,10 @@ These payloads MUST be inserted into the first message of the handshake pattern
 **that guarantees secrecy**. In practice, this means that the initiator must not
 send a payload in their first message. Instead, the initiator will send its
 payload in message 3 (closing message), whereas the responder will send theirs
-in message 2 (their only message). It should be stressed, that the second message of the handshake pattern has forward
-secrecy, however the sender has not authenticated the responder, so this payload might be sent to any
-party, including an active attacker.
+in message 2 (their only message). It should be stressed, that the second
+message of the handshake pattern has forward secrecy, however the sender has not
+authenticated the responder, so this payload might be sent to any party,
+including an active attacker.
 
 When decrypted, the payload contains a serialized [protobuf][protobuf]
 `NoiseHandshakePayload` message with the following schema:
