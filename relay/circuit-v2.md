@@ -294,6 +294,38 @@ Common failure status codes are:
 
 ***Note: implementations _should not_ accept connection initiations over already relayed connections***
 
+##### Security protocol selection for the relayed connection
+
+Instead of negotiating the security protocol in-band, security protocols should
+be encapsulated in the multiaddr (see [The multiaddr security component
+section](../addressing/README.md#the-multiaddr-security-component)). A relayed
+connection is not an exception. A target advertises the support for a security
+protocol for relayed connections by appending
+`/p2p-circuit-inner/<security-protocol>` to its relayed multiaddresses. An
+initiator may include any set of relayed multiaddr in the `peer` field of
+`HopMessage` on type `CONNECT` in which all addresses end with the same
+`/p2p-circuit-inner/<security-protocol>`. The initiator is thus signaling to the
+target which security protocol, out of all advertised security protocols
+by the target, the initiator chose to use on the relayed connection.
+
+As an example, let's say the target listens for incoming relayed connections via
+relay `R1` and relay `R2`. In addition it supports both TLS Noise as security
+protocols. It would then advertise the following relayed multiaddresses:
+
+- `<relay-R1-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-inner/tls`
+- `<relay-R1-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-inner/noise`
+- `<relay-R2-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-inner/tls`
+- `<relay-R2-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-inner/noise`
+
+Once the initiator received the above multiaddresses and decides to initiate a
+relayed connection to the target, it needs to decide whether it wants to secure
+the relayed connection via TLS or Noise. Say it decides for Noise it would then
+include the multiaddresses below in it `HopMessage` with type `Connect` in the
+`peer` field:
+
+- `<relay-R1-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-inner/noise`
+- `<relay-R2-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-inner/noise`
+
 ### Stop Protocol
 
 The Stop protocol governs connection termination between the relay and the target peer;
@@ -309,11 +341,13 @@ The relay sends a `StopMessage` with `type = CONNECT` and the following form:
 ```
 StopMessage {
   type = CONNECT
-  peer = Peer { ID = ...}
+  initiator = Peer { ID = ...}
+  target = Peer { addrs = ...}
   limit = Limit { ...}
 }
 ```
-- the `peer` field contains a `Peer` struct with the peer `ID` of the connection initiator.
+- the `initiator` field contains a `Peer` struct with the peer `ID` of the connection initiator.
+- the `target` field contains a `Peer` struct with the peer `addrs` of the target that the initiator included in its `HopMessage`.
 - the `limit` field, if present, conveys the limits applied to the relayed connection with the semantics described [above](#reservation).
 
 If the target peer accepts the connection it responds to the relay with a `StopMessage` of `type = STATUS` and `status = OK`:
@@ -329,6 +363,16 @@ At this point the original `stop` stream becomes the relayed connection.
 If the target fails to terminate the connection for some reason, then it responds to the relay with a `StopMessage` of `type = STATUS` and the `status` code set to something other than `OK`.
 Common failure status codes are:
 - `CONNECTION_FAILED` if the target internally failed to create the relayed connection for some reason.
+
+#### Security protocol selection for the relayed connection
+
+A target may advertise support for different security protocols by advertising
+multiple multiaddresses with different `/p2p-circuit-inner/<security-protocol>`
+suffixes. A target needs some mechanism to determine which of the advertised
+security protocols the initiator intends to use to secure an incoming relayed
+connection. The target can use the addresses included in the `target` field of
+the `StopMessage` to determine which security protocol the initiator chose to
+secure the relayed connection.
 
 ### Reservation Vouchers
 
@@ -383,7 +427,8 @@ message StopMessage {
 
   required Type type = 1;
 
-  optional Peer peer = 2;
+  optional Peer initiator = 2;
+  optional Peer target = 5;
   optional Limit limit = 3;
 
   optional Status status = 4;
