@@ -74,7 +74,7 @@ In order to prove ownership of its host key, an endpoint sends two values:
 
 The public host key allows the peer to calculate the peer ID of the peer it is connecting to. Clients MUST verify that the peer ID derived from the certificate matches the peer ID they intended to connect to, and MUST abort the connection if there is a mismatch.
 
-The peer signs the concatenation of the string `libp2p-tls-handshake:` and the public key that it used to generate the certificate carrying the libp2p Public Key Extension, using its private host key. The encoded public key is a `SubjectPublicKeyInfo` structure (see RFC 5280, Section 4.1):
+The peer signs the concatenation of the string `libp2p-tls-handshake:` and the encoded public key that it used to generate the certificate carrying the libp2p Public Key Extension, using its private host key. The public key is encoded as a `SubjectPublicKeyInfo` structure (see RFC 5280, Section 4.1):
 
 ```asn1
 SubjectPublicKeyInfo ::= SEQUENCE {
