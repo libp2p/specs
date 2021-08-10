@@ -5,7 +5,7 @@
 
 | Lifecycle Stage | Maturity Level | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r0, 2019-05-01  |
+| 3A              | Recommendation | Active | r1, 2021-08-09  |
 
 Authors: [@vyzo]
 
@@ -85,10 +85,14 @@ message Identify {
 
 ### protocolVersion
 
-The protocol version identifies the family of protocols used by the peer.
-The current protocol version is `ipfs/0.1.0`; if the protocol major or minor
-version does not match the protocol used by the initiating peer, then the connection
-is considered unusable and the peer must close the connection.
+The protocol version identifies the family of protocols used by the peer. The
+field is optional but recommended for debugging and statistic purposes.
+
+Previous versions of this specification required connections to be closed on
+version mismatch. This requirement is revoked to allow interoperability between
+protocol families / networks.
+
+Example value: `/my-network/0.1.0`.
 
 ### agentVersion
 
