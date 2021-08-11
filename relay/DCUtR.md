@@ -16,6 +16,15 @@ Interest Group: [@raulk], [@stebalien], [@whyrusleeping]
 See the [lifecycle document](https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md)
 for context about maturity level and spec status.
 
+## Table of Contents
+
+- [Direct Connection Upgrade through Relay](#direct-connection-upgrade-through-relay)
+    - [Introduction](#introduction)
+    - [The Protocol](#the-protocol)
+        - [Protobuf](#protobuf)
+    - [Implementation Considerations](#implementation-considerations)
+    - [References](#references)
+
 ## Introduction
 
 NAT traversal is a quintessential problem in peer-to-peer networks.
