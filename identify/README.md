@@ -1,7 +1,45 @@
 # Identify v1.0.0
 
-The identify protocol is used to exchange basic information with other peers
-in the network, including addresses, public keys, and capabilities.
+> The identify protocol is used to exchange basic information with other peers
+> in the network, including addresses, public keys, and capabilities.
+
+| Lifecycle Stage | Maturity Level | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
+| 3A              | Recommendation | Active | r1, 2021-08-09  |
+
+Authors: [@vyzo]
+
+Interest Group: [@yusefnapora], [@tomaka], [@richardschneider], [@Stebalien], [@bigs]
+
+[@vyzo]: https://github.com/vyzo
+[@yusefnapora]: https://github.com/yusefnapora
+[@tomaka]: https://github.com/tomaka
+[@richardschneider]: https://github.com/richardschneider
+[@Stebalien]: https://github.com/Stebalien
+[@bigs]: https://github.com/bigs
+
+See the [lifecycle document][lifecycle-spec] for context about maturity level
+and spec status.
+
+[lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
+
+## Table of Contents
+
+- [Identify v1.0.0](#identify-v100)
+    - [Table of Contents](#table-of-contents)
+    - [Overview](#overview)
+        - [`identify`](#identify)
+        - [`identify/push`](#identifypush)
+    - [The Identify Message](#the-identify-message)
+        - [protocolVersion](#protocolversion)
+        - [agentVersion](#agentversion)
+        - [publicKey](#publickey)
+        - [listenAddrs](#listenaddrs)
+        - [observedAddr](#observedaddr)
+        - [protocols](#protocols)
+
+
+## Overview
 
 There are two variations of the identify protocol, `identify` and `identify/push`.
 
@@ -47,10 +85,14 @@ message Identify {
 
 ### protocolVersion
 
-The protocol version identifies the family of protocols used by the peer.
-The current protocol version is `ipfs/0.1.0`; if the protocol major or minor
-version does not match the protocol used by the initiating peer, then the connection
-is considered unusable and the peer must close the connection.
+The protocol version identifies the family of protocols used by the peer. The
+field is optional but recommended for debugging and statistic purposes.
+
+Previous versions of this specification required connections to be closed on
+version mismatch. This requirement is revoked to allow interoperability between
+protocol families / networks.
+
+Example value: `/my-network/0.1.0`.
 
 ### agentVersion
 
@@ -82,3 +124,11 @@ observable source address.
 ### protocols
 
 This is a list of protocols supported by the peer.
+
+A node should only advertise a protocol if it's willing to receive inbound
+streams on that protocol. This is relevant for asymmetrical protocols. For
+example assume an asymmetrical request-response style protocol `foo` where some
+clients only support initiating requests while some servers (only) support
+responding to requests. To prevent clients from initiating requests to other
+clients, which given them being clients they fail to respond, clients should not
+advertise `foo` in their `protocols` list.

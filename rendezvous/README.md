@@ -1,8 +1,40 @@
 # Rendezvous Protocol
 
-Author: vyzo
+| Lifecycle Stage | Maturity      | Status | Latest Revision |
+|-----------------|---------------|--------|-----------------|
+| 1A              | Working Draft | Active | r3, 2021-07-12  |
 
-Revision: DRAFT; 2019-01-18
+Authors: [@vyzo]
+
+Interest Group: [@daviddias], [@whyrusleeping], [@Stebalien], [@jacobheun], [@yusefnapora], [@vasco-santos]
+
+[@vyzo]: https://github.com/vyzo
+[@daviddias]: https://github.com/daviddias
+[@whyrusleeping]: https://github.com/whyrusleeping
+[@Stebalien]: https://github.com/Stebalien
+[@jacobheun]: https://github.com/jacobheun
+[@yusefnapora]: https://github.com/yusefnapora
+[@vasco-santos]: https://github.com/vasco-santos
+
+See the [lifecycle document][lifecycle-spec] for context about maturity level
+and spec status.
+
+[lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Use Cases](#use-cases)
+   - [Replacing ws-star-rendezvous](#replacing-ws-star-rendezvous)
+   - [Rendezvous and pubsub](#rendezvous-and-pubsub)
+- [The Protocol](#the-protocol)
+   - [Registration Lifetime](#registration-lifetime)
+   - [Interaction](#interaction)
+   - [Spam mitigation](#spam-mitigation)
+   - [Protobuf](#protobuf)
+- [Recommendations for Rendezvous Points configurations](#recommendations-for-rendezvous-points-configurations)
+
+## Overview
 
 The protocol described in this specification is intended to provide a
 lightweight mechanism for generalized peer discovery. It can be used
@@ -51,7 +83,6 @@ number of rendezvous points can federate using pubsub for internal
 real-time distribution, while still providing a simple interface to
 clients.
 
-
 ## The Protocol
 
 The rendezvous protocol provides facilities for real-time peer
@@ -59,7 +90,8 @@ discovery within application specific namespaces. Peers connect to the
 rendezvous point and register their presence in one or more
 namespaces. It is not allowed to register arbitrary peers in a
 namespace; only the peer initiating the registration can register
-itself.
+itself. The register message contains a serialized [signed peer record](https://github.com/libp2p/specs/blob/377f05a/RFC/0002-signed-envelopes.md)
+created by the peer, which can be validated by others.
 
 Peers registered with the rendezvous point can be discovered by other
 nodes by querying the rendezvous point. The query specifies the
@@ -75,6 +107,8 @@ greatly simplifies real time discovery. It also allows for pagination
 of query responses, so that large numbers of peer registrations can be
 managed.
 
+The rendezvous protocol runs over libp2p streams using the protocol id `/rendezvous/1.0.0`.
+
 ### Registration Lifetime
 
 Registration lifetime is controlled by an optional TTL parameter in
@@ -88,7 +122,9 @@ an `E_INVALID_TTL` status.
 Peers can refresh their registrations at any time with a new
 `REGISTER` message; the TTL of the new message supersedes previous
 registrations. Peers can also cancel existing registrations at any
-time with an explicit `UNREGISTER` message.
+time with an explicit `UNREGISTER` message. An `UNREGISTER` message does
+**not** have an explicit response. `UNREGISTER` messages for a namespace
+that a client is currently not registered for should be treated as a no-op.
 
 The registration response includes the actual TTL of the registration,
 so that peers know when to refresh.
@@ -144,15 +180,15 @@ R -> D: {[REGISTER{my-app, {QmE, AddrE}}],
          c3}
 ```
 
-### Proof of Work
+### Spam mitigation
 
 The protocol as described so far is susceptible to spam attacks from
 adversarial actors who generate a large number of peer identities and
-register under a namespace of interest (eg: the relay namespace). This
-can be mitigated by requiring a Proof of Work scheme for client
-registrations.
+register under a namespace of interest (eg: the relay namespace).
 
-This is TBD before finalizing the spec.
+It is TBD how exactly such attacks will be mitigated.
+See https://github.com/libp2p/specs/issues/341 for a discussion on this
+topic.
 
 ### Protobuf
 
@@ -167,41 +203,36 @@ message Message {
   }
 
   enum ResponseStatus {
-    OK                  = 0;
-    E_INVALID_NAMESPACE = 100;
-    E_INVALID_PEER_INFO = 101;
-    E_INVALID_TTL       = 102;
-    E_INVALID_COOKIE    = 103;
-    E_NOT_AUTHORIZED    = 200;
-    E_INTERNAL_ERROR    = 300;
-    E_UNAVAILABLE       = 400;
-  }
-
-  message PeerInfo {
-    optional bytes id = 1;
-    repeated bytes addrs = 2;
+    OK                            = 0;
+    E_INVALID_NAMESPACE           = 100;
+    E_INVALID_SIGNED_PEER_RECORD  = 101;
+    E_INVALID_TTL                 = 102;
+    E_INVALID_COOKIE              = 103;
+    E_NOT_AUTHORIZED              = 200;
+    E_INTERNAL_ERROR              = 300;
+    E_UNAVAILABLE                 = 400;
   }
 
   message Register {
     optional string ns = 1;
-    optional PeerInfo peer = 2;
-    optional int64 ttl = 3; // in seconds
+    optional bytes signedPeerRecord = 2;
+    optional uint64 ttl = 3; // in seconds
   }
 
   message RegisterResponse {
     optional ResponseStatus status = 1;
     optional string statusText = 2;
-    optional int64 ttl = 3; // in seconds
+    optional uint64 ttl = 3; // in seconds
   }
 
   message Unregister {
     optional string ns = 1;
-    optional bytes id = 2;
+    // optional bytes id = 2; deprecated as per https://github.com/libp2p/specs/issues/335
   }
 
   message Discover {
     optional string ns = 1;
-    optional int64 limit = 2;
+    optional uint64 limit = 2;
     optional bytes cookie = 3;
   }
 
@@ -220,3 +251,21 @@ message Message {
   optional DiscoverResponse discoverResponse = 6;
 }
 ```
+
+## Recommendations for Rendezvous Points configurations
+
+Rendezvous points should have well defined configurations to enable libp2p
+nodes running the rendezvous protocol to have friendly defaults, as well as to
+guarantee the security and efficiency of a Rendezvous point. This will be
+particularly important in a federation, where rendezvous points should share
+the same expectations.
+
+Regarding the validation of registrations, rendezvous points should have:
+- a minimum acceptable **ttl** of `2H`
+- a maximum acceptable **ttl** of `72H`
+- a maximum **namespace** length of `255`
+
+Rendezvous points are also recommend to allow:
+- a maximum of `1000` registration for each peer
+  - defend against trivial DoS attacks
+- a maximum of `1000` peers should be returned per namespace query

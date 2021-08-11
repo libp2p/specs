@@ -1,6 +1,42 @@
 # mplex
 
-> This repo contains the spec of mplex, the friendly Stream Multiplexer (that works in 3 languages!)
+> The spec for the friendly Stream Multiplexer (that works in 3 languages!)
+
+| Lifecycle Stage | Maturity       | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
+| 3A              | Recommendation | Active | r0, 2018-10-10  |
+
+Authors: [@daviddias], [@Stebalien], [@tomaka]
+
+Interest Group: [@yusefnapora], [@richardschneider], [@jacobheun]
+
+[@daviddias]: https://github.com/daviddias
+[@Stebalien]: https://github.com/Stebalien
+[@tomaka]: https://github.com/tomaka
+[@yusefnapora]: https://github.com/yusefnapora
+[@richardschneider]: https://github.com/richardschneider
+[@jacobheun]: https://github.com/jacobheun
+
+See the [lifecycle document][lifecycle-spec] for context about maturity level
+and spec status.
+
+[lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
+
+## Table of Contents
+
+- [mplex](#mplex)
+    - [Table of Contents](#table-of-contents)
+    - [Overview](#overview)
+    - [Message format](#message-format)
+        - [Flag Values](#flag-values)
+    - [Protocol](#protocol)
+        - [Opening a new stream](#opening-a-new-stream)
+        - [Writing to a stream](#writing-to-a-stream)
+        - [Closing a stream](#closing-a-stream)
+        - [Resetting a stream](#resetting-a-stream)
+    - [Implementation notes](#implementation-notes)
+
+## Overview
 
 Mplex is a Stream Multiplexer protocol used by js-ipfs and go-ipfs in their implementations. The origins of this protocol are based in [multiplex](https://github.com/maxogden/multiplex), the JavaScript-only Stream Multiplexer. After many battle field tests, we felt the need to improve and fix some of its bugs and mechanics, resulting on this new version used by libp2p.
 
@@ -18,13 +54,15 @@ Implementations in:
 
 Every communication in mplex consists of a header, and a length prefixed data segment.
 
-The header is an unsigned base128 varint, as defined in the [protocol buffers spec](https://developers.google.com/protocol-buffers/docs/encoding#varints). The lower three bits are the message flags, and the rest of the bits (shifted down by three bits) are the stream ID this message pertains to:
+The header is an [unsigned base128 varint](https://github.com/multiformats/unsigned-varint). The lower three bits are the message flags, and the rest of the bits (shifted down by three bits) are the stream ID this message pertains to:
 
 ```
 header = readUvarint()
 flag = header & 0x07
 id = header >> 3
 ```
+
+The maximum header length is 9 bytes (per the unsigned-varint spec). With 9 continuation bits and 3 message flag bits the maximum stream ID is 60 bits (maximum value of `2^60 - 1`).
 
 ### Flag Values
 

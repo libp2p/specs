@@ -1,6 +1,49 @@
 # Multicast DNS (mDNS)
 
-Author: Richard Schneider (makaretu@gmail.com)
+> Local peer discovery with zero configuration using multicast DNS.
+
+| Lifecycle Stage | Maturity       | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
+| 1A              | Working Draft  | Active | r1, 2019-05-05  |
+
+Authors: [@richardschneider]
+
+Interest Group: [@yusefnapora], [@raulk], [@daviddias], [@jacobheun]
+
+[@richardschneider]: https://github.com/richardschneider
+[@yusefnapora]: https://github.com/yusefnapora
+[@raulk]: https://github.com/raulk
+[@daviddias]: https://github.com/daviddias
+[@jacobheun]: https://github.com/jacobheun
+
+See the [lifecycle document][lifecycle-spec] for context about maturity level
+and spec status.
+
+[lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
+
+## Table of Contents
+
+- [Multicast DNS (mDNS)](#multicast-dns-mdns)
+    - [Table of Contents](#table-of-contents)
+    - [Overview](#overview)
+    - [Definitions](#definitions)
+    - [Peer Discovery](#peer-discovery)
+        - [Request](#request)
+        - [Response](#response)
+    - [DNS Service Discovery](#dns-service-discovery)
+        - [Meta Query](#meta-query)
+        - [Find All Response](#find-all-response)
+        - [Gotchas](#gotchas)
+    - [Issues](#issues)
+    - [References](#references)
+    - [Worked Examples](#worked-examples)
+        - [Meta Query](#meta-query-1)
+            - [Question](#question)
+            - [Answer](#answer)
+        - [Find All Peers](#find-all-peers)
+            - [Question](#question-1)
+            - [Answer](#answer-1)
+            - [Additional Records](#additional-records)
 
 ## Overview
 
@@ -127,5 +170,5 @@ _p2p._udp.local IN PTR `name`._p2p._udp.local
 
 #### Additional Records
 
-- `name`._p2p._udp.local IN TXT dnsaddr=/ip6/fe80::7573:b0a8:46b0:bfea/tcp/4001/ipfs/`id`
-- `name`._p2p._udp.local IN TXT dnsaddr=/ip4/192.168.178.21/tcp/4001/ipfs/'id'
+- `name`._p2p._udp.local IN TXT dnsaddr=/ip6/fe80::7573:b0a8:46b0:bfea/tcp/4001/p2p/`id`
+- `name`._p2p._udp.local IN TXT dnsaddr=/ip4/192.168.178.21/tcp/4001/p2p/'id'
