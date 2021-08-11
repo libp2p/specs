@@ -127,22 +127,6 @@ message HolePunch {
 }
 ```
 
-## Implementation Considerations
-
-There are some difficulties regarding implementing the protocol, at least in `go-libp2p`:
-- the swarm currently has no mechanism for direct dials in the presence of existing connections,
-  as required by the upgrade protocol.
-- the swarm has no logic for prioritizing direct connections over relay connections
-- the current multistream select protocol is an interactive protocol that requires a single
-  initiator, which breaks with simultaneous connect as it can result in both peers having outbound
-  connections to each other.
-
-All of these will have to be addressed in order to implement the protocol. The first two
-are perhaps simple implementation details, but the multistream problem is hard to resolve.
-Perhaps we will have to upgrade to `multistream-select/2.0`, which has explicit mechanisms
-for handling simultaneous connect, before we can deploy the protocol.
-
-
 ## References
 
 1. Peer-to-Peer Communication Across Network Address Translators. B. Ford and P. Srisuresh.
