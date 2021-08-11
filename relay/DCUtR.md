@@ -74,6 +74,7 @@ by initiating a direct connection to `A`.
 If the unilateral connection upgrade attempt fails or if `A` is itself a NATed peer that
 doesn't advertise public address, then `B` initiates the direct connection
 upgrade protocol as follows:
+<!-- Note the golang implementation is using "/libp2p/holepunch/1.0.0" -->
 1. `B` opens a stream to `A` using the `/libp2p/connect` protocol
 2. `B` sends to `A` a `Connect` message containing its observed (and possibly predicted)
    addresses from identify and starts a timer to measure RTT of the relay connection.
