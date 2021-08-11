@@ -89,6 +89,8 @@ upgrade protocol as follows:
    - Upon expiry of the timer, `B` starts a direct dial to `A` using the addresses obtained
      from the `Connect` message.
 
+<!-- TODO: Document retry logic -->
+
 The purpose of the `Sync` message and `B`'s timer is to allow the two peers to synchronize
 so that they perform a simultaneous open that allows hole punching to succeed.
 
