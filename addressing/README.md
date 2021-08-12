@@ -202,7 +202,7 @@ within](#encapsulation) another multiaddr.
 For example, the above `p2p` address can be combined with the transport address
 on which the node is listening:
 
-``` 
+```
 /ip4/7.7.7.7/tcp/1234/p2p/QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N
 ```
 
@@ -235,7 +235,7 @@ appreciated.
 
 Most libp2p transports use the IP protocol as a foundational layer, and as a
 result, most transport multiaddrs will begin with a component that represents an
-IPv4 or IPv6 address. 
+IPv4 or IPv6 address.
 
 This may be an actual address, such as `/ip4/7.7.7.7` or
 `/ip6/fe80::883:a581:fff1:833`, or it could be something that resolves to an IP
@@ -255,7 +255,7 @@ resolvable or "name-based" protocols:
 
 When the `/dns` protocol is used, the lookup may result in both IPv4 and IPv6
 addresses, in which case IPv6 will be preferred. To explicitly resolve to IPv4
-or IPv6 addresses, use the `/dns4` or `/dns6` protocols, respectively. 
+or IPv6 addresses, use the `/dns4` or `/dns6` protocols, respectively.
 
 Note that in some restricted environments, such as inside a web browser, libp2p
 may not have access to the resolved IP addresses at all, in which case the
@@ -305,7 +305,7 @@ wherever TCP/IP sockets are accessible.
 
 Addresses for the TCP transport are of the form `<ip-multiaddr>/tcp/<tcp-port>`,
 where `<ip-multiaddr>` is a multiaddr that resolves to an IP address, as
-described in the [IP and Name Resolution section](#ip-and-name-resolution). 
+described in the [IP and Name Resolution section](#ip-and-name-resolution).
 The `<tcp-port>` argument must be a 16-bit unsigned integer.
 
 ### WebSockets
@@ -324,7 +324,7 @@ multiaddr format mirrors this arrangement.
 
 A libp2p QUIC multiaddr is of the form `<ip-multiaddr>/udp/<udp-port>/quic`,
 where `<ip-multiaddr>` is a multiaddr that resolves to an IP address, as
-described in the [IP and Name Resolution section](#ip-and-name-resolution). 
+described in the [IP and Name Resolution section](#ip-and-name-resolution).
 The `<udp-port>` argument must be a 16-bit unsigned integer in network byte order.
 
 
@@ -354,7 +354,7 @@ destination peer.
 
 A full example would be:
 
-``` 
+```
 /ip4/127.0.0.1/tcp/5002/p2p/QmdPU7PfRyKehdrP5A3WqmjyD6bhVpU1mLGKppa2FjGDjZ/p2p-circuit/p2p/QmVT6GYwjeeAF5TR485Yc58S3xRF5EFsZ5YAF4VcP3URHt
 ```
 
@@ -362,6 +362,50 @@ Here, the destination peer has the peer id
 `QmVT6GYwjeeAF5TR485Yc58S3xRF5EFsZ5YAF4VcP3URHt` and is reachable through a
 relay node with peer id `QmdPU7PfRyKehdrP5A3WqmjyD6bhVpU1mLGKppa2FjGDjZ` running
 on TCP port 5002 of the IPv4 loopback interface.
+
+#### Relay addresses and multiaddr security component
+
+Instead of negotiating the security protocol in-band, security protocols should
+be encapsulated in the multiaddr (see [The multiaddr security component
+section](#the-multiaddr-security-component)). Establishing a single relayed
+connection involves 3 security protocol upgrades:
+
+1. Upgrading the connection from the source to the relay.
+
+   The security protocol is specified in the relay multiaddr (before
+   `p2p-circuit`).
+
+   Example: `/ip4/6.6.6.6/tcp/1234/tls/p2p/QmRelay/p2p-circuit/<destination-multiaddr>`
+
+2. Upgrading the connection from the relay to the destination.
+
+   The security protocol is specified in the destination multiaddr (after
+   `p2p-circuit`).
+
+   Note: Specifying this security protocol is only necessary for active
+   relaying. In the case of passive relaying the connection established by the
+   destination to the relay will be used to relay the connection.
+
+   Example:
+   - Passive relaying: `<relay-multiaddr>/p2p-circuit/p2p/QmDestination`
+   - Active relaying: `<relay-multiaddr>/p2p-circuit/ip4/6.6.6.6/tcp/1234/tls/p2p/QmDestination`
+
+3. Upgrading the relayed connection from the source to the destination.
+
+   The security protocol is specified by appending
+   `/p2p-circuit-inner/<relayed-connection-security-protocol>` to the full
+   address.
+
+   <!-- TODO: Is `p2p-circuit-inner` the ideal name? Up for alternative
+   suggestions. -->
+
+   Example: `<relay-mulitaddr>/p2p-circuit/<destination-multiaddr>/p2p-circuit-inner/tls`
+
+   Note: One might be tempted to not specify (3) and simply use the security
+   protocol in (2). This would break if the security protocol used for (2) can
+   not be used for (3), e.g. in the case where the relay establishes a QUIC
+   connection to the destination secured via TLS and the source only supports
+   Noise.
 
 
 [peer-id-spec]: ../peer-ids/peer-ids.md
