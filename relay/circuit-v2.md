@@ -326,6 +326,10 @@ include the multiaddresses below in it `HopMessage` with type `Connect` in the
 - `<relay-R1-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-inner/noise`
 - `<relay-R2-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-inner/noise`
 
+Note that all addresses sent by the initiator in the `peer` field MUST share the
+same security protocol for the relayed connection
+(`/p2p-circuit-inner/<security-protocol>`).
+
 ### Stop Protocol
 
 The Stop protocol governs connection termination between the relay and the target peer;
@@ -373,6 +377,11 @@ security protocols the initiator intends to use to secure an incoming relayed
 connection. The target can use the addresses included in the `target` field of
 the `StopMessage` to determine which security protocol the initiator chose to
 secure the relayed connection.
+
+Note that all addresses sent by the initiator MUST share the same security
+protocol for the relayed connection (`/p2p-circuit-inner/<security-protocol>`).
+Thus a target MUST abort the connection attempt (i.e. reset the stream) if it
+receives a `CONNECT` with varying security protocols for the relay connection.
 
 ### Reservation Vouchers
 
