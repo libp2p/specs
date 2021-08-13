@@ -105,7 +105,13 @@ network notifications: the new direct connection will emit a new
 sever existing streams and emit `Disconnected` notification.
 
 
-### Protobuf
+### RPC messages
+
+All RPC messages sent over a stream are prefixed with the message length in
+bytes, encoded as an unsigned variable length integer as defined by the
+[multiformats unsigned-varint spec][uvarint-spec].
+
+RPC messages conform to the following protobuf:
 
 ```proto
 syntax = "proto2";
@@ -135,3 +141,5 @@ message HolePunch {
    https://pdos.csail.mit.edu/papers/p2pnat.pdf
 2. Interactive Connectivity Establishment (ICE): A Protocol for Network Address Translator (NAT) Traversal for Offer/Answer Protocols. IETF RFC 5245.
    https://tools.ietf.org/html/rfc5245
+
+[uvarint-spec]: https://github.com/multiformats/unsigned-varint
