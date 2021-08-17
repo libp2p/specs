@@ -71,28 +71,30 @@ includes public addresses, then `A` _may_ be reachable by a direct
 connection, in which case `B` attempts a unilateral connection upgrade
 by initiating a direct connection to `A`.
 
-If the unilateral connection upgrade attempt fails or if `A` is itself a NATed peer that
-doesn't advertise public address, then `B` initiates the direct connection
-upgrade protocol as follows:
+If the unilateral connection upgrade attempt fails or if `A` is itself a NATed
+peer that doesn't advertise public address, then `B` initiates the direct
+connection upgrade protocol as follows:
 <!-- Note the golang implementation is using "/libp2p/holepunch/1.0.0" -->
 1. `B` opens a stream to `A` using the `/libp2p/connect` protocol
-2. `B` sends to `A` a `Connect` message containing its observed (and possibly predicted)
-   addresses from identify and starts a timer to measure RTT of the relay connection.
-3. Upon receving the `Connect`, `A` responds back with a `Connect` message containing
-   its observed (and possibly predicted) addresses.
-4. Upon receiving the `Connect`, `B` sends a `Sync` message and starts a timer for
-   half the RTT measured from the time between sending the initial `Connect` and receiving
-   the response.
+2. `B` sends to `A` a `Connect` message containing its observed (and possibly
+   predicted) addresses from identify and starts a timer to measure RTT of the
+   relay connection.
+3. Upon receving the `Connect`, `A` responds back with a `Connect` message
+   containing its observed (and possibly predicted) addresses.
+4. Upon receiving the `Connect`, `B` sends a `Sync` message and starts a timer
+   for half the RTT measured from the time between sending the initial `Connect`
+   and receiving the response.
 5. Simultaneous Connect
-   - Upon receiving the `Sync`, `A` immediately starts a direct dial to B using the addresses
-     obtained from the `Connect` message.
-   - Upon expiry of the timer, `B` starts a direct dial to `A` using the addresses obtained
-     from the `Connect` message.
+   - Upon receiving the `Sync`, `A` immediately starts a direct dial to B using
+     the addresses obtained from the `Connect` message.
+   - Upon expiry of the timer, `B` starts a direct dial to `A` using the
+     addresses obtained from the `Connect` message.
 
 <!-- TODO: Document retry logic -->
 
-The purpose of the `Sync` message and `B`'s timer is to allow the two peers to synchronize
-so that they perform a simultaneous open that allows hole punching to succeed.
+The purpose of the `Sync` message and `B`'s timer is to allow the two peers to
+synchronize so that they perform a simultaneous open that allows hole punching
+to succeed.
 
 If the direct connection is successful, then the peers should migrate
 to it by prioritizing over the existing relay connection. All new
@@ -140,9 +142,10 @@ message HolePunch {
 
 ## References
 
-1. Peer-to-Peer Communication Across Network Address Translators. B. Ford and P. Srisuresh.
-   https://pdos.csail.mit.edu/papers/p2pnat.pdf
-2. Interactive Connectivity Establishment (ICE): A Protocol for Network Address Translator (NAT) Traversal for Offer/Answer Protocols. IETF RFC 5245.
+1. Peer-to-Peer Communication Across Network Address Translators. B. Ford and P.
+   Srisuresh. https://pdos.csail.mit.edu/papers/p2pnat.pdf
+2. Interactive Connectivity Establishment (ICE): A Protocol for Network Address
+   Translator (NAT) Traversal for Offer/Answer Protocols. IETF RFC 5245.
    https://tools.ietf.org/html/rfc5245
 
 [uvarint-spec]: https://github.com/multiformats/unsigned-varint
