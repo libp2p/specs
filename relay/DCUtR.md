@@ -20,10 +20,11 @@ for context about maturity level and spec status.
 ## Table of Contents
 
 - [Direct Connection Upgrade through Relay](#direct-connection-upgrade-through-relay)
+    - [Table of Contents](#table-of-contents)
     - [Introduction](#introduction)
     - [The Protocol](#the-protocol)
-        - [Protobuf](#protobuf)
-    - [Implementation Considerations](#implementation-considerations)
+        - [RPC messages](#rpc-messages)
+    - [FAQ](#faq)
     - [References](#references)
 
 ## Introduction
@@ -50,14 +51,13 @@ introduces yet another piece of infrastructure, while still requiring
 the use of relays as a fallback for the cases where a direct
 connection is not possible.
 
-In this draft, we describe a synchronization protocol for direct
-connectivity with hole punching that eschews signaling servers and
-utilizes existing relay connections instead.  That is, peers start
-with a relay connection and synchronize directly, without the use of a
-signaling server.  If the hole punching attempt is successful, the
-peers _upgrade_ their connection to a direct connection and they can
-close the relay connection.  If the hole punching attempt fails, they
-can keep using the relay connection as they were.
+In this specification, we describe a synchronization protocol for direct
+connectivity with hole punching that eschews signaling servers and utilizes
+existing relay connections instead. That is, peers start with a relay connection
+and synchronize directly, without the use of a signaling server. If the hole
+punching attempt is successful, the peers _upgrade_ their connection to a direct
+connection and they can close the relay connection. If the hole punching attempt
+fails, they can keep using the relay connection as they were.
 
 ## The Protocol
 
@@ -75,8 +75,7 @@ by initiating a direct connection to `A`.
 If the unilateral connection upgrade attempt fails or if `A` is itself a NATed
 peer that doesn't advertise public address, then `B` initiates the direct
 connection upgrade protocol as follows:
-<!-- Note the golang implementation is using "/libp2p/holepunch/1.0.0" -->
-1. `B` opens a stream to `A` using the `/libp2p/connect` protocol
+1. `B` opens a stream to `A` using the `/libp2p/dcutr` protocol.
 2. `B` sends to `A` a `Connect` message containing its observed (and possibly
    predicted) addresses from identify and starts a timer to measure RTT of the
    relay connection.
@@ -90,8 +89,9 @@ connection upgrade protocol as follows:
      the addresses obtained from the `Connect` message.
    - Upon expiry of the timer, `B` starts a direct dial to `A` using the
      addresses obtained from the `Connect` message.
-
-<!-- TODO: Document retry logic -->
+6. On failure go back to step (2), reusing the same stream opened in (1).
+   Inbound peers (here `B`) SHOULD retry twice (thus a total of 3 attempts)
+   before considering the upgrade as failed.
 
 The purpose of the `Sync` message and `B`'s timer is to allow the two peers to
 synchronize so that they perform a simultaneous open that allows hole punching
@@ -140,6 +140,20 @@ message HolePunch {
   repeated bytes ObsAddrs = 2;
 }
 ```
+
+## FAQ
+
+- *Why exchange `CONNECT` and `SYNC` messages once more on each retry?*
+
+  Doing an additional CONNECT and SYNC for each retry prevents a flawed RTT
+  measurement on the first attempt to distort all following retry attempts.
+
+- *Why reuse the same stream for retries?*
+
+  Stream opening and stream protocol negotiation might distort the measured
+  round-trip-time. Reusing the stream from the first attempt allows cutting out
+  these distortions, allowing a more precise round-trip-time measurement on the
+  second and third attempt.
 
 ## References
 
