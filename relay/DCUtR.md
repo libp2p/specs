@@ -102,10 +102,7 @@ to it by prioritizing over the existing relay connection. All new
 streams should be opened in the direct connection, while the relay
 connection should be closed after a grace period.  Existing indefinite
 duration streams will have to be recreated in the new connection once
-the relay connection is closed.  This can be accomplised by observing
-network notifications: the new direct connection will emit a new
-`Connected` notification, while closing the relay connection will
-sever existing streams and emit `Disconnected` notification.
+the relay connection is closed.
 
 
 ### RPC messages
