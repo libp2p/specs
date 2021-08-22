@@ -84,11 +84,15 @@ connection upgrade protocol as follows:
 4. Upon receiving the `Connect`, `B` sends a `Sync` message and starts a timer
    for half the RTT measured from the time between sending the initial `Connect`
    and receiving the response.
-5. Simultaneous Connect
-   - Upon receiving the `Sync`, `A` immediately starts a direct dial to B using
-     the addresses obtained from the `Connect` message.
-   - Upon expiry of the timer, `B` starts a direct dial to `A` using the
-     addresses obtained from the `Connect` message.
+5. Simultaneous Connect. This depends on the transport in use:
+   - For TCP:
+      - Upon receiving the `Sync`, `A` immediately starts a direct dial to B using
+         the addresses obtained from the `Connect` message.
+      - Upon expiry of the timer, `B` starts a direct dial to `A` using the
+         addresses obtained from the `Connect` message.
+      - This will result in a TCP Simultaneous Connect. For the purpose of all
+         protocols run on top of this TCP connection, `A` is assumed to be the
+         client and `B` the server.
 6. On failure go back to step (2), reusing the same stream opened in (1).
    Inbound peers (here `B`) SHOULD retry twice (thus a total of 3 attempts)
    before considering the upgrade as failed.
