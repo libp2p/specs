@@ -6,13 +6,14 @@
 
 Authors: [@vyzo]
 
-Interest Group: [@raulk], [@stebalien], [@whyrusleeping], [@mxinden]
+Interest Group: [@raulk], [@stebalien], [@whyrusleeping], [@mxinden], [@marten-seemann]
 
 [@vyzo]: https://github.com/vyzo
 [@raulk]: https://github.com/raulk
 [@stebalien]: https://github.com/stebalien
 [@whyrusleeping]: https://github.com/whyrusleeping
 [@mxinden]: https://github.com/mxinden
+[@marten-seemann]: https://github.com/marten-seemann
 
 See the [lifecycle document](https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md)
 for context about maturity level and spec status.
