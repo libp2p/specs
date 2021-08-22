@@ -93,6 +93,14 @@ connection upgrade protocol as follows:
       - This will result in a TCP Simultaneous Connect. For the purpose of all
          protocols run on top of this TCP connection, `A` is assumed to be the
          client and `B` the server.
+   - For QUIC:
+      - Upon receiving the `Sync`, `A` immediately starts a direct dial to B using
+         the addresses obtained from the `Connect` message.
+      - Upon expiry of the timer, `B` starts to send UDP packets filled with
+         random bytes to the addresses obtained from the `Connect` message.
+         Packets should be sent in random intervals between 10 and 200 ms.
+      - This will result in a QUIC connection where `A` is the client and `B`
+         is the server.
 6. On failure go back to step (2), reusing the same stream opened in (1).
    Inbound peers (here `B`) SHOULD retry twice (thus a total of 3 attempts)
    before considering the upgrade as failed.
