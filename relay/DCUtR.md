@@ -85,25 +85,19 @@ connection upgrade protocol as follows:
 4. Upon receiving the `Connect`, `B` sends a `Sync` message and starts a timer
    for half the RTT measured from the time between sending the initial `Connect`
    and receiving the response.
-5. Simultaneous Connect. This depends on the transport in use:
-   - For TCP:
-      - Upon receiving the `Sync`, `A` immediately attempts to directly connect
-        to `B`. `A` does so by dialling the addresses obtained from the
-        `Connect` message in parallel.
-      - Upon expiry of the timer, `B` attempts to directly connect to `A`. `B`
-        does so by dialing the addresses obtained from the `Connect` message in
-        parallel.
+5. Simultaneous Connect. The two nodes follow the steps below for every address
+   obtained from the `Connect` message in parallel:
+   - For a TCP address:
+      - Upon receiving the `Sync`, `A` immediately dials the address to `B`.
+      - Upon expiry of the timer, `B` dials the address to `A`.
       - This will result in a TCP Simultaneous Connect. For the purpose of all
         protocols run on top of this TCP connection, `A` is assumed to be the
         client and `B` the server.
-   - For QUIC:
-      - Upon receiving the `Sync`, `A` immediately attempts to directly connect
-        to `B`. `A` does so by dialing the addresses obtained from the `Connect`
-        message in parallel.
+   - For a QUIC address:
+      - Upon receiving the `Sync`, `A` immediately dials the address to `B`.
       - Upon expiry of the timer, `B` starts to send UDP packets filled with
-        random bytes to the addresses obtained from the `Connect` message.
-        Packets should be sent in random intervals between 10 and 200 ms to each
-        address.
+        random bytes to `A`'s address. Packets should be sent repeatedly in
+        random intervals between 10 and 200 ms.
       - This will result in a QUIC connection where `A` is the client and `B` is
         the server.
 6. On failure go back to step (1). Inbound peers (here `B`) SHOULD retry twice
