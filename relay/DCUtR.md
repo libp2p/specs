@@ -106,9 +106,8 @@ connection upgrade protocol as follows:
         address.
       - This will result in a QUIC connection where `A` is the client and `B` is
         the server.
-6. On failure go back to step (2), reusing the same stream opened in (1).
-   Inbound peers (here `B`) SHOULD retry twice (thus a total of 3 attempts)
-   before considering the upgrade as failed.
+6. On failure go back to step (1). Inbound peers (here `B`) SHOULD retry twice
+   (thus a total of 3 attempts) before considering the upgrade as failed.
 
 The purpose of the `Sync` message and `B`'s timer is to allow the two peers to
 synchronize so that they perform a simultaneous open that allows hole punching
@@ -159,13 +158,6 @@ representation. See [Addressing specification] for details.
 
   Doing an additional CONNECT and SYNC for each retry prevents a flawed RTT
   measurement on the first attempt to distort all following retry attempts.
-
-- *Why reuse the same stream for retries?*
-
-  Stream opening and stream protocol negotiation might distort the measured
-  round-trip-time. Reusing the stream from the first attempt allows cutting out
-  these distortions, allowing a more precise round-trip-time measurement on the
-  second and third attempt.
 
 ## References
 
