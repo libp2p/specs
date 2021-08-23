@@ -128,7 +128,7 @@ All RPC messages sent over a stream are prefixed with the message length in
 bytes, encoded as an unsigned variable length integer as defined by the
 [multiformats unsigned-varint spec][uvarint-spec].
 
-Implemntations SHOULD refuse encoded RPC messages (length prefix excluded)
+Implementations SHOULD refuse encoded RPC messages (length prefix excluded)
 larger than 4 KiB.
 
 RPC messages conform to the following protobuf schema:
