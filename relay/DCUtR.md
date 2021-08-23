@@ -38,12 +38,11 @@ connect peers behind NAT albeit with a high-latency, low-bandwidth
 connection.  Unfortunately, they are expensive to scale and maintain
 if they have to carry all the NATed node traffic in the network.
 
-It is often possible for two peers behind NAT to communicate directly
-by utilizing a technique called _hole punching_[1]. The technique
-relies on the two peers synchronizing and simultaneously opening
-connections to each other to their predicted external address. It
-works well for UDP, with an estimated 80% success rate, and reasonably
-well for TCP, with an estimated 60% success rate.
+It is often possible for two peers behind NAT to communicate directly by
+utilizing a technique called _hole punching_[1]. The technique relies on the two
+peers synchronizing and simultaneously opening connections to each other to
+their predicted external address. It works well for UDP, and reasonably well for
+TCP.
 
 The problem in hole punching, apart from not working all the time, is
 the need for rendezvous and synchronization. This is usually
