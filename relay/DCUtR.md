@@ -101,11 +101,11 @@ connection upgrade protocol as follows:
         random intervals between 10 and 200 ms.
       - This will result in a QUIC connection where `A` is the client and `B` is
         the server.
-6. On successful establishment of a single connection does `A` cancel all
+6. Once a single connection has been established, `A` SHOULD cancel all
    outstanding connection attempts. The peers should migrate to the established
    connection by prioritizing over the existing relay connection. All new
    streams should be opened in the direct connection, while the relay connection
-   should be closed after a grace period. Existing undefinite duration streams
+   should be closed after a grace period. Existing long-lived streams
    will have to be recreated in the new connection once the relay connection is
    closed.
 
