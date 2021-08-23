@@ -87,21 +87,25 @@ connection upgrade protocol as follows:
    and receiving the response.
 5. Simultaneous Connect. This depends on the transport in use:
    - For TCP:
-      - Upon receiving the `Sync`, `A` immediately starts a direct dial to B using
-         the addresses obtained from the `Connect` message.
-      - Upon expiry of the timer, `B` starts a direct dial to `A` using the
-         addresses obtained from the `Connect` message.
+      - Upon receiving the `Sync`, `A` immediately attempts to directly connect
+        to `B`. `A` does so by dialling the addresses obtained from the
+        `Connect` message in parallel.
+      - Upon expiry of the timer, `B` attempts to directly connect to `A`. `B`
+        does so by dialing the addresses obtained from the `Connect` message in
+        parallel.
       - This will result in a TCP Simultaneous Connect. For the purpose of all
-         protocols run on top of this TCP connection, `A` is assumed to be the
-         client and `B` the server.
+        protocols run on top of this TCP connection, `A` is assumed to be the
+        client and `B` the server.
    - For QUIC:
-      - Upon receiving the `Sync`, `A` immediately starts a direct dial to B using
-         the addresses obtained from the `Connect` message.
+      - Upon receiving the `Sync`, `A` immediately attempts to directly connect
+        to `B`. `A` does so by dialing the addresses obtained from the `Connect`
+        message in parallel.
       - Upon expiry of the timer, `B` starts to send UDP packets filled with
-         random bytes to the addresses obtained from the `Connect` message.
-         Packets should be sent in random intervals between 10 and 200 ms.
-      - This will result in a QUIC connection where `A` is the client and `B`
-         is the server.
+        random bytes to the addresses obtained from the `Connect` message.
+        Packets should be sent in random intervals between 10 and 200 ms to each
+        address.
+      - This will result in a QUIC connection where `A` is the client and `B` is
+        the server.
 6. On failure go back to step (2), reusing the same stream opened in (1).
    Inbound peers (here `B`) SHOULD retry twice (thus a total of 3 attempts)
    before considering the upgrade as failed.
