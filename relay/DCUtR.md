@@ -150,6 +150,9 @@ message HolePunch {
 }
 ```
 
+`ObsAddrs` is a list of multiaddrs encoded in the binary multiaddr
+representation. See [Addressing specification] for details.
+
 ## FAQ
 
 - *Why exchange `CONNECT` and `SYNC` messages once more on each retry?*
@@ -173,3 +176,4 @@ message HolePunch {
    https://tools.ietf.org/html/rfc5245
 
 [uvarint-spec]: https://github.com/multiformats/unsigned-varint
+[Addressing specification]: ../addressing/README.md
