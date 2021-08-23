@@ -84,7 +84,9 @@ connection upgrade protocol as follows:
    containing its observed (and possibly predicted) addresses.
 4. Upon receiving the `Connect`, `B` sends a `Sync` message and starts a timer
    for half the RTT measured from the time between sending the initial `Connect`
-   and receiving the response.
+   and receiving the response. The purpose of the `Sync` message and `B`'s timer
+   is to allow the two peers to synchronize so that they perform a simultaneous
+   open that allows hole punching to succeed.
 5. Simultaneous Connect. The two nodes follow the steps below in parallel for
    every address obtained from the `Connect` message:
    - For a TCP address:
@@ -101,21 +103,16 @@ connection upgrade protocol as follows:
       - This will result in a QUIC connection where `A` is the client and `B` is
         the server.
 6. On successful establishment of a single connection does `A` cancel all
-   outstanding connection attempts. On failure of all connection attempts go
-   back to step (1). Inbound peers (here `B`) SHOULD retry twice (thus a total
-   of 3 attempts) before considering the upgrade as failed.
+   outstanding connection attempts. The peers should migrate to the established
+   connection by prioritizing over the existing relay connection. All new
+   streams should be opened in the direct connection, while the relay connection
+   should be closed after a grace period. Existing undefinite duration streams
+   will have to be recreated in the new connection once the relay connection is
+   closed.
 
-The purpose of the `Sync` message and `B`'s timer is to allow the two peers to
-synchronize so that they perform a simultaneous open that allows hole punching
-to succeed.
-
-If the direct connection is successful, then the peers should migrate
-to it by prioritizing over the existing relay connection. All new
-streams should be opened in the direct connection, while the relay
-connection should be closed after a grace period.  Existing indefinite
-duration streams will have to be recreated in the new connection once
-the relay connection is closed.
-
+   On failure of all connection attempts go back to step (1). Inbound peers
+   (here `B`) SHOULD retry twice (thus a total of 3 attempts) before considering
+   the upgrade as failed.
 
 ### RPC messages
 
