@@ -169,7 +169,7 @@ negotiation. As soon as an endpoints reaches a state during the handshake where
 it can send encrypted application data, it sends a list of supported protocols,
 no matter whether it is in the role of a dialer or listener. Note that depending
 on the handshake protocol used (and the optimisations implemented), either the
-dialer or the dialer might arrive at this state first.
+dialer or the listener might arrive at this state first.
 
 When using TLS 1.3, the listener can send Early Data after it receives the
 ClientHello. Early Data is encrypted, but at this point of the handshake the
@@ -253,7 +253,7 @@ listener. Differentiating the two protocols as a listener is detailed in the
 [Heuristics](#heuristics) section below. Nodes, when dialing, MUST NOT yet use
 Protocol Select, but instead continue to use [Multistream Select].
 
-Once a large enogh fraction of the network has upgraded, one can transition to
+Once a large enough fraction of the network has upgraded, one can transition to
 phase 2.
 
 #### Phase 2
@@ -470,7 +470,7 @@ mechanisms:
   One could then use the _Protocol ID_ instead of the _Protocol Name_ for future
   negotiations on that same connection.
 
-  While this approach would reliev us of the need to specify the _Protocol Name_
+  While this approach would relieve us of the need to specify the _Protocol Name_
   _Protocol ID_ mapping in e.g. libp2p/specs, it does add state to be kept
   across negotiations, thus complicating implementations and potentially
   resulting in state-mismatch edge-cases. Another argument for the current
@@ -496,7 +496,7 @@ mechanisms:
 
 * _Why not include Protocol IDs from the start_?
 
-  _Protocol IDs_ are part of the initial _Protocol Select_ version to reduce
+  _Protocol IDs_ are not part of the initial _Protocol Select_ version to reduce
   complexity and thus ease the initial roll-out. As detailed above, introducing
   _Protocol IDs_ at a later stage can be done with low coordination and
   performance overhead.
