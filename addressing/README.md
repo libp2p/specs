@@ -407,9 +407,13 @@ connection involves 3 security protocol upgrades:
    connection to the destination secured via TLS and the source only supports
    Noise.
 
+   See [Security protocol selection for the relayed connection] for details on
+   how the above integrates with the circuit relayv 2 _Hop_ and _Stop_ protocol.
+
 
 [peer-id-spec]: ../peer-ids/peer-ids.md
 [identify-spec]: ../identify/README.md
 [multiaddr-repo]: https://github.com/multiformats/multiaddr
 [multiaddr-proto-table]: https://github.com/multiformats/multiaddr/blob/master/protocols.csv
 [relay-spec]: ../relay/README.md
+[Security protocol selection for the relayed connection]: ../relay/circuit-v2.md#security-protocol-selection-for-the-relayed-connection
