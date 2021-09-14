@@ -241,11 +241,7 @@ ping-pong).
 
 **Links:**
 
-- [Multiselect 2.0 design doc](https://github.com/libp2p/specs/pull/205).
-
-- [Multiselect 2.0 specification](https://github.com/libp2p/specs/pull/227)
-
-- [RFC Multistream 2.0](https://github.com/libp2p/specs/pull/95).
+- [Protocol Select specification](https://github.com/libp2p/specs/pull/349)
 
 ### 🕸 Unprecedented global connectivity
 
