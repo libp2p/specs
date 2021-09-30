@@ -276,7 +276,7 @@ If the relayed connection is successfully established, then the relay responds w
 ```
 HopMessage {
   type = STATUS
-  sgtatus = OK
+  status = OK
   limit = Limit {...}
 }
 ```
