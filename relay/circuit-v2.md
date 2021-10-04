@@ -300,8 +300,8 @@ Instead of negotiating the security protocol in-band, security protocols should
 be encapsulated in the multiaddr (see [The multiaddr security component
 section](../addressing/README.md#the-multiaddr-security-component)). A relayed
 connection is not an exception. A target advertises the support for a security
-protocol for relayed connections by appending
-`/p2p-circuit-security/<security-protocol>` to its relayed multiaddresses. An
+protocol for relayed connections by including
+`/p2p-circuit-security/<security-protocol>` in its relayed multiaddresses. An
 initiator may include any set of relayed multiaddr in the `peer` field of
 `HopMessage` on type `CONNECT` in which all addresses end with the same
 `/p2p-circuit-security/<security-protocol>`. The initiator is thus signaling to the
@@ -312,10 +312,10 @@ As an example, let's say the target listens for incoming relayed connections via
 relay `R1` and relay `R2`. In addition it supports both TLS Noise as security
 protocols. It would then advertise the following relayed multiaddresses:
 
-- `<relay-R1-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-security/tls`
-- `<relay-R1-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-security/noise`
-- `<relay-R2-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-security/tls`
-- `<relay-R2-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-security/noise`
+- `<relay-R1-multiaddr>/p2p-circuit/p2p-circuit-security/tls/p2p/QmTarget`
+- `<relay-R1-multiaddr>/p2p-circuit/p2p-circuit-security/noise/p2p/QmTarget`
+- `<relay-R2-multiaddr>/p2p-circuit/p2p-circuit-security/tls/p2p/QmTarget`
+- `<relay-R2-multiaddr>/p2p-circuit/p2p-circuit-security/noise/p2p/QmTarget`
 
 Once the initiator received the above multiaddresses and decides to initiate a
 relayed connection to the target, it needs to decide whether it wants to secure
@@ -323,8 +323,8 @@ the relayed connection via TLS or Noise. Say it decides for Noise it would then
 include the multiaddresses below in it `HopMessage` with type `Connect` in the
 `peer` field:
 
-- `<relay-R1-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-security/noise`
-- `<relay-R2-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-security/noise`
+- `<relay-R1-multiaddr>/p2p-circuit/p2p-circuit-security/noise/p2p/QmTarget`
+- `<relay-R2-multiaddr>/p2p-circuit/p2p-circuit-security/noise/p2p/QmTarget`
 
 Note that all addresses sent by the initiator in the `peer` field MUST share the
 same security protocol for the relayed connection
