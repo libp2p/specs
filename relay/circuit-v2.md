@@ -303,13 +303,13 @@ connection is not an exception. A target advertises the support for a security
 protocol for relayed connections by including
 `/p2p-circuit-security/<security-protocol>` in its relayed multiaddresses. An
 initiator may include any set of relayed multiaddr in the `peer` field of
-`HopMessage` on type `CONNECT` in which all addresses end with the same
+`HopMessage` on type `CONNECT` in which all addresses include the same
 `/p2p-circuit-security/<security-protocol>`. The initiator is thus signaling to the
 target which security protocol, out of all advertised security protocols
 by the target, the initiator chose to use on the relayed connection.
 
 As an example, let's say the target listens for incoming relayed connections via
-relay `R1` and relay `R2`. In addition it supports both TLS Noise as security
+relay `R1` and relay `R2`. In addition it supports both TLS and Noise as security
 protocols. It would then advertise the following relayed multiaddresses:
 
 - `<relay-R1-multiaddr>/p2p-circuit/p2p-circuit-security/tls/p2p/QmTarget`
@@ -318,16 +318,16 @@ protocols. It would then advertise the following relayed multiaddresses:
 - `<relay-R2-multiaddr>/p2p-circuit/p2p-circuit-security/noise/p2p/QmTarget`
 
 Once the initiator received the above multiaddresses and decides to initiate a
-relayed connection to the target, it needs to decide whether it wants to secure
-the relayed connection via TLS or Noise. Say it decides for Noise it would then
-include the multiaddresses below in it `HopMessage` with type `Connect` in the
-`peer` field:
+relayed connection to the target, it needs to decide whether it wants to use
+`R1` or `R2` and whether it wants to secure the relayed connection via TLS or
+Noise. Say it decides for `R1` and Noise it would then include the multiaddress
+below in it `HopMessage` with type `Connect` in the `peer` field:
 
 - `<relay-R1-multiaddr>/p2p-circuit/p2p-circuit-security/noise/p2p/QmTarget`
-- `<relay-R2-multiaddr>/p2p-circuit/p2p-circuit-security/noise/p2p/QmTarget`
 
-Note that all addresses sent by the initiator in the `peer` field MUST share the
-same security protocol for the relayed connection
+Note when activly relaying and thus potentially including multiple addresses in
+the `peer` field that all addresses sent by the initiator MUST share the same
+security protocol for the relayed connection
 (`/p2p-circuit-security/<security-protocol>`).
 
 ### Stop Protocol
