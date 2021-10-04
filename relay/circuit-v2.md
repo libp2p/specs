@@ -301,10 +301,10 @@ be encapsulated in the multiaddr (see [The multiaddr security component
 section](../addressing/README.md#the-multiaddr-security-component)). A relayed
 connection is not an exception. A target advertises the support for a security
 protocol for relayed connections by appending
-`/p2p-circuit-inner/<security-protocol>` to its relayed multiaddresses. An
+`/p2p-circuit-security/<security-protocol>` to its relayed multiaddresses. An
 initiator may include any set of relayed multiaddr in the `peer` field of
 `HopMessage` on type `CONNECT` in which all addresses end with the same
-`/p2p-circuit-inner/<security-protocol>`. The initiator is thus signaling to the
+`/p2p-circuit-security/<security-protocol>`. The initiator is thus signaling to the
 target which security protocol, out of all advertised security protocols
 by the target, the initiator chose to use on the relayed connection.
 
@@ -312,10 +312,10 @@ As an example, let's say the target listens for incoming relayed connections via
 relay `R1` and relay `R2`. In addition it supports both TLS Noise as security
 protocols. It would then advertise the following relayed multiaddresses:
 
-- `<relay-R1-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-inner/tls`
-- `<relay-R1-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-inner/noise`
-- `<relay-R2-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-inner/tls`
-- `<relay-R2-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-inner/noise`
+- `<relay-R1-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-security/tls`
+- `<relay-R1-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-security/noise`
+- `<relay-R2-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-security/tls`
+- `<relay-R2-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-security/noise`
 
 Once the initiator received the above multiaddresses and decides to initiate a
 relayed connection to the target, it needs to decide whether it wants to secure
@@ -323,12 +323,12 @@ the relayed connection via TLS or Noise. Say it decides for Noise it would then
 include the multiaddresses below in it `HopMessage` with type `Connect` in the
 `peer` field:
 
-- `<relay-R1-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-inner/noise`
-- `<relay-R2-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-inner/noise`
+- `<relay-R1-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-security/noise`
+- `<relay-R2-multiaddr>/p2p-circuit/p2p/QmTarget/p2p-circuit-security/noise`
 
 Note that all addresses sent by the initiator in the `peer` field MUST share the
 same security protocol for the relayed connection
-(`/p2p-circuit-inner/<security-protocol>`).
+(`/p2p-circuit-security/<security-protocol>`).
 
 ### Stop Protocol
 
@@ -371,7 +371,7 @@ Common failure status codes are:
 #### Security protocol selection for the relayed connection
 
 A target may advertise support for different security protocols by advertising
-multiple multiaddresses with different `/p2p-circuit-inner/<security-protocol>`
+multiple multiaddresses with different `/p2p-circuit-security/<security-protocol>`
 suffixes. A target needs some mechanism to determine which of the advertised
 security protocols the initiator intends to use to secure an incoming relayed
 connection. The target can use the addresses included in the `target` field of
@@ -379,7 +379,7 @@ the `StopMessage` to determine which security protocol the initiator chose to
 secure the relayed connection.
 
 Note that all addresses sent by the initiator MUST share the same security
-protocol for the relayed connection (`/p2p-circuit-inner/<security-protocol>`).
+protocol for the relayed connection (`/p2p-circuit-security/<security-protocol>`).
 Thus a target MUST abort the connection attempt (i.e. reset the stream) if it
 receives a `CONNECT` with varying security protocols for the relay connection.
 

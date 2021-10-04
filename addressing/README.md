@@ -393,13 +393,10 @@ connection involves 3 security protocol upgrades:
 3. Upgrading the relayed connection from the source to the destination.
 
    The security protocol is specified by appending
-   `/p2p-circuit-inner/<relayed-connection-security-protocol>` to the full
+   `/p2p-circuit-security/<relayed-connection-security-protocol>` to the full
    address.
 
-   <!-- TODO: Is `p2p-circuit-inner` the ideal name? Up for alternative
-   suggestions. -->
-
-   Example: `<relay-mulitaddr>/p2p-circuit/<destination-multiaddr>/p2p-circuit-inner/tls`
+   Example: `<relay-mulitaddr>/p2p-circuit/<destination-multiaddr>/p2p-circuit-security/tls`
 
    Note: One might be tempted to not specify (3) and simply use the security
    protocol in (2). This would break if the security protocol used for (2) can
