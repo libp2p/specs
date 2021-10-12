@@ -52,11 +52,12 @@ Upon receiving this message, the peer starts to dial these addresses. It MAY
 dial all of them in parallel. The peer MAY use a different IP and peer ID than
 it uses for its regular libp2p connection to perform these dial backs.
 
-In order to prevent attacks like the one described below, implementations
-MUST NOT dial any multiaddress unless it is based on the IP address the
-requesting node is observed as.
+In order to prevent attacks like the one described in [RFC 3489, Section
+12.1.1](https://www.rfc-editor.org/rfc/rfc3489#section-12.1.1) (see excerpt
+below), implementations MUST NOT dial any multiaddress unless it is based on the
+IP address the requesting node is observed as.
 
-> 12.1.1 Attack I: DDOS Against a Target
+> RFC 3489 12.1.1 Attack I: DDOS Against a Target
 >
 > In this case, the attacker provides a large number of clients with the same
 > faked MAPPED-ADDRESS that points to the intended target. This will trick all
@@ -66,8 +67,6 @@ requesting node is observed as.
 > becomes focused at the intended target. The attack can provide substantial
 > amplification, especially when used with clients that are using STUN to enable
 > multimedia applications.
-
-https://www.rfc-editor.org/rfc/rfc3489#section-12.1.1
 
 If all dials fail, the receiver sends a `DialResponse` message with the
 `ResponseStatus` `E_DIAL_ERROR`. If at least one of the dials complete
