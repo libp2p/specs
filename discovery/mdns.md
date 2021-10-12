@@ -55,9 +55,9 @@ Conceptually, it is very simple. When a peer starts (or detects a network change
 
 - `service-name` is the DNS Service Discovery (DNS-SD) service name for all peers. It is defined as `_p2p._udp.local`.
 - `host-name` is the fully qualified name of the peer. It is derived from the peer's name and `p2p.local`.
-- `peer-name` is the case-insensitive unique identifier of the peer, and is less than 64 characters. It is normally the base-32 encoding of the peer's ID.
+- `peer-name` is the case-insensitive unique identifier of the peer, and is less than 64 characters.
 
-   If the encoding of the peer's ID exceeds 63 characters, then the [Split at 63rd character](https://github.com/ipfs/in-web-browsers/issues/89#issue-341357014) workaround can be used.
+   As the this field doesn't carry any meaning, it is sufficient to ensure the uniqueness of this identifier. Peers SHOULD generate a random, lower-case alphanumeric string of least 32 characters in length when booting up their node. Peers SHOULD NOT use their Peer ID here because a future Peer ID could exceed the DNS label limit of 63 characters.
 
 If a [private network](https://github.com/libp2p/specs/blob/master/pnet/Private-Networks-PSK-V1.md) is in use, then the `service-name` contains the base-16 encoding of the network's fingerprint  as in `_p2p-X._udp.local`. 
 The prevents public and private networks from discovering each other's peers.
@@ -130,11 +130,6 @@ Many existing tools ignore the Additional Records, and always send individual qu
 - [RFC 6763 - DNS-Based Service Discovery](https://tools.ietf.org/html/rfc6763)
 - [Multiaddr](https://github.com/multiformats/multiaddr)
 
-## Worked Examples
-
-Asumming that `peer-id` is `QmQusTXc1Z9C1mzxsqC9ZTFXCgSkpBRGgW4Jk2QYHxKE22`, then the `peer-name` is `ciqcmoputolsfsigvm7nx5fwkko2eq26h46qhbj6o4co7uyn2f2srdy` (base32 encoding of the peer ID).
-
-To make the examples more readable `id` and `name` are used.
 
 ### Meta Query
 
@@ -165,10 +160,10 @@ _p2p._udp.local PTR
 #### Answer
 
 ```
-_p2p._udp.local IN PTR `name`._p2p._udp.local
+_p2p._udp.local IN PTR `<peer-name>`._p2p._udp.local
 ```
 
 #### Additional Records
 
-- `name`._p2p._udp.local IN TXT dnsaddr=/ip6/fe80::7573:b0a8:46b0:bfea/tcp/4001/p2p/`id`
-- `name`._p2p._udp.local IN TXT dnsaddr=/ip4/192.168.178.21/tcp/4001/p2p/'id'
+- `<peer-name>`._p2p._udp.local IN TXT dnsaddr=/ip6/fe80::7573:b0a8:46b0:bfea/tcp/4001/p2p/`id`
+- `<peer-name>`._p2p._udp.local IN TXT dnsaddr=/ip4/192.168.178.21/tcp/4001/p2p/`id`
