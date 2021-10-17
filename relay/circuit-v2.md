@@ -58,7 +58,7 @@ protocol, while very flexible, has some limitations when it comes to
 the practicalities of relaying connections.
 
 The main problem is that v1 has no mechanism to reserve resources in the
-relay, which leads to continuoues oversubscription of relays and the
+relay, which leads to continuous over-subscription of relays and the
 necessity of (often ineffective) heuristics for balancing resources.
 In practice, running a relay proved to be an expensive proposition
 requiring dedicated hosts with significant hardware and bandwidth
@@ -246,7 +246,7 @@ management policy after all reservations expired.  The expectation is
 that the server will make a best effort attempt to maintain the
 connection for the duration of any reservations and tag it to prevent
 accidental termination according to its connection management policy.
-If a relay server becomes oerloaded however, it may still drop a
+If a relay server becomes overloaded however, it may still drop a
 connection with reservations in order to maintain its resource quotas.
 
 ***Note: implementations _should not_ accept reservations over already relayed connections***
