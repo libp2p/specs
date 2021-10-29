@@ -345,13 +345,13 @@ The relay sends a `StopMessage` with `type = CONNECT` and the following form:
 ```
 StopMessage {
   type = CONNECT
-  initiator = Peer { ID = ...}
-  target = Peer { addrs = ...}
+  source = Peer { ID = ...}
+  destination = Peer { addrs = ...}
   limit = Limit { ...}
 }
 ```
-- the `initiator` field contains a `Peer` struct with the peer `ID` of the connection initiator.
-- the `target` field contains a `Peer` struct with the peer `addrs` of the target that the initiator included in its `HopMessage`.
+- the `source` field contains a `Peer` struct with the peer `ID` of the connection initiator.
+- the `destination` field contains a `Peer` struct with the peer `addrs` of the destination that the initiator included in its `HopMessage`.
 - the `limit` field, if present, conveys the limits applied to the relayed connection with the semantics described [above](#reservation).
 
 If the target peer accepts the connection it responds to the relay with a `StopMessage` of `type = STATUS` and `status = OK`:
@@ -436,8 +436,8 @@ message StopMessage {
 
   required Type type = 1;
 
-  optional Peer initiator = 2;
-  optional Peer target = 5;
+  optional Peer source = 2;
+  optional Peer destination = 5;
   optional Limit limit = 3;
 
   optional Status status = 4;
