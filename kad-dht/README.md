@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r0, 2021-05-07  |
+| 3A              | Recommendation | Active | r1, 2021-10-30  |
 
 Authors: [@raulk], [@jhiesey], [@mxinden]
 
@@ -404,9 +404,10 @@ These are the requirements for each `MessageType`:
   is set to the value for the given key (if found in the datastore) and
   `closerPeers` is set to the `k` closest peers.
 
-* `PUT_VALUE`: In the request `key` is an unstructured array of bytes. The
-  target node validates `record`, and if it is valid, it stores it in the
-  datastore.
+* `PUT_VALUE`: In the request `record` is set to the record to be stored and `key`
+  on `Message` is set to equal `key` of the `Record`. The target node validates
+  `record`, and if it is valid, it stores it in the datastore and as a response
+  echoes the request.
 
 * `GET_PROVIDERS`: In the request `key` is set to a CID. The target node
   returns the closest known `providerPeers` (if any) and the `k` closest known
