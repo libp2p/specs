@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision    |
 |-----------------|---------------|--------|--------------------|
-| 1A              | Working Draft | Active | r0, 2021-08-17     |
+| 1A              | Working Draft | Active | r1, 2021-11-20     |
 
 Authors: [@vyzo]
 
@@ -135,7 +135,7 @@ message HolePunch {
     SYNC = 300;
   }
 
-  optional Type type=1;
+  required Type type=1;
 
   repeated bytes ObsAddrs = 2;
 }
