@@ -648,7 +648,7 @@ purely through a small set of network entry points (bootstrappers) by utilizing 
 In order to successfully bootstrap the network without a discovery service, network operators
 should
 - Create and operate a set of stable bootstrapper nodes, whose addresses are known ahead of time by the application.
-- The bootstrappers should be configured without a mesh (ie set `D=Dlo=Dhi=Dout=0`)
+- The bootstrappers should be configured without a mesh (ie set `D=D_lo=D_hi=D_out=0`)
   and with Peer Exchange enabled, utilizing Signed Peer Records.
 - The application should assign a high application-specific score to the bootstrappers and
   set `AcceptPXThreshold` to a high enough value attainable only by the bootstrappers.
