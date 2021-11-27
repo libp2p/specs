@@ -340,7 +340,7 @@ _Protocol Name_ conventions such as path-like structure.
 syntax = "proto2";
 
 message ProtoSelect {
-    uint32 version = 1;
+    required uint32 version = 1;
 
     message Protocol {
         oneof protocol {
