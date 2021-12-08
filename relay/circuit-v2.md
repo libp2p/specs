@@ -199,7 +199,7 @@ HopMessage {
 
 If the reservation is rejected, the relay responds with a `HopMessage` of the form
 ```
-Reservation {
+HopMessage {
   type = STATUS
   status = ...
 }
