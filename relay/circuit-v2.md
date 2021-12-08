@@ -266,6 +266,7 @@ The `peer` field contains the peer `ID` of the target peer and optionally the ad
 Peer {
   id = ...
   addrs = [...]
+}
 ```
 
 ***Note that active relay functionality is considered deprecated for security reasons, at least in public relays.***
