@@ -249,7 +249,7 @@ accidental termination according to its connection management policy.
 If a relay server becomes overloaded however, it may still drop a
 connection with reservations in order to maintain its resource quotas.
 
-***Note: implementations _should not_ accept reservations over already relayed connections***
+***Note: Implementations _should not_ accept reservations over already relayed connections.***
 
 #### Connection Initiation
 
