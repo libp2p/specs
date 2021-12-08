@@ -233,6 +233,7 @@ The struct has the following fields:
 Limit {
   duration = ...
   data = ...
+}
 ```
 - the `duration` field indicates the maximum duration of a relayed connection in seconds; if 0, there is no limit applied.
 - the `data` field indicates the maximum number of bytes allowed to be transmitted in each direction; if 0 there is no limit applied.
