@@ -294,7 +294,7 @@ Common failure status codes are:
 - `RESOURCE_LIMIT_EXCEEDED` if there are too many relayed connections from the initiator or to the target peer.
 - `CONNECTION_FAILED` if the relay failed to terminate the connection to the target peer.
 
-***Note: implementations _should not_ accept connection initiations over already relayed connections***
+***Note: Implementations _should not_ accept connection initiations over already relayed connections.***
 
 ### Stop Protocol
 
