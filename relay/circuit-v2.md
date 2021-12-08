@@ -289,7 +289,7 @@ If the relayed connection cannot be established, then the relay responds with a 
 Common failure status codes are:
 - `PERMISSION_DENIED` if the connection is rejected because of peer filtering using ACLs.
 - `NO_RESERVATION` if there is no active reservation for the target peer
-- `RESOURCE_LIMIT_EXCEEDED` if there are two many relayed connections from the initiator or to the target peer.
+- `RESOURCE_LIMIT_EXCEEDED` if there are too many relayed connections from the initiator or to the target peer.
 - `CONNECTION_FAILED` if the relay failed to terminate the connection to the target peer.
 
 ***Note: implementations _should not_ accept connection initiations over already relayed connections***
