@@ -269,7 +269,8 @@ Peer {
 }
 ```
 
-***Note that active relay functionality is considered deprecated for security reasons, at least in public relays.***
+***Note: Active relay functionality is considered deprecated for security reasons, at least in public relays.***
+
 However, the protocol reserves the field to support the functionality for the rare cases where it is actually desirable to use active relay functionality in a controlled environment.
 
 If the relay has a reservation (and thus an active connection) from the peer, then it opens the second hop of the connection using the `stop` protocol; the details are not relevant for the `hop` protocol and the only thing that matters is whether it succeeds in opening the relay connection or not.
