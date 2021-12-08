@@ -226,7 +226,7 @@ Reservation {
  `p2p-circuit/p2p/QmPeer` where `QmPeer` is its peer ID.
 - the `voucher` is the binary representation of the reservation voucher -- see [Reservation Vouchers](#reservation-vouchers) for details.
 
-The `limit` field, if present, provides information about the limits applied by the relay in relayed connection. When omitted, it indicates that the relay does not apply any limits.
+The `limit` field in `HopMessage`, if present, provides information about the limits applied by the relay in relayed connection. When omitted, it indicates that the relay does not apply any limits.
 
 The struct has the following fields:
 ```
