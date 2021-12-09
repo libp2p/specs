@@ -199,7 +199,7 @@ HopMessage {
 
 If the reservation is rejected, the relay responds with a `HopMessage` of the form
 ```
-Reservation {
+HopMessage {
   type = STATUS
   status = ...
 }
@@ -226,13 +226,14 @@ Reservation {
  `p2p-circuit/p2p/QmPeer` where `QmPeer` is its peer ID.
 - the `voucher` is the binary representation of the reservation voucher -- see [Reservation Vouchers](#reservation-vouchers) for details.
 
-The `limit` field, if present, provides information about the limits applied by the relay in relayed connection. When omitted, it indicates that the relay does not apply any limits.
+The `limit` field in `HopMessage`, if present, provides information about the limits applied by the relay in relayed connection. When omitted, it indicates that the relay does not apply any limits.
 
 The struct has the following fields:
 ```
 Limit {
   duration = ...
   data = ...
+}
 ```
 - the `duration` field indicates the maximum duration of a relayed connection in seconds; if 0, there is no limit applied.
 - the `data` field indicates the maximum number of bytes allowed to be transmitted in each direction; if 0 there is no limit applied.
@@ -249,7 +250,7 @@ accidental termination according to its connection management policy.
 If a relay server becomes overloaded however, it may still drop a
 connection with reservations in order to maintain its resource quotas.
 
-***Note: implementations _should not_ accept reservations over already relayed connections***
+***Note: Implementations _should not_ accept reservations over already relayed connections.***
 
 #### Connection Initiation
 
@@ -266,10 +267,12 @@ The `peer` field contains the peer `ID` of the target peer and optionally the ad
 Peer {
   id = ...
   addrs = [...]
+}
 ```
 
-***Note that active relay functionality is considered deprecated for security reasons, at least in public relays.***
-However, the protocol reserves the field to support the functionality for the rare cases where it is actually desirable to use active relay functionality in a controlled environment.
+***Note: Active relay functionality is considered deprecated for security reasons, at least in public relays.***
+
+The protocol reserves the field nonetheless to support the functionality for the rare cases where it is actually desirable to use active relay functionality in a controlled environment.
 
 If the relay has a reservation (and thus an active connection) from the peer, then it opens the second hop of the connection using the `stop` protocol; the details are not relevant for the `hop` protocol and the only thing that matters is whether it succeeds in opening the relay connection or not.
 If the relayed connection is successfully established, then the relay responds with `HopMessage` with `type = STATUS` and `status = OK`:
@@ -292,7 +295,7 @@ Common failure status codes are:
 - `RESOURCE_LIMIT_EXCEEDED` if there are too many relayed connections from the initiator or to the target peer.
 - `CONNECTION_FAILED` if the relay failed to terminate the connection to the target peer.
 
-***Note: implementations _should not_ accept connection initiations over already relayed connections***
+***Note: Implementations _should not_ accept connection initiations over already relayed connections.***
 
 ### Stop Protocol
 
