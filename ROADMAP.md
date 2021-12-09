@@ -247,7 +247,7 @@ ping-pong).
 ### 🧪 Automated compatibility testing
 
 **What?** There are more than 6 implementations of the [libp2p specification] in
-different languages. We need to ensure compatibility of all combination of these
+different languages. We need to ensure compatibility of all combinations of these
 implementations. Given the number of libp2p implementations and the amount of
 libp2p protocols, verifying compatibility on a continuous basis can only be
 tackled in an automated fashion.
