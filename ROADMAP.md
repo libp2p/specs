@@ -21,8 +21,9 @@ third-party ownership of data.
         - [🤖 libp2p as a WASM library](#🤖-libp2p-as-a-wasm-library)
     - [Evolve](#evolve)
         - [🕸 Unprecedented global connectivity](#🕸-unprecedented-global-connectivity)
+        - [🧪 Automated compatibility testing](#🧪-automated-compatibility-testing)
         - [🤝 Low latency, efficient connection handshake](#🤝-low-latency-efficient-connection-handshake)
-        - [Peer Routing Records](#peer-routing-records)
+        - [🛣️ Peer Routing Records](#🛣️-peer-routing-records)
         - [🗣️ Polite peering](#🗣️-polite-peering)
         - [🧱 Composable routing](#🧱-composable-routing)
         - [💣 Attack resistance, threat models and security](#💣-attack-resistance-threat-models-and-security)
@@ -247,6 +248,21 @@ rest of the system.
 
 - [NAT traversal tracking issue](https://github.com/libp2p/specs/issues/312).
 
+### 🧪 Automated compatibility testing
+
+**What?** There are more than 6 implementations of the [libp2p specification] in
+different languages. We need to ensure compatibility of all combinations of these
+implementations. Given the number of libp2p implementations and the amount of
+libp2p protocols, verifying compatibility on a continuous basis can only be
+tackled in an automated fashion.
+
+**Why?** Automated compatibility testing allows us to move fast with confidence
+and will increase trust in the libp2p project as a whole.
+
+We can build on top of the [testground project]. Multiple of the so called
+testground _test plans_ are already in place for the go-libp2p implementation in
+the [libp2p test-plans repository].
+
 ### 🤝 Low latency, efficient connection handshake
 
 **High priority for: IPFS**
@@ -269,7 +285,7 @@ ping-pong).
 
 - [Protocol Select specification](https://github.com/libp2p/specs/pull/349)
 
-### Peer Routing Records
+### 🛣️ Peer Routing Records
 
 **What?** Methods such as DHT traversal depend on potentially untrustworthy
 third parties to relay address information. Peer Routing Records provide a means
@@ -572,3 +588,6 @@ networking to get started with libp2p.
   abstraction.
 
 [libp2p-request-response]: https://docs.rs/libp2p-request-response/0.11.0/libp2p_request_response/
+[libp2p specification]: https://github.com/libp2p/specs/
+[testground project]: https://github.com/testground/testground
+[libp2p test-plans repository]: https://github.com/libp2p/test-plans
