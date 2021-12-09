@@ -20,9 +20,9 @@ third-party ownership of data.
         - [📮 Offline message queue / postbox](#📮-offline-message-queue--postbox)
         - [🤖 libp2p as a WASM library](#🤖-libp2p-as-a-wasm-library)
     - [Evolve](#evolve)
-        - [🤝 Low latency, efficient connection handshake](#🤝-low-latency-efficient-connection-handshake)
-        - [🧪 Automated compatibility testing](#🧪-automated-compatibility-testing)
         - [🕸 Unprecedented global connectivity](#🕸-unprecedented-global-connectivity)
+        - [🧪 Automated compatibility testing](#🧪-automated-compatibility-testing)
+        - [🤝 Low latency, efficient connection handshake](#🤝-low-latency-efficient-connection-handshake)
         - [🛣️ Peer Routing Records](#🛣️-peer-routing-records)
         - [🗣️ Polite peering](#🗣️-polite-peering)
         - [🧱 Composable routing](#🧱-composable-routing)
@@ -222,43 +222,6 @@ model.
 
 This is the stuff pushing the existing libp2p stack forward.
 
-### 🤝 Low latency, efficient connection handshake
-
-**High priority for: IPFS**
-
-**What?** Establishing a connection and performing the initial handshake
-should be as cheap and fast as possible. Supporting things like
-*selective* stream opening, *preemption*, *speculative* negotiation,
-*upfront* negotiation, protocol table *pinning*, etc. may enable us to
-achieve lower latencies when establishing connections, and even the
-0-RTT holy grail in some cases. These features are being discussed in
-the *Protocol Select* protocol design.
-
-**Why?** Multistream 1.0 is chatty and naïve. Streams are essential to
-libp2p, and negotiating them is currently inefficient in a number of
-scenarios. Also, bootstrapping a multiplexed connection is currently
-guesswork (we test protocols one by one, incurring in significant
-ping-pong).
-
-**Links:**
-
-- [Protocol Select specification](https://github.com/libp2p/specs/pull/349)
-
-### 🧪 Automated compatibility testing
-
-**What?** There are more than 6 implementations of the [libp2p specification] in
-different languages. We need to ensure compatibility of all combinations of these
-implementations. Given the number of libp2p implementations and the amount of
-libp2p protocols, verifying compatibility on a continuous basis can only be
-tackled in an automated fashion.
-
-**Why?** Automated compatibility testing allows us to move fast with confidence
-and will increase trust in the libp2p project as a whole.
-
-We can build on top of the [testground project]. Multiple of the so called
-testground _test plans_ are already in place for the go-libp2p implementation in
-the [libp2p test-plans repository].
-
 ### 🕸 Unprecedented global connectivity
 
 **What?** A DHT crawl measurements (Nov 22nd 2019) showed that out
@@ -284,6 +247,43 @@ rest of the system.
   vision](https://github.com/mxinden/specs/blob/hole-punching/connections/hole-punching.md).
 
 - [NAT traversal tracking issue](https://github.com/libp2p/specs/issues/312).
+
+### 🧪 Automated compatibility testing
+
+**What?** There are more than 6 implementations of the [libp2p specification] in
+different languages. We need to ensure compatibility of all combinations of these
+implementations. Given the number of libp2p implementations and the amount of
+libp2p protocols, verifying compatibility on a continuous basis can only be
+tackled in an automated fashion.
+
+**Why?** Automated compatibility testing allows us to move fast with confidence
+and will increase trust in the libp2p project as a whole.
+
+We can build on top of the [testground project]. Multiple of the so called
+testground _test plans_ are already in place for the go-libp2p implementation in
+the [libp2p test-plans repository].
+
+### 🤝 Low latency, efficient connection handshake
+
+**High priority for: IPFS**
+
+**What?** Establishing a connection and performing the initial handshake
+should be as cheap and fast as possible. Supporting things like
+*selective* stream opening, *preemption*, *speculative* negotiation,
+*upfront* negotiation, protocol table *pinning*, etc. may enable us to
+achieve lower latencies when establishing connections, and even the
+0-RTT holy grail in some cases. These features are being discussed in
+the *Protocol Select* protocol design.
+
+**Why?** Multistream 1.0 is chatty and naïve. Streams are essential to
+libp2p, and negotiating them is currently inefficient in a number of
+scenarios. Also, bootstrapping a multiplexed connection is currently
+guesswork (we test protocols one by one, incurring in significant
+ping-pong).
+
+**Links:**
+
+- [Protocol Select specification](https://github.com/libp2p/specs/pull/349)
 
 ### 🛣️ Peer Routing Records
 
