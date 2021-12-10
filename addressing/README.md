@@ -147,6 +147,40 @@ within it. Using our example above, decapsulating either `/tcp/1234/ws` _or_
 unsurprising if you consider the utility of the `/ip4/7.7.7.7/ws` address that
 would result from simply removing the `tcp` component.
 
+### The multiaddr security component
+
+Peers MAY advertise their addresses without a security protocol, e.g.
+`/ip4/6.6.6.6/tcp/1234/` or `/ip4/6.6.6.6/udp/1234/quic`. The security handshake
+protocol is then negotiated using [multistream-select](../connections/README.md#multistream-select). This is
+the way the libp2p handshake worked until mid 2021.
+This poses a security problem, as the negotiation was not authenticated and
+therefore susceptible to man-in-the-middle attacks. A MITM could modify the list
+of supported handshake protocols, thereby forcing a downgrade to a (potentially)
+less secure handshake protocol. Note that since QUIC is standardized to use
+TLS 1.3, no handshake protocol needs to be negotiated when using QUIC.
+
+Peers SHOULD encapsulate the security protocol in the addresses they advertise,
+for example `/ip4/6.6.6.6/tcp/1234/tls` for a TLS 1.3 server listening on TCP
+port 1234 and `/ip4/6.6.6.6/tcp/1235/noise` for a Noise server listening on TCP
+port 1235. QUIC multiaddrs remain unchanged.
+The nodes jump straight into a cryptographic handshake, thus curtailing the
+possibility of packet-inspection-based censorship and dynamic downgrade attacks.
+This also applies to circuit addresses: the security protocol is encoded in the
+`<destination address>` as defined in [`p2p-circuit` Relay Addresses](#p2p-circuit-relay-addresses).
+
+Advertising the secure channel protocol through the peer's Multiaddr instead of
+negotiating the protocol in-band forces users to advertise an updated Multiaddr
+when changing the secure channel protocol in use. This is especially cumbersome
+when using hardcoded Multiaddresses. Users may leverage the [dnsaddr] Multiaddr
+protocol as well as using a new UDP or TCP port for the new protocol to ease the
+transition.
+
+Implementations using [Protocol Select](https://github.com/libp2p/specs/pull/349/)
+(**TODO**: update link) MUST encapsulate the security protocol in the multiaddr.
+Note that it’s not valid to assume that any node that encapsulated the security
+protocol in their multiaddr also supports Protocol Select.
+
+
 ### The p2p multiaddr
 
 libp2p defines the `p2p` multiaddr protocol, whose address component is the
@@ -168,7 +202,7 @@ within](#encapsulation) another multiaddr.
 For example, the above `p2p` address can be combined with the transport address
 on which the node is listening:
 
-``` 
+```
 /ip4/7.7.7.7/tcp/1234/p2p/QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N
 ```
 
@@ -201,7 +235,7 @@ appreciated.
 
 Most libp2p transports use the IP protocol as a foundational layer, and as a
 result, most transport multiaddrs will begin with a component that represents an
-IPv4 or IPv6 address. 
+IPv4 or IPv6 address.
 
 This may be an actual address, such as `/ip4/7.7.7.7` or
 `/ip6/fe80::883:a581:fff1:833`, or it could be something that resolves to an IP
@@ -221,7 +255,7 @@ resolvable or "name-based" protocols:
 
 When the `/dns` protocol is used, the lookup may result in both IPv4 and IPv6
 addresses, in which case IPv6 will be preferred. To explicitly resolve to IPv4
-or IPv6 addresses, use the `/dns4` or `/dns6` protocols, respectively. 
+or IPv6 addresses, use the `/dns4` or `/dns6` protocols, respectively.
 
 Note that in some restricted environments, such as inside a web browser, libp2p
 may not have access to the resolved IP addresses at all, in which case the
@@ -271,7 +305,7 @@ wherever TCP/IP sockets are accessible.
 
 Addresses for the TCP transport are of the form `<ip-multiaddr>/tcp/<tcp-port>`,
 where `<ip-multiaddr>` is a multiaddr that resolves to an IP address, as
-described in the [IP and Name Resolution section](#ip-and-name-resolution). 
+described in the [IP and Name Resolution section](#ip-and-name-resolution).
 The `<tcp-port>` argument must be a 16-bit unsigned integer.
 
 ### WebSockets
@@ -290,7 +324,7 @@ multiaddr format mirrors this arrangement.
 
 A libp2p QUIC multiaddr is of the form `<ip-multiaddr>/udp/<udp-port>/quic`,
 where `<ip-multiaddr>` is a multiaddr that resolves to an IP address, as
-described in the [IP and Name Resolution section](#ip-and-name-resolution). 
+described in the [IP and Name Resolution section](#ip-and-name-resolution).
 The `<udp-port>` argument must be a 16-bit unsigned integer in network byte order.
 
 
@@ -320,7 +354,7 @@ destination peer.
 
 A full example would be:
 
-``` 
+```
 /ip4/127.0.0.1/tcp/5002/p2p/QmdPU7PfRyKehdrP5A3WqmjyD6bhVpU1mLGKppa2FjGDjZ/p2p-circuit/p2p/QmVT6GYwjeeAF5TR485Yc58S3xRF5EFsZ5YAF4VcP3URHt
 ```
 
@@ -329,9 +363,54 @@ Here, the destination peer has the peer id
 relay node with peer id `QmdPU7PfRyKehdrP5A3WqmjyD6bhVpU1mLGKppa2FjGDjZ` running
 on TCP port 5002 of the IPv4 loopback interface.
 
+#### Relay addresses and multiaddr security component
+
+Instead of negotiating the security protocol in-band, security protocols should
+be encapsulated in the multiaddr (see [The multiaddr security component
+section](#the-multiaddr-security-component)). Establishing a single relayed
+connection involves 3 security protocol upgrades:
+
+1. Upgrading the connection from the source to the relay.
+
+   The security protocol is specified in the relay multiaddr (before
+   `p2p-circuit`).
+
+   Example: `/ip4/6.6.6.6/tcp/1234/tls/p2p/QmRelay/p2p-circuit/<destination-multiaddr>`
+
+2. Upgrading the connection from the relay to the destination.
+
+   The security protocol is specified in the destination multiaddr (after
+   `p2p-circuit`).
+
+   Note: Specifying this security protocol is only necessary for active
+   relaying. In the case of passive relaying the connection established by the
+   destination to the relay will be used to relay the connection.
+
+   Example:
+   - Passive relaying: `<relay-multiaddr>/p2p-circuit/p2p/QmDestination`
+   - Active relaying: `<relay-multiaddr>/p2p-circuit/ip4/6.6.6.6/tcp/1234/tls/p2p/QmDestination`
+
+3. Upgrading the relayed connection from the source to the destination.
+
+   The security protocol is specified by appending
+   `/p2p-circuit-security/<relayed-connection-security-protocol>` to the full
+   address.
+
+   Example: `<relay-mulitaddr>/p2p-circuit/<destination-multiaddr>/p2p-circuit-security/tls`
+
+   Note: One might be tempted to not specify (3) and simply use the security
+   protocol in (2). This would break if the security protocol used for (2) can
+   not be used for (3), e.g. in the case where the relay establishes a QUIC
+   connection to the destination secured via TLS and the source only supports
+   Noise.
+
+   See [Security protocol selection for the relayed connection] for details on
+   how the above integrates with the circuit relayv 2 _Hop_ and _Stop_ protocol.
+
 
 [peer-id-spec]: ../peer-ids/peer-ids.md
 [identify-spec]: ../identify/README.md
 [multiaddr-repo]: https://github.com/multiformats/multiaddr
 [multiaddr-proto-table]: https://github.com/multiformats/multiaddr/blob/master/protocols.csv
 [relay-spec]: ../relay/README.md
+[Security protocol selection for the relayed connection]: ../relay/circuit-v2.md#security-protocol-selection-for-the-relayed-connection
