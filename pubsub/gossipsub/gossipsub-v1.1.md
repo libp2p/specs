@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity                  | Status | Latest Revision |
 |-----------------|---------------------------|--------|-----------------|
-| 2A              | Candidate Recommendation  | Active | r7, 2020-05-30  |
+| 2A              | Candidate Recommendation  | Active | r8, 2021-12-14  |
 
 Authors: [@vyzo]
 
@@ -107,7 +107,7 @@ for the action, and penalize the peer through P₇ (see [Peer Scoring](#peer-sco
 
 When unsubscribing from a topic, the backoff period should be finished before subscribing to
 the topic again, otherwise a healthy mesh will be difficult to reach.
-A specific backoff period for unsubscribing should be set accordingly.
+A shorter backoff period can be used in case of an unsubscribe event, allowing faster resubscribing.
 
 The recommended duration for the backoff period is 1 minute, while the recommended number of peers
 to exchange is larger than `D_hi` so that the pruned peer can reliably form a full mesh.
