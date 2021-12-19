@@ -4,7 +4,7 @@ This is the version 2 of the libp2p Circuit Relay protocol.
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 1A              | DRAFT          | Active | r0, 2021-05-05  |
+| 1A              | DRAFT          | Active | r1, 2021-12-17  |
 
 Authors: [@vyzo]
 
@@ -398,7 +398,7 @@ message Peer {
 }
 
 message Reservation {
-  optional uint64 expire = 1; // Unix expiration time (UTC)
+  required uint64 expire = 1; // Unix expiration time (UTC)
   repeated bytes addrs = 2;   // relay addrs for reserving peer
   optional bytes voucher = 3; // reservation voucher
 }
