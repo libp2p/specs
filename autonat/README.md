@@ -24,7 +24,9 @@ and spec status.
 
 ## Table of Contents
 
-TODO: fill in
+- [Overview](#overview)
+- [AutoNAT Protocol](#autonat-protocol)
+- [Security Considerations](#security-considerations)
 
 ## Overview
 
