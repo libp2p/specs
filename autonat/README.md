@@ -58,7 +58,9 @@ it uses for its regular libp2p connection to perform these dial backs.
 In order to prevent attacks like the one described in [RFC 3489, Section
 12.1.1](https://www.rfc-editor.org/rfc/rfc3489#section-12.1.1) (see excerpt
 below), implementations MUST NOT dial any multiaddress unless it is based on the
-IP address the requesting node is observed as.
+IP address the requesting node is observed as. This restriction as well implies that
+implementations MUST NOT accept dial requests via relayed connections as one can
+not validate the IP address of the requesting node.
 
 > RFC 3489 12.1.1 Attack I: DDOS Against a Target
 >
