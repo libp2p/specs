@@ -91,7 +91,6 @@ Messages are exchanged by:
 1. Opening a new stream.
 2. Sending the RPC request message.
 3. Listening for the RPC response message.
-4. Closing the stream.
 
 All RPC messages sent over a stream are prefixed with the message length in
 bytes, encoded as an unsigned variable length integer as defined by the
