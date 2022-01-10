@@ -1,8 +1,8 @@
 # NAT Discovery
 > How we detect if we're behind a NAT.
 
-| Lifecycle Stage | Maturity      | Status | Latest Revision |
-|-----------------|---------------|--------|-----------------|
+| Lifecycle Stage | Maturity       | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
 | 1A              | Recommendation | Active | r0, 2021-08-26  |
 
 
@@ -24,17 +24,20 @@ and spec status.
 
 ## Table of Contents
 
-TODO: fill in
+- [Overview](#overview)
+- [AutoNAT Protocol](#autonat-protocol)
+- [RPC messages](#rpc-messages)
+- [Security Considerations](#security-considerations)
 
 ## Overview
 
-A priori, a node cannot know if it is behind a NAT / firewall or if it is publicly reachable.
-Knowing its NAT status is essential for the node to be well-behaved in the
-network: A node that's behind a NAT doesn't need to advertise its (undiable)
-addresses to the rest of the network, preventing superfluous dials from other
-peers. Furthermore, it might actively seek to improve its connectivity by
-finding a relay server, which would allow other peers to establish a relayed
-connection.
+A priori, a node cannot know if it is behind a NAT / firewall or if it is
+publicly reachable. Knowing its NAT status is essential for the node to be
+well-behaved in the network: A node that's behind a NAT doesn't need to
+advertise its (undiable) addresses to the rest of the network, preventing
+superfluous dials from other peers. Furthermore, it might actively seek to
+improve its connectivity by finding a relay server, which would allow other
+peers to establish a relayed connection.
 
 To determine if it is located behind a NAT, nodes use the `autonat` protocol.
 Using this protocol, the node requests other peers to dial its presumed public
@@ -72,6 +75,26 @@ If all dials fail, the receiver sends a `DialResponse` message with the
 `ResponseStatus` `E_DIAL_ERROR`. If at least one of the dials complete
 successfully, it sends a `DialResponse` with the `ResponseStatus` `OK`. It
 SHOULD include the address it successfully dialed in its response.
+
+The initiator uses the responses obtained from multiple peers to determine its
+NAT status. If more than 3 peers report a successfully dialed address, the node
+SHOULD assume that it is not located behind a NAT and publicly accessible. On
+the other hand, if more than 3 peers report unsuccessful dials, the node SHOULD
+assume that it is not publicly accessible.
+Nodes are encouraged to periodically re-check their status, especially after
+changing their set of addresses they're listening on.
+
+## RPC messages
+
+Messages are exchanged by:
+
+1. Opening a new stream.
+2. Sending the RPC request message.
+3. Listening for the RPC response message.
+
+All RPC messages sent over a stream are prefixed with the message length in
+bytes, encoded as an unsigned variable length integer as defined by the
+[multiformats unsigned-varint spec][uvarint-spec].
 
 ```proto
 syntax = "proto2";
@@ -111,17 +134,11 @@ message Message {
 }
 ```
 
-The initiator uses the responses obtained from multiple peers to determine its
-NAT status. If more than 3 peers report a successfully dialed address, the node
-SHOULD assume that it is not located behind a NAT and publicly accessible. On
-the other hand, if more than 3 peers report unsuccessful dials, the node SHOULD
-assume that it is not publicly accessible.
-Nodes are encouraged to periodically re-check their status, especially after
-changing their set of addresses they're listening on.
-
 ## Security Considerations
 
 Note that in the current iteration of this protocol, a node doesn't check if
 a peer's report of a successful dial is accurate. This might be solved in a
 future iteration of this protocol, see
 https://github.com/libp2p/go-libp2p-autonat/issues/10 for a detailed discussion.
+
+[uvarint-spec]: https://github.com/multiformats/unsigned-varint
