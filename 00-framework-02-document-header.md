@@ -92,7 +92,7 @@ The following fields are all required:
     currently in. This must match the `Maturity` and `Status` fields.
 - `Maturity`
   - The full name of the maturity level that the spec is currently in.
-  - Valid values are: `Working Draft`, `Candidate Recommenation`,
+  - Valid values are: `Working Draft`, `Candidate Recommendation`,
     `Recommendation`.
 - `Status`
   - The full name of the status that the spec is currently in.
