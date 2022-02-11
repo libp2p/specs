@@ -68,6 +68,31 @@ The concurrency of node and value lookups are limited by parameter `α`, with a
 default value of 3. This implies that each lookup process can perform no more
 than 3 inflight requests, at any given time.
 
+## Client and server mode
+
+When the libp2p Kademlia protocol is run on top of a network of heterogeneous
+nodes, unrestricted nodes should operate in _server mode_ and restricted nodes,
+e.g. those with intermittent availability, high latency, low bandwidth, low
+CPU/RAM/Storage, etc., should operate in _client mode_.
+
+As an example, running the libp2p Kademlia protocol on top of the Internet,
+publicly routable nodes, e.g. servers in a datacenter, would operate in _server
+mode_ and non-publicly routable nodes, e.g. laptops behind a NAT and firewall,
+would operate in _client mode_.
+
+Nodes, both those operating in _client_ and _server mode_, add another node to
+their routing table if and only if that node operates in _server mode_. This
+distinction allows restricted nodes to utilize the DHT, i.e. query the DHT,
+without decreasing the quality of the distributed hash table, i.e. without
+polluting the routing tables.
+
+Nodes operating in _server mode_ advertise the libp2p Kademlia protocol
+identifier via the [identify protocol](../identify/README.md). In addition
+_server mode_ nodes accept incoming streams using the Kademlia protocol
+identifier. Nodes operating in _client mode_ do not advertise support for the
+libp2p Kademlia protocol identifier. In addition they do not offer the Kademlia
+protocol identifier for incoming streams.
+
 ## DHT operations
 
 The libp2p Kademlia DHT offers the following types of operations:
@@ -289,6 +314,7 @@ implementations should include a lookup for their own peer ID.
 
 Every repetition is subject to a `QueryTimeout` (default: 10 seconds), which
 upon firing, aborts the run.
+
 
 ## RPC messages
 
