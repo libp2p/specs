@@ -76,9 +76,12 @@ e.g. those with intermittent availability, high latency, low bandwidth, low
 CPU/RAM/Storage, etc., should operate in _client mode_.
 
 As an example, running the libp2p Kademlia protocol on top of the Internet,
-publicly routable nodes, e.g. servers in a datacenter, would operate in _server
+publicly routable nodes, e.g. servers in a datacenter, might operate in _server
 mode_ and non-publicly routable nodes, e.g. laptops behind a NAT and firewall,
-would operate in _client mode_.
+might operate in _client mode_. The concrete factors used to classify nodes into
+_clients_ and _servers_ depend on the characteristics of the network topology
+and the properties of the Kademlia DHT . Factors to take into account are e.g.
+network size, replication factor and republishing period.
 
 Nodes, both those operating in _client_ and _server mode_, add another node to
 their routing table if and only if that node operates in _server mode_. This
@@ -314,7 +317,6 @@ implementations should include a lookup for their own peer ID.
 
 Every repetition is subject to a `QueryTimeout` (default: 10 seconds), which
 upon firing, aborts the run.
-
 
 ## RPC messages
 
