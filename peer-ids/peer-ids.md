@@ -47,7 +47,7 @@ format used to store keys on disk is also included as a reference for libp2p
 implementors who would like to import existing libp2p key pairs.
 
 Key encodings and message signing semantics are
-[covered below](#how-keys-are-encoded-and-messages-signed).
+[covered below](#key-types).
 
 ## Keys
 
