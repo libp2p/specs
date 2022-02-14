@@ -46,8 +46,7 @@ Although private keys are not transmitted over the wire, the serialization
 format used to store keys on disk is also included as a reference for libp2p
 implementors who would like to import existing libp2p key pairs.
 
-Key encodings and message signing semantics are
-[covered below](#key-types).
+Key encodings and message signing semantics are covered below.
 
 ## Keys
 
