@@ -579,7 +579,7 @@ which topics they are subscribed to:
 | `IPColocationFactorWeight`    | Weight  | Weight of `P₆`, the IP colocation score.              | Must be negative, to penalize peers with multiple IPs.        |
 | `IPColocationFactorThreshold` | Integer | Number of IPs a peer may have before being penalized. | Must be at least 1. Values above threshold will be penalized. |
 | `BehaviourPenaltyWeight`      | Weight  | Weight of `P₇`, the behaviour penalty.                | Must be negative to penalize peers for misbehaviour. |
-| `BehaviourPenaltyDecay`       | Float   | Decay factor for `P₇`.                                | Must be between in (0, 1]. |
+| `BehaviourPenaltyDecay`       | Float   | Decay factor for `P₇`.                                | Must be between 0 and 1. |
 
 The remaining parameters are applied to a peer's behavior within a single topic. Implementations
 should be able to accept configurations for multiple topics, keyed by topic ID string. Each topic
