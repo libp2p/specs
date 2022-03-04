@@ -555,7 +555,7 @@ The following peer scoring parameters apply globally to all peers and topics:
 | Parameter           | Type     | Description                                                             | Constraints                  |
 |---------------------|----------|-------------------------------------------------------------------------|------------------------------|
 | `GossipThreshold`   | Float    | No gossip emitted to peers below threshold; incoming gossip is ignored. | Must be < 0                  |
-| `PublishThreshold`  | Float    | No self-published messages are sent to peers below threshold.           | Must be < `GossipThreshold`  |
+| `PublishThreshold`  | Float    | No self-published messages are sent to peers below threshold.           | Must be <= `GossipThreshold`  |
 | `GraylistThreshold` | Float    | All RPC messages are ignored from peers below threshold.                | Must be < `PublishThreshold` |
 | `AcceptPXThreshold` | Float    | PX information by peers below this threshold is ignored.                | Must be >= 0                 |
 | `OpportunisticGraftThreshold` | Float | If the median score in the mesh drops below this threshold, then the router may opportunistically graft better scoring peers. | Must be >= 0 |
@@ -573,13 +573,13 @@ Function](#the-score-function) for details.
 There are some parameters that apply to the peer "as a whole", regardless of
 which topics they are subscribed to:
 
-| Parameter                     | Type   | Description                                           | Constraints                                                   |
-|-------------------------------|--------|-------------------------------------------------------|---------------------------------------------------------------|
-| `AppSpecificWeight`           | Weight | Weight of `P₅`, the application-specific score.       | Must be positive, however score values may be negative.       |
-| `IPColocationFactorWeight`    | Weight | Weight of `P₆`, the IP colocation score.              | Must be negative, to penalize peers with multiple IPs.        |
-| `IPColocationFactorThreshold` | Float  | Number of IPs a peer may have before being penalized. | Must be at least 1. Values above threshold will be penalized. |
-| `BehaviourPenaltyWeight`      | Weight | Weight of `P₇`, the behaviour penalty.                | Must be negative to penalize peers for misbehaviour. |
-| `BehaviourPenaltyDecay`       | Float  | Decay factor for `P₇`.                                | Must be between 0 and 1. |
+| Parameter                     | Type    | Description                                           | Constraints                                                   |
+|-------------------------------|---------|-------------------------------------------------------|---------------------------------------------------------------|
+| `AppSpecificWeight`           | Weight  | Weight of `P₅`, the application-specific score.       | Must be positive, however score values may be negative.       |
+| `IPColocationFactorWeight`    | Weight  | Weight of `P₆`, the IP colocation score.              | Must be negative, to penalize peers with multiple IPs.        |
+| `IPColocationFactorThreshold` | Integer | Number of IPs a peer may have before being penalized. | Must be at least 1. Values above threshold will be penalized. |
+| `BehaviourPenaltyWeight`      | Weight  | Weight of `P₇`, the behaviour penalty.                | Must be negative to penalize peers for misbehaviour. |
+| `BehaviourPenaltyDecay`       | Float   | Decay factor for `P₇`.                                | Must be between in (0, 1]. |
 
 The remaining parameters are applied to a peer's behavior within a single topic. Implementations
 should be able to accept configurations for multiple topics, keyed by topic ID string. Each topic
