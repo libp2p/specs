@@ -222,19 +222,19 @@ More specifically, the following thresholds apply:
   during the heartbeat and ignored when looking for peers to graft. Furthermore, no PX information
   is emitted towards those peers and PX is ignored from them. In addition, when performing PX only
   peers with non-negative scores are exchanged.
-- `gossipThreshold`: when a peer's score drops below this threshold, no gossip is emitted towards
+- `GossipThreshold`: when a peer's score drops below this threshold, no gossip is emitted towards
   that peer and gossip from that peer is ignored. This threshold should be negative, such that
   some information can be propagated to/from mildly negatively scoring peers.
-- `publishThreshold`: when a peer's score drops below this threshold, self published messages are
+- `PublishThreshold`: when a peer's score drops below this threshold, self published messages are
   not propagated towards this peer when (flood) publishing. This threshold should be negative, and
   less than or equal to the gossip threshold.
-- `graylistThreshold`: when a peer's score drops below this threshold, the peer is graylisted and
+- `GraylistThreshold`: when a peer's score drops below this threshold, the peer is graylisted and
   its RPCs are ignored. This threshold must be negative, and less than the gossip/publish threshold.
-- `acceptPXThreshold`: when a peer sends us PX information with a prune, we only accept it and connect
+- `AcceptPXThreshold`: when a peer sends us PX information with a prune, we only accept it and connect
   to the supplied peers if the originating peer's score exceeds this threshold. This threshold should
   be non-negative and for increased security a large positive score attainable only by bootstrappers
   and other trusted well-connected peers.
-- `opportunisticGraftThreshold`: when the median peer score in the mesh drops below this value, the
+- `OpportunisticGraftThreshold`: when the median peer score in the mesh drops below this value, the
   router may select more peers with score above the median to opportunistically graft on the mesh
   (see Opportunistic Grafting below). This threshold should be positive, with a relatively small value
   compared to scores achievable through topic contributions.
@@ -265,7 +265,7 @@ making sybils re-eligible for grafting.
 
 In order to recover from such disaster scenarios and generally adaptively optimize the mesh over time,
 gossipsub v1.1 introduces an opportunistic grafting mechanism.
-Periodically, the router checks the median score of peers in the mesh against the `opportunisticGraftThreshold`.
+Periodically, the router checks the median score of peers in the mesh against the `OpportunisticGraftThreshold`.
 If the median score is below the threshold, the router opportunistically grafts (at least) two peers
 with score above the median in the mesh.
 This improves an underperforming mesh by introducing good scoring peers that may have been gossiping
