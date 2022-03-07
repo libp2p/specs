@@ -109,7 +109,7 @@ message Message {
 	optional string from = 1;
 	optional bytes data = 2;
 	optional bytes seqno = 3;
-	repeated string topicIDs = 4;
+        required string topic = 4;
 	optional bytes signature = 5;
 	optional bytes key = 6;
 }
@@ -138,7 +138,7 @@ whose `from` and `seqno` fields are populated.
 The `data` (optional) field is an opaque blob of data representing the payload.
 It can contain any data that the publisher wants it to.
 
-The `topicIDs` field specifies a set of topics that this message is being
+The `topic` field specifies a topic that this message is being
 published to.
 
 The `signature` and `key` fields (optional) are used for message signing, if
