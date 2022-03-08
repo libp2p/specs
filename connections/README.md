@@ -26,7 +26,8 @@ and spec status.
     - [Overview](#overview)
     - [Definitions](#definitions)
     - [Protocol Negotiation](#protocol-negotiation)
-        - [multistream-select](#multistream-select)
+        - [Protocol Select](#protocol-select)
+        - [Multistream Select](#multistream-select)
     - [Upgrading Connections](#upgrading-connections)
     - [Opening New Streams Over a Connection](#opening-new-streams-over-a-connection)
     - [Practical Considerations](#practical-considerations)
@@ -113,8 +114,7 @@ Each protocol supported by a peer is identified using a unique string called a
 **protocol id**. While any string can be used, the conventional format is a
 path-like structure containing a short name and a version number, separated by
 `/` characters. For example: `/mplex/1.0.0` identifies version 1.0.0 of the
-[`mplex` stream multiplexing protocol][mplex]. multistream-select itself has a
-protocol id of `/multistream/1.0.0`. 
+[`mplex` stream multiplexing protocol][mplex].
 
 Including a version number in the protocol id simplifies the case where you want
 to concurrently support multiple versions of a protocol, perhaps a stable version
@@ -125,10 +125,18 @@ receives the protocol id negotiated for each new stream, so it's possible to
 register the same handler for multiple versions of a protocol and dynamically alter
 functionality based on the version in use for a given stream.
 
-### multistream-select
+libp2p supports two protocol negotiation protocols, _Protocol Select_ and
+_Multistream Select_, the former replacing the latter and the latter being
+deprecated.
 
-libp2p uses a protocol called multistream-select for protocol negotiation. Below
-we cover the basics of multistream-select and its use in libp2p. For more
+### Protocol Select
+
+The _Protocol Select_ protocol as well as how it is embedded in libp2p is
+described in the [_Protocol Select_ specification][protocol-select].
+
+### Multistream Select
+
+Below we cover the basics of multistream-select and its use in libp2p. For more
 details, see [the multistream-select repository][mss].
 
 Before engaging in the multistream-select negotiation process, it is assumed
@@ -152,6 +160,7 @@ hex):
 The first byte is the varint-encoded length (`0x03`), followed by `na` (`0x6e 0x61`),
 then the newline (`0x0a`).
 
+Multistream-select itself has a protocol id of `/multistream/1.0.0`.
 
 The basic multistream-select interaction flow looks like this:
 
@@ -182,6 +191,9 @@ traffic over the channel will adhere to the rules of the agreed-upon protocol.
 If a peer receives a `"na"` response to a proposed protocol id, they can either
 try again with a different protocol id or close the channel.
 
+Note: In the case where both peers initially act as initiators, e.g. during NAT
+hole punching, tie-breaking is done via the [multistream-select simultaneous
+open protocol extension][simopen].
 
 ## Upgrading Connections
 
@@ -193,47 +205,16 @@ connections is called "upgrading" the connection.
 Because there are many valid ways to provide the libp2p capabilities, the
 connection upgrade process uses protocol negotiation to decide which specific
 protocols to use for each capability. The protocol negotiation process uses
-multistream-select as described in the [Protocol
+_Protocol Select_ as described in the [Protocol
 Negotiation](#protocol-negotiation) section.
 
 When raw connections need both security and multiplexing, security is always
 established first, and the negotiation for stream multiplexing takes place over
 the encrypted channel.
 
-Here's an example of the connection upgrade process:
-
-![see conn-upgrade.plantuml for diagram source](conn-upgrade.svg)
-
-First, the peers both send the multistream protocol id to establish that they'll
-use multistream-select to negotiate protocols for the connection upgrade.
-
-Next, the Initiator proposes the [TLS protocol][tls-libp2p] for encryption, but
-the Responder rejects the proposal as they don't support TLS.
-
-The Initiator then proposes the [Noise protocol][noise-spec], which is supported
-by the Responder. The Listener echoes back the protocol id for Noise to indicate
-agreement.
-
-At this point the Noise protocol takes over, and the peers exchange the Noise
-handshake to establish a secure channel. If the Noise handshake fails, the
-connection establishment process aborts. If successful, the peers will use the
-secured channel for all future communications, including the remainder of the
-connection upgrade process.
-
-Once security has been established, the peers negotiate which stream multiplexer
-to use. The negotiation process works in the same manner as before, with the
-dialing peer proposing a multiplexer by sending its protocol id, and the
-listening peer responding by either echoing back the supported id or sending
-`"na"` if the multiplexer is unsupported.
-
 Once security and stream multiplexing are both established, the connection
 upgrade process is complete, and both peers are able to use the resulting libp2p
 connection to open new secure multiplexed streams.
-
-Note: In the case where both peers initially act as initiators, e.g. during NAT
-hole punching, tie-breaking is done via the [multistream-select simultaneous
-open protocol extension][simopen].
-
 
 ## Opening New Streams Over a Connection
 
@@ -244,24 +225,11 @@ process](#upgrading-connections) if the transport lacks native multiplexing.
 Either peer can open a new stream to the other over an existing connection.
 
 When a new stream is opened, a protocol is negotiated using
-`multistream-select`. The [protocol negotiation process](#protocol-negotiation)
+_Protocol Select_. The [protocol negotiation process](#protocol-negotiation)
 for new streams is very similar to the one used for upgrading connections.
 However, while the security and stream multiplexing modules for connection
 upgrades are typically libp2p framework components, the protocols negotiated for
 new streams can be easily defined by libp2p applications.
-
-Streams are routed to application-defined handler functions based on their
-protocol id string. Incoming stream requests will propose a protocol id to use
-for the stream using `multistream-select`, and the peer accepting the stream
-request will determine if there are any registered handlers capable of handling
-the protocol. If no handlers are found, the peer will respond to the proposal
-with `"na"`.
-
-When registering protocol handlers, it's possible to use a custom predicate or
-"match function", which will receive incoming protocol ids and return a boolean
-indicating whether the handler supports the protocol. This allows more flexible
-behavior than exact literal matching, which is the default behavior if no match
-function is provided.
 
 ## Practical Considerations
 
@@ -354,12 +322,6 @@ See [hole punching][hole-punching] document.
 
 ## Future Work
 
-A replacement for multistream-select is [being discussed][mss-2-pr] which
-proposes solutions for several inefficiencies and shortcomings in the current
-protocol negotiation and connection establishment process. The ideal outcome of
-that discussion will require many changes to this document, once the new
-multistream semantics are fully specified.
-
 For connection management, there is currently a draft of a [connection manager
 specification][connmgr-v2-spec] that may replace the current [connmgr
 interface][connmgr-go-interface] in go-libp2p and may also form the basis of
@@ -409,3 +371,4 @@ updated to incorporate the changes.
 [simopen]: ./simopen.md
 [resource-manager-issue]: https://github.com/libp2p/go-libp2p/issues/635
 [hole-punching]: ./hole-punching.md
+[protocol-select]: ../protocol-select/README.md
