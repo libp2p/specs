@@ -112,8 +112,8 @@ functions.
 Each protocol supported by a peer is identified using a unique string called a
 **protocol id**. While any string can be used, the conventional format is a
 path-like structure containing a short name and a version number, separated by
-`/` characters. For example: `/mplex/1.0.0` identifies version 1.0.0 of the
-[`mplex` stream multiplexing protocol][mplex]. multistream-select itself has a
+`/` characters. For example: `/yamux/1.0.0` identifies version 1.0.0 of the
+[`yamux` stream multiplexing protocol][yamux]. multistream-select itself has a
 protocol id of `/multistream/1.0.0`. 
 
 Including a version number in the protocol id simplifies the case where you want
@@ -277,8 +277,8 @@ should support a baseline "stack" of security and multiplexing protocols.
 The recommended baseline **security** protocol is [Noise][noise-spec], which is
 supported in all current libp2p implementations.
 
-The recommended baseline **stream multiplexer** is [mplex][mplex], which
-provides a very simple programmatic API and is supported in all current libp2p
+The recommended baseline **stream multiplexer** is [yamux][yamux], which
+provides a very simple programmatic API and is supported in most libp2p
 implementations.
 
 ### State Management 
@@ -394,7 +394,7 @@ updated to incorporate the changes.
 
 [mss]: https://github.com/multiformats/multistream-select
 [uvarint]: https://github.com/multiformats/unsigned-varint
-[mplex]: ../mplex/README.md
+[yamux]: https://github.com/hashicorp/yamux/blob/master/spec.md
 [noise-spec]: ../noise/README.md
 [connmgr-v2-spec]: https://github.com/libp2p/specs/pull/161
 [connmgr-go-interface]: https://github.com/libp2p/go-libp2p-core/blob/master/connmgr/connmgr.go
