@@ -258,7 +258,6 @@ monitor the system.
 Metrics should include:
 - Transport metrics (TCP, QUIC, security protocols, stream multiplexers)
 - Swarm metrics
-- Resource Manager metrics
 - other subsystems (AutoNAT, AutoRelay, Hole Punching)
 
 **Why?** A system that cannot be monitored will misbehave - sooner or later.
