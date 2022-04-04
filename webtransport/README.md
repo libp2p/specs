@@ -36,6 +36,14 @@ Examples:
 
 If it is able to present a CA-signed certificate the list of certificate hashes SHOULD be empty. When using self-signed certificates, the server MUST include the hash(es) in the multiaddr.
 
+## WebTransport HTTP endpoint
+
+WebTransport needs a HTTPS URL to establish a WebTransport session, e.g. `https://example.com/webtransport`. As multiaddrs don't allow the encoding of URLs, this spec standardizes the endpoint. The HTTP endpoint of a libp2p WebTransport servers MUST be located at `/.well-known/libp2p-webtransport`.
+
+To allow future evolution of the way we run the libp2p handshake over WebTransport, we use a URL parameter. The handshake described in this document MUST be signaled by setting the `type` URL parameter to `multistream`.
+
+Example: The WebTransport URL of a WebTransport server advertising `/ip4/1.2.3.4/udp/1443/quic/webtransport/` would be `https://1.2.3.4:1443/.well-known/libp2p-webtransport?type=multistream`.
+
 ## Security Handshake
 
 Unfortunately, the self-signed certificate doesn't allow the nodes to authenticate each others' peer IDs. It is therefore necessary to run an additional libp2p handshake on a newly established WebTransport connection.
