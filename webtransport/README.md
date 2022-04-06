@@ -13,7 +13,7 @@ and spec status.
 
 ## Introduction
 
-WebTransport is a way for browsers to establish a stream-multiplexed connection to servers that allows bidirectional streaming.
+WebTransport is a way for browsers to establish a stream-multiplexed and bidirectional connection to servers using QUIC.
 
 The WebTransport protocol is currently under development at the IETF. Chrome has implemented and shipped support for [draft-02](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http3/).
 
