@@ -4,6 +4,9 @@
 |-----------------|---------------|--------|-----------------|
 | 1A              | Working Draft | Active | r0, 2022-04-13  |
 
+Authors: [@marcopolo]
+
+Interest Group: TODO
 ## Introduction
 
 A peer may have many connections open for another peer and may be transmitting
