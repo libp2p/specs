@@ -52,8 +52,6 @@ Initiator <-> Responder: <b>Connection 2</b>
 
 note over Initiator, Responder: Migrate <b>Stream A</b> to <b>Stream B</b>
 
-Initiator -> Responder: <b>Stream A:</b> Start stream migration, this stream is <b>id=A</b>
-
 Initiator -> Responder: Open new stream on <b>Connection 2</b>. Call this <b>Stream B</b>
 
 Initiator -> Responder: <b>Stream B:</b> Migrate stream with <b>id=A</b> to this stream
@@ -109,7 +107,7 @@ reset and the stream as a whole should be considered "aborted" (reset).
 
 ### Half closed streams
 
-The final migrated stream should loook the same as the initial stream. If the
+The final migrated stream should look the same as the initial stream. If the
 initial stream `A` was half closed, then the final migrated stream `B` should
 also be half closed. Note this may involve an extra step by one of the nodes.
 If a node, when trying to close writes to its old stream, notices that it was
@@ -127,6 +125,7 @@ skinparam sequenceMessageAlign center
 entity Initiator
 entity Responder
 
+Initiator <- Responder: <b>Stream A:</b> ""EOF""
 note over Responder: <b>Stream A</b> is closed for writing
 
 == Stream Migration ==
