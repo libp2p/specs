@@ -225,12 +225,14 @@ This is the stuff pushing the existing libp2p stack forward.
 
 ### 🕸 Unprecedented global connectivity
 
+**Status**: In progress
+
 **What?** A DHT crawl measurements (Nov 22nd 2019) showed that out
 of 4344 peers, 2754 were undialable (\~63%). This evidence correlates
 with feedback from the IPFS and Filecoin teams.
 
 We need to implement additional mechanisms for Firewall and NAT traversal to
-have the highest probability of being able to establish a direct connections.
+have the highest probability of being able to establish a direct connection.
 Mechanisms we wish to add include:
 
 - Project Flare stack (via *Circuit Relay v2*, *Direct Connection Upgrade
@@ -249,6 +251,7 @@ rest of the system.
 
 - [NAT traversal tracking issue](https://github.com/libp2p/specs/issues/312).
 
+- [WebRTC tracking issue](https://github.com/libp2p/specs/issues/220)
 
 ### ⏱ Full Observability
 
@@ -268,6 +271,8 @@ Metrics should include:
 
 ### 🧪 Automated compatibility testing
 
+**Status**: In progress
+
 **What?** There are more than 6 implementations of the [libp2p specification] in
 different languages. We need to ensure compatibility of all combinations of these
 implementations. Given the number of libp2p implementations and the amount of
@@ -280,6 +285,10 @@ and will increase trust in the libp2p project as a whole.
 We can build on top of the [testground project]. Multiple of the so called
 testground _test plans_ are already in place for the go-libp2p implementation in
 the [libp2p test-plans repository].
+
+**Links:**
+
+- [First proof of concept](https://github.com/libp2p/test-plans/pull/20)
 
 ### 🤝 Low latency, efficient connection handshake
 
