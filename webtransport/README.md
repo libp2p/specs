@@ -21,20 +21,16 @@ The most exciting feature for libp2p (other than the improved performance and ho
 
 ## Certificates
 
-Server nodes can choose between 2 modes of operation:
-1. They possess a certificate that's accepted by the WebPKI (i.e. a certificate signed by a well-known certificate authority). Due to the p2p nature of libp2p, obtaining such a certificate will only be practical for a small number of nodes.
-2. They use a self-signed certificate. According to the [w3c WebTransport certification](https://www.w3.org/TR/webtransport/), the validity of the certificate MUST be at most 14 days. Nodes then include the hash of one (or more) certificates in their multiaddr (see [#addressing]).
+Since most libp2p nodes don't possess a TLS certificate signed by a Certificate Authority, servers use a self-signed certificates. According to the [w3c WebTransport certification](https://www.w3.org/TR/webtransport/), the validity of the certificate MUST be at most 14 days, and must not use an RSA key. Nodes then include the hash of one (or more) certificates in their multiaddr (see [#addressing]).
 
-When using self-signed certificates, nodes need to take care to regularly renew their certificate. In the following, the RECOMMENDED logic for rolling certificates is described. At first boot of the node, it creates a self-signed certificate with a validity of 14 days, and publishes a multiaddr containing the hash of that certificate. After 10 days, the node prepares the next certificate, setting the `NotBefore` date of that certificate to the expiration date (or shortly before that) of the first certificate, and an expiration of 14 days after that. The node continues using the old certificate until its expiry date, but it already advertises a multiaddr containing both certificate hashes. This way, clients will be able to connect to the node, even if they cache the multiaddr for multiple days.
+Servers need to take care to regularly renew their certificate. In the following, the RECOMMENDED logic for rolling certificates is described. At first boot of the node, it creates a self-signed certificate with a validity of 14 days, and publishes a multiaddr containing the hash of that certificate. After 10 days, the node prepares the next certificate, setting the `NotBefore` date of that certificate to the expiration date (or shortly before that) of the first certificate, and an expiration of 14 days after that. The node continues using the old certificate until the expiry date, but it already advertises a multiaddr containing both certificate hashes. This way, clients will be able to connect to the node, even if they cache the multiaddr for multiple days.
 
 ## Addressing
 
 Webtransport multiaddresses are composed of a QUIC multiaddr, followed by `/webtransport` and a list of multihashes of the certificates that the server uses.
 Examples:
-* `/ip4/1.2.3.4/udp/443/quic/webtransport/`
+* `/ip4/1.2.3.4/udp/443/quic/webtransport/certhash/<hash1>`
 * `/ip6/fe80::1ff:fe23:4567:890a/udp/1234/quic/webtransport/certhash/<hash1>/certhash/<hash2>/certhash/<hash3>`
-
-If it is able to present a CA-signed certificate the list of certificate hashes SHOULD be empty. When using self-signed certificates, the server MUST include the hash(es) in the multiaddr.
 
 ## WebTransport HTTP endpoint
 
