@@ -40,21 +40,18 @@ If it is able to present a CA-signed certificate the list of certificate hashes 
 
 WebTransport needs a HTTPS URL to establish a WebTransport session, e.g. `https://example.com/webtransport`. As multiaddrs don't allow the encoding of URLs, this spec standardizes the endpoint. The HTTP endpoint of a libp2p WebTransport servers MUST be located at `/.well-known/libp2p-webtransport`.
 
-To allow future evolution of the way we run the libp2p handshake over WebTransport, we use a URL parameter. The handshake described in this document MUST be signaled by setting the `type` URL parameter to `multistream`.
+To allow future evolution of the way we run the libp2p handshake over WebTransport, we use a URL parameter. The handshake described in this document MUST be signaled by setting the `type` URL parameter to `noise`.
 
-Example: The WebTransport URL of a WebTransport server advertising `/ip4/1.2.3.4/udp/1443/quic/webtransport/` would be `https://1.2.3.4:1443/.well-known/libp2p-webtransport?type=multistream`.
+Example: The WebTransport URL of a WebTransport server advertising `/ip4/1.2.3.4/udp/1443/quic/webtransport/` would be `https://1.2.3.4:1443/.well-known/libp2p-webtransport?type=noise`.
 
 ## Security Handshake
 
 Unfortunately, the self-signed certificate doesn't allow the nodes to authenticate each others' peer IDs. It is therefore necessary to run an additional libp2p handshake on a newly established WebTransport connection.
-Once a WebTransport session is established, the clients opens a new stream and initiates a libp2p handshake (selecting the security protocol by running multistream, then performing the selected handshake).
+The first stream that the client opens on a new WebTransport session is used to perform a libp2p handshake using Noise (https://github.com/libp2p/specs/tree/master/noise). The client SHOULD start the handshake right after sending the CONNECT request, without waiting for the server's response.
 
-Note: Once we include the security protocol in the multiaddr (see https://github.com/libp2p/specs/pull/353), we will be able to shave off two (!!) round-trips here: Not running multistream saves one round trip. Furthermore, we'll be able to run the WebTransport handshake (i.e. the CONNECT request) in parallel with the cryptographic handshake, for example by transmitting the first handshake message as a URL parameter. The specifics of this is left to a future iteration of this spec.
+In order to verify that the end-to-end encryption of the connection, the peers need to establish that no MITM intercepted the connection. To do so, the client MUST include the certificate hash that was used to establish the connection as payload of the first Noise message (the `e` message). This payload is not encrypted, but the Noise handshake provides integrity protection.
+If the client was willing to accept multiple certificate hashes, but cannot determine with certificate was actually used to establish the connection (this will commonly be the case for browser clients), it MUST include a list of all certificate hashes.
 
-## Securing Streams
+On receipt of the `e` message, the server MUST verify the list of certificate hashes. If the list is empty, it MUST fail the handshake. For every certificate in the list, it checks if it possesses a certificate with the corresponding hash. If so, it continues with the handshake. However, if there is even a single certificate hash in the list that it cannot associate with a certificate, it MUST abort the handshake.
 
-All streams other than the stream used for the security handshake are protected using Salsa20. Two (symmetric) keys are derived from the master secrect established during the handshake, one for sending and for receiving on the stream.
-
-When using TLS, the 32 byte key used by Salsa20 is derived using the algorithm described in RFC 5705. In Go, this is achieved by using [`tls.ConnectionState.ExportKeyingMaterial`](https://pkg.go.dev/crypto/tls#ConnectionState.ExportKeyingMaterial). The label is `libp2p-webtransport-stream-<perspective>`, where `<perspective>` is `client` or `server`, respectively, depending on which side is sending on the stream, and the context is the QUIC stream ID, serialized as a uint64 in network byte order.
-
-TODO: We need a similar construction for Noise.
+For the client, the libp2p connection is fully established once it has sent the last Noise handshake message. For the server, receipt (and successful verification) of that message completes the handshake.
