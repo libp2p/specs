@@ -32,7 +32,7 @@ When using self-signed certificates, nodes need to take care to regularly renew 
 Webtransport multiaddresses are composed of a QUIC multiaddr, followed by `/webtransport` and a list of multihashes of the certificates that the server uses.
 Examples:
 * `/ip4/1.2.3.4/udp/443/quic/webtransport/`
-* `/ip6/fe80::1ff:fe23:4567:890a/udp/1234/quic/webtransport/<hash1><hash2><hash3>`
+* `/ip6/fe80::1ff:fe23:4567:890a/udp/1234/quic/webtransport/certhash/<hash1>/certhash/<hash2>/certhash/<hash3>`
 
 If it is able to present a CA-signed certificate the list of certificate hashes SHOULD be empty. When using self-signed certificates, the server MUST include the hash(es) in the multiaddr.
 
