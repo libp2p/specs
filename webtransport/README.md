@@ -52,6 +52,15 @@ The first stream that the client opens on a new WebTransport session is used to 
 In order to verify that the end-to-end encryption of the connection, the peers need to establish that no MITM intercepted the connection. To do so, the client MUST include the certificate hash that was used to establish the connection as payload of the first Noise message (the `e` message). This payload is not encrypted, but the Noise handshake provides integrity protection.
 If the client was willing to accept multiple certificate hashes, but cannot determine with certificate was actually used to establish the connection (this will commonly be the case for browser clients), it MUST include a list of all certificate hashes.
 
+Certificate hashes are encoded using the following protobuf message:
+```proto
+syntax = "proto2";
+
+message WebTransport {
+  repeated bytes cert_hashes = 1;
+}
+```
+
 On receipt of the `e` message, the server MUST verify the list of certificate hashes. If the list is empty, it MUST fail the handshake. For every certificate in the list, it checks if it possesses a certificate with the corresponding hash. If so, it continues with the handshake. However, if there is even a single certificate hash in the list that it cannot associate with a certificate, it MUST abort the handshake.
 
 For the client, the libp2p connection is fully established once it has sent the last Noise handshake message. For the server, receipt (and successful verification) of that message completes the handshake.
