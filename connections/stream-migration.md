@@ -32,6 +32,13 @@ The goal of the protocol is to move traffic from one stream to another
 seamlessly. The final state of the new stream should be the same as the initial
 state of the old stream.
 
+The protocol works as a prefix before another protocol. If we are creating a
+stream for some user protocol `P`, we coordinate the stream-migration protocol
+first, and then negotiate protocol `P` later. The initial stream-migration
+negotiation is so that both sides agree on an ID for the stream. This way when a
+peer decides to migrate the stream, it can reference which stream it wants to
+migrate and both peers know which stream is being referenced.
+
 ![stream-migration](./stream-migration/stream-migration.svg)
 
 <details>
@@ -43,10 +50,35 @@ skinparam sequenceMessageAlign center
 entity Initiator
 entity Responder
 
-note over Initiator, Responder: Assume at least 2 connections.
+' note over Initiator, Responder: Assume at least 2 connections.
 
-Initiator <-> Responder: <b>Connection 1; stream A</b>
-Initiator <-> Responder: <b>Connection 2</b>
+Initiator -> Responder: Open connection
+... <i>Establish both sides support multistream-select</i> ...
+
+Initiator -> Responder: Open multiplexed stream
+
+Initiator -> Responder: Send ""<stream-migration protocol id>/<stream-id>""\ne.g. ""streamMigration/1.0.0/A""
+Initiator -> Responder: Send ""<user-protocol-id>"" (as-in multistream select)
+
+alt Responder supports stream-migration
+  Initiator <- Responder: Echo back ""<user-protocol-id>"" (as-in multistream select)
+  note over Initiator
+   The initiator knows the peer supports stream-migration since it echoed back
+   the user protocol.
+  end note
+
+
+  note over Responder
+   The responder knows that this stream is called <b>stream A</b>
+  end note
+
+  ... <i>Continue negotiating another protocol</i> ...
+else Responder does <i>not</i> supports stream-migration
+  Initiator <- Responder: send back "na" for the stream-migration protocol (like multistream-select)
+  Initiator <- Responder: Echo back ""<user-protocol-id>"" (as-in multistream select)
+end
+
+... <i>Nodes use the stream as normal<i> ...
 
 == Stream Migration ==
 
@@ -54,7 +86,8 @@ note over Initiator, Responder: Migrate <b>Stream A</b> to <b>Stream B</b>
 
 Initiator -> Responder: Open new stream on <b>Connection 2</b>. Call this <b>Stream B</b>
 
-Initiator -> Responder: <b>Stream B:</b> Migrate stream with <b>id=A</b> to this stream
+Initiator -> Responder: ""<stream-migration protocol id>/<this-stream-id>/from/<original-stream-id>""\ne.g. ""streamMigration/1.0.0/B/from/A""
+
 Initiator <- Responder: <b>Stream B:</b> Ack Migrate
 
 note over Responder
@@ -100,6 +133,21 @@ plantuml stream-migration.md -o stream-migration -tsvg
 
 Note: some of these steps may be pipelined.
 
+
+### Stream IDs
+
+In the above diagram stream IDs have the labels `A` and `B`. In practice this
+ID will be represented as an int defined by the initiator. Both sides can
+globally identify this stream by the namespacing the ID with the initiator's
+peer ID. e.g. `12D3Foo.1`.
+### Stream migration protocol id
+
+The stream migration protocol id should follow the format of
+`/streamMigration/1.0.0/<streamID>`. The stream should be an int.
+
+When migrating an existing stream, the protocol id should follow the format of
+`/streamMigration/1.0.0/<streamID>/from/<streamID>`.
+
 ### Resets
 
 If either stream is "reset" before both ends are closed, both streams must be
@@ -132,18 +180,16 @@ note over Responder: <b>Stream A</b> is closed for writing
 
 note over Initiator, Responder: Migrate <b>Stream A</b> to <b>Stream B</b>
 
-Initiator -> Responder: <b>Stream A:</b> Start stream migration, this stream is <b>id=A</b>
-
 Initiator -> Responder: Open new stream on <b>Connection 2</b>. Call this <b>Stream B</b>
 
-Initiator -> Responder: <b>Stream B:</b> Migrate stream with <b>id=A</b> to this stream
+Initiator -> Responder: ""streamMigration/1.0.0/B/from/A""
+
 Initiator <- Responder: <b>Stream B:</b> Ack Migrate
 
 note over Initiator
     Close <b>stream A</b> for writing.
     Will only write to <b>stream B</b> from now on.
 end note
-
 
 note over Initiator
     We have already seen the ""EOF"" on
@@ -160,8 +206,8 @@ note over Responder
 end note
 Initiator <- Responder: <b>Stream B:</b> ""EOF""
 
-
 note over Initiator, Responder: Stream A is now migrated to Stream B
+
 @enduml
 ```
 To generate:
@@ -205,12 +251,5 @@ where to migrate to.
 
 Some questions that will probably be resolved when a PoC is implemented.
 
-- How many streams are there total? 2 or 3? There is the old stream and new
-  stream, but is there a migration protocol specific stream? Or can the
-  migration be started from the old stream? If yes, how do we prevent
-  application data from looking like a migration without framing?
 - In simultaneous open how do we pick who's the initiator? I think we can rely
   on the `/libp2p/simultaneous-connect` to do the correct thing here.
-- Do we need a new connection that we migrate towards? Or can we re-use an
-  existing connection?
-- Can we migrate multiplexed streams to another multiplexed stream destination?
