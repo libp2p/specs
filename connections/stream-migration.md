@@ -50,45 +50,28 @@ skinparam sequenceMessageAlign center
 entity Initiator
 entity Responder
 
-' note over Initiator, Responder: Assume at least 2 connections.
+note over Initiator, Responder: Assume both sides understand stream-migration
 
 Initiator -> Responder: Open connection
-... <i>Establish both sides support multistream-select</i> ...
-
 Initiator -> Responder: Open multiplexed stream
 
-Initiator -> Responder: Send ""<stream-migration protocol id>/<stream-id>""\ne.g. ""streamMigration/1.0.0/A""
-Initiator -> Responder: Send ""<user-protocol-id>"" (as-in multistream select)
+Initiator -> Responder: Negotiate stream-migration protocol with ""<stream-migration protocol id>""
 
-alt Responder supports stream-migration
-  Initiator <- Responder: Echo back ""<user-protocol-id>"" (as-in multistream select)
-  note over Initiator
-   The initiator knows the peer supports stream-migration since it echoed back
-   the user protocol.
-  end note
+Initiator -> Responder: Send ""StreamMigration(type=Label, id=A)"" message
 
-
-  note over Responder
-   The responder knows that this stream is called <b>stream A</b>
-  end note
-
-  ... <i>Continue negotiating another protocol</i> ...
-else Responder does <i>not</i> supports stream-migration
-  Initiator <- Responder: send back "na" for the stream-migration protocol (like multistream-select)
-  Initiator <- Responder: Echo back ""<user-protocol-id>"" (as-in multistream select)
-end
-
+Initiator -> Responder: <i> continue negotiating underlying protocol </i>
 ... <i>Nodes use the stream as normal<i> ...
 
 == Stream Migration ==
 
 note over Initiator, Responder: Migrate <b>Stream A</b> to <b>Stream B</b>
 
-Initiator -> Responder: Open new stream on <b>Connection 2</b>. Call this <b>Stream B</b>
+Initiator -> Responder: Open new stream
+Initiator -> Responder: Negotiate stream-migration protocol with ""<stream-migration protocol id>""
 
-Initiator -> Responder: ""<stream-migration protocol id>/<this-stream-id>/from/<original-stream-id>""\ne.g. ""streamMigration/1.0.0/B/from/A""
+Initiator -> Responder: <b>Stream B:</b> Send ""StreamMigration(type=Migrate, id=B, from=A)"" message
 
-Initiator <- Responder: <b>Stream B:</b> Ack Migrate
+Initiator <- Responder: <b>Stream B:</b> Send AckMigrate message
 
 note over Responder
     Treat any ""EOF"" on <b>stream A</b> as a signal
