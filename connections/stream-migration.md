@@ -32,6 +32,9 @@ The goal of the protocol is to move traffic from one stream to another
 seamlessly. The final state of the new stream should be the same as the initial
 state of the old stream.
 
+The protocol should only be used when the initiator knows the responder
+understands the stream-migration protocol (otherwise you'll waste a roundtrip).
+
 The protocol works as a prefix before another protocol. If we are creating a
 stream for some user protocol `P`, we coordinate the stream-migration protocol
 first, and then negotiate protocol `P` later. The initial stream-migration
@@ -120,16 +123,12 @@ Note: some of these steps may be pipelined.
 ### Stream IDs
 
 In the above diagram stream IDs have the labels `A` and `B`. In practice this
-ID will be represented as an int defined by the initiator. Both sides can
-globally identify this stream by the namespacing the ID with the initiator's
-peer ID. e.g. `12D3Foo.1`.
+ID will be represented as a uint32 defined by the initiator.
+
 ### Stream migration protocol id
 
-The stream migration protocol id should follow the format of
-`/streamMigration/1.0.0/<streamID>`. The stream should be an int.
+The stream migration protocol id should follow be `/libp2p/streamMigration`.
 
-When migrating an existing stream, the protocol id should follow the format of
-`/streamMigration/1.0.0/<streamID>/from/<streamID>`.
 
 ### Resets
 
@@ -165,7 +164,8 @@ note over Initiator, Responder: Migrate <b>Stream A</b> to <b>Stream B</b>
 
 Initiator -> Responder: Open new stream on <b>Connection 2</b>. Call this <b>Stream B</b>
 
-Initiator -> Responder: ""streamMigration/1.0.0/B/from/A""
+Initiator -> Responder: <b>Stream B:</b> Negotiate stream-migration protocol with ""<stream-migration protocol id>""
+Initiator -> Responder: <b>Stream B:</b> Send ""StreamMigration(type=Migrate, id=B, from=A)"" message
 
 Initiator <- Responder: <b>Stream B:</b> Ack Migrate
 
