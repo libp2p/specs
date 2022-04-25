@@ -18,4 +18,6 @@ message Label {
   required uint64 id=1;
 }
 
-message AckMigrate {}
+message AckMigrate {
+  optional bool deny_migrate=1;
+}
