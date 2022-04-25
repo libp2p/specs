@@ -52,8 +52,7 @@ assigns an ID for the stream with the `Label` or `Migrate`
 [message](#stream-migration-messages) so that both sides can know the ID for the
 stream. This way when a peer decides to migrate the stream later on, it can
 reference which stream it wants to migrate and both peers know which stream is
-being referenced. The migration is driven by a peer chosen
-[deterministically](#who-moves-the-stream).
+being referenced.
 
 ![stream-migration](./stream-migration/stream-migration.svg)
 
@@ -68,7 +67,6 @@ entity Responder
 
 note over Initiator, Responder
     Assume both sides understand stream-migration.
-    Also Assume Initiator has the lower peer ID.
 end note
 
 Initiator -> Responder: Open connection
@@ -155,11 +153,15 @@ Here is a possible strategy that implementors could use when labelling a
 stream, but is not required as long as the above invariants hold true.
  1. Define an atomic uint64 as a counter.
  1. Grab and increment the counter, call this `ID`.
- 1. Bitshift the `ID` by one.
+ 1. Bitshift-left the `ID` by one (i.e. multiply it by two).
  1. Check if we are the lower peer ID.
     1. If yes, do nothing
     1. If no, add one to the `ID`
  1. Use `ID` as the ID for the stream.
+
+Note that this reduces the total counter space to be 63bits since the lowest bit
+is used to signal which node labelled this stream. This limit should be plenty
+high in practice, as no node will have more than `2^63` streams.
 
 ### Stream Migration Messages
 
@@ -177,9 +179,10 @@ message that may optionally deny the migration.
 
 ## Who moves the stream
 
-For simplicity and to avoid handling edge cases (what if both peers try
-migrating at the same time?), the node with the lower peer id is responsible for
-initiating stream migration (either node can start and label a stream).
+This protocol makes no assumption on which node starts the migration. Either
+node may start the migration. However extensions to this protocol may want to
+designate a single node to start the migration (i.e. picking the node with the
+lowest peer id).
 
 ## Picking the best connection
 
