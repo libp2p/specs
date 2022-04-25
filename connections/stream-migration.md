@@ -48,10 +48,12 @@ understands the stream-migration protocol. Otherwise we waste 1 round trip.
 The protocol works as a prefix before another protocol. If we are creating a
 stream for some user protocol `P`, we coordinate the stream-migration protocol
 first, and then negotiate protocol `P` later. The stream-migration protocol
-assigns an ID for the stream with the `Label` or `Migrate` message so that both
-sides can know the ID for the stream. This way when a peer decides to migrate
-the stream later on, it can reference which stream it wants to migrate and both
-peers know which stream is being referenced.
+assigns an ID for the stream with the `Label` or `Migrate`
+[message](#stream-migration-messages) so that both sides can know the ID for the
+stream. This way when a peer decides to migrate the stream later on, it can
+reference which stream it wants to migrate and both peers know which stream is
+being referenced. The migration is driven by a peer chosen
+[deterministically](#who-moves-the-stream).
 
 ![stream-migration](./stream-migration/stream-migration.svg)
 
