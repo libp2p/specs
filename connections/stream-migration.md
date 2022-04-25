@@ -33,14 +33,15 @@ seamlessly. The final state of the new stream should be the same as the initial
 state of the old stream.
 
 The protocol should only be used when the initiator knows the responder
-understands the stream-migration protocol (otherwise you'll waste a roundtrip).
+understands the stream-migration protocol to avoid wasting 1 round trip.
 
 The protocol works as a prefix before another protocol. If we are creating a
 stream for some user protocol `P`, we coordinate the stream-migration protocol
-first, and then negotiate protocol `P` later. The initial stream-migration
-negotiation is so that both sides agree on an ID for the stream. This way when a
-peer decides to migrate the stream, it can reference which stream it wants to
-migrate and both peers know which stream is being referenced.
+first, and then negotiate protocol `P` later. The stream-migration protocol
+assigns an ID for the stream with the `Label` or `Migrate` message so that both
+sides can know the ID for the stream. This way when a peer decides to migrate
+the stream later on, it can reference which stream it wants to migrate and both
+peers know which stream is being referenced.
 
 ![stream-migration](./stream-migration/stream-migration.svg)
 
@@ -60,52 +61,52 @@ Initiator -> Responder: Open multiplexed stream
 
 Initiator -> Responder: Negotiate stream-migration protocol with ""<stream-migration protocol id>""
 
-Initiator -> Responder: Send ""StreamMigration(type=Label, id=A)"" message
+Initiator -> Responder: Send ""StreamMigration(type=Label(id=1))"" message
 
 Initiator -> Responder: <i> continue negotiating underlying protocol </i>
 ... <i>Nodes use the stream as normal<i> ...
 
 == Stream Migration ==
 
-note over Initiator, Responder: Migrate <b>Stream A</b> to <b>Stream B</b>
+note over Initiator, Responder: Migrate <b>Stream 1</b> to <b>Stream 2</b>
 
 Initiator -> Responder: Open new stream
 Initiator -> Responder: Negotiate stream-migration protocol with ""<stream-migration protocol id>""
 
-Initiator -> Responder: <b>Stream B:</b> Send ""StreamMigration(type=Migrate, id=B, from=A)"" message
+Initiator -> Responder: <b>Stream 2:</b> Send ""StreamMigration(type=Migrate(id=2, from=1))"" message
 
-Initiator <- Responder: <b>Stream B:</b> Send AckMigrate message
+Initiator <- Responder: <b>Stream 2:</b> Send AckMigrate message
 
 note over Responder
-    Treat any ""EOF"" on <b>stream A</b> as a signal
-    that it should continue reading on <b>stream B</b>
+    Treat any ""EOF"" on <b>stream 1</b> as a signal
+    that it should continue reading on <b>stream 2</b>
 end note
 
 
 note over Initiator
-    Close <b>stream A</b> for writing.
-    Will only write to <b>stream B</b> from now on.
+    Close <b>stream 1</b> for writing.
+    Will only write to <b>stream 2</b> from now on.
 end note
 
-Initiator -> Responder: <b>Stream A:</b> ""EOF""
+Initiator -> Responder: <b>Stream 2:</b> ""EOF""
 
 note over Responder
-    When <i>Responder</i> reads ""EOF"" on <b>stream A</b>
-    it will close <b>stream A</b> for writing.
-    It will only write to <b>stream B</b> from now on.
+    When <i>Responder</i> reads ""EOF"" on <b>stream 1</b>
+    it will close <b>stream 1</b> for writing.
+    It will only write to <b>stream 2</b> from now on.
 end note
 
-Initiator <- Responder: <b>Stream A:</b> ""EOF""
+Initiator <- Responder: <b>Stream 2:</b> ""EOF""
 
 note over Initiator
-    Treat any ""EOF"" on <b>stream A</b> as a signal
-    that it should continue reading on <b>stream B</b>
+    Treat any ""EOF"" on <b>stream 1</b> as a signal
+    that it should continue reading on <b>stream 2</b>
 end note
 
 note over Initiator, Responder
-    At this point <b>stream A</b> is closed for writing on
+    At this point <b>stream 1</b> is closed for writing on
     both sides, and both sides have read up to ""EOF"".
-    <b>stream A</b> has been fully migrated to <b>stream B</b>
+    <b>stream 1</b> has been fully migrated to <b>stream 2</b>
 end note
 
 @enduml
@@ -122,13 +123,17 @@ Note: some of these steps may be pipelined.
 
 ### Stream IDs
 
-In the above diagram stream IDs have the labels `A` and `B`. In practice this
-ID will be represented as a uint32 defined by the initiator.
+Stream IDs are identified by a uint64 defined by the initiator and conveyed to
+the responder in the `StreamMigration` message.
 
-### Stream migration protocol id
+### Stream Migration Protocol ID
 
-The stream migration protocol id should follow be `/libp2p/streamMigration`.
+The protocol id should be `/libp2p/stream-migration`.
 
+### Stream Migration Messages
+
+Messages for stream migration are Protobuf messages defined in
+[./stream-migration/streammigration.proto](./stream-migration/streammigration.proto).
 
 ### Resets
 
@@ -138,7 +143,7 @@ reset and the stream as a whole should be considered "aborted" (reset).
 ### Half closed streams
 
 The final migrated stream should look the same as the initial stream. If the
-initial stream `A` was half closed, then the final migrated stream `B` should
+initial stream `1` was half closed, then the final migrated stream `2` should
 also be half closed. Note this may involve an extra step by one of the nodes.
 If a node, when trying to close writes to its old stream, notices that it was
 already closed, it should also close the new stream for writing. Specifically
@@ -155,41 +160,41 @@ skinparam sequenceMessageAlign center
 entity Initiator
 entity Responder
 
-Initiator <- Responder: <b>Stream A:</b> ""EOF""
-note over Responder: <b>Stream A</b> is closed for writing
+Initiator <- Responder: <b>Stream 1:</b> ""EOF""
+note over Responder: <b>Stream 1</b> is closed for writing
 
 == Stream Migration ==
 
-note over Initiator, Responder: Migrate <b>Stream A</b> to <b>Stream B</b>
+note over Initiator, Responder: Migrate <b>Stream 1</b> to <b>Stream 2</b>
 
-Initiator -> Responder: Open new stream on <b>Connection 2</b>. Call this <b>Stream B</b>
+Initiator -> Responder: Open new stream on <b>Connection 2</b>. Call this <b>Stream 2</b>
 
-Initiator -> Responder: <b>Stream B:</b> Negotiate stream-migration protocol with ""<stream-migration protocol id>""
-Initiator -> Responder: <b>Stream B:</b> Send ""StreamMigration(type=Migrate, id=B, from=A)"" message
+Initiator -> Responder: <b>Stream 2:</b> Negotiate stream-migration protocol with ""<stream-migration protocol id>""
+Initiator -> Responder: <b>Stream 2:</b> Send ""StreamMigration(type=Migrate(id=2, from=1))"" message
 
-Initiator <- Responder: <b>Stream B:</b> Ack Migrate
+Initiator <- Responder: <b>Stream 2:</b> Ack Migrate
 
 note over Initiator
-    Close <b>stream A</b> for writing.
-    Will only write to <b>stream B</b> from now on.
+    Close <b>stream 1</b> for writing.
+    Will only write to <b>stream 2</b> from now on.
 end note
 
 note over Initiator
     We have already seen the ""EOF"" on
-    <b>Stream A</b> from <i>Responder</i>
-    So we continue reading on <b>stream B</b>
+    <b>Stream 1</b> from <i>Responder</i>
+    So we continue reading on <b>stream 2</b>
 end note
 
-Initiator -> Responder: <b>Stream A:</b> ""EOF""
+Initiator -> Responder: <b>Stream 1:</b> ""EOF""
 
 note over Responder
-    Treat ""EOF"" on <b>stream A</b> as a signal to close <b>stream A</b> for
-    writing and continue writing on <b>stream B</b>. However stream A was
-    already closed (before migration), so we close <b>stream B</b> as well here.
+    Treat ""EOF"" on <b>stream 1</b> as a signal to close <b>stream 1</b> for
+    writing and continue writing on <b>stream 2</b>. However stream 1 was
+    already closed (before migration), so we close <b>stream 2</b> as well here.
 end note
-Initiator <- Responder: <b>Stream B:</b> ""EOF""
+Initiator <- Responder: <b>Stream 2:</b> ""EOF""
 
-note over Initiator, Responder: Stream A is now migrated to Stream B
+note over Initiator, Responder: Stream 1 is now migrated to Stream 2
 
 @enduml
 ```
@@ -222,6 +227,7 @@ Note that it's not required that all implementations (and all versions) follow
 the same heuristics since the initiator is driving the migration and specifies
 where to migrate to.
 
+
 ## Appendix
 
 [Specs Issue](https://github.com/libp2p/specs/issues/328)
@@ -236,3 +242,4 @@ Some questions that will probably be resolved when a PoC is implemented.
 
 - In simultaneous open how do we pick who's the initiator? I think we can rely
   on the `/libp2p/simultaneous-connect` to do the correct thing here.
+- Multiple connections with different initiators. (?) which connection to keep?
