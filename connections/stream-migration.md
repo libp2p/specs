@@ -68,9 +68,7 @@ entity Responder
 
 note over Initiator, Responder
     Assume both sides understand stream-migration.
-    Also Assume Initiator has the lower peer ID, and
-    ""Hash(PeerID(Initiator)+PeerID(responder))%2 == 0""
-
+    Also Assume Initiator has the lower peer ID.
 end note
 
 Initiator -> Responder: Open connection
@@ -180,20 +178,8 @@ message that may optionally deny the migration.
 ## Who moves the stream
 
 For simplicity and to avoid handling edge cases (what if both peers try
-migrating at the same time?), we define a way for both nodes to agree on who is
-responsible for initiating stream migration. Only this node will start a stream
-migration, but either node can start and label a stream.
-
-To decide which one of two nodes is responsible for stream migration:
-1. Take the hash of the concatenated value of the lower peer ID with the higher
-   peer ID. E.g. for peer `A` and peer `B` we evaluate `SHA256(A+B)`.
-1. If the hash is even, the lower peer id is responsible for stream migration.
-1. Otherwise, the higher peer id is responsible for stream migration. To
-   continue the example, `SHA256("AB")` ends with `c`, so it's even and peer A
-   is responsible for stream migration.
-
-The hash of the two peer ids is used to avoid biasing the protocol to assigning
-more responsibilities to peers with lower ids.
+migrating at the same time?), the node with the lower peer id is responsible for
+initiating stream migration (either node can start and label a stream).
 
 ## Picking the best connection
 
