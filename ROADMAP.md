@@ -21,7 +21,7 @@ third-party ownership of data.
         - [🤖 libp2p as a WASM library](#🤖-libp2p-as-a-wasm-library)
     - [Evolve](#evolve)
         - [🕸 Unprecedented global connectivity](#🕸-unprecedented-global-connectivity)
-        - [⏱ Full Observability)(#⏱-full-observability)
+        - [⏱ Full Observability](#⏱-full-observability)
         - [🧪 Automated compatibility testing](#🧪-automated-compatibility-testing)
         - [🤝 Low latency, efficient connection handshake](#🤝-low-latency-efficient-connection-handshake)
         - [🛣️ Peer Routing Records](#🛣️-peer-routing-records)
