@@ -223,6 +223,17 @@ model.
 
 This is the stuff pushing the existing libp2p stack forward.
 
+### A robust stream multiplexer
+
+**What?** A stream multiplexer that supports:
+- backpressure on the stream level (stream flow control)
+- backpressure on the connection level connection flow control)
+- backpressure for the creation of new streams.
+
+**Why?** So far, we've been using yamux and mplex as stream multiplexers.
+Shortcomings in those protocols have made our stack less robust than it
+could be.
+
 ### 🕸 Unprecedented global connectivity
 
 **Status**: In progress
