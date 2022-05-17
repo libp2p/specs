@@ -91,6 +91,11 @@ Safari, Edge, Firefox)._
 - Can _Browser_ control the lifecycle of its local TLS certificate, i.e. can
   _Browser_ use the same TLS certificate for multiple WebRTC connections?
 
+- Can two _Browsers_ exchange their SDP packets via a third server node using
+  Circuit Relay v2 and DCUtR? Instead of exchanging the original SDP packets,
+  could they exchange their multiaddr and construct the remote's SDP packet
+  based on it?
+
 ### Securing the connection
 
 While WebRTC offers confidentiality and integrity via TLS, one still needs to
