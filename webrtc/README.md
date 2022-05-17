@@ -85,6 +85,15 @@ Safari, Edge, Firefox)._
 While WebRTC offers confidentiality and integrity via TLS, one still needs to
 authenticate the remote peer by its libp2p identity.
 
+- Can a _Browser_ access the fingerprint of its TLS certificate?
+
+  Chrome allows you to access the fingerprint of any locally-created certificate
+  directly via `RTCCertificate#getFingerprints`. Firefox does not allow you to
+  do so. Browser compatibility can be found
+  [here](https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate). In
+  practice, this is not an issue since the fingerprint is embedded in the local
+  SDP string.
+
 - Is the above proposed #protocol secure?
 
 ### Multiplexing
@@ -96,8 +105,10 @@ authenticate the remote peer by its libp2p identity.
 
 ## Previous, ongoing and related work
 
-- Proof of concept for the server side in rust-libp2p: https://github.com/libp2p/rust-libp2p/pull/2622
+- Proof of concept for the server side in rust-libp2p:
+  https://github.com/libp2p/rust-libp2p/pull/2622
 
-- Proof of concept for the server side (native) and the client side (Rust in WASM): https://github.com/wngr/libp2p-webrtc
+- Proof of concept for the server side (native) and the client side (Rust in
+  WASM): https://github.com/wngr/libp2p-webrtc
 
 - WebRTC using STUN and TURN: https://github.com/libp2p/js-libp2p-webrtc-star
