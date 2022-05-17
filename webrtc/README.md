@@ -27,7 +27,9 @@ Interest Group: [@marten-seemann]
 
 ## Protocol
 
-### Setup
+Scenario: Browser _A_ wants to connect to server node _B_.
+
+### Setup - Both _A_ and _B_
 
 1. [Generate a
    certificate](https://www.w3.org/TR/webrtc/#dom-rtcpeerconnection-generatecertificate).
@@ -39,18 +41,27 @@ Interest Group: [@marten-seemann]
 
 ### Connection Establishment
 
-1. Create a connection with the certificate.
+1. Browser _A_ discovers server node _B_'s multiaddr, containing _B_'s IP, UDP
+  port and TLS certificate fingerprint (e.g.
+  `/ip6/2001:db8::/udp/1234/webrtc/<tls-certificate-fingerprint`), through some
+  external mechanism.
 
-2. Open a data stream.
+2. _A_ create a connection with its local certificate.
 
-3. Send the "peer cert".
+3. _A_ constructs _B_'s SDP offer based on _B_'s multiaddr and sets it
+   via
+   [`RTCPeerConnection.setRemoteDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setRemoteDescription).
 
-4. Wait for the other side to do the same.
+4. _A_ establishes the connection to _B_.
 
-5. [Get the remote peer's TLS
+5. _A_ opens a data stream.
+
+6. _A_ and _B_ exchange the "peer certs".
+
+7. [Get the remote peer's TLS
    certificate](https://www.w3.org/TR/webrtc/#dom-rtcdtlstransport-getremotecertificates).
 
-6. Check the remote endpoint's "peer cert".
+8. Check the remote endpoint's "peer cert".
 
 ## Open Questions
 
