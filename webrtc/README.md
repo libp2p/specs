@@ -48,7 +48,7 @@ Scenario: Browser _A_ wants to connect to server node _B_.
 
 2. _A_ create a connection with its local certificate.
 
-3. _A_ constructs _B_'s SDP offer based on _B_'s multiaddr and sets it
+3. _A_ constructs _B_'s SDP offer locally based on _B_'s multiaddr and sets it
    via
    [`RTCPeerConnection.setRemoteDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setRemoteDescription).
 
