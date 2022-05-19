@@ -128,3 +128,28 @@ authenticate the remote peer by its libp2p identity.
   WASM): https://github.com/wngr/libp2p-webrtc
 
 - WebRTC using STUN and TURN: https://github.com/libp2p/js-libp2p-webrtc-star
+
+# FAQ
+
+- _Why exchange the TLS certificate fingerprint in the multiaddr? Why not
+  base it on the libp2p public key?_
+
+  Browsers do not allow loading a custom certificate. One can only generate a
+  certificate via
+  [rtcpeerconnection-generatecertificate](https://www.w3.org/TR/webrtc/#dom-rtcpeerconnection-generatecertificate).
+
+- _Why not embed the peer ID in the TLS certificate, thus rendering the
+  additional "peer certificate" exchange obsolete?_
+
+  Browsers do not allow editing the properties of the TLS certificate.
+
+- _How about distributing the multiaddr in a signed peer record, thus rendering
+  the additional "peer certificate" exchange obsolete?_
+
+  Signed peer records are not yet rolled out across the many libp2p protocols.
+  Making the libp2p WebRTC protocol dependent on the former is not deemed worth
+  it at this point in time. Later versions of the libp2p WebRTC protocol might
+  adopt this optimization.
+
+  Note, one can role out a new version of the libp2p WebRTC protocol through a
+  new multiaddr protocol, e.g. `/webrtc-2`.
