@@ -21,9 +21,9 @@ third-party ownership of data.
         - [🤖 libp2p as a WASM library](#🤖-libp2p-as-a-wasm-library)
     - [Evolve](#evolve)
         - [🕸 Unprecedented global connectivity](#🕸-unprecedented-global-connectivity)
-        - [⏱ Full Observability](#⏱-full-observability)
         - [🧪 Automated compatibility testing](#🧪-automated-compatibility-testing)
         - [🤝 Low latency, efficient connection handshake](#🤝-low-latency-efficient-connection-handshake)
+        - [⏱ Full Observability](#-full-observability)
         - [🛣️ Peer Routing Records](#🛣️-peer-routing-records)
         - [🗣️ Polite peering](#🗣️-polite-peering)
         - [🧱 Composable routing](#🧱-composable-routing)
@@ -253,22 +253,6 @@ rest of the system.
 
 - [WebRTC tracking issue](https://github.com/libp2p/specs/issues/220)
 
-### ⏱ Full Observability
-
-**What?** libp2p should expose a wide set of metrics, making it easy to
-monitor the system.
-
-Metrics should include:
-- Transport metrics (TCP, QUIC, security protocols, stream multiplexers)
-- Swarm metrics
-- other subsystems (AutoNAT, AutoRelay, Hole Punching)
-
-**Why?** A system that cannot be monitored will misbehave - sooner or later.
-
-**Links:**
-
-- [go-libp2p discussion](https://github.com/libp2p/go-libp2p/issues/1356)
-
 ### 🧪 Automated compatibility testing
 
 **Status**: In progress
@@ -311,6 +295,22 @@ ping-pong).
 **Links:**
 
 - [Protocol Select specification](https://github.com/libp2p/specs/pull/349)
+
+### ⏱ Full Observability
+
+**What?** libp2p should expose a wide set of metrics, making it easy to
+monitor the system.
+
+Metrics should include:
+- Transport metrics (TCP, QUIC, security protocols, stream multiplexers)
+- Swarm metrics
+- other subsystems (AutoNAT, AutoRelay, Hole Punching)
+
+**Why?** A system that cannot be monitored will misbehave - sooner or later.
+
+**Links:**
+
+- [go-libp2p discussion](https://github.com/libp2p/go-libp2p/issues/1356)
 
 ### 🛣️ Peer Routing Records
 
