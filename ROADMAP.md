@@ -21,7 +21,8 @@ third-party ownership of data.
         - [🤖 libp2p as a WASM library](#🤖-libp2p-as-a-wasm-library)
     - [Evolve](#evolve)
         - [🕸 Unprecedented global connectivity](#🕸-unprecedented-global-connectivity)
-        - [⏱ Full Observability](#⏱-full-observability)
+        - [WebRTC](#webrtc)
+        - [⏱ Full Observability](#-full-observability)
         - [🧪 Automated compatibility testing](#🧪-automated-compatibility-testing)
         - [🤝 Low latency, efficient connection handshake](#🤝-low-latency-efficient-connection-handshake)
         - [🛣️ Peer Routing Records](#🛣️-peer-routing-records)
@@ -238,8 +239,6 @@ Mechanisms we wish to add include:
 - Project Flare stack (via *Circuit Relay v2*, *Direct Connection Upgrade
   through Relay*, *AutoNAT*, *Stream Migration*, ...)
 
-- WebRTC
-
 **Why?** Good connectivity is the bread-and-butter of libp2p. Focusing
 on solving these issues will bring more stability and robustness to the
 rest of the system.
@@ -250,8 +249,6 @@ rest of the system.
   vision](https://github.com/mxinden/specs/blob/hole-punching/connections/hole-punching.md).
 
 - [NAT traversal tracking issue](https://github.com/libp2p/specs/issues/312).
-
-- [WebRTC tracking issue](https://github.com/libp2p/specs/issues/220)
 
 ### ⏱ Full Observability
 
@@ -289,6 +286,25 @@ the [libp2p test-plans repository].
 **Links:**
 
 - [First proof of concept](https://github.com/libp2p/test-plans/pull/20)
+
+### WebRTC
+
+**Status**: In progress
+
+**What?** WebRTC is a transport protocol supported by all major browsers. Those
+browsers allow the establishment of connections to remote endpoints that don't
+have a TLS certificate signed by a trusted certificate authority. In addition
+WebRTC includes hole punching capabilities.
+
+**Why?** In most p2p networks the majority of nodes does not have a signed TLS
+certificate. With WebRTC browsers will thus be able to connect to these
+previously unreachable nodes. In addition, being able to hole punch allows
+browsers to connect to nodes behind firewalls and NATs e.g. other browsers.
+
+**Links:**
+
+- Tracking issue https://github.com/libp2p/specs/issues/220
+- Specification draft https://github.com/libp2p/specs/pull/412
 
 ### 🤝 Low latency, efficient connection handshake
 
@@ -471,9 +487,6 @@ creating examples and documentation on how to bundle js-libp2p with
 popular frontend tooling (webpack, parcel, etc.). Developers should be
 able to cherry-pick the features to incorporate in their bundle, and
 tree-shaking should produce good results.
-
-In terms of transports, hardening our WebRTC support and enabling it by
-default will bring a huge boost to general browser connectivity.
 
 Targeting the [WASM runtime](#libp2p-as-a-wasm-library)
 deserves a special mention, as we're likely to see more user interest in
