@@ -1,9 +1,9 @@
 @startuml
-skinparam backgroundColor white
 participant A
 participant R
 participant B
 
+skinparam backgroundColor white
 skinparam sequenceMessageAlign center
 
 == Reservation ==
