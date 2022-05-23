@@ -1,4 +1,5 @@
 @startuml
+skinparam backgroundColor white
 
 entity Initiator
 entity Responder
