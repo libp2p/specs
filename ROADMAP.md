@@ -296,10 +296,12 @@ browsers allow the establishment of connections to remote endpoints that don't
 have a TLS certificate signed by a trusted certificate authority. In addition
 WebRTC includes hole punching capabilities.
 
-**Why?** In most p2p networks the majority of nodes does not have a signed TLS
+**Why?** In most p2p networks the majority of nodes do not have a signed TLS
 certificate. With WebRTC browsers will thus be able to connect to these
 previously unreachable nodes. In addition, being able to hole punch allows
-browsers to connect to nodes behind firewalls and NATs e.g. other browsers.
+browsers to connect to nodes behind firewalls and NATs e.g. other browsers. Note
+that the former, namely connecting without trusted TLS certificate, can as well
+be achieved with the [WebTransport](#✈️-webtransport) protocol.
 
 **Links:**
 
