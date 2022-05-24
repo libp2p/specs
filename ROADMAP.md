@@ -20,7 +20,8 @@ third-party ownership of data.
         - [📮 Offline message queue / postbox](#📮-offline-message-queue--postbox)
         - [🤖 libp2p as a WASM library](#🤖-libp2p-as-a-wasm-library)
     - [Evolve](#evolve)
-        - [⏱ Full Observability](#-full-observability)
+        - [✈️ WebTransport](#✈️-webtransport)
+        - [⏱ Full Observability](#⏱-full-observability)
         - [🧪 Automated compatibility testing](#🧪-automated-compatibility-testing)
         - [🤝 Low latency, efficient connection handshake](#🤝-low-latency-efficient-connection-handshake)
         - [🛣️ Peer Routing Records](#🛣️-peer-routing-records)
@@ -223,6 +224,26 @@ model.
 **Our short-term roadmap**.
 
 This is the stuff pushing the existing libp2p stack forward.
+
+### ✈️ WebTransport
+
+**Status**: In progress
+
+**What?** WebTransport is a browser-API offering low-latency, bidirectional
+client-server messaging running on top of QUIC. The browser API allows the
+establishment of connections to servers that don't have a TLS certificate
+signed by a certificate authority if the hash of the certificate is known in
+advance.
+
+**Why?** This allows libp2p nodes running in the browser (using js-libp2p) to
+connect to the rest of the libp2p network.
+
+**Links:**
+
+- [IETF draft](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http3/)
+- [W3C Browser API](https://w3c.github.io/webtransport/)
+- [libp2p spec discussion](https://github.com/libp2p/specs/pull/404)
+- [webtransport-go](https://github.com/marten-seemann/webtransport-go/)
 
 ### ⏱ Full Observability
 
