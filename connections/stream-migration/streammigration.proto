@@ -6,6 +6,7 @@ message StreamMigration {
   oneof type {
     Label label = 1;
     Migrate migrate = 2;
+    AckMigrate ack_migrate = 3;
   }
 }
 
