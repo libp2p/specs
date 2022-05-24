@@ -20,10 +20,10 @@ third-party ownership of data.
         - [📮 Offline message queue / postbox](#📮-offline-message-queue--postbox)
         - [🤖 libp2p as a WASM library](#🤖-libp2p-as-a-wasm-library)
     - [Evolve](#evolve)
-        - [🕸 Unprecedented global connectivity](#🕸-unprecedented-global-connectivity)
-        - [WebRTC](#webrtc)
-        - [⏱ Full Observability](#-full-observability)
+        - [✈️ WebTransport](#✈️-webtransport)
+        - [⏱ Full Observability](#⏱-full-observability)
         - [🧪 Automated compatibility testing](#🧪-automated-compatibility-testing)
+        - [WebRTC](#webrtc)
         - [🤝 Low latency, efficient connection handshake](#🤝-low-latency-efficient-connection-handshake)
         - [🛣️ Peer Routing Records](#🛣️-peer-routing-records)
         - [🗣️ Polite peering](#🗣️-polite-peering)
@@ -36,6 +36,8 @@ third-party ownership of data.
         - [☎️ Reducing the dial fail rate](#️-reducing-the-dial-fail-rate)
         - [🔀 Peer exchange protocol](#🔀-peer-exchange-protocol)
         - [🏹 RPC and other common node communication patterns](#🏹-rpc-and-other-common-node-communication-patterns)
+    - [Done](#done)
+        - [🕸 Hole punching on TCP and QUIC](#🕸-hole-punching-on-tcp-and-quic)
 
 ## Visionary
 
@@ -224,31 +226,25 @@ model.
 
 This is the stuff pushing the existing libp2p stack forward.
 
-### 🕸 Unprecedented global connectivity
+### ✈️ WebTransport
 
 **Status**: In progress
 
-**What?** A DHT crawl measurements (Nov 22nd 2019) showed that out
-of 4344 peers, 2754 were undialable (\~63%). This evidence correlates
-with feedback from the IPFS and Filecoin teams.
+**What?** WebTransport is a browser-API offering low-latency, bidirectional
+client-server messaging running on top of QUIC. The browser API allows the
+establishment of connections to servers that don't have a TLS certificate
+signed by a certificate authority if the hash of the certificate is known in
+advance.
 
-We need to implement additional mechanisms for Firewall and NAT traversal to
-have the highest probability of being able to establish a direct connection.
-Mechanisms we wish to add include:
-
-- Project Flare stack (via *Circuit Relay v2*, *Direct Connection Upgrade
-  through Relay*, *AutoNAT*, *Stream Migration*, ...)
-
-**Why?** Good connectivity is the bread-and-butter of libp2p. Focusing
-on solving these issues will bring more stability and robustness to the
-rest of the system.
+**Why?** This allows libp2p nodes running in the browser (using js-libp2p) to
+connect to the rest of the libp2p network.
 
 **Links:**
 
-- [Hole punching long-term
-  vision](https://github.com/mxinden/specs/blob/hole-punching/connections/hole-punching.md).
-
-- [NAT traversal tracking issue](https://github.com/libp2p/specs/issues/312).
+- [IETF draft](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http3/)
+- [W3C Browser API](https://w3c.github.io/webtransport/)
+- [libp2p spec discussion](https://github.com/libp2p/specs/pull/404)
+- [webtransport-go](https://github.com/marten-seemann/webtransport-go/)
 
 ### ⏱ Full Observability
 
@@ -633,3 +629,31 @@ networking to get started with libp2p.
 [libp2p specification]: https://github.com/libp2p/specs/
 [testground project]: https://github.com/testground/testground
 [libp2p test-plans repository]: https://github.com/libp2p/test-plans
+
+## Done
+
+### 🕸 Hole punching on TCP and QUIC
+
+**Status**: Done
+
+**What?** A DHT crawl measurements (Nov 22nd 2019) showed that out
+of 4344 peers, 2754 were undialable (\~63%). This evidence correlates
+with feedback from the IPFS and Filecoin teams.
+
+We need to implement additional mechanisms for Firewall and NAT traversal to
+have the highest probability of being able to establish a direct connection.
+Mechanisms we wish to add include:
+
+- Project Flare stack (via *Circuit Relay v2*, *Direct Connection Upgrade
+  through Relay*, *AutoNAT*, *Stream Migration*, ...)
+
+**Why?** Good connectivity is the bread-and-butter of libp2p. Focusing on
+solving these issues for TCP and QUIC will bring more stability and robustness
+to the rest of the system.
+
+**Links:**
+
+- [Hole punching long-term
+  vision](https://github.com/mxinden/specs/blob/hole-punching/connections/hole-punching.md).
+
+- [NAT traversal tracking issue](https://github.com/libp2p/specs/issues/312).
