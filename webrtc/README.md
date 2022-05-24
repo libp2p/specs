@@ -37,8 +37,6 @@ Scenario: Browser _A_ wants to connect to server node _B_.
 2. [Get the certificate's
    fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
 
-3. Sign this fingerprint using the libp2p peer key to generate a "peer cert"
-
 ### Connection Establishment
 
 1. Browser _A_ discovers server node _B_'s multiaddr, containing _B_'s IP, UDP
@@ -54,14 +52,15 @@ Scenario: Browser _A_ wants to connect to server node _B_.
 
 4. _A_ establishes the connection to _B_.
 
-5. _A_ opens a data stream.
+5. _A_ initiates some authentication handshake _X_ to _B_ on a datachannel,
+   where _X_ allows _A_ and _B_ to authenticate each other's peer IDs. _X_ could
+   for example be Noise. See WebTransport specification as an example
+   https://github.com/libp2p/specs/pull/404. Still to be specified here for
+   WebRTC.
 
-6. _A_ and _B_ exchange the "peer certs".
-
-7. [Get the remote peer's TLS
-   certificate](https://www.w3.org/TR/webrtc/#dom-rtcdtlstransport-getremotecertificates).
-
-8. Check the remote endpoint's "peer cert".
+6. On success of the authentication handshake _X_, the used datachannel is
+   closed and the plain WebRTC connection is used with its multiplexing
+   capabilities via datachannels.
 
 ## Open Questions
 
@@ -153,3 +152,9 @@ authenticate the remote peer by its libp2p identity.
 
   Note, one can role out a new version of the libp2p WebRTC protocol through a
   new multiaddr protocol, e.g. `/webrtc-2`.
+
+- _Why do an authentication handshake on top of an established WebRTC
+  connection? Why not only exchange signatures of ones TLS fingerprint signed
+  with ones libp2p private key?_
+
+  This is prone to replay attacks.
