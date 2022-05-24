@@ -23,6 +23,7 @@ third-party ownership of data.
         - [✈️ WebTransport](#✈️-webtransport)
         - [⏱ Full Observability](#⏱-full-observability)
         - [🧪 Automated compatibility testing](#🧪-automated-compatibility-testing)
+        - [WebRTC](#webrtc)
         - [🤝 Low latency, efficient connection handshake](#🤝-low-latency-efficient-connection-handshake)
         - [🛣️ Peer Routing Records](#🛣️-peer-routing-records)
         - [🗣️ Polite peering](#🗣️-polite-peering)
@@ -282,6 +283,27 @@ the [libp2p test-plans repository].
 
 - [First proof of concept](https://github.com/libp2p/test-plans/pull/20)
 
+### WebRTC
+
+**Status**: In progress
+
+**What?** WebRTC is a transport protocol supported by all major browsers. Those
+browsers allow the establishment of connections to remote endpoints that don't
+have a TLS certificate signed by a trusted certificate authority. In addition
+WebRTC includes hole punching capabilities.
+
+**Why?** In most p2p networks the majority of nodes do not have a signed TLS
+certificate. With WebRTC browsers will thus be able to connect to these
+previously unreachable nodes. In addition, being able to hole punch allows
+browsers to connect to nodes behind firewalls and NATs e.g. other browsers. Note
+that the former, namely connecting without trusted TLS certificate, can as well
+be achieved with the [WebTransport](#✈️-webtransport) protocol.
+
+**Links:**
+
+- Tracking issue https://github.com/libp2p/specs/issues/220
+- Specification draft https://github.com/libp2p/specs/pull/412
+
 ### 🤝 Low latency, efficient connection handshake
 
 **High priority for: IPFS**
@@ -463,9 +485,6 @@ creating examples and documentation on how to bundle js-libp2p with
 popular frontend tooling (webpack, parcel, etc.). Developers should be
 able to cherry-pick the features to incorporate in their bundle, and
 tree-shaking should produce good results.
-
-In terms of transports, hardening our WebRTC support and enabling it by
-default will bring a huge boost to general browser connectivity.
 
 Targeting the [WASM runtime](#libp2p-as-a-wasm-library)
 deserves a special mention, as we're likely to see more user interest in
