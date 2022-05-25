@@ -112,7 +112,7 @@ These are the addresses on which the peer is listening as multi-addresses.
 
 ### observedAddr
 
-This is the connection source address of the stream initiating peer as observed by the peer
+This is the connection source address of the stream-initiating peer as observed by the peer
 being identified; it is a multi-address. The initiator can use this address to infer
 the existence of a NAT and its public address.
 
