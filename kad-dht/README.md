@@ -143,7 +143,7 @@ definition](#distance)).
 Then we loop:
 
 1. > The lookup terminates when the initiator has queried and gotten responses
-   from the k (see [#replication-parameter-k]) closest nodes it has seen.
+   from the k (see [replication parameter `k`](#replication-parameter-k)) closest nodes it has seen.
 
    (See Kademlia paper [0].)
 
