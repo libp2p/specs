@@ -20,10 +20,11 @@ third-party ownership of data.
         - [📮 Offline message queue / postbox](#📮-offline-message-queue--postbox)
         - [🤖 libp2p as a WASM library](#🤖-libp2p-as-a-wasm-library)
     - [Evolve](#evolve)
-        - [🕸 Unprecedented global connectivity](#🕸-unprecedented-global-connectivity)
+        - [✈️ WebTransport](#✈️-webtransport)
         - [⏱ Full Observability](#⏱-full-observability)
         - [🧪 Automated compatibility testing](#🧪-automated-compatibility-testing)
         - [Stream Migration Protocol](#stream-migration-protocol)
+        - [WebRTC](#webrtc)
         - [🤝 Low latency, efficient connection handshake](#🤝-low-latency-efficient-connection-handshake)
         - [🛣️ Peer Routing Records](#🛣️-peer-routing-records)
         - [🗣️ Polite peering](#🗣️-polite-peering)
@@ -36,6 +37,8 @@ third-party ownership of data.
         - [☎️ Reducing the dial fail rate](#️-reducing-the-dial-fail-rate)
         - [🔀 Peer exchange protocol](#🔀-peer-exchange-protocol)
         - [🏹 RPC and other common node communication patterns](#🏹-rpc-and-other-common-node-communication-patterns)
+    - [Done](#done)
+        - [🕸 Hole punching on TCP and QUIC](#🕸-hole-punching-on-tcp-and-quic)
 
 ## Visionary
 
@@ -224,35 +227,25 @@ model.
 
 This is the stuff pushing the existing libp2p stack forward.
 
-### 🕸 Unprecedented global connectivity
+### ✈️ WebTransport
 
 **Status**: In progress
 
-**What?** A DHT crawl measurements (Nov 22nd 2019) showed that out
-of 4344 peers, 2754 were undialable (\~63%). This evidence correlates
-with feedback from the IPFS and Filecoin teams.
+**What?** WebTransport is a browser-API offering low-latency, bidirectional
+client-server messaging running on top of QUIC. The browser API allows the
+establishment of connections to servers that don't have a TLS certificate
+signed by a certificate authority if the hash of the certificate is known in
+advance.
 
-We need to implement additional mechanisms for Firewall and NAT traversal to
-have the highest probability of being able to establish a direct connection.
-Mechanisms we wish to add include:
-
-- Project Flare stack (via *Circuit Relay v2*, *Direct Connection Upgrade
-  through Relay*, *AutoNAT*, *Stream Migration*, ...)
-
-- WebRTC
-
-**Why?** Good connectivity is the bread-and-butter of libp2p. Focusing
-on solving these issues will bring more stability and robustness to the
-rest of the system.
+**Why?** This allows libp2p nodes running in the browser (using js-libp2p) to
+connect to the rest of the libp2p network.
 
 **Links:**
 
-- [Hole punching long-term
-  vision](https://github.com/mxinden/specs/blob/hole-punching/connections/hole-punching.md).
-
-- [NAT traversal tracking issue](https://github.com/libp2p/specs/issues/312).
-
-- [WebRTC tracking issue](https://github.com/libp2p/specs/issues/220)
+- [IETF draft](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http3/)
+- [W3C Browser API](https://w3c.github.io/webtransport/)
+- [libp2p spec discussion](https://github.com/libp2p/specs/pull/404)
+- [webtransport-go](https://github.com/marten-seemann/webtransport-go/)
 
 ### ⏱ Full Observability
 
@@ -302,6 +295,27 @@ connection to a direct connection.
 
 - Tracking issue https://github.com/libp2p/specs/issues/328
 - Specification draft https://github.com/libp2p/specs/pull/406#discussion_r852835671
+
+### WebRTC
+
+**Status**: In progress
+
+**What?** WebRTC is a transport protocol supported by all major browsers. Those
+browsers allow the establishment of connections to remote endpoints that don't
+have a TLS certificate signed by a trusted certificate authority. In addition
+WebRTC includes hole punching capabilities.
+
+**Why?** In most p2p networks the majority of nodes do not have a signed TLS
+certificate. With WebRTC browsers will thus be able to connect to these
+previously unreachable nodes. In addition, being able to hole punch allows
+browsers to connect to nodes behind firewalls and NATs e.g. other browsers. Note
+that the former, namely connecting without trusted TLS certificate, can as well
+be achieved with the [WebTransport](#✈️-webtransport) protocol.
+
+**Links:**
+
+- Tracking issue https://github.com/libp2p/specs/issues/220
+- Specification draft https://github.com/libp2p/specs/pull/412
 
 ### 🤝 Low latency, efficient connection handshake
 
@@ -485,9 +499,6 @@ popular frontend tooling (webpack, parcel, etc.). Developers should be
 able to cherry-pick the features to incorporate in their bundle, and
 tree-shaking should produce good results.
 
-In terms of transports, hardening our WebRTC support and enabling it by
-default will bring a huge boost to general browser connectivity.
-
 Targeting the [WASM runtime](#libp2p-as-a-wasm-library)
 deserves a special mention, as we're likely to see more user interest in
 this area. Finally, we should continue supporting the
@@ -631,3 +642,31 @@ networking to get started with libp2p.
 [libp2p specification]: https://github.com/libp2p/specs/
 [testground project]: https://github.com/testground/testground
 [libp2p test-plans repository]: https://github.com/libp2p/test-plans
+
+## Done
+
+### 🕸 Hole punching on TCP and QUIC
+
+**Status**: Done
+
+**What?** A DHT crawl measurements (Nov 22nd 2019) showed that out
+of 4344 peers, 2754 were undialable (\~63%). This evidence correlates
+with feedback from the IPFS and Filecoin teams.
+
+We need to implement additional mechanisms for Firewall and NAT traversal to
+have the highest probability of being able to establish a direct connection.
+Mechanisms we wish to add include:
+
+- Project Flare stack (via *Circuit Relay v2*, *Direct Connection Upgrade
+  through Relay*, *AutoNAT*, *Stream Migration*, ...)
+
+**Why?** Good connectivity is the bread-and-butter of libp2p. Focusing on
+solving these issues for TCP and QUIC will bring more stability and robustness
+to the rest of the system.
+
+**Links:**
+
+- [Hole punching long-term
+  vision](https://github.com/mxinden/specs/blob/hole-punching/connections/hole-punching.md).
+
+- [NAT traversal tracking issue](https://github.com/libp2p/specs/issues/312).
