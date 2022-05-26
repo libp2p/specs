@@ -23,6 +23,7 @@ third-party ownership of data.
         - [✈️ WebTransport](#✈️-webtransport)
         - [⏱ Full Observability](#⏱-full-observability)
         - [🧪 Automated compatibility testing](#🧪-automated-compatibility-testing)
+        - [Stream Migration Protocol](#stream-migration-protocol)
         - [WebRTC](#webrtc)
         - [🤝 Low latency, efficient connection handshake](#🤝-low-latency-efficient-connection-handshake)
         - [🛣️ Peer Routing Records](#🛣️-peer-routing-records)
@@ -282,6 +283,18 @@ the [libp2p test-plans repository].
 **Links:**
 
 - [First proof of concept](https://github.com/libp2p/test-plans/pull/20)
+
+### Stream Migration Protocol
+
+**What?** A protocol to migrate a stream from one connection to another.
+
+**Why?** Among others, this allows the migration of streams from a relayed
+connection to a direct connection.
+
+**Links:***
+
+- Tracking issue https://github.com/libp2p/specs/issues/328
+- Specification draft https://github.com/libp2p/specs/pull/406#discussion_r852835671
 
 ### WebRTC
 
