@@ -140,6 +140,11 @@ authenticate the remote peer by its libp2p identity.
 
 - Is the above proposed #protocol secure?
 
+- On the server side, can one derive the TLS certificate in a deterministic way
+  based on a node's libp2p private key? Benefit would be that a node only needs
+  to persist the libp2p private key and not the TLS key material while still
+  maintaining a fixed TLS certificate fingerprint.
+
 ### Multiplexing
 
 - Can we use WebRTC’s data channels in _Browser_ to multiplex a single
