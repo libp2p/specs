@@ -62,7 +62,9 @@ Scenario: Browser _A_ wants to connect to server node _B_.
    via
    [`RTCPeerConnection.setRemoteDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setRemoteDescription).
 
-4. _A_ establishes the connection to _B_.
+4. _A_ establishes the connection to _B_. Yet to be determined how _B_ learns of
+   _A_ fingerprint. Potentially through A's STUN message USERNAME attribute. See
+   Open Questions below.
 
 5. _A_ initiates some authentication handshake _X_ to _B_ on a datachannel,
    where _X_ allows _A_ and _B_ to authenticate each other's peer IDs. _X_ could
