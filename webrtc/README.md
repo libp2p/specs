@@ -25,6 +25,15 @@ Interest Group: [@marten-seemann]
 
 - No dependency on central STUN and/or TURN servers.
 
+## Addressing
+
+WebRTC multiaddresses are composed of an IP and UDP address component, followed
+by `/webrtc` and a multihash of the certificate that the node uses.
+
+Examples:
+- `/ip4/1.2.3.4/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`
+- `/ip6/fe80::1ff:fe23:4567:890a/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`
+
 ## Protocol
 
 ### Browser to Server
