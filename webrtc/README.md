@@ -95,6 +95,10 @@ Safari, Edge, Firefox)._
   WebRTC connection from a remote node without previously receiving an SDP
   packet from such host?
 
+  How does the server learn the TLS certificate fingerprint of the browser? Is
+  embedding A's TLS certificate fingerprint in A's STUN message USERNAME
+  attribute a valid option?
+
 #### Browser to browser or non-public server node
 
 - Can _Browser_ know upfront its UDP port which it is listening for incoming
