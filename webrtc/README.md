@@ -27,9 +27,11 @@ Interest Group: [@marten-seemann]
 
 ## Protocol
 
+### Browser to Server
+
 Scenario: Browser _A_ wants to connect to server node _B_.
 
-### Setup - Both _A_ and _B_
+#### Setup - Both _A_ and _B_
 
 1. [Generate a
    certificate](https://www.w3.org/TR/webrtc/#dom-rtcpeerconnection-generatecertificate).
@@ -37,7 +39,7 @@ Scenario: Browser _A_ wants to connect to server node _B_.
 2. [Get the certificate's
    fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
 
-### Connection Establishment
+#### Connection Establishment
 
 1. Browser _A_ discovers server node _B_'s multiaddr, containing _B_'s IP, UDP
   port, TLS certificate fingerprint and libp2p peer ID (e.g.
@@ -61,6 +63,17 @@ Scenario: Browser _A_ wants to connect to server node _B_.
 6. On success of the authentication handshake _X_, the used datachannel is
    closed and the plain WebRTC connection is used with its multiplexing
    capabilities via datachannels.
+
+### Browser to Browser
+
+Scenario: Browser _A_ wants to connect to Browser node _B_ with the help of
+server node _R_.
+
+- Replace STUN with libp2p's identify and AutoNAT
+  - https://github.com/libp2p/specs/tree/master/identify
+  - https://github.com/libp2p/specs/blob/master/autonat/README.md
+- Replace TURN with libp2p's Circuit Relay v2
+  - https://github.com/libp2p/specs/blob/master/relay/circuit-v2.md
 
 ## Open Questions
 
