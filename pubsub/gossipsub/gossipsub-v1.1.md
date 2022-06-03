@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity                  | Status | Latest Revision |
 |-----------------|---------------------------|--------|-----------------|
-| 2A              | Candidate Recommendation  | Active | r7, 2020-05-30  |
+| 2A              | Candidate Recommendation  | Active | r8, 2021-12-14  |
 
 Authors: [@vyzo]
 
@@ -104,6 +104,10 @@ they will not try to regraft. Both the pruning and the pruned peer will immediat
 within the backoff period and extend it.
 When a peer tries to regraft too early, the pruning peer may apply a behavioural penalty
 for the action, and penalize the peer through P₇ (see [Peer Scoring](#peer-scoring) below).
+
+When unsubscribing from a topic, the backoff period should be finished before subscribing to
+the topic again, otherwise a healthy mesh will be difficult to reach.
+A shorter backoff period can be used in case of an unsubscribe event, allowing faster resubscribing.
 
 The recommended duration for the backoff period is 1 minute, while the recommended number of peers
 to exchange is larger than `D_hi` so that the pruned peer can reliably form a full mesh.
@@ -537,13 +541,14 @@ parameters. This section summarizes all the new parameters along with a brief de
 
 The following parameters apply globally:
 
-| Parameter      | Type             | Description                                                            | Reasonable Default |
-|----------------|------------------|------------------------------------------------------------------------|--------------------|
-| `PruneBackoff` | Duration         | Time after pruning a mesh peer before we consider grafting them again. | `1 minute`         |
-| `FloodPublish` | Boolean          | Whether to enable flood publishing                                     | `true`             |
-| `GossipFactor` | Float [0.0, 1.0] | % of peers to send gossip to, if we have more than `D_lazy` available  | `0.25`             |
-| `D_score`      | Integer          | Number of peers to retain by score when pruning because of oversubscription | 4 or 5 for a `D` of 6. |
-| `D_out`        | Integer          | Number of outbound connections to keep in the mesh. Must be less than `D_lo` and at most `D/2`  | 2 for a `D` of 6        |
+| Parameter            | Type             | Description                                                            | Reasonable Default |
+|----------------------|------------------|------------------------------------------------------------------------|--------------------|
+| `PruneBackoff`       | Duration         | Time after pruning a mesh peer before we consider grafting them again. | `1 minute`         |
+| `UnsubscribeBackoff` | Duration         | Backoff to use when unsuscribing from a topic. Should not resubscribe to this topic before it expired. | `10 seconds`         |
+| `FloodPublish`       | Boolean          | Whether to enable flood publishing                                     | `true`             |
+| `GossipFactor`       | Float [0.0, 1.0] | % of peers to send gossip to, if we have more than `D_lazy` available  | `0.25`             |
+| `D_score`            | Integer          | Number of peers to retain by score when pruning because of oversubscription | 4 or 5 for a `D` of 6. |
+| `D_out`              | Integer          | Number of outbound connections to keep in the mesh. Must be less than `D_lo` and at most `D/2`  | 2 for a `D` of 6        |
 
 The remaining parameters apply to [Peer Scoring](#peer-scoring). Because many parameters are
 inter-related and may be application-specific, reasonable defaults are not shown here. See
