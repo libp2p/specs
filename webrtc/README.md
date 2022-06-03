@@ -114,7 +114,9 @@ Safari, Edge, Firefox)._
 #### Browser to browser or non-public server node
 
 - Can _Browser_ know upfront its UDP port which it is listening for incoming
-  connections on?
+  connections on? Does the browser reuse the UDP port across many WebRTC
+  connections? If that is the case one could connect to any public node, with
+  the remote telling the local node what port it is perceived on.
 
 - Can _Browser_ control the lifecycle of its local TLS certificate, i.e. can
   _Browser_ use the same TLS certificate for multiple WebRTC connections?
