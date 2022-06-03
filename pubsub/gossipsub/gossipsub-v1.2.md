@@ -18,8 +18,8 @@ The modifications outlined above intend to optimize the Gossipsub mesh to receiv
 
 ## Protocol Id
 
-Nodes that support this Gossipsub extension should additionally advertise the version number `2.0.0`. Gossipsub nodes can advertise their own protocol-id prefix, by default this is `meshsub` giving the default protocol id:
-- `/meshsub/2.0.0`
+Nodes that support this Gossipsub extension should additionally advertise the version number `1.2.0`. Gossipsub nodes can advertise their own protocol-id prefix, by default this is `meshsub` giving the default protocol id:
+- `/meshsub/1.2.0`
 
 ## Parameters
 
