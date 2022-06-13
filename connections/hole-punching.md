@@ -162,7 +162,6 @@ connections across the various permutations of the two dimensions.
 [SDP]: https://en.wikipedia.org/wiki/Session_Description_Protocol
 [circuit-relay-v2]: https://github.com/libp2p/specs/blob/master/relay/circuit-v2.md
 [DCUTR]: https://github.com/libp2p/specs/pull/173
-[project-flare]: https://github.com/protocol/web3-dev-team/pull/21
 [symmetric-nat]: https://dh2i.com/kbs/kbs-2961448-understanding-different-nat-types-and-hole-punching/
 [ipfs-kademlia]: https://docs.ipfs.io/concepts/dht/
 [Kademlia]: https://github.com/libp2p/specs/blob/master/kad-dht/README.md
