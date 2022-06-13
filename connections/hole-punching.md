@@ -54,6 +54,13 @@ reachable, but operate within the same local layer 2 or layer 3 network.
 Oftentimes in such cases direct connections between the two hosts can be
 established without prior hole punching.
 
+### Trusted TLS certificate
+
+When using TLS as a transport security protocol, one needs to differentiate
+whether the source trusts the destination's TLS certificate. For example in the
+browser to server use-case one needs to differentiate whether the server's TLS
+certificate is in the browser's certificate chain of trust.
+
 ### Platforms
 
 We differentiate two types of platforms: _browser_ and _non-browser_.
