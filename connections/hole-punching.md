@@ -95,9 +95,8 @@ namely QUIC and WebRTC.
 #### Relay
 
 A relay protocol allows two clients to communicate, routing data via a relay
-server, instead of using a direct connection. Examples of relay protocols are
-[TURN], [circuit relay v1][circuit-relay-v1] and [circuit relay
-v2][circuit-relay-v2].
+server, instead of using a direct connection. Example of a relay protocol is the
+[circuit relay v2][circuit-relay-v2] protocol.
 
 #### STUN-like
 
@@ -161,7 +160,6 @@ connections across the various permutations of the two dimensions.
 [AutoNAT]: https://github.com/libp2p/specs/issues/180
 [Identify]: ../identify/README.md
 [SDP]: https://en.wikipedia.org/wiki/Session_Description_Protocol
-[circuit-relay-v1]: https://github.com/libp2p/specs/blob/master/relay/circuit-v1.md
 [circuit-relay-v2]: https://github.com/libp2p/specs/blob/master/relay/circuit-v2.md
 [DCUTR]: https://github.com/libp2p/specs/pull/173
 [project-flare]: https://github.com/protocol/web3-dev-team/pull/21
