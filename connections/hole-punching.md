@@ -90,7 +90,8 @@ platform types.
 
 A transport protocol allows basic host-to-host communication. Examples are TCP,
 Websockets building on top of TCP, as well as the protocols layered over UDP
-namely QUIC, [WebRTC] and [WebTransport].
+namely QUIC and [WebTransport]. In addition there is [WebRTC] which can run both
+atop TCP and UDP.
 
 #### Relay
 
