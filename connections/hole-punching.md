@@ -3,7 +3,7 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r0, 2021-04-27  |
+| 1A              | Working Draft | Active | r1, 2022-06-13  |
 
 Authors: [@mxinden]
 
@@ -54,6 +54,13 @@ reachable, but operate within the same local layer 2 or layer 3 network.
 Oftentimes in such cases direct connections between the two hosts can be
 established without prior hole punching.
 
+### Trusted TLS certificate
+
+When using TLS as a transport security protocol, one needs to differentiate
+whether the source trusts the destination's TLS certificate. For example in the
+browser to server use-case one needs to differentiate whether the server's TLS
+certificate is in the browser's certificate chain of trust.
+
 ### Platforms
 
 We differentiate two types of platforms: _browser_ and _non-browser_.
@@ -83,14 +90,14 @@ platform types.
 
 A transport protocol allows basic host-to-host communication. Examples are TCP,
 Websockets building on top of TCP, as well as the protocols layered over UDP
-namely QUIC and WebRTC.
+namely QUIC and [WebTransport]. In addition there is [WebRTC] which can run both
+atop TCP and UDP.
 
 #### Relay
 
 A relay protocol allows two clients to communicate, routing data via a relay
-server, instead of using a direct connection. Examples of relay protocols are
-[TURN], [circuit relay v1][circuit-relay-v1] and [circuit relay
-v2][circuit-relay-v2].
+server, instead of using a direct connection. Example of a relay protocol is the
+[circuit relay v2][circuit-relay-v2] protocol.
 
 #### STUN-like
 
@@ -127,137 +134,13 @@ platform type (browser / non-browser) as as well as routability (public /
 private). The below describes on a high level how to establish direct
 connections across the various permutations of the two dimensions.
 
-### Public Non-Browser (A) to Public Non-Browser (B)
-
-This is the ideal case, where both hosts can be directly dialed, thus there
-being no need for hole punching. The two hosts should use either TCP or QUIC to
-communicate directly.
-
-### Private Non-Browser (A) to Public Non-Browser (B)
-
-Given that B is publicly reachable, A can establish a direct TCP or QUIC
-connection to B.
-
-### Private Browser (A) to Public Non-Browser (B)
-
-Given that B is publicly reachable A can establish a direct connection, though
-multiple restrictions are imposed by the browser platform type of A:
-
-- The only transport protocol allowing direct connections on browser platforms
-  is WebSockets. Thus B has to support the WebSocket transport protocol.
-
-- Browser platforms do not allow insecure WebSocket connections, thus B has to
-  have a valid TLS certificate to offer secure Websocket communication.
-
-In cases where B does not fulfill both of these requirements, additional steps
-as detailed in [Private Browser (A) to Private Non-Browser
-(B)](#private-browser-a-to-private-non-browser-b) are necessary.
-
-### Public or Private Non-Browser (A) to Private Non-Browser (B)
-
-In order to establish a direct connection from A to B, one needs to utilize some
-means of firewall / NAT hole punching. Given the permissiveness of non-browser
-platforms there are many ways to achieve this goal, with the below being one of
-them.
-
-- B uses the observed addresses from the [Identify] protocol in combination with
-  the [AutoNAT] protocol to determine whether it is running behind firewalls
-  and/or NATs and in the latter case what type of NATs.
-  
-  Note: Hole punching fails if either A or B runs behind a [symmetric
-  NAT][symmetric-nat].
-
-- B establishes a TCP or QUIC connections to one or more relay servers and
-  listens for incoming connection requests via the [circuit relay v2
-  protocol][circuit-relay-v2]. Once B established a reservation at one or more
-  relay servers, B can advertise its relayed addresses (e.g.
-  `/ip4/.../tcp/.../p2p/QmRelay`) via some external mechanism.
-
-  Note on decentralization: Given the low resource requirements of the [circuit
-  relay v2 protocol][circuit-relay-v2] any public host can serve as a relay
-  server.
-
-- A discovers the relayed address of B through some external mechanism. Given
-  the relayed address, A can establish a relayed connection to B via the [circuit
-  relay v2 protocol][circuit-relay-v2] protocol over TCP or QUIC. A and B can
-  then run the [Direct Connection Upgrade through Relay][DCUTR] protocol over
-  the relayed connection to coordinate TCP or QUIC hole punching in the best
-  case establishing a direction connection.
-
-For more details see the [Project Flare][project-flare] project proposal.
-
-### Private Browser (A) to Private Non-Browser (B)
-
-As mentioned above browser platforms (1) do not allow libp2p implementations to
-manage the network sockets nor (2) do they allow managing the transport security
-stack, thus not allowing _insecure_ connections from [secure contexts].
-
-- Both A and B discover [STUN] servers through some external mechanism. Given
-  that two hosts do not need to share the same [STUN] server to establish a
-  WebRTC connection, this does not require any coordination beyond the [STUN]
-  server discovery process.
-
-- B establishes a TCP or QUIC connections to one or more relay servers and
-  listens for incoming connection requests via the [circuit relay v2
-  protocol][circuit-relay-v2]. Once B establishes a reservation at one or more
-  relay servers, B can advertise its relayed addresses (e.g.
-  `/ip4/.../tcp/.../p2p/QmRelay`) via some external mechanism.
-
-  Note: Given that browser platforms do not allow insecure connections
-  to non-localhost addresses, the relay server needs to listen on
-  TLS secured Websockets (`/ip4/.../tcp/.../wss/p2p/QmRelay`).  
-
-- A discovers the relayed address of B through some external mechanism. Given
-  B's relayed address A can establish a Websocket connection to the relay server
-  of B. With the help of the [circuit relay v2 protocol][circuit-relay-v2]
-  protocol A and B can exchange [SDP] messages eventually allowing A B and to
-  establish a WebRTC connection.
-
-### Public or Private Non-Browser (A) to Private Browser (B)
-
-- Both A and B discover [STUN] servers through some external mechanism. Given
-  that two hosts do not need to share the same [STUN] server to establish a
-  WebRTC connection, this does not require any coordination beyond the [STUN]
-  server discovery process.
-
-- B establishes a Websocket connections to one or more relay server and listens
-  for incoming connection requests via the [circuit relay v2
-  protocol][circuit-relay-v2]. Once B established a reservation at one or more
-  relay servers, B can advertise its relayed addresses (e.g.
-  `/ip4/.../tcp/.../p2p/QmRelay`) via some external mechanism.
-
-- A discovers the relayed address of B through some external mechanism. Given
-  B's relayed address A can establish a TCP or QUIC connection to the relay
-  server of B. With the help of the [circuit relay v2
-  protocol][circuit-relay-v2] protocol A and B can exchange [SDP] messages
-  eventually allowing A B and to establish a WebRTC connection.
-
-### Private Browser (A) to Private Browser (B)
-
-- Both A and B discover [STUN] servers through some external mechanism. Given
-  that two hosts do not need to share the same [STUN] server to establish a
-  WebRTC connection, this does not require any coordination beyond the [STUN]
-  server discovery.
-
-- B establishes a Websocket connections to one or more relay servers and listens
-  for incoming connection requests via the [circuit relay v2
-  protocol][circuit-relay-v2]. Once B established a reservation at one or more
-  relay servers, B can advertise its relayed addresses (e.g.
-  `/ip4/.../tcp/.../wss/p2p/QmRelay`) via some external mechanism.
-
-- A discovers the relayed `/wss/` address of B through some external mechanism. Given
-  B's relayed address A can establish a Websocket connection to the relay server
-  of B. With the help of the [circuit relay v2 protocol][circuit-relay-v2]
-  protocol A and B can exchange [SDP] messages eventually allowing A B and to
-  establish a WebRTC connection.
+| ↓ establishing connection to → | public non-browser                                                                       | private non-browser                                                                                                                                                                                                         | private browser                                                                                                                                                                                                            |
+|--------------------------------|------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **public non-browser**         | TCP or QUIC                                                                              | Destination has reservation with [circuit-relay-v2]. Source connects to destination via relay. Source triggers connection (TCP or QUIC) reversal with destination via [DCUTR].                                              | Destination has reservation with [circuit-relay-v2]. Source connects to destination via relay. Source triggers connection (WebSocket (trusted TLS cert),[WebRTC] or [WebTransport]) reversal with destination via [DCUTR]. |
+| **private non-browser**        | TCP or QUIC                                                                              | Source and destination use [identify] and [AutoNAT]. Destination has reservation with [circuit-relay-v2]. Source connects to destination via relay. Source and destination coordinate hole punch (TCP or QUIC) via [DCUTR]. | Source uses [identify] and [AutoNAT]. Destination has reservation with [circuit-relay-v2]. Source connects to destination via relay. Source and destination coordinate hole punch ([WebRTC]) via [DCUTR].                  |
+| **private browser**            | If source trusts destination's TLS certificate WebSocket else [WebRTC] or [WebTransport] | [WebRTC]                                                                                                                                                                                                                    | [WebRTC]                                                                                                                                                                                                                   |
 
 ## FAQ
-
-- **Why not connect to a relay server via WebRTC instead of Websockets?**
-
-  WebRTC needs some mechanism to exchange [SDP] messages. Unless there is some
-  other means to exchange these [SDP] messages to a relay server, one has to use
-  Websockets.
 
 - **What to do when hole punching fails?**
 
@@ -278,12 +161,10 @@ stack, thus not allowing _insecure_ connections from [secure contexts].
 [AutoNAT]: https://github.com/libp2p/specs/issues/180
 [Identify]: ../identify/README.md
 [SDP]: https://en.wikipedia.org/wiki/Session_Description_Protocol
-[circuit-relay-v1]: https://github.com/libp2p/specs/blob/master/relay/circuit-v1.md
 [circuit-relay-v2]: https://github.com/libp2p/specs/blob/master/relay/circuit-v2.md
 [DCUTR]: https://github.com/libp2p/specs/pull/173
-[project-flare]: https://github.com/protocol/web3-dev-team/pull/21
-[symmetric-nat]: https://dh2i.com/kbs/kbs-2961448-understanding-different-nat-types-and-hole-punching/
 [ipfs-kademlia]: https://docs.ipfs.io/concepts/dht/
 [Kademlia]: https://github.com/libp2p/specs/blob/master/kad-dht/README.md
 [Gossipsub]: ../pubsub/gossipsub/README.md
-[secure contexts]: https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts
+[WebRTC]: https://github.com/libp2p/specs/issues/220
+[WebTransport]: https://github.com/libp2p/specs/pull/404
