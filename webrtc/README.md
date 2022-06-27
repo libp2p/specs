@@ -161,6 +161,9 @@ authenticate the remote peer by its libp2p identity.
   of a WebRTC connection and WebRTC datachannel? In other words, does WebRTC
   provide all functionality of a libp2p muxer like Yamux (e.g. flow control)?
 
+  Yes, with WebRTC's datachannels running on top of SCTP, there is no need for
+  additional multiplexing.
+
 ## Previous, ongoing and related work
 
 - Proof of concept for the server side in rust-libp2p:
