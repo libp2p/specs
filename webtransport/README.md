@@ -8,7 +8,7 @@ Authors: [@marten-seemann]
 
 Interest Group: TODO
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document](../00-framework-01-spec-lifecycle.md) for context about maturity level
 and spec status.
 
 ## Introduction
@@ -17,11 +17,11 @@ WebTransport is a way for browsers to establish a stream-multiplexed and bidirec
 
 The WebTransport protocol is currently under development at the IETF. Chrome has implemented and shipped support for [draft-02](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http3/).
 
-The most exciting feature for libp2p (other than the improved performance and hole punching success rates that QUIC gives us) is that the W3C added a browser API allowing browsers to establish connections to nodes with self-signed certificates, provided they know the hash of the certificate in advance: `[serverCertificateHashes](https://www.w3.org/TR/webtransport/#dom-webtransportoptions-servercertificatehashes)`. This API is already [implemented in Chrome](https://chromestatus.com/feature/5690646332440576). Firefox is working on a WebTransport implementation and is [likely to implement](https://github.com/mozilla/standards-positions/issues/167#issuecomment-1015951396) `serverCertificateHashes` as well.
+The most exciting feature for libp2p (other than the improved performance and hole punching success rates that QUIC gives us) is that the W3C added a browser API allowing browsers to establish connections to nodes with self-signed certificates, provided they know the hash of the certificate in advance: [`serverCertificateHashes`](https://www.w3.org/TR/webtransport/#dom-webtransportoptions-servercertificatehashes). This API is already [implemented in Chrome](https://chromestatus.com/feature/5690646332440576). Firefox is working on a WebTransport implementation and is [likely to implement](https://github.com/mozilla/standards-positions/issues/167#issuecomment-1015951396) `serverCertificateHashes` as well.
 
 ## Certificates
 
-Since most libp2p nodes don't possess a TLS certificate signed by a Certificate Authority, servers use a self-signed certificates. According to the [w3c WebTransport certification](https://www.w3.org/TR/webtransport/), the validity of the certificate MUST be at most 14 days, and must not use an RSA key. Nodes then include the hash of one (or more) certificates in their multiaddr (see [#addressing]).
+Since most libp2p nodes don't possess a TLS certificate signed by a Certificate Authority, servers use a self-signed certificates. According to the [w3c WebTransport certification](https://www.w3.org/TR/webtransport/), the validity of the certificate MUST be at most 14 days, and must not use an RSA key. Nodes then include the hash of one (or more) certificates in their multiaddr (see [Addressing](#addressing)).
 
 Servers need to take care to regularly renew their certificate. In the following, the RECOMMENDED logic for rolling certificates is described. At first boot of the node, it creates a self-signed certificate with a validity of 14 days, and publishes a multiaddr containing the hash of that certificate. After 10 days, the node prepares the next certificate, setting the `NotBefore` date of that certificate to the expiration date (or shortly before that) of the first certificate, and an expiration of 14 days after that. The node continues using the old certificate until the expiry date, but it already advertises a multiaddr containing both certificate hashes. This way, clients will be able to connect to the node, even if they cache the multiaddr for multiple days.
 
@@ -46,7 +46,7 @@ Unfortunately, the self-signed certificate doesn't allow the nodes to authentica
 The first stream that the client opens on a new WebTransport session is used to perform a libp2p handshake using Noise (https://github.com/libp2p/specs/tree/master/noise). The client SHOULD start the handshake right after sending the CONNECT request, without waiting for the server's response.
 
 In order to verify that the end-to-end encryption of the connection, the peers need to establish that no MITM intercepted the connection. To do so, the client MUST include the certificate hash that was used to establish the connection as payload of the first Noise message (the `e` message). This payload is not encrypted, but the Noise handshake provides integrity protection.
-If the client was willing to accept multiple certificate hashes, but cannot determine with certificate was actually used to establish the connection (this will commonly be the case for browser clients), it MUST include a list of all certificate hashes.
+If the client was willing to accept multiple certificate hashes, but cannot determine which certificate was actually used to establish the connection (this will commonly be the case for browser clients), it MUST include a list of all certificate hashes.
 
 Certificate hashes are encoded using the following protobuf message:
 ```proto
