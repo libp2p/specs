@@ -123,6 +123,10 @@ Safari, Edge, Firefox)._
 
 - Can _Browser_ control the lifecycle of its local TLS certificate, i.e. can
   _Browser_ use the same TLS certificate for multiple WebRTC connections?
+  
+  Yes. For the lifetime of the page, one can generate a certificate once and
+  reuse it across connections. See also
+  https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection#using_certificates
 
 - Can two _Browsers_ exchange their SDP packets via a third server node using
   Circuit Relay v2 and DCUtR? Instead of exchanging the original SDP packets,
