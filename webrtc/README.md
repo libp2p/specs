@@ -107,6 +107,8 @@ Safari, Edge, Firefox)._
   the sense that this generated SDP packet can then be used to establish a
   WebRTC connection to the remote.
 
+  Yes.
+
 - Do the major (Go / Rust / ...) WebRTC implementations allow us to accept a
   WebRTC connection from a remote node without previously receiving an SDP
   packet from such host?
