@@ -55,7 +55,8 @@ Scenario: Browser _A_ wants to connect to server node _B_.
   `/ip6/2001:db8::/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`),
   through some external mechanism.
 
-2. _A_ create a connection passing its local certificate as a parameter. See
+2. _A_ instantiates a `RTCPeerConnection`, passing its local certificate as a
+   parameter. See
    [`RTCPeerConnection()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection).
 
 3. _A_ constructs _B_'s SDP offer locally based on _B_'s multiaddr and sets it
