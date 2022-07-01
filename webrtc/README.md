@@ -124,6 +124,11 @@ server node _R_.
   - https://github.com/libp2p/specs/blob/master/autonat/README.md
 - Replace TURN with libp2p's Circuit Relay v2
   - https://github.com/libp2p/specs/blob/master/relay/circuit-v2.md
+- Use DCUtR over Circuit Relay v2 to transmit SDP information
+  1. Transform ICE candidates in SDP to multiaddresses.
+  2. Transmit the set of multiaddresses to the remote via DCUtR.
+  3. Transform the set of multiaddresses back to the remotes SDP.
+  4. https://github.com/libp2p/specs/blob/master/relay/DCUtR.md
   
 #### Open Questions
 
