@@ -8,6 +8,28 @@ Authors: [@mxinden]
 
 Interest Group: [@marten-seemann]
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
+
+- [WebRTC](#webrtc)
+    - [Motivation](#motivation)
+    - [Requirements](#requirements)
+    - [Addressing](#addressing)
+    - [Connection Establishment](#connection-establishment)
+        - [Browser to public Server](#browser-to-public-server)
+            - [Open Questions](#open-questions)
+        - [Browser to Browser](#browser-to-browser)
+            - [Open Questions](#open-questions-1)
+    - [Connection Security](#connection-security)
+        - [Open Questions](#open-questions-2)
+    - [Multiplexing](#multiplexing)
+    - [General Open Questions](#general-open-questions)
+    - [Previous, ongoing and related work](#previous-ongoing-and-related-work)
+- [FAQ](#faq)
+
+<!-- markdown-toc end -->
+
+
 ## Motivation
 
 1. **No need for valid TLS certificates.** Enable browsers to connect to public
@@ -34,21 +56,17 @@ Examples:
 - `/ip4/1.2.3.4/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`
 - `/ip6/fe80::1ff:fe23:4567:890a/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`
 
-## Protocol
+## Connection Establishment
 
-### Browser to Server
+### Browser to public Server
 
-Scenario: Browser _A_ wants to connect to server node _B_.
+Scenario: Browser _A_ wants to connect to server node _B_ where _B_ is publicly
+reachable but _B_ does not have a TLS certificate trusted by _A_.
 
-#### Setup - Both _A_ and _B_
-
-1. [Generate a
-   certificate](https://www.w3.org/TR/webrtc/#dom-rtcpeerconnection-generatecertificate).
-
-2. [Get the certificate's
-   fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
-
-#### Connection Establishment
+As a preparation browser _A_ [generates a
+certificate](https://www.w3.org/TR/webrtc/#dom-rtcpeerconnection-generatecertificate)
+and [gets the certificate's
+fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
 
 1. Browser _A_ discovers server node _B_'s multiaddr, containing _B_'s IP, UDP
   port, TLS certificate fingerprint and libp2p peer ID (e.g.
@@ -77,28 +95,7 @@ Scenario: Browser _A_ wants to connect to server node _B_.
    closed and the plain WebRTC connection is used with its multiplexing
    capabilities via datachannels.
 
-### Browser to Browser
-
-Scenario: Browser _A_ wants to connect to Browser node _B_ with the help of
-server node _R_.
-
-- Replace STUN with libp2p's identify and AutoNAT
-  - https://github.com/libp2p/specs/tree/master/identify
-  - https://github.com/libp2p/specs/blob/master/autonat/README.md
-- Replace TURN with libp2p's Circuit Relay v2
-  - https://github.com/libp2p/specs/blob/master/relay/circuit-v2.md
-
-## Open Questions
-
-_Where _Browser_ is replaced with the major desktop browsers of today (Chrome,
-Safari, Edge, Firefox)._
-
-- Should libp2p's WebRTC stack limit itself to using UDP only, or support WebRTC
-  on top of both UDP and TCP?
-
-### Direct connections
-
-#### Browser to public server node
+#### Open Questions
 
 - Can _Browser_ generate a _valid_ SDP packet for the remote node based on the
   remote's Multiaddr, where that Multiaddr contains the IP, UDP port and TLS
@@ -113,11 +110,22 @@ Safari, Edge, Firefox)._
   WebRTC connection from a remote node without previously receiving an SDP
   packet from such host?
 
-  How does the server learn the TLS certificate fingerprint of the browser? Is
+- How does the server learn the TLS certificate fingerprint of the browser? Is
   embedding A's TLS certificate fingerprint in A's STUN message USERNAME
-  attribute a valid option?
+  attribute the best option?
 
-#### Browser to browser or non-public server node
+### Browser to Browser
+
+Scenario: Browser _A_ wants to connect to Browser node _B_ with the help of
+server node _R_.
+
+- Replace STUN with libp2p's identify and AutoNAT
+  - https://github.com/libp2p/specs/tree/master/identify
+  - https://github.com/libp2p/specs/blob/master/autonat/README.md
+- Replace TURN with libp2p's Circuit Relay v2
+  - https://github.com/libp2p/specs/blob/master/relay/circuit-v2.md
+  
+#### Open Questions
 
 - Can _Browser_ know upfront its UDP port which it is listening for incoming
   connections on? Does the browser reuse the UDP port across many WebRTC
@@ -136,10 +144,12 @@ Safari, Edge, Firefox)._
   could they exchange their multiaddr and construct the remote's SDP packet
   based on it?
 
-### Securing the connection
+## Connection Security
 
 While WebRTC offers confidentiality and integrity via TLS, one still needs to
 authenticate the remote peer by its libp2p identity.
+
+### Open Questions
 
 - Can a _Browser_ access the fingerprint of its TLS certificate?
 
@@ -157,7 +167,7 @@ authenticate the remote peer by its libp2p identity.
   to persist the libp2p private key and not the TLS key material while still
   maintaining a fixed TLS certificate fingerprint.
 
-### Multiplexing
+## Multiplexing
 
 - Can we use WebRTC’s data channels in _Browser_ to multiplex a single
   connection, or do we need to run an additional multiplexer (e.g. yamux) on top
@@ -166,6 +176,14 @@ authenticate the remote peer by its libp2p identity.
 
   Yes, with WebRTC's datachannels running on top of SCTP, there is no need for
   additional multiplexing.
+
+## General Open Questions
+
+_Where _Browser_ is replaced with the major desktop browsers of today (Chrome,
+Safari, Edge, Firefox)._
+
+- Should libp2p's WebRTC stack limit itself to using UDP only, or support WebRTC
+  on top of both UDP and TCP?
 
 ## Previous, ongoing and related work
 
