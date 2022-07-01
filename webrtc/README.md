@@ -85,15 +85,9 @@ fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
    through A's STUN message USERNAME attribute. See Open Questions below for
    potential better solutions.
 
-5. _A_ initiates some authentication handshake _X_ to _B_ on a datachannel,
-   where _X_ allows _A_ and _B_ to authenticate each other's peer IDs. _X_ could
-   for example be Noise. See WebTransport specification as an example
-   https://github.com/libp2p/specs/pull/404. Still to be specified here for
-   WebRTC.
+5. See [Connection Security](#connection-security).
 
-6. On success of the authentication handshake _X_, the used datachannel is
-   closed and the plain WebRTC connection is used with its multiplexing
-   capabilities via datachannels.
+6. See [Multiplexing](#multiplexing).
 
 #### Open Questions
 
@@ -129,7 +123,7 @@ server node _R_.
   2. Transmit the set of multiaddresses to the remote via DCUtR.
   3. Transform the set of multiaddresses back to the remotes SDP.
   4. https://github.com/libp2p/specs/blob/master/relay/DCUtR.md
-  
+
 #### Open Questions
 
 - Can _Browser_ know upfront its UDP port which it is listening for incoming
@@ -139,7 +133,7 @@ server node _R_.
 
 - Can _Browser_ control the lifecycle of its local TLS certificate, i.e. can
   _Browser_ use the same TLS certificate for multiple WebRTC connections?
-  
+
   Yes. For the lifetime of the page, one can generate a certificate once and
   reuse it across connections. See also
   https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection#using_certificates
@@ -153,6 +147,14 @@ server node _R_.
 
 While WebRTC offers confidentiality and integrity via TLS, one still needs to
 authenticate the remote peer by its libp2p identity.
+
+After [Connection Establishment](#connection-establishment):
+
+1. _A_ initiates some authentication handshake _X_ to _B_ on a datachannel,
+   where _X_ allows _A_ and _B_ to authenticate each other's peer IDs. _X_ could
+   for example be Noise. See WebTransport specification as an example
+   https://github.com/libp2p/specs/pull/404. Still to be specified here for
+   WebRTC.
 
 ### Open Questions
 
@@ -173,6 +175,14 @@ authenticate the remote peer by its libp2p identity.
   maintaining a fixed TLS certificate fingerprint.
 
 ## Multiplexing
+
+After [Connection Security](#connection-security):
+
+1. On success of the authentication handshake _X_, the used datachannel is
+   closed and the plain WebRTC connection is used with its multiplexing
+   capabilities via datachannels.
+
+### Open Questions
 
 - Can we use WebRTC’s data channels in _Browser_ to multiplex a single
   connection, or do we need to run an additional multiplexer (e.g. yamux) on top
