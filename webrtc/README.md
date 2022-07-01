@@ -173,11 +173,15 @@ authenticate the remote peer by its libp2p identity.
 
 After [Connection Establishment](#connection-establishment):
 
-1. _A_ initiates some authentication handshake _X_ to _B_ on a datachannel,
-   where _X_ allows _A_ and _B_ to authenticate each other's peer IDs. _X_ could
-   for example be Noise. See WebTransport specification as an example
-   https://github.com/libp2p/specs/pull/404. Still to be specified here for
-   WebRTC.
+1. _A_ opens a WebRTC datachannel and starts a Noise handshake using _A_'s and
+   _B_'s libp2p identity. See
+   [noise-libp2p](https://github.com/libp2p/specs/tree/master/noise).
+
+2. _A_ and _B_ write their TLS certificate fingerprint on the negotiated Noise channel.
+
+3. _A_ and _B_ read the other sides TLS certificate fingerprint on the
+   negotiated Noise channel and compare it to the ones verified during the DTLS
+   handshake.
 
 ### Open Questions
 
@@ -190,7 +194,9 @@ After [Connection Establishment](#connection-establishment):
   practice, this is not an issue since the fingerprint is embedded in the local
   SDP string.
 
-- Is the above proposed #protocol secure?
+- Is the above proposed additional handshake secure? See also alternative
+  proposed Handshake for
+  [WebTransport](https://github.com/libp2p/specs/pull/404).
 
 - On the server side, can one derive the TLS certificate in a deterministic way
   based on a node's libp2p private key? Benefit would be that a node only needs
