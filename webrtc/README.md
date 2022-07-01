@@ -223,9 +223,6 @@ After [Connection Security](#connection-security):
 
 ## General Open Questions
 
-_Where _Browser_ is replaced with the major desktop browsers of today (Chrome,
-Safari, Edge, Firefox)._
-
 - Should libp2p's WebRTC stack limit itself to using UDP only, or support WebRTC
   on top of both UDP and TCP?
 
