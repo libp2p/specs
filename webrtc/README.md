@@ -91,22 +91,24 @@ fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
 
 #### Open Questions
 
-- Can _Browser_ generate a _valid_ SDP packet for the remote node based on the
-  remote's Multiaddr, where that Multiaddr contains the IP, UDP port and TLS
-  certificate fingerprint (e.g.
-  `/ip6/2001:db8::/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`)? _Valid_ in
-  the sense that this generated SDP packet can then be used to establish a
-  WebRTC connection to the remote.
-
-  Yes.
-
-- Do the major (Go / Rust / ...) WebRTC implementations allow us to accept a
-  WebRTC connection from a remote node without previously receiving an SDP
-  packet from such host?
-
 - How does the server learn the TLS certificate fingerprint of the browser? Is
   embedding A's TLS certificate fingerprint in A's STUN message USERNAME
   attribute the best option?
+
+- Is the fact that the server accepts STUN messages from the client prone to
+  attacks?
+
+    - Can an attacker launch an **amplification attack** with the STUN endpoint
+      of the server?
+
+    - Can a client run a **DOS attack** by sending many STUN messages with
+      different ufrags using different UDP source ports, forcing the server to
+      allocate a new peer connection for each? Would rate limiting suffice to
+      defend against this attack?
+
+  See also:
+  - https://datatracker.ietf.org/doc/html/rfc5389#section-16.2.1
+  - https://datatracker.ietf.org/doc/html/rfc5389#section-16.1.2
 
 - Do the major WebRTC server implementations support using the same UDP port for
   multiple WebRTC connections, thus requiring multiplexing multiple WebRTC
@@ -115,6 +117,19 @@ fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
   This is related to [ICE Lite](https://www.rfc-editor.org/rfc/rfc5245), having
   a host only advertise a single address, namely the host address, which is
   assumed to be public.
+
+- Do the major (Go / Rust / ...) WebRTC implementations allow us to accept a
+  WebRTC connection from a remote node without previously receiving an SDP
+  packet from such host?
+
+- Can _Browser_ generate a _valid_ SDP packet for the remote node based on the
+  remote's Multiaddr, where that Multiaddr contains the IP, UDP port and TLS
+  certificate fingerprint (e.g.
+  `/ip6/2001:db8::/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`)? _Valid_ in
+  the sense that this generated SDP packet can then be used to establish a
+  WebRTC connection to the remote.
+
+  Yes.
 
 ### Browser to Browser
 
