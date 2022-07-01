@@ -81,9 +81,9 @@ fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
    via
    [`RTCPeerConnection.setRemoteDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setRemoteDescription).
 
-4. _A_ establishes the connection to _B_. Yet to be determined how _B_ learns of
-   _A_ fingerprint. Potentially through A's STUN message USERNAME attribute. See
-   Open Questions below.
+4. _A_ establishes the connection to _B_. _B_ learns of _A_ TLS fingerprint
+   through A's STUN message USERNAME attribute. See Open Questions below for
+   potential better solutions.
 
 5. _A_ initiates some authentication handshake _X_ to _B_ on a datachannel,
    where _X_ allows _A_ and _B_ to authenticate each other's peer IDs. _X_ could
