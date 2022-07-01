@@ -108,6 +108,14 @@ fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
   embedding A's TLS certificate fingerprint in A's STUN message USERNAME
   attribute the best option?
 
+- Do the major WebRTC server implementations support using the same UDP port for
+  multiple WebRTC connections, thus requiring multiplexing multiple WebRTC
+  connections on the same UDP port? In particular this came up for NodeJS.
+
+  This is related to [ICE Lite](https://www.rfc-editor.org/rfc/rfc5245), having
+  a host only advertise a single address, namely the host address, which is
+  assumed to be public.
+
 ### Browser to Browser
 
 Scenario: Browser _A_ wants to connect to Browser node _B_ with the help of
