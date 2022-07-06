@@ -226,6 +226,9 @@ After [Connection Security](#connection-security):
 - Should libp2p's WebRTC stack limit itself to using UDP only, or support WebRTC
   on top of both UDP and TCP?
 
+- Is the fact that Firefox does not allow a WebRTC to `localhost` an issue? See
+  https://bugzilla.mozilla.org/show_bug.cgi?id=831926.
+
 ## Previous, ongoing and related work
 
 - Proof of concept for the server side in rust-libp2p:
