@@ -105,6 +105,17 @@ fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
     - Can an attacker launch an **amplification attack** with the STUN endpoint
       of the server?
 
+      The QUIC protocol defends against amplification attacks by requiring:
+
+      > an endpoint MUST limit the amount of data it sends to the unvalidated
+      > address to three times the amount of data received from that address.
+
+      https://datatracker.ietf.org/doc/html/rfc9000#section-8
+
+      For WebRTC in libp2p one could require the client (_A_) to add additional
+      bytes to its STUN message, e.g. in the STUN username and password, thus
+      making an amplification attack less attractive.
+
     - Can a client run a **DOS attack** by sending many STUN messages with
       different ufrags using different UDP source ports, forcing the server to
       allocate a new peer connection for each? Would rate limiting suffice to
