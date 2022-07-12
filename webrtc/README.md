@@ -227,6 +227,10 @@ After [Connection Establishment](#connection-establishment):
   proposed Handshake for
   [WebTransport](https://github.com/libp2p/specs/pull/404).
 
+- Would it be more efficient for _B_ to initiate the Noise handshake? In other
+  words, who is able to write on an established WebRTC connection first? _A_ or
+  _B_?
+
 - On the server side, can one derive the TLS certificate in a deterministic way
   based on a node's libp2p private key? Benefit would be that a node only needs
   to persist the libp2p private key and not the TLS key material while still
