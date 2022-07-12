@@ -56,6 +56,10 @@ Examples:
 - `/ip4/1.2.3.4/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`
 - `/ip6/fe80::1ff:fe23:4567:890a/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`
 
+The TLS certificate fingerprint in `/certhash` is a
+[multibase](https://github.com/multiformats/multibase) encoded
+[multihash](https://github.com/multiformats/multihash).
+
 ## Connection Establishment
 
 ### Browser to public Server
