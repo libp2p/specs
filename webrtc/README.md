@@ -81,19 +81,23 @@ fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
    via
    [`RTCPeerConnection.setRemoteDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setRemoteDescription).
 
-4. _A_ establishes the connection to _B_. _B_ learns of _A_ TLS fingerprint
-   through A's STUN message USERNAME attribute. See Open Questions below for
-   potential better solutions.
+4. _A_ establishes the connection to _B_. _A_ generates a random string and uses
+   that string as the username (_ufrag_ or _username fragment_) and password in
+   the initial STUN message from _A_ to _B_. The random string can be used by
+   _B_ to identify the connection, i.e. demultiplex incoming UDP datagrams per
+   incoming connection. _B_ uses the same random string for the username and
+   password of the STUN message from _B_ to _A_.
 
-5. See [Connection Security](#connection-security).
+5. _B_ does not know the TLS fingerprint of _A_. _B_ upgrades the incoming
+   connection from _A_ as an _insecure_ connection, learning _A_'s TLS
+   fingerprint through the WebRTC DTLS handshake. At this point the DTLS
+   handshake provides confidentiality and integrity but not authenticity.
 
-6. See [Multiplexing](#multiplexing).
+6. See [Connection Security](#connection-security).
+
+7. See [Multiplexing](#multiplexing).
 
 #### Open Questions
-
-- How does the server learn the TLS certificate fingerprint of the browser? Is
-  embedding A's TLS certificate fingerprint in A's STUN message USERNAME
-  attribute the best option?
 
 - Is the fact that the server accepts STUN messages from the client prone to
   attacks?
