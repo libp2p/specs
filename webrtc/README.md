@@ -196,11 +196,21 @@ After [Connection Establishment](#connection-establishment):
    _B_'s libp2p identity. See
    [noise-libp2p](https://github.com/libp2p/specs/tree/master/noise).
 
-2. _A_ and _B_ write their TLS certificate fingerprint on the negotiated Noise channel.
+2. _A_ and _B_ write their TLS certificate fingerprint on the negotiated Noise
+   channel as multibase encoded multihashes (see [#addressing]).
 
 3. _A_ and _B_ read the other sides TLS certificate fingerprint on the
    negotiated Noise channel and compare it to the ones verified during the DTLS
    handshake.
+
+   Note: WebRTC supports different hash functions to hash the TLS certificate
+   (see https://datatracker.ietf.org/doc/html/rfc8122#section-5). The hash
+   function used in WebRTC, the hash function used for the hash exchanged in the
+   additional Noise handshake and the hash function used in the multiaddr
+   `/certhash` component MUST be the same. On mismatch the final Noise handshake
+   MUST fail.
+
+
 
 ### Open Questions
 
