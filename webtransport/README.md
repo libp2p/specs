@@ -48,12 +48,10 @@ The first stream that the client opens on a new WebTransport session is used to 
 In order to verify that the end-to-end encryption of the connection, the peers need to establish that no MITM intercepted the connection. To do so, the client MUST include the certificate hash that was used to establish the connection as payload of the first Noise message (the `e` message). This payload is not encrypted, but the Noise handshake provides integrity protection.
 If the client was willing to accept multiple certificate hashes, but cannot determine which certificate was actually used to establish the connection (this will commonly be the case for browser clients), it MUST include a list of all certificate hashes.
 
-Certificate hashes are encoded using the following protobuf message:
-```proto
-syntax = "proto2";
-
-message WebTransport {
-  repeated bytes cert_hashes = 1;
+Certificate hashes are sent in this CBOR-encoding message:
+```cbor
+{
+  "webtransport-hashes" []byte string
 }
 ```
 
