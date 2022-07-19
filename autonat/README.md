@@ -78,6 +78,12 @@ If all dials fail, the receiver sends a `DialResponse` message with the
 successfully, it sends a `DialResponse` with the `ResponseStatus` `OK`. It
 SHOULD include the address it successfully dialed in its response.
 
+If the receiver elects not to dial any addresses from the message - for example
+because they are invalid, because they resolve to the same host as the receiver,
+because they only include private addresses, because it does not support the
+relevant transports, or because it has no capacity, is sends a `DialResponse`
+message with the `ResponseStatus` `E_DIAL_REFUSED`.
+
 The initiator uses the responses obtained from multiple peers to determine its
 NAT status. If more than 3 peers report a successfully dialed address, the node
 SHOULD assume that it is not located behind a NAT and publicly accessible. On
