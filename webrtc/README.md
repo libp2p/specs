@@ -312,5 +312,6 @@ After [Connection Security](#connection-security):
   works, just that _E_ can only impersonate _A_ when talking to _B_.
 
   Adding a cryptographic identifier of the unique connection (i.e. session) to
-  the fingerprint would protect against this attack. To the best of our
+  the signature (`signature_libp2p_a(fingerprint_a, fingerprint_b,
+  connection_identifier)`) would protect against this attack. To the best of our
   knowledge the browser does not give us access to such identifier.
