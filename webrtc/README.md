@@ -210,8 +210,6 @@ After [Connection Establishment](#connection-establishment):
    `/certhash` component MUST be the same. On mismatch the final Noise handshake
    MUST fail.
 
-
-
 ### Open Questions
 
 - Can a _Browser_ access the fingerprint of its TLS certificate?
@@ -297,8 +295,22 @@ After [Connection Security](#connection-security):
   Note, one can role out a new version of the libp2p WebRTC protocol through a
   new multiaddr protocol, e.g. `/webrtc-2`.
 
-- _Why do an authentication handshake on top of an established WebRTC
-  connection? Why not only exchange signatures of ones TLS fingerprint signed
-  with ones libp2p private key?_
+- _Why exchange fingerprints in an additional authentication handshake on top of
+  an established WebRTC connection? Why not only exchange signatures of ones TLS
+  fingerprints signed with ones libp2p private key on the plain WebRTC
+  connection?_
 
-  This is prone to replay attacks.
+  Once _A_ and _B_ established a WebRTC connection, _A_ sends
+  `signature_libp2p_a(fingerprint_a)` to _B_ and vice versa. While this has the
+  benefit of only requring two messages, thus one round trip, it is prone to a
+  key compromise and replay attack. Say that _E_ is able to attain
+  `signature_libp2p_a(fingerprint_a)` and somehow compromise _A_'s TLS private
+  key, _E_ can now impersonate _A_ without knowing _A_'s libp2p private key.
+
+  If one requires the signatures to contain both fingerprints, e.g.
+  `signature_libp2p_a(fingerprint_a, fingerprint_b)`, the above attack still
+  works, just that _E_ can only impersonate _A_ when talking to _B_.
+
+  Adding a cryptographic identifier of the unique connection (i.e. session) to
+  the fingerprint would protect against this attack. To the best of our
+  knowledge the browser does not give us access to such identifier.
