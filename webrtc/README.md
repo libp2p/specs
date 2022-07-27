@@ -229,6 +229,12 @@ After [Connection Establishment](#connection-establishment):
   words, who is able to write on an established WebRTC connection first? _A_ or
   _B_?
 
+- Instead of exchanging the TLS fingerprints once the Noise handshake finished,
+  could one instead attach the fingerprints to the Noise handshake messages as
+  additional payloads? That would reduce the overall connection establishment
+  latency by one round trip. Would this schema be secure using the Noise XX
+  handshake pattern?
+
 - On the server side, can one derive the TLS certificate in a deterministic way
   based on a node's libp2p private key? Benefit would be that a node only needs
   to persist the libp2p private key and not the TLS key material while still
