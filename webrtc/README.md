@@ -32,13 +32,15 @@ Interest Group: [@marten-seemann]
 
 ## Motivation
 
-1. **No need for valid TLS certificates.** Enable browsers to connect to public
-   server nodes without those server nodes providing a TLS certificate within
-   the browsers trustchain. Note that we can not do this today with our
-   Websocket transport.
+1. **No need for trusted TLS certificates.** Enable browsers to connect to
+   public server nodes without those server nodes providing a TLS certificate
+   within the browsers trustchain. Note that we can not do this today with our
+   Websocket transport as the browser requires the remote to have a trusted TLS
+   certificate. Nor can we establish a plain TCP or QUIC connection from within
+   a browser.
 
 2. **Hole punching in the browser**: Enable two browsers or a browser and a
-   non-public server node to connect.
+   server node to connect even though one or both are behind a NAT / firewall.
 
 ## Requirements
 
