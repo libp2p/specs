@@ -133,11 +133,15 @@ fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
 
 - Do the major WebRTC server implementations support using the same UDP port for
   multiple WebRTC connections, thus requiring multiplexing multiple WebRTC
-  connections on the same UDP port? In particular this came up for NodeJS.
+  connections on the same UDP port?
 
   This is related to [ICE Lite](https://www.rfc-editor.org/rfc/rfc5245), having
   a host only advertise a single address, namely the host address, which is
   assumed to be public.
+
+  The [Go WebRTC](https://github.com/pion/webrtc/) implementation and the [Rust
+  WebRTC](https://github.com/webrtc-rs/webrtc) implementation support this. It
+  is unclear whether this is supported in any of the NodeJS implementations.
 
 - Do the major (Go / Rust / ...) WebRTC implementations allow us to accept a
   WebRTC connection from a remote node without previously receiving an SDP
