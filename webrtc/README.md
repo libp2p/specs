@@ -87,21 +87,32 @@ fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
    via
    [`RTCPeerConnection.setRemoteDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setRemoteDescription).
 
-4. _A_ establishes the connection to _B_. _A_ generates a random string and uses
-   that string as the username (_ufrag_ or _username fragment_) and password in
-   the initial STUN message from _A_ to _B_. The random string can be used by
-   _B_ to identify the connection, i.e. demultiplex incoming UDP datagrams per
-   incoming connection. _B_ uses the same random string for the username and
-   password of the STUN message from _B_ to _A_.
+4. _A_ creates a local offer via
+   [`RTCPeerConnection.createOffer()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createOffer).
+   _A_ generates a random string and sets that string as the username (_ufrag_
+   or _username fragment_) and password on the SDP of the local offer. Finally
+   _A_ sets the modified offer via
+   [`RTCPeerConnection.setLocalDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setLocalDescription).
 
-5. _B_ does not know the TLS fingerprint of _A_. _B_ upgrades the incoming
+   Note that this process, oftentimes referred to as "SDP munging" is disallowed
+   by the specification, but not enforced across the major browsers (Safari,
+   Firefox, Chrome) due to use-cases in the wild. See also
+   https://bugs.chromium.org/p/chromium/issues/detail?id=823036
+
+5. _A_ establishes the connection to _B_. The random string used as a _username_
+   and _password_ can be used by _B_ to identify the connection, i.e.
+   demultiplex incoming UDP datagrams per incoming connection. _B_ uses the same
+   random string for the username and password in the STUN message from _B_ to
+   _A_.
+
+6. _B_ does not know the TLS fingerprint of _A_. _B_ upgrades the incoming
    connection from _A_ as an _insecure_ connection, learning _A_'s TLS
    fingerprint through the WebRTC DTLS handshake. At this point the DTLS
    handshake provides confidentiality and integrity but not authenticity.
 
-6. See [Connection Security](#connection-security).
+7. See [Connection Security](#connection-security).
 
-7. See [Multiplexing](#multiplexing).
+8. See [Multiplexing](#multiplexing).
 
 #### Open Questions
 
