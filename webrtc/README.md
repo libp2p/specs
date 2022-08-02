@@ -211,23 +211,27 @@ authenticate the remote peer by its libp2p identity.
 
 After [Connection Establishment](#connection-establishment):
 
-1. _A_ opens a WebRTC datachannel and starts a Noise handshake using _A_'s and
-   _B_'s libp2p identity. See
+1. _A_ opens a WebRTC datachannel.
+
+2. _A_ starts a Noise `XX` handshake using _A_'s and _B_'s libp2p identity. See
    [noise-libp2p](https://github.com/libp2p/specs/tree/master/noise).
 
-2. _A_ and _B_ write their TLS certificate fingerprint on the negotiated Noise
-   channel as multibase encoded multihashes (see [#addressing]).
+   Instead of exchanging the TLS certificate fingerprints on the established
+   Noise channel once the Noise handshake succeeded, _A_ and _B_ use the [Noise
+   Prologue](https://noiseprotocol.org/noise.html#prologue) mechanism, thus
+   saving one round trip.
 
-3. _A_ and _B_ read the other sides TLS certificate fingerprint on the
-   negotiated Noise channel and compare it to the ones verified during the DTLS
-   handshake.
+   More specifically, _A_ and _B_ set
+   `<MULTIHASH_A_FINGERPRINT><MULTIHASH_B_FINGERPRINT>` (_connection intiator_
+   first, _connection responder_ second) as the Noise _Prologue_ before starting
+   the actual Noise handshake.
 
-   Note: WebRTC supports different hash functions to hash the TLS certificate
-   (see https://datatracker.ietf.org/doc/html/rfc8122#section-5). The hash
-   function used in WebRTC, the hash function used for the hash exchanged in the
-   additional Noise handshake and the hash function used in the multiaddr
-   `/certhash` component MUST be the same. On mismatch the final Noise handshake
-   MUST fail.
+3. See [Multiplexing](#multiplexing).
+
+Note: WebRTC supports different hash functions to hash the TLS certificate (see
+https://datatracker.ietf.org/doc/html/rfc8122#section-5). The hash function used
+in WebRTC and the hash function used in the multiaddr `/certhash` component MUST
+be the same. On mismatch the final Noise handshake MUST fail.
 
 ### Open Questions
 
@@ -247,12 +251,6 @@ After [Connection Establishment](#connection-establishment):
 - Would it be more efficient for _B_ to initiate the Noise handshake? In other
   words, who is able to write on an established WebRTC connection first? _A_ or
   _B_?
-
-- Instead of exchanging the TLS fingerprints once the Noise handshake finished,
-  could one instead attach the fingerprints to the Noise handshake messages as
-  additional payloads? That would reduce the overall connection establishment
-  latency by one round trip. Would this schema be secure using the Noise XX
-  handshake pattern?
 
 - On the server side, can one derive the TLS certificate in a deterministic way
   based on a node's libp2p private key? Benefit would be that a node only needs
