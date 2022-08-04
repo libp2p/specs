@@ -221,10 +221,11 @@ After [Connection Establishment](#connection-establishment):
    Prologue](https://noiseprotocol.org/noise.html#prologue) mechanism, thus
    saving one round trip.
 
-   More specifically, _A_ and _B_ set
-   `<MULTIHASH_A_FINGERPRINT><MULTIHASH_B_FINGERPRINT>` (_connection intiator_
-   first, _connection responder_ second) as the Noise _Prologue_ before starting
-   the actual Noise handshake.
+   More specifically _A_ and _B_ set the Noise _Prologue_ to
+   `libp2p-webrtc-noise:<FINGERPRINTS>` before starting the actual Noise
+   handshake. `<FINGERPRINTS>` is the concatenation of the of the two TLS
+   fingerprints of _A_ and _B_ in their multihash byte representation, sorted in
+   ascending order.
 
 3. See [Multiplexing](#multiplexing).
 
