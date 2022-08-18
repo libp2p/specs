@@ -227,7 +227,9 @@ After [Connection Establishment](#connection-establishment):
    fingerprints of _A_ and _B_ in their multihash byte representation, sorted in
    ascending order.
 
-3. See [Multiplexing](#multiplexing).
+3. On success of the authentication handshake, the used datachannel is
+   closed and the plain WebRTC connection is used with its multiplexing
+   capabilities via datachannels. See [Multiplexing](#multiplexing).
 
 Note: WebRTC supports different hash functions to hash the TLS certificate (see
 https://datatracker.ietf.org/doc/html/rfc8122#section-5). The hash function used
@@ -260,21 +262,50 @@ be the same. On mismatch the final Noise handshake MUST fail.
 
 ## Multiplexing
 
-After [Connection Security](#connection-security):
+Following [Connection Security](#connection-security).
 
-1. On success of the authentication handshake _X_, the used datachannel is
-   closed and the plain WebRTC connection is used with its multiplexing
-   capabilities via datachannels.
+The WebRTC browser APIs do not support half-closing nor resets of streams.
+[`RTCDataChannel.close()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel/close)
+flushes the remaining messages and closes the local write and read side. After
+calling `RTCDataChannel.close()` one can no longer read from the channel. This
+lack of functionality is problematic, given that libp2p protocols running on top
+of transport protocols, like WebRTC, expect to be able to half-close or reset a
+stream. See [Connection Establishment in
+libp2p](https://github.com/libp2p/specs/blob/master/connections/README.md#definitions).
 
-### Open Questions
+To support half-closing and resets of streams, libp2p WebRTC uses message
+framing. Messages on a `RTCDataChannel` are embedded into the Protobuf message
+below and send on the `RTCDataChannel` prefixed with the message length in
+bytes, encoded as an unsigned variable length integer as defined by the
+[multiformats unsigned-varint spec][uvarint-spec].
 
-- Can we use WebRTC’s data channels in _Browser_ to multiplex a single
-  connection, or do we need to run an additional multiplexer (e.g. yamux) on top
-  of a WebRTC connection and WebRTC datachannel? In other words, does WebRTC
-  provide all functionality of a libp2p muxer like Yamux (e.g. flow control)?
+``` proto
+syntax = "proto2";
 
-  Yes, with WebRTC's datachannels running on top of SCTP, there is no need for
-  additional multiplexing.
+package webrtc.pb;
+
+message Message {
+  enum Flag {
+    // The local endpoint will no longer send messages.
+    CLOSE_WRITE = 0;
+    // The local endpoint will no longer read messages.
+    CLOSE_READ = 1;
+    // The local endpoint abruptly terminates the stream. The remote endpoint
+    // may discard any in-flight data.
+    RESET = 2;
+  }
+
+  optional Flag flag=1;
+
+  optional bytes message = 2;
+}
+```
+
+Encoded messages including their length prefix MUST NOT exceed 16kiB to support
+all major browsers. See ["Understanding message size
+limits"](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Using_data_channels#understanding_message_size_limits).
+Implementations MAY choose to send smaller messages, e.g. to reduce delays
+sending _flagged_ messages.
 
 ## General Open Questions
 
@@ -339,3 +370,16 @@ After [Connection Security](#connection-security):
   the signature (`signature_libp2p_a(fingerprint_a, fingerprint_b,
   connection_identifier)`) would protect against this attack. To the best of our
   knowledge the browser does not give us access to such identifier.
+
+- _Why use Protobuf for WebRTC message framing. Why not use our own,
+  potentially smaller encoding schema?_
+
+  The Protobuf framing adds an overhead of 5 bytes. The unsigned-varint prefix
+  adds another 2 bytes. On a large message the overhead is negligible (`(5
+  bytes + 2 bytes) / (16384 bytes - 7 bytes) = 0.000427246`). On a small
+  message, e.g. a multistream-select message with ~40 bytes the overhead is high
+  (`(5 bytes + 2 bytes) / 40 bytes = 0.175`) but likely irrelevant.
+
+  Using Protobuf allows us to evolve the protocol in a backwards compatibile way
+  going forward. Using Protobuf is consisten with the many other libp2p
+  protocols. These benefits outweigh the drawback of additional overhead.
