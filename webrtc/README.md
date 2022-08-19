@@ -62,6 +62,12 @@ The TLS certificate fingerprint in `/certhash` is a
 [multibase](https://github.com/multiformats/multibase) encoded
 [multihash](https://github.com/multiformats/multihash).
 
+For compatibility implementations MUST support hash algorithm
+[`sha-256`](https://github.com/multiformats/multihash) and base encoding
+[`base64url`](https://github.com/multiformats/multibase). Implementations MAY
+support other hash algorithms and base encodings, but they may not be able to
+connect to all other nodes.
+
 ## Connection Establishment
 
 ### Browser to public Server
