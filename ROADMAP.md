@@ -667,6 +667,6 @@ to the rest of the system.
 **Links:**
 
 - [Hole punching long-term
-  vision](https://github.com/mxinden/specs/blob/hole-punching/connections/hole-punching.md).
+  vision](https://github.com/libp2p/specs/blob/master/connections/hole-punching.md).
 
 - [NAT traversal tracking issue](https://github.com/libp2p/specs/issues/312).
