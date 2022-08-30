@@ -74,13 +74,13 @@ Protocol multiplexing is done through [`multistream`](https://github.com/jbenet/
 
 ### 4.2.6 Relay
 
-See [Circuit Relay](/relay).
+See [Circuit Relay](../relay/README.md).
 
 ## 4.3 Distributed Record Store
 
 ### 4.3.1 Record
 
-Follows [IPRS spec](/IPRS.md).
+Follows [IPRS spec](./IPRS.md).
 
 ### 4.3.2 abstract-record-store
 
@@ -96,7 +96,7 @@ Follows [IPRS spec](/IPRS.md).
 
 mDNS-discovery is a Discovery Protocol that uses [mDNS](https://en.wikipedia.org/wiki/Multicast_DNS) over local area networks with zero configuration. Local area network peers are very useful to peer-to-peer protocols, because of their low latency links.
 
-The [mDNS-discovery](discovery/mdns.md) specification describes how to use mDNS to discover other peers.
+The [mDNS-discovery](../discovery/mdns.md) specification describes how to use mDNS to discover other peers.
 
 mDNS-discovery is a standalone protocol and does not depend on any other `libp2p` protocol. mDNS-discovery can yield peers available in the local area network, without relying on other infrastructure. This is particularly useful in intranets, networks disconnected from the Internet backbone, and networks which temporarily lose links.
 
