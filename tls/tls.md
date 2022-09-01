@@ -114,7 +114,11 @@ message PublicKey {
 }
 ```
 
-**TODO: PublicKey.Data looks underspecified. Define precisely how to marshal the key.**
+How the public key is encoded into the `Data` bytes depends on the Key Type.
+- `Ed25519`: Only the 32 bytes of the public key
+- `Secp256k1`: Only the compressed form of the public key. 33 bytes.
+- The rest of the keys are encoded as a [SubjectPublicKeyInfo structure](https://www.rfc-editor.org/rfc/rfc5280.html#section-4.1) in PKIX, ASN.1 DER form.
+
 
 ## Future Extensibility
 
