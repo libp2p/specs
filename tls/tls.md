@@ -1,12 +1,14 @@
 # libp2p TLS Handshake
 
 | Lifecycle Stage | Maturity                 | Status | Latest Revision |
-|-----------------|--------------------------|--------|-----------------|
-| 2A              | Candidate Recommendation | Active | r0, 2019-03-23  |
+| --------------- | ------------------------ | ------ | --------------- |
+| 2A              | Candidate Recommendation | Active | r1, 2022-08-31  |
+
+Current Version: v1.1.0
 
 Authors: [@marten-seemann]
 
-Interest Group: [@Stebalien], [@jacobheun], [@raulk], [@Kubuxu], [@yusefnapora]
+Interest Group: [@Stebalien], [@jacobheun], [@raulk], [@Kubuxu], [@yusefnapora], [@marcopolo]
 
 [@marten-seemann]: https://github.com/marten-seemann
 [@Stebalien]: https://github.com/Stebalien
@@ -14,6 +16,7 @@ Interest Group: [@Stebalien], [@jacobheun], [@raulk], [@Kubuxu], [@yusefnapora]
 [@raulk]: https://github.com/raulk
 [@Kubuxu]: https://github.com/Kubuxu
 [@yusefnapora]: https://github.com/yusefnapora
+[@marcopolo]: https://github.com/marcopolo
 
 
 See the [lifecycle document][lifecycle-spec] for context about maturity level
@@ -21,15 +24,17 @@ and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
 
-## Table of Contents
+## Table of Contents <!-- omit in toc -->
 
 - [libp2p TLS Handshake](#libp2p-tls-handshake)
-    - [Table of Contents](#table-of-contents)
-    - [Introduction](#introduction)
-    - [Handshake Protocol](#handshake-protocol)
-    - [Peer Authentication](#peer-authentication)
-        - [libp2p Public Key Extension](#libp2p-public-key-extension)
-    - [Future Extensibility](#future-extensibility)
+  - [Introduction](#introduction)
+  - [Handshake Protocol](#handshake-protocol)
+  - [Peer Authentication](#peer-authentication)
+    - [libp2p Public Key Extension](#libp2p-public-key-extension)
+  - [SNI](#sni)
+- [Changelog](#changelog)
+  - [V1.1.0](#v110)
+    - [Backwards compatibility](#backwards-compatibility)
 
 ## Introduction
 
@@ -116,8 +121,15 @@ message PublicKey {
 
 **TODO: PublicKey.Data looks underspecified. Define precisely how to marshal the key.**
 
-## Future Extensibility
+## SNI
+Clients MAY use the Server Name Indication (SNI) in the `ClientHello` as defined in [RFC 6066 §3](https://www.rfc-editor.org/rfc/rfc6066#section-3).
 
-Future versions of this handshake protocol MAY use the Server Name Indication (SNI) in the `ClientHello` as defined in [RFC 6066, section 3](https://tools.ietf.org/html/rfc6066) to announce their support for other versions.
 
-In order to keep this flexibility for future versions, clients that only support the version of the handshake defined in this document MUST NOT send any value in the Server Name Indication. Servers that support only this version MUST ignore this field if present.
+# Changelog
+## V1.1.0
+
+Allow Clients to send an [SNI](#sni). Servers MAY use the SNI.
+### Backwards compatibility
+
+- Clients communicating with nodes only speaking `v1.0.0` MUST NOT send an SNI.
+- Servers communicating with nodes only speaking `v1.0.0` MUST ignore the SNI.
