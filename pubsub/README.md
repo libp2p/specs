@@ -75,6 +75,10 @@ You can find information about the PubSub research and notes in the following re
   - [gossipsub](https://github.com/libp2p/specs/tree/master/pubsub/gossipsub#implementation-status)
 - [EpiSub](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/episub.md), an epidemic broadcast tree router (defined 2018, not yet started as of Oct 2018)
 
+## Stream management
+
+Data should be exchanged between peers using two separately negotiated streams, one inbound, one outbound. These streams are treated as unidirectional streams. The outbound stream is used only to write data. The inbound stream is used only to read data.
+
 ## The RPC
 
 All communication between peers happens in the form of exchanging protobuf RPC
