@@ -77,7 +77,10 @@ You can find information about the PubSub research and notes in the following re
 
 ## Stream management
 
-Data should be exchanged between peers using two separately negotiated streams, one inbound, one outbound. These streams are treated as unidirectional streams. The outbound stream is used only to write data. The inbound stream is used only to read data.
+Data should be exchanged between peers using two separately negotiated streams,
+one inbound, one outbound. These streams are treated as unidirectional streams.
+The outbound stream is used only to write data. The inbound stream is used only
+to read data.
 
 ## The RPC
 
