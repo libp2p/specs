@@ -122,13 +122,13 @@ Bootstrap-List is a Discovery Protocol that uses local storage to cache the addr
 
 #### 4.5.1 PubSub
 
-See [`pubsub/`](pubsub/) and [`pubsub/gossipsub/`](pubsub/gossipsub/).
+See [`pubsub/`](../pubsub/README.md) and [`pubsub/gossipsub/`](../pubsub/gossipsub/README.md).
 
 
 ## 4.6 Naming
 
 #### 4.6.1 IPRS
 
-[IPRS spec](/IPRS.md)
+[IPRS spec](./IPRS.md)
 
 #### 4.6.2 IPNS
