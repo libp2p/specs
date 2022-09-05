@@ -302,6 +302,9 @@ message Message {
 }
 ```
 
+The above is adapted from the [QUIC RFC]. When in doubt on the semantics of
+these messages, consult the [QUIC RFC].
+
 Encoded messages including their length prefix MUST NOT exceed 16kiB to support
 all major browsers. See ["Understanding message size
 limits"](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Using_data_channels#understanding_message_size_limits).
@@ -384,3 +387,5 @@ sending _flagged_ messages.
   Using Protobuf allows us to evolve the protocol in a backwards compatibile way
   going forward. Using Protobuf is consisten with the many other libp2p
   protocols. These benefits outweigh the drawback of additional overhead.
+
+[QUIC RFC]: https://www.rfc-editor.org/rfc/rfc9000.html
