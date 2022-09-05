@@ -264,7 +264,8 @@ be the same. On mismatch the final Noise handshake MUST fail.
 
 Following [Connection Security](#connection-security).
 
-The WebRTC browser APIs do not support half-closing nor resets of streams.
+The WebRTC browser APIs do not support half-closing of streams nor resets of the
+sending part of streams.
 [`RTCDataChannel.close()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel/close)
 flushes the remaining messages and closes the local write and read side. After
 calling `RTCDataChannel.close()` one can no longer read from the channel. This
