@@ -23,12 +23,13 @@ Interest Group: [@marten-seemann]
     - [Connection Security](#connection-security)
         - [Open Questions](#open-questions-2)
     - [Multiplexing](#multiplexing)
+        - [Ordering](#ordering)
+        - [Open Questions](#open-questions-3)
     - [General Open Questions](#general-open-questions)
     - [Previous, ongoing and related work](#previous-ongoing-and-related-work)
 - [FAQ](#faq)
 
 <!-- markdown-toc end -->
-
 
 ## Motivation
 
@@ -271,6 +272,13 @@ After [Connection Security](#connection-security):
 1. On success of the authentication handshake _X_, the used datachannel is
    closed and the plain WebRTC connection is used with its multiplexing
    capabilities via datachannels.
+
+### Ordering
+
+As of writing this specification, libp2p supports ordered streams only.
+Implementations MUST NOT change the default value of `ordered` `true` when
+creating a new data channel via
+[`RTCPeerConnection.createDataChannel`](https://www.w3.org/TR/webrtc/#dom-peerconnection-createdatachannel).
 
 ### Open Questions
 
