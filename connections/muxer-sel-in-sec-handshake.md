@@ -142,13 +142,37 @@ selection result is returned, and multistream-selection MUST be performed.
 ## Cross version support
 
 The improved muxer selection approach MUST be inter-operable with pervious
-libp2p versions. 
-In the current implementation of libp2p, the "NextProtos" field is populated with
-a key "libp2p" so that the client and server alwways find that to be the mutal
-protocol. 
+libp2p versions which do not support this improved approach.
+
+### TLS case
+
+In the current version of libp2p, the "NextProtos" field is populated with a
+key "libp2p". By appending the key of "libp2p" to the end of the supported
+muxer list, the TLS handshaking process is not broken when peers run different
+versions of libp2p, because the minimum overlap of the peer's NextProtos sets
+is always satisfied. When one peer runs the old version and the other peer runs
+the version that supports this feature, the negotiated protocol is "libp2p".
+
+In the case "libp2p" is the result of TLS ALPN, an empty result MUST be
+returned to the upgrade process to indicate that no muxer was selected. And the
+upgrade process MUST fall back to the multistream-selection protocol to
+to negotiate the muxer to be selected.
+
+### Noise case
+
+The existing version of libp2p Noise handshake carries empty early data. When a
+version that supports this feature talks to an older version which does not
+support this feature, the muxer selection process on the new version runs
+against an empty string and will return empty muxer selection result.
+
+In the case an empty muxer selection result is returned, the upgrade process
+MUST fall back to the multistream-selection protocol to select the muxer.
 
 ## Security
 
+The muxer list carried in TLS NextProtos field is part of the ClientHello
+message which is not encrypted. This feature will expose the supported muxers
+in plain text, but this is not an weakening of securiy posture.
 ## Protocol coupling
 
 [#426]: https://github.com/libp2p/specs/issues/426
