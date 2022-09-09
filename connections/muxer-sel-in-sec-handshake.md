@@ -19,6 +19,22 @@ and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
 
+## Table of Contents
+
+- [Muxer selection in security handshake](#Muxer-selection-in-security-handshake)
+    - [Table of Contents](#table-of-contents)
+    - [Overview](#overview)
+    - [Design])(#Design)
+        - [Current connection upgrade process](#current-connection-upgrade-process)
+        - [Improved muxer selection](#improved-muxer-selection)
+            - [Muxer selection over TLS](#muxer-selection-over-tls)
+            - [Muxer selection over Noise](#muxer-selection-over-noise)
+    - [Cross version support](#cross-version-support)
+        - [TLS case](#tls-case)
+        - [Noise case](#noise-case)
+    - [Security](#security)
+    - [Protocol coupling](#protocol-coupling)
+
 ## Overview
 
 This document discribes an imporvement on the connection upgrade process. The
@@ -31,11 +47,11 @@ The proposed solution saves the RTT of multistream selection for muxers.
 For more context and the status of this work, please refer to [#426]
 
 
-## The design
+## Design
 
-### Current connection upgrade
+### Current connection upgrade process
 
-The current connection upgrade process is described in detail in [connections]
+The current connection upgrade process is described in detail in [connections].
 As shown in this [sequence-chart], after a network connection is established,
 the following will happen to upgrade the conntection to a capable connection.
 
@@ -101,7 +117,7 @@ the muxer.
 (TBD: in some cases early abortion is desireable)
 
 
-## Muxer selection over Noise
+### Muxer selection over Noise
 
 The libp2p Noise implementation allows the Noise handshake process to carry
 early data. [Noise-Early-Data] is carried in the second and third message of
@@ -141,7 +157,7 @@ selection result is returned, and multistream-selection MUST be performed.
 
 ## Cross version support
 
-The improved muxer selection approach MUST be inter-operable with pervious
+The improved muxer selection approach MUST be interoperable with pervious
 libp2p versions which do not support this improved approach.
 
 ### TLS case
@@ -172,15 +188,29 @@ MUST fall back to the multistream-selection protocol to select the muxer.
 
 The muxer list carried in TLS NextProtos field is part of the ClientHello
 message which is not encrypted. This feature will expose the supported muxers
-in plain text, but this is not an weakening of securiy posture.
+in plain text, but this is not a weakening of securiy posture. In the fuure
+when [ECH] is ready the muxer info can be protected too.
+
+The early data in Noise handshake is encrypted so that the muxer info carried
+over is protected. These is no security weakening in this case either.
+
+
 ## Protocol coupling
+
+This feature aggregates the multistream-selecion function and security
+handshake function. From function separation point of view, it introduces
+coupling between different functions. But the argument is that in the case of
+libp2p, the muxer and security are always needed at the same time, and it is a
+small price to pay to gain efficiency by ruducing one RTT.
+
+
 
 [#426]: https://github.com/libp2p/specs/issues/426
 [connections]: https://github.com/libp2p/specs/tree/master/connections
-[sequnce-chart]: https://github.com/libp2p/specs/tree/master/connections#upgrading-connections
+[sequence-chart]: https://github.com/libp2p/specs/tree/master/connections#upgrading-connections
 [ALPN]: https://datatracker.ietf.org/doc/html/rfc7301
 [Noise-Early-Data]: https://github.com/libp2p/specs/tree/master/noise#the-libp2p-handshake-payload
-
+[ECH]: https://datatracker.ietf.org/doc/draft-ietf-tls-esni/
 
 
 
