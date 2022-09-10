@@ -50,7 +50,7 @@ Key encodings and message signing semantics are covered below.
 
 ## Keys
 
-Libp2p encodes keys in a [protobuf](https://github.com/libp2p/go-libp2p-core/blob/master/crypto/pb/crypto.proto)
+Libp2p encodes keys in a [protobuf](https://github.com/libp2p/go-libp2p/blob/master/core/crypto/pb/crypto.proto)
 containing a key _type_ and the encoded key (where the encoding depends on the type).
 
 Specifically:
@@ -247,7 +247,7 @@ To decode a peer ID:
 Examples:
 
 - `bafzbeie5745rpv2m6tjyuugywy4d5ewrqgqqhfnf445he3omzpjbx5xqxe` -- Peer ID (sha256) encoded as a CID
-  ([inspect](http://cid.ipfs.io/#bafzbeie5745rpv2m6tjyuugywy4d5ewrqgqqhfnf445he3omzpjbx5xqxe)).
+  ([inspect](http://cid.ipfs.tech/#bafzbeie5745rpv2m6tjyuugywy4d5ewrqgqqhfnf445he3omzpjbx5xqxe)).
 - `QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N` -- Peer ID (sha256) encoded as a raw base58btc multihash.
 - `12D3KooWD3eckifWpRn9wQpMG9R9hX3sD158z7EqHWmweQAJU5SA` -- Peer ID (ed25519, using the "identity" multihash) encoded as a raw base58btc multihash.
 
