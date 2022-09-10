@@ -297,7 +297,7 @@ message Message {
     STOP_SENDING = 1;
     // The sender abruptly terminates the sending part of the stream. The
     // receiver can discard any data that it already received on that stream.
-    RESET = 2;
+    RESET_STREAM = 2;
   }
 
   optional Flag flag=1;
