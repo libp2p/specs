@@ -280,6 +280,9 @@ below and sent on the `RTCDataChannel` prefixed with the message length in
 bytes, encoded as an unsigned variable length integer as defined by the
 [multiformats unsigned-varint spec][uvarint-spec].
 
+It is an adaptation from the [QUIC RFC]. When in doubt on the semantics of
+these messages, consult the [QUIC RFC].
+
 ``` proto
 syntax = "proto2";
 
@@ -303,8 +306,9 @@ message Message {
 }
 ```
 
-The above is adapted from the [QUIC RFC]. When in doubt on the semantics of
-these messages, consult the [QUIC RFC].
+Note that "a STOP_SENDING frame requests that the receiving endpoint send a
+RESET_STREAM frame.". See [QUIC RFC - 3.5 Solicited State
+Transitions](https://www.rfc-editor.org/rfc/rfc9000.html#section-3.5).
 
 Encoded messages including their length prefix MUST NOT exceed 16kiB to support
 all major browsers. See ["Understanding message size
