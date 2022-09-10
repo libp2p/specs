@@ -276,7 +276,7 @@ libp2p](https://github.com/libp2p/specs/blob/master/connections/README.md#defini
 
 To support half-closing and resets of streams, libp2p WebRTC uses message
 framing. Messages on a `RTCDataChannel` are embedded into the Protobuf message
-below and send on the `RTCDataChannel` prefixed with the message length in
+below and sent on the `RTCDataChannel` prefixed with the message length in
 bytes, encoded as an unsigned variable length integer as defined by the
 [multiformats unsigned-varint spec][uvarint-spec].
 
@@ -386,7 +386,7 @@ sending _flagged_ messages.
   (`(5 bytes + 2 bytes) / 40 bytes = 0.175`) but likely irrelevant.
 
   Using Protobuf allows us to evolve the protocol in a backwards compatibile way
-  going forward. Using Protobuf is consisten with the many other libp2p
+  going forward. Using Protobuf is consistent with the many other libp2p
   protocols. These benefits outweigh the drawback of additional overhead.
 
 [QUIC RFC]: https://www.rfc-editor.org/rfc/rfc9000.html
