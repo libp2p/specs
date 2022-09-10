@@ -275,9 +275,9 @@ After [Connection Security](#connection-security):
 
 ### Ordering
 
-As of writing this specification, libp2p supports ordered streams only.
-Implementations MUST NOT change the default value of `ordered` `true` when
-creating a new data channel via
+Implementations MAY expose an unordered byte stream abstraction to the user by
+overriding the default value of `ordered` `true` to `false` when creating a new
+data channel via
 [`RTCPeerConnection.createDataChannel`](https://www.w3.org/TR/webrtc/#dom-peerconnection-createdatachannel).
 
 ### Open Questions
