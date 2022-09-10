@@ -23,12 +23,12 @@ Interest Group: [@marten-seemann]
     - [Connection Security](#connection-security)
         - [Open Questions](#open-questions-2)
     - [Multiplexing](#multiplexing)
+        - [Ordering](#ordering)
     - [General Open Questions](#general-open-questions)
     - [Previous, ongoing and related work](#previous-ongoing-and-related-work)
 - [FAQ](#faq)
 
 <!-- markdown-toc end -->
-
 
 ## Motivation
 
@@ -61,6 +61,12 @@ Examples:
 The TLS certificate fingerprint in `/certhash` is a
 [multibase](https://github.com/multiformats/multibase) encoded
 [multihash](https://github.com/multiformats/multihash).
+
+For compatibility implementations MUST support hash algorithm
+[`sha-256`](https://github.com/multiformats/multihash) and base encoding
+[`base64url`](https://github.com/multiformats/multibase). Implementations MAY
+support other hash algorithms and base encodings, but they may not be able to
+connect to all other nodes.
 
 ## Connection Establishment
 
@@ -315,6 +321,13 @@ all major browsers. See ["Understanding message size
 limits"](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Using_data_channels#understanding_message_size_limits).
 Implementations MAY choose to send smaller messages, e.g. to reduce delays
 sending _flagged_ messages.
+
+### Ordering
+
+Implementations MAY expose an unordered byte stream abstraction to the user by
+overriding the default value of `ordered` `true` to `false` when creating a new
+data channel via
+[`RTCPeerConnection.createDataChannel`](https://www.w3.org/TR/webrtc/#dom-peerconnection-createdatachannel).
 
 ## General Open Questions
 
