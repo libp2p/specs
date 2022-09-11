@@ -20,10 +20,10 @@ Interest Group: [@marten-seemann]
             - [Open Questions](#open-questions)
         - [Browser to Browser](#browser-to-browser)
             - [Open Questions](#open-questions-1)
-    - [Connection Security](#connection-security)
-        - [Open Questions](#open-questions-2)
     - [Multiplexing](#multiplexing)
         - [Ordering](#ordering)
+    - [Connection Security](#connection-security)
+        - [Open Questions](#open-questions-2)
     - [General Open Questions](#general-open-questions)
     - [Previous, ongoing and related work](#previous-ongoing-and-related-work)
 - [FAQ](#faq)
@@ -116,9 +116,11 @@ fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
    fingerprint through the WebRTC DTLS handshake. At this point the DTLS
    handshake provides confidentiality and integrity but not authenticity.
 
-7. See [Connection Security](#connection-security).
+7. Messages on an `RTCDataChannel` are framed using the message framing
+   mechanism described in [Multiplexing](#multiplexing).
 
-8. See [Multiplexing](#multiplexing).
+7. The remote is authenticated via an additional Noise handshake. See
+   [Connection Security](#connection-security).
 
 #### Open Questions
 
@@ -210,65 +212,7 @@ server node _R_.
   could they exchange their multiaddr and construct the remote's SDP packet
   based on it?
 
-## Connection Security
-
-While WebRTC offers confidentiality and integrity via TLS, one still needs to
-authenticate the remote peer by its libp2p identity.
-
-After [Connection Establishment](#connection-establishment):
-
-1. _A_ opens a WebRTC datachannel.
-
-2. _A_ starts a Noise `XX` handshake using _A_'s and _B_'s libp2p identity. See
-   [noise-libp2p](https://github.com/libp2p/specs/tree/master/noise).
-
-   Instead of exchanging the TLS certificate fingerprints on the established
-   Noise channel once the Noise handshake succeeded, _A_ and _B_ use the [Noise
-   Prologue](https://noiseprotocol.org/noise.html#prologue) mechanism, thus
-   saving one round trip.
-
-   More specifically _A_ and _B_ set the Noise _Prologue_ to
-   `libp2p-webrtc-noise:<FINGERPRINTS>` before starting the actual Noise
-   handshake. `<FINGERPRINTS>` is the concatenation of the of the two TLS
-   fingerprints of _A_ and _B_ in their multihash byte representation, sorted in
-   ascending order.
-
-3. On success of the authentication handshake, the used datachannel is
-   closed and the plain WebRTC connection is used with its multiplexing
-   capabilities via datachannels. See [Multiplexing](#multiplexing).
-
-Note: WebRTC supports different hash functions to hash the TLS certificate (see
-https://datatracker.ietf.org/doc/html/rfc8122#section-5). The hash function used
-in WebRTC and the hash function used in the multiaddr `/certhash` component MUST
-be the same. On mismatch the final Noise handshake MUST fail.
-
-### Open Questions
-
-- Can a _Browser_ access the fingerprint of its TLS certificate?
-
-  Chrome allows you to access the fingerprint of any locally-created certificate
-  directly via `RTCCertificate#getFingerprints`. Firefox does not allow you to
-  do so. Browser compatibility can be found
-  [here](https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate). In
-  practice, this is not an issue since the fingerprint is embedded in the local
-  SDP string.
-
-- Is the above proposed additional handshake secure? See also alternative
-  proposed Handshake for
-  [WebTransport](https://github.com/libp2p/specs/pull/404).
-
-- Would it be more efficient for _B_ to initiate the Noise handshake? In other
-  words, who is able to write on an established WebRTC connection first? _A_ or
-  _B_?
-
-- On the server side, can one derive the TLS certificate in a deterministic way
-  based on a node's libp2p private key? Benefit would be that a node only needs
-  to persist the libp2p private key and not the TLS key material while still
-  maintaining a fixed TLS certificate fingerprint.
-
 ## Multiplexing
-
-Following [Connection Security](#connection-security).
 
 The WebRTC browser APIs do not support half-closing of streams nor resets of the
 sending part of streams.
@@ -328,6 +272,65 @@ Implementations MAY expose an unordered byte stream abstraction to the user by
 overriding the default value of `ordered` `true` to `false` when creating a new
 data channel via
 [`RTCPeerConnection.createDataChannel`](https://www.w3.org/TR/webrtc/#dom-peerconnection-createdatachannel).
+
+## Connection Security
+
+Note that the below uses the message framing described in
+[multiplexing](#multiplexing).
+
+While WebRTC offers confidentiality and integrity via TLS, one still needs to
+authenticate the remote peer by its libp2p identity.
+
+After [Connection Establishment](#connection-establishment):
+
+1. _A_ opens a WebRTC datachannel.
+
+2. _A_ starts a Noise `XX` handshake using _A_'s and _B_'s libp2p identity. See
+   [noise-libp2p](https://github.com/libp2p/specs/tree/master/noise).
+
+   Instead of exchanging the TLS certificate fingerprints on the established
+   Noise channel once the Noise handshake succeeded, _A_ and _B_ use the [Noise
+   Prologue](https://noiseprotocol.org/noise.html#prologue) mechanism, thus
+   saving one round trip.
+
+   More specifically _A_ and _B_ set the Noise _Prologue_ to
+   `libp2p-webrtc-noise:<FINGERPRINTS>` before starting the actual Noise
+   handshake. `<FINGERPRINTS>` is the concatenation of the of the two TLS
+   fingerprints of _A_ and _B_ in their multihash byte representation, sorted in
+   ascending order.
+
+3. On success of the authentication handshake, the used datachannel is
+   closed and the plain WebRTC connection is used with its multiplexing
+   capabilities via datachannels. See [Multiplexing](#multiplexing).
+
+Note: WebRTC supports different hash functions to hash the TLS certificate (see
+https://datatracker.ietf.org/doc/html/rfc8122#section-5). The hash function used
+in WebRTC and the hash function used in the multiaddr `/certhash` component MUST
+be the same. On mismatch the final Noise handshake MUST fail.
+
+### Open Questions
+
+- Can a _Browser_ access the fingerprint of its TLS certificate?
+
+  Chrome allows you to access the fingerprint of any locally-created certificate
+  directly via `RTCCertificate#getFingerprints`. Firefox does not allow you to
+  do so. Browser compatibility can be found
+  [here](https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate). In
+  practice, this is not an issue since the fingerprint is embedded in the local
+  SDP string.
+
+- Is the above proposed additional handshake secure? See also alternative
+  proposed Handshake for
+  [WebTransport](https://github.com/libp2p/specs/pull/404).
+
+- Would it be more efficient for _B_ to initiate the Noise handshake? In other
+  words, who is able to write on an established WebRTC connection first? _A_ or
+  _B_?
+
+- On the server side, can one derive the TLS certificate in a deterministic way
+  based on a node's libp2p private key? Benefit would be that a node only needs
+  to persist the libp2p private key and not the TLS key material while still
+  maintaining a fixed TLS certificate fingerprint.
 
 ## General Open Questions
 
