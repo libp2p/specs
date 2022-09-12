@@ -24,11 +24,12 @@ and spec status.
 - [Muxer selection in security handshake](#Muxer-selection-in-security-handshake)
     - [Table of Contents](#table-of-contents)
     - [Overview](#overview)
-    - [Design])(#Design)
+    - [Design])(#design)
         - [Current connection upgrade process](#current-connection-upgrade-process)
         - [Improved muxer selection](#improved-muxer-selection)
             - [Muxer selection over TLS](#muxer-selection-over-tls)
             - [Muxer selection over Noise](#muxer-selection-over-noise)
+                - [Early data specification](#early-data-specification)
     - [Cross version support](#cross-version-support)
         - [TLS case](#tls-case)
         - [Noise case](#noise-case)
@@ -66,11 +67,11 @@ tunnel
 ## Improved muxer selection
 
 The security protocol's ability of supporting higher level abstract protocol
-negotiation (for example, TLS's support of NextProtos, and Noise's support of
-Early Data) makes it possible to collapse the step 2 and step 3 in the
-previous section into one step. Muxer selection can be performed as part of
-the security protocol handshake, thus there is no need to perform another
-mutistream-selection negotiation for muxer selection.
+negotiation (for example, TLS's support of ALPN, and Noise's support of Early
+Data) makes it possible to collapse the step 2 and step 3 in the previous
+section into one step. Muxer selection can be performed as part of the security
+protocol handshake, thus there is no need to perform another mutistream
+-selection negotiation for muxer selection.
 
 In order to achieve the above stated goal, each candidate muxer will be
 represented by a protocol name/code, and the candidate muxers are supplied to
@@ -114,19 +115,17 @@ If the selected NextProto is "libp2p" then the muxer selection process returns
 an empty result, and the multistream-selection protocol MUST be run to negotiate
 the muxer.
 
-(TBD: in some cases early abortion is desireable)
-
 
 ### Muxer selection over Noise
 
 The libp2p Noise implementation allows the Noise handshake process to carry
 early data. [Noise-Early-Data] is carried in the second and third message of
-the handshake pattern:
+the handshake pattern as illustrated in the following message sequence chart.
 
     XX:
     -> e
-    <- e, ee, s, es
-    -> s, se
+    <- e, ee, s, es, _early-data_
+    -> s, se, _early-data_
 
 At the end of the handshake pattern, both the client and server have received
 the peer's early data. The Noise protocol does not perform the protocol
@@ -135,13 +134,12 @@ peers.
 
 The muxer selection logic runs out of the Noise handshake process, relying on
 the early data exchanged during the handshake. The early data is delivered in
-the form of a byte string. The supported muxers are passed in space separated
-string codes. An example early data string:
-
-    "yamux/1.0.0 mplux"
-
-The byte string is ordered by preference, with the most prefered muxer at the
-beginning.
+the form of a byte string in the second and third message of the XX handshake
+pattern. 
+ 
+The early data for this purpose is specified in the protobuf in the
+[Early-data-specification] section. The muxers are ordered by preference, with
+the most prefered muxer at the beginning.
 
 After the Noise handshake, the client and server run the muxer selection
 process with the same logic. Each side will go through the server's early
@@ -153,7 +151,34 @@ If the muxer selection process does not find any mutually supported muxer, for
 example, in the case that one early data string is empty, then an empty muxer
 selection result is returned, and multistream-selection MUST be performed.
 
-(TBD: in some cases early abortion is desireable)
+#### Early data specification
+
+The early data message is encoded in the "protobuf2" syntax as shown in the
+following. The protobuf definition is an extension to [handshake-payload]. The
+existing byte array early data (the "data" field) will be replaced by a
+structured EarlyData schema.
+
+ (TBD: verify backward compatiblity)
+
+```protobuf
+syntax = "proto2";
+
+message EarlyData {
+    message Muxer {
+        oneof Muxer {
+            string name = 1;
+        }
+    }
+    repeated Muxer muxers = 2;
+}
+
+message NoiseHandshakePayload {
+	bytes identity_key = 1;
+	bytes identity_sig = 2;
+	EarlyData early_data = 3;
+}
+```
+
 
 ## Cross version support
 
@@ -191,8 +216,10 @@ message which is not encrypted. This feature will expose the supported muxers
 in plain text, but this is not a weakening of securiy posture. In the fuure
 when [ECH] is ready the muxer info can be protected too.
 
-The early data in Noise handshake is encrypted so that the muxer info carried
-over is protected. These is no security weakening in this case either.
+The early data in Noise handshake is only sent afer the peers establish a
+shared key, in the second and third handshake messages in the XX pattern. So
+the early data is encrypted and the muxer info carried over is protected.
+These is no security weakening in this case either.
 
 
 ## Protocol coupling
@@ -211,6 +238,7 @@ small price to pay to gain efficiency by ruducing one RTT.
 [ALPN]: https://datatracker.ietf.org/doc/html/rfc7301
 [Noise-Early-Data]: https://github.com/libp2p/specs/tree/master/noise#the-libp2p-handshake-payload
 [ECH]: https://datatracker.ietf.org/doc/draft-ietf-tls-esni/
+[handshake-payload]: https://github.com/libp2p/specs/tree/master/noise#the-libp2p-handshake-payload
 
 
 
