@@ -101,7 +101,7 @@ For the purpose of muxer selection, the types of muxers are coded as protocol
 names in the form of a list of strings, and inserted in the ALPN "NextProtos"
 field. An example list as following:
 
-    ["yamux/1.0.0", "mplux", "libp2p"]
+    ["yamux/1.0.0", "/mplex/6.7.0", "libp2p"]
 
 The NextProtos list is ordered by preference, with the most prefered muxer at
 the beginning. The "libp2p" protocol code MUST always be the last item in the
@@ -119,20 +119,35 @@ the muxer.
 ### Muxer selection over Noise
 
 The libp2p Noise implementation allows the Noise handshake process to carry
-early data. [Noise-Early-Data] is carried in the second and third message of
-the handshake pattern as illustrated in the following message sequence chart.
+early data. [Noise-Early-Data] is carried in the first and second message of
+the XX handshake pattern as illustrated in the following message sequence chart.
+The first message carries early data in the form of a list of muxers supported
+by the initiator, ordered by preference. The responder goes through the list in
+the order of preference, and finds the first muxer that is mutually supported
+by both the initator and the responder, and then populates the selected muxer
+in the second message, sent by the responder. If no mutually supported muxer is
+found, the early data in the second message is empty.
+
+Example: Noise handshake between peers that have a mutually supported muxer.
+    Initiator supports: ["yamux/1.0.0", "/mplex/6.7.0"]
+    Responder supports: ["yamux/1.0.0"]
 
     XX:
-    -> e
-    <- e, ee, s, es, _early-data_
-    -> s, se, _early-data_
+    -> e ["yamux/1.0.0", "/mplex/6.7.0"]
+    <- e, ee, s, es, ["yamux/1.0.0"]
+    -> s, se, 
 
-At the end of the handshake pattern, both the client and server have received
-the peer's early data. The Noise protocol does not perform the protocol
-selection as TLS does, rather it just delivers the early data to handshaking
-peers.
+Example: Noise handshake between peers that don't have mutually supported
+muxers.
+    Initiator supports: ["/mplex/6.7.0"]
+    Responder supports: ["yamux/1.0.0"]
 
-The muxer selection logic runs out of the Noise handshake process, relying on
+    XX:
+    -> e ["/mplex/6.7.0"]
+    <- e, ee, s, es, []
+    -> s, se, 
+
+The muxer selection logic runs as a plugin of the Noise handshake logic, relying
 the early data exchanged during the handshake. The early data is delivered in
 the form of a byte string in the second and third message of the XX handshake
 pattern. 
@@ -156,26 +171,24 @@ selection result is returned, and multistream-selection MUST be performed.
 The early data message is encoded in the "protobuf2" syntax as shown in the
 following. The protobuf definition is an extension to [handshake-payload]. The
 existing byte array early data (the "data" field) will be replaced by a
-structured EarlyData schema.
+structured NoiseExtension schema. The supported muxers and selected muxer are
+populated in the "stream_muxers" field.
 
  (TBD: verify backward compatiblity)
 
 ```protobuf
 syntax = "proto2";
 
-message EarlyData {
-    message Muxer {
-        oneof Muxer {
-            string name = 1;
-        }
-    }
-    repeated Muxer muxers = 2;
+message NoiseExtension {
+    repeated bytes webtransport_certhashes = 1;
+    optional bytes webrtc_fingerprint = 2;
+    repeated string stream_muxers = 3; 
 }
 
 message NoiseHandshakePayload {
 	bytes identity_key = 1;
 	bytes identity_sig = 2;
-	EarlyData early_data = 3;
+	NoiseExtension noise_extension = 3;
 }
 ```
 
