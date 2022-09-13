@@ -119,7 +119,7 @@ fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
 7. Messages on an `RTCDataChannel` are framed using the message framing
    mechanism described in [Multiplexing](#multiplexing).
 
-7. The remote is authenticated via an additional Noise handshake. See
+8. The remote is authenticated via an additional Noise handshake. See
    [Connection Security](#connection-security).
 
 #### Open Questions
