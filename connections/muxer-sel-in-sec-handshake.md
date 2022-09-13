@@ -24,7 +24,7 @@ and spec status.
 - [Muxer selection in security handshake](#Muxer-selection-in-security-handshake)
     - [Table of Contents](#table-of-contents)
     - [Overview](#overview)
-    - [Design])(#design)
+    - [Design](#design)
         - [Current connection upgrade process](#current-connection-upgrade-process)
         - [Improved muxer selection](#improved-muxer-selection)
             - [Muxer selection over TLS](#muxer-selection-over-tls)
@@ -241,7 +241,7 @@ This feature aggregates the multistream-selecion function and security
 handshake function. From function separation point of view, it introduces
 coupling between different functions. But the argument is that in the case of
 libp2p, the muxer and security are always needed at the same time, and it is a
-small price to pay to gain efficiency by ruducing one RTT.
+small price to pay to gain efficiency by reducing one RTT.
 
 
 
