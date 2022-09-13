@@ -20,11 +20,10 @@ Interest Group: [@marten-seemann]
             - [Open Questions](#open-questions)
         - [Browser to Browser](#browser-to-browser)
             - [Open Questions](#open-questions-1)
-    - [Connection Security](#connection-security)
-        - [Open Questions](#open-questions-2)
     - [Multiplexing](#multiplexing)
         - [Ordering](#ordering)
-        - [Open Questions](#open-questions-3)
+    - [Connection Security](#connection-security)
+        - [Open Questions](#open-questions-2)
     - [General Open Questions](#general-open-questions)
     - [Previous, ongoing and related work](#previous-ongoing-and-related-work)
 - [FAQ](#faq)
@@ -117,9 +116,11 @@ fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
    fingerprint through the WebRTC DTLS handshake. At this point the DTLS
    handshake provides confidentiality and integrity but not authenticity.
 
-7. See [Connection Security](#connection-security).
+7. Messages on an `RTCDataChannel` are framed using the message framing
+   mechanism described in [Multiplexing](#multiplexing).
 
-8. See [Multiplexing](#multiplexing).
+8. The remote is authenticated via an additional Noise handshake. See
+   [Connection Security](#connection-security).
 
 #### Open Questions
 
@@ -211,7 +212,71 @@ server node _R_.
   could they exchange their multiaddr and construct the remote's SDP packet
   based on it?
 
+## Multiplexing
+
+The WebRTC browser APIs do not support half-closing of streams nor resets of the
+sending part of streams.
+[`RTCDataChannel.close()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel/close)
+flushes the remaining messages and closes the local write and read side. After
+calling `RTCDataChannel.close()` one can no longer read from the channel. This
+lack of functionality is problematic, given that libp2p protocols running on top
+of transport protocols, like WebRTC, expect to be able to half-close or reset a
+stream. See [Connection Establishment in
+libp2p](https://github.com/libp2p/specs/blob/master/connections/README.md#definitions).
+
+To support half-closing and resets of streams, libp2p WebRTC uses message
+framing. Messages on a `RTCDataChannel` are embedded into the Protobuf message
+below and sent on the `RTCDataChannel` prefixed with the message length in
+bytes, encoded as an unsigned variable length integer as defined by the
+[multiformats unsigned-varint spec][uvarint-spec].
+
+It is an adaptation from the [QUIC RFC]. When in doubt on the semantics of
+these messages, consult the [QUIC RFC].
+
+``` proto
+syntax = "proto2";
+
+package webrtc.pb;
+
+message Message {
+  enum Flag {
+    // The sender will no longer send messages on the stream.
+    FIN = 0;
+    // The sender will no longer read messages on the stream. Incoming data is
+    // being discarded on receipt.
+    STOP_SENDING = 1;
+    // The sender abruptly terminates the sending part of the stream. The
+    // receiver can discard any data that it already received on that stream.
+    RESET_STREAM = 2;
+  }
+
+  optional Flag flag=1;
+
+  optional bytes message = 2;
+}
+```
+
+Note that "a STOP_SENDING frame requests that the receiving endpoint send a
+RESET_STREAM frame.". See [QUIC RFC - 3.5 Solicited State
+Transitions](https://www.rfc-editor.org/rfc/rfc9000.html#section-3.5).
+
+Encoded messages including their length prefix MUST NOT exceed 16kiB to support
+all major browsers. See ["Understanding message size
+limits"](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Using_data_channels#understanding_message_size_limits).
+Implementations MAY choose to send smaller messages, e.g. to reduce delays
+sending _flagged_ messages.
+
+### Ordering
+
+Implementations MAY expose an unordered byte stream abstraction to the user by
+overriding the default value of `ordered` `true` to `false` when creating a new
+data channel via
+[`RTCPeerConnection.createDataChannel`](https://www.w3.org/TR/webrtc/#dom-peerconnection-createdatachannel).
+
 ## Connection Security
+
+Note that the below uses the message framing described in
+[multiplexing](#multiplexing).
 
 While WebRTC offers confidentiality and integrity via TLS, one still needs to
 authenticate the remote peer by its libp2p identity.
@@ -234,7 +299,9 @@ After [Connection Establishment](#connection-establishment):
    fingerprints of _A_ and _B_ in their multihash byte representation, sorted in
    ascending order.
 
-3. See [Multiplexing](#multiplexing).
+3. On success of the authentication handshake, the used datachannel is
+   closed and the plain WebRTC connection is used with its multiplexing
+   capabilities via datachannels. See [Multiplexing](#multiplexing).
 
 Note: WebRTC supports different hash functions to hash the TLS certificate (see
 https://datatracker.ietf.org/doc/html/rfc8122#section-5). The hash function used
@@ -264,31 +331,6 @@ be the same. On mismatch the final Noise handshake MUST fail.
   based on a node's libp2p private key? Benefit would be that a node only needs
   to persist the libp2p private key and not the TLS key material while still
   maintaining a fixed TLS certificate fingerprint.
-
-## Multiplexing
-
-After [Connection Security](#connection-security):
-
-1. On success of the authentication handshake _X_, the used datachannel is
-   closed and the plain WebRTC connection is used with its multiplexing
-   capabilities via datachannels.
-
-### Ordering
-
-Implementations MAY expose an unordered byte stream abstraction to the user by
-overriding the default value of `ordered` `true` to `false` when creating a new
-data channel via
-[`RTCPeerConnection.createDataChannel`](https://www.w3.org/TR/webrtc/#dom-peerconnection-createdatachannel).
-
-### Open Questions
-
-- Can we use WebRTC’s data channels in _Browser_ to multiplex a single
-  connection, or do we need to run an additional multiplexer (e.g. yamux) on top
-  of a WebRTC connection and WebRTC datachannel? In other words, does WebRTC
-  provide all functionality of a libp2p muxer like Yamux (e.g. flow control)?
-
-  Yes, with WebRTC's datachannels running on top of SCTP, there is no need for
-  additional multiplexing.
 
 ## General Open Questions
 
@@ -353,3 +395,18 @@ data channel via
   the signature (`signature_libp2p_a(fingerprint_a, fingerprint_b,
   connection_identifier)`) would protect against this attack. To the best of our
   knowledge the browser does not give us access to such identifier.
+
+- _Why use Protobuf for WebRTC message framing. Why not use our own,
+  potentially smaller encoding schema?_
+
+  The Protobuf framing adds an overhead of 5 bytes. The unsigned-varint prefix
+  adds another 2 bytes. On a large message the overhead is negligible (`(5
+  bytes + 2 bytes) / (16384 bytes - 7 bytes) = 0.000427246`). On a small
+  message, e.g. a multistream-select message with ~40 bytes the overhead is high
+  (`(5 bytes + 2 bytes) / 40 bytes = 0.175`) but likely irrelevant.
+
+  Using Protobuf allows us to evolve the protocol in a backwards compatibile way
+  going forward. Using Protobuf is consistent with the many other libp2p
+  protocols. These benefits outweigh the drawback of additional overhead.
+
+[QUIC RFC]: https://www.rfc-editor.org/rfc/rfc9000.html
