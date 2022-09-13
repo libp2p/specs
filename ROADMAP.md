@@ -544,7 +544,7 @@ Progressing with this work entails designing the abstractions, and
 implementing, at least, a UDP transport, [as the community has
 demanded](https://github.com/libp2p/go-libp2p/issues/353).
 
-**Why?** Current the libp2p API precludes us from modelling
+**Why?** Currently the libp2p API precludes us from modelling
 message-oriented transports like UDP or Bluetooth.
 
 ### ☎️ Reducing the dial fail rate
