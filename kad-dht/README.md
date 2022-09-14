@@ -75,12 +75,12 @@ nodes, unrestricted nodes should operate in _server mode_ and restricted nodes,
 e.g. those with intermittent availability, high latency, low bandwidth, low
 CPU/RAM/Storage, etc., should operate in _client mode_.
 
-As an example, running the libp2p Kademlia protocol on top of the Internet,
-publicly routable nodes, e.g. servers in a datacenter, might operate in _server
+As an example, running the libp2p Kademlia protocol on top of
+publicly routable nodes, e.g. servers in a datacenter, should operate in _server
 mode_ and non-publicly routable nodes, e.g. laptops behind a NAT and firewall,
-might operate in _client mode_. The concrete factors used to classify nodes into
+should operate in _client mode_. The concrete factors used to classify nodes into
 _clients_ and _servers_ depend on the characteristics of the network topology
-and the properties of the Kademlia DHT . Factors to take into account are e.g.
+and the properties of the Kademlia DHT. Factors to take into account are e.g.
 network size, replication factor and republishing period.
 
 Nodes, both those operating in _client_ and _server mode_, add another node to
@@ -228,7 +228,7 @@ Then we loop:
                becomes the new best peer (`Pb`).
 			2. If the new value loses, we add the current peer to `Po`.
 	2. If successful with or without a value, the response will contain the
-       closest nodes the peer knows to the key `Key`. Add them to the candidate
+       closest nodes the peer knows to the `Key`. Add them to the candidate
        list `Pn`, except for those that have already been queried.
 	3. If an error or timeout occurs, discard it.
 4. Go to 1.
@@ -256,7 +256,7 @@ type Validator interface {
 ```
 
 `Validate()` should be a pure function that reports the validity of a record. It
-may validate a cryptographic signature, or else. It is called on two occasions:
+may validate a cryptographic signature, or similar. It is called on two occasions:
 
 1. To validate values retrieved in a `GET_VALUE` query.
 2. To validate values received in a `PUT_VALUE` query before storing them in the
@@ -268,23 +268,55 @@ heuristic of the value to make the decision.
 
 ### Content provider advertisement and discovery
 
-Nodes must keep track of which nodes advertise that they provide a given key
-(CID). These provider advertisements should expire, by default, after 24 hours.
-These records are managed through the `ADD_PROVIDER` and `GET_PROVIDERS`
+There are two things at play with regard to provider record (and therefore content)
+liveness and reachability:
+
+Content providers need to make sure that their content is reachable, despite peer churn
+and nodes that store and serve provider records need to make sure that the CIDs whose 
+records they store are still served by the content provider.
+
+The following two parameters help cover both of these cases.
+1. **Provider Record Republish Interval (24hrs):** The content provider 
+needs to make sure that the nodes chosen to store the provider record 
+remain online when clients ask for the record. In order to 
+guarantee this, while taking into account the peer churn, content providers
+republish the records they want to provide every 24 hours.
+2. **Provider Record Expiration Interval (48hrs):** The network needs to provide
+content that content providers are still interested in providing. In other words,
+nodes should not keep records for content that content providers have stopped 
+providing (aka stale records). In order to guarantee this, provider records 
+_expire_ after 48 hours, i.e., nodes stop serving those records, 
+unless the content provider has republished the provider record.
+
+The values chosen for those parameters should be subject to continuous monitoring 
+and investigation. Ultimately, the values of those parameters should balance 
+the tradeoff between provider record liveness (due to node churn) and traffic overhead
+(to republish records).
+The latest parameters are based on the comprehensive study published
+in [provider-record-measurements].
+
+Provider records are managed through the `ADD_PROVIDER` and `GET_PROVIDERS`
 messages.
 
 #### Content provider advertisement
 
 When the local node wants to indicate that it provides the value for a given
-key, the DHT finds the closest peers to the key using the `FIND_NODE` RPC (see
+key, the DHT finds the (`k` = 20) closest peers to the key using the `FIND_NODE` RPC (see
 [peer routing section](#peer-routing)), and then sends an `ADD_PROVIDER` RPC with
-its own `PeerInfo` to each of these peers.
+its own `PeerInfo` to each of these peers. The study in [provider-record-measurements]
+proved that the replication factor of `k` = 20 is a good setting, although continuous
+monitoring and investigation.
 
 Each peer that receives the `ADD_PROVIDER` RPC should validate that the received
 `PeerInfo` matches the sender's `peerID`, and if it does, that peer should store
 the `PeerInfo` in its datastore. Implementations may choose to not store the
 addresses of the providing peer e.g. to reduce the amount of required storage or
-to prevent storing potentially outdated address information.
+to prevent storing potentially outdated address information. In the current implementation
+peers keep the network address (i.e., the `multiaddress`) of the providing peer for **the
+first 10 mins** after the provider record (re-)publication. The setting of 10 mins follows
+the DHT Routing Table refresh interval. After that, peers provide 
+the provider's `peerID` only, in order to avoid pointing to stale network addresses 
+(i.e., the case where the peer has moved to a new network address).
 
 #### Content provider discovery
 
@@ -470,3 +502,5 @@ multiaddrs are stored in the node's peerbook.
 [ping]: https://github.com/libp2p/specs/issues/183
 
 [go-libp2p-xor]: https://github.com/libp2p/go-libp2p-xor
+
+[provider-record-measurements]: https://github.com/protocol/network-measurements/blob/master/results/rfm17-provider-record-liveness.md
