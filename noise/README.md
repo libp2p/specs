@@ -52,12 +52,6 @@ and spec status.
 - [Noise Protocol Name](#noise-protocol-name)
 - [Wire Format](#wire-format)
 - [Encryption and I/O](#encryption-and-io)
-- [libp2p Interfaces and API](#libp2p-interfaces-and-api)
-  - [Initialization](#initialization)
-  - [Secure Transport Interface](#secure-transport-interface)
-    - [NoiseConnection](#noiseconnection)
-    - [SecureOutbound](#secureoutbound)
-    - [SecureInbound](#secureinbound)
 - [Design Considerations](#design-considerations)
   - [No Negotiation of Noise Protocols](#no-negotiation-of-noise-protocols)
   - [Why the XX handshake pattern?](#why-the-xx-handshake-pattern)
@@ -114,10 +108,6 @@ protocol used to exchange them is described in the [Wire Format
 section](#wire-format). The cryptographic primitives used to secure the channel
 are described in the [Cryptographic Primitives
 section](#cryptographic-primitives).
-
-The [libp2p Interfaces and API section](#libp2p-interfaces-and-api) goes into
-detail about how noise-libp2p integrates with the libp2p framework and offers a
-suggested API for implementations to adapt to their respective language idioms.
 
 ## Negotiation
 
@@ -362,96 +352,6 @@ spec][npf-message-format].
 In the unlikely event that peers exchange more than `2^64 - 1` messages, they
 MUST terminate the connection to avoid reusing nonces, in accordance with the
 [Noise spec][npf-security].
-
-## libp2p Interfaces and API
-
-This section describes an abstract API for noise-libp2p. Implementations may
-alter this API to conform to language idioms or patterns used by the targeted
-libp2p implementation. Examples are written in pseudo-code that vaguely
-resembles Swift.
-
-### Initialization
-
-The noise-libp2p module accepts the following inputs at initialization.
-
-- The private libp2p identity key
-- [optional] An early data payload to be sent in handshake messages
-
-The private libp2p identity key is required for [static key
-authentication](#static-key-authentication) and signing of early data (if
-provided).
-
-Implementations that support sending [early data in handshake
-messages](#libp2p-data-in-handshake-messages) should accept this data at
-initialization time, rather than accepting an early data payload for each new
-connection. This ensures that no user or connection-specific data can be present
-in the early data payload.
-
-A minimal constructor could look like:
-
-``` 
-init(libp2pKey: PrivateKey) -> NoiseLibp2p
-```
-
-While one supporting all options might look like:
-
-```
-init(libp2pKey: PrivateKey, earlyData: ByteStringl) -> NoiseLibp2p
-```
-
-### Secure Transport Interface
-
-noise-libp2p is designed to work with libp2p's **transport upgrade** pattern.
-libp2p security modules conform to a secure transport interface, which provides
-the `SecureOutbound` and `SecureInbound` methods described below.
-
-`SecureOutbound` and `SecureInbound` each accept an `InsecureConnection` and
-return a `NoiseConnection` on success. 
-
-The details of the `InsecureConnection` type are libp2p-implementation
-dependent, but it is assumed to expose a bidirectional, reliable streaming
-interface.
-
-#### NoiseConnection
-
-A `NoiseConnection` must conform to the libp2p secure transport interface in the
-noise-libp2p implementation language by defining `SecureOutbound` and
-`SecureInbound` connections, described below.
-
-In addition to the secure transport interface defined by the libp2p framework, a
-`NoiseConnection` MAY have an additional method to expose early data transmitted
-by the remote peer during the handshake phase, if any. For example:
-
-```
-remoteEarlyData() -> ByteString?
-```
-
-Following a successful handshake, a `NoiseConnection` will transmit and receive
-data over the `InsecureConnection` as described in [Encryption and
-I/O](#encryption-and-io).
-
-#### SecureOutbound
-
-```
-SecureOutbound(insecure: InsecureConnection, remotePeer: PeerId) -> Result<NoiseConnection, Error>
-```
-
-`SecureOutbound` initiates a noise-libp2p connection to `remotePeer` over the
-provided `InsecureConnection`.
-
-The `remotePeer` PeerId argument MUST be validated against the libp2p public
-identity sent by the remote peer during the handshake. If a remote peer sends a
-public key that is not capable of deriving their expected peer id, the
-connection MUST be aborted.
-
-#### SecureInbound
-
-```
-SecureInbound(insecure: InsecureConnection) -> Result<NoiseConnection, Error>
-```
-
-`SecureInbound` attempts to complete a noise-libp2p handshake initiated by a
-remote peer over the given `InsecureConnection`.
 
 ## Design Considerations
 
