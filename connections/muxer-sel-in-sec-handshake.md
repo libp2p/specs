@@ -156,24 +156,9 @@ muxers.
     After handshaking is done, early data processing will find no mutually
     supported muxer, and falls back to multistream-selection protocol.
 
-The muxer selection logic runs as a plugin of the Noise handshake logic, relying
-the early data exchanged during the handshake. The early data is delivered in
-the form of a byte string in the second and third message of the XX handshake
-pattern. 
- 
-The early data for this purpose is specified in the protobuf in the
-[Early-data-specification] section. The muxers are ordered by preference, with
-the most prefered muxer at the beginning.
-
-After the Noise handshake, the client and server run the muxer selection
-process with the same logic. Each side will go through the server's early
-data from most prefered to lest prefered muxer, and if the muxer is in the
-client's early data list, that muxer is selected. The process guarantees that
-both the client and server reaches at the same conclusion of muxer slection.
-
-If the muxer selection process does not find any mutually supported muxer, for
-example, in the case that one early data string is empty, then an empty muxer
-selection result is returned, and multistream-selection MUST be performed.
+The muxer selection logic is run outside of the Noise handshake process. The
+format of he early data for this purpose is specified in the protobuf in the
+[Early-data-specification] section.
 
 #### Early data specification
 
@@ -182,6 +167,9 @@ following. The protobuf definition is an extension to [handshake-payload]. The
 existing byte array early data (the "data" field) will be replaced by a
 structured NoiseExtension schema. The supported muxers and selected muxer are
 populated in the "stream_muxers" field.
+
+The muxers are ordered by preference, with the most prefered muxer at the
+beginning.
 
 ```protobuf
 syntax = "proto2";
@@ -196,7 +184,6 @@ message NoiseHandshakePayload {
 	NoiseExtension noise_extension = 4;
 }
 ```
-
 
 ## Cross version support
 
