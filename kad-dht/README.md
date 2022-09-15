@@ -305,7 +305,7 @@ key, the DHT finds the (`k` = 20) closest peers to the key using the `FIND_NODE`
 [peer routing section](#peer-routing)), and then sends an `ADD_PROVIDER` RPC with
 its own `PeerInfo` to each of these peers. The study in [provider-record-measurements]
 proved that the replication factor of `k` = 20 is a good setting, although continuous
-monitoring and investigation.
+monitoring and investigation may change this recommendation in the future.
 
 Each peer that receives the `ADD_PROVIDER` RPC should validate that the received
 `PeerInfo` matches the sender's `peerID`, and if it does, that peer should store
