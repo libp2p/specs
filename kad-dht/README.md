@@ -272,7 +272,7 @@ There are two things at play with regard to provider record (and therefore conte
 liveness and reachability:
 
 Content providers need to make sure that their content is reachable, despite peer churn
-and nodes that store and serve provider records need to make sure that the CIDs whose 
+and nodes that store and serve provider records need to make sure that the Multihashes whose 
 records they store are still served by the content provider.
 
 The following two parameters help cover both of these cases.
