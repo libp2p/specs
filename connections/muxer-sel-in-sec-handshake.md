@@ -189,15 +189,13 @@ populated in the "stream_muxers" field.
 syntax = "proto2";
 
 message NoiseExtension {
-    repeated bytes webtransport_certhashes = 1;
-    optional bytes webrtc_fingerprint = 2;
     repeated string stream_muxers = 3; 
 }
 
 message NoiseHandshakePayload {
 	bytes identity_key = 1;
 	bytes identity_sig = 2;
-	NoiseExtension noise_extension = 3;
+	NoiseExtension noise_extension = 4;
 }
 ```
 
