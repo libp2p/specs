@@ -311,8 +311,8 @@ Each peer that receives the `ADD_PROVIDER` RPC should validate that the received
 `PeerInfo` matches the sender's `peerID`, and if it does, that peer should store
 the `PeerInfo` in its datastore. Implementations may choose to not store the
 addresses of the providing peer e.g. to reduce the amount of required storage or
-to prevent storing potentially outdated address information. In the current implementation
-peers keep the network address (i.e., the `multiaddress`) of the providing peer for **the
+to prevent storing potentially outdated address information. Implementations that choose
+to keep the network address (i.e., the `multiaddress`) of the providing peer should do it for **the
 first 10 mins** after the provider record (re-)publication. The setting of 10 mins follows
 the DHT Routing Table refresh interval. After that, peers provide 
 the provider's `peerID` only, in order to avoid pointing to stale network addresses 
