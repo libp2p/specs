@@ -183,8 +183,6 @@ existing byte array early data (the "data" field) will be replaced by a
 structured NoiseExtension schema. The supported muxers and selected muxer are
 populated in the "stream_muxers" field.
 
- (TBD: verify backward compatiblity)
-
 ```protobuf
 syntax = "proto2";
 
