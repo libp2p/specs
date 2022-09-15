@@ -122,11 +122,14 @@ The libp2p Noise implementation allows the Noise handshake process to carry
 early data. [Noise-Early-Data] is carried in the first and second message of
 the XX handshake pattern as illustrated in the following message sequence chart.
 The first message carries early data in the form of a list of muxers supported
-by the initiator, ordered by preference. The responder goes through the list in
-the order of preference, and finds the first muxer that is mutually supported
-by both the initator and the responder, and then populates the selected muxer
-in the second message, sent by the responder. If no mutually supported muxer is
-found, the early data in the second message is empty.
+by the initiator, ordered by preference. The responder sends its supported
+muxer list in the second message to the initiator. After the Noise handshake
+process is fully done, the initiator and responder will both process the
+received eraly data and select the muxer to be used, they both iterate through
+the initiator's prefered muxer list in order, and if any muxer is also
+supported by the responder, that muxer is selected. If no mutually supported
+muxer is found, the muxer selection process MUST fall back to multistream
+-selection protocol.
 
 Example: Noise handshake between peers that have a mutually supported muxer.
     Initiator supports: ["yamux/1.0.0", "/mplex/6.7.0"]
@@ -137,6 +140,9 @@ Example: Noise handshake between peers that have a mutually supported muxer.
     <- e, ee, s, es, ["yamux/1.0.0"]
     -> s, se, 
 
+    After handshake is done, both parties can arrive on the same conclusion
+    and select "yamux/1.0.0" as the muxer to use.
+
 Example: Noise handshake between peers that don't have mutually supported
 muxers.
     Initiator supports: ["/mplex/6.7.0"]
@@ -144,8 +150,11 @@ muxers.
 
     XX:
     -> e ["/mplex/6.7.0"]
-    <- e, ee, s, es, []
+    <- e, ee, s, es, ["yamux/1.0.0"]
     -> s, se, 
+    
+    After handshaking is done, early data processing will find no mutually
+    supported muxer, and falls back to multistream-selection protocol.
 
 The muxer selection logic runs as a plugin of the Noise handshake logic, relying
 the early data exchanged during the handshake. The early data is delivered in
