@@ -45,18 +45,8 @@ Example: The WebTransport URL of a WebTransport server advertising `/ip4/1.2.3.4
 Unfortunately, the self-signed certificate doesn't allow the nodes to authenticate each others' peer IDs. It is therefore necessary to run an additional libp2p handshake on a newly established WebTransport connection.
 The first stream that the client opens on a new WebTransport session is used to perform a libp2p handshake using Noise (https://github.com/libp2p/specs/tree/master/noise). The client SHOULD start the handshake right after sending the CONNECT request, without waiting for the server's response.
 
-In order to verify that the end-to-end encryption of the connection, the peers need to establish that no MITM intercepted the connection. To do so, the client MUST include the certificate hash that was used to establish the connection as payload of the first Noise message (the `e` message). This payload is not encrypted, but the Noise handshake provides integrity protection.
-If the client was willing to accept multiple certificate hashes, but cannot determine which certificate was actually used to establish the connection (this will commonly be the case for browser clients), it MUST include a list of all certificate hashes.
+In order to verify that the end-to-end encryption of the connection, the peers need to establish that no MITM intercepted the connection. To do so, the server MUST include the certificate hash of the currently used certificate as well as the certificate hashes of all future certificates it has already advertised to the network in the `webtransport_certhashes` Noise extension. The hash of recently used, but expired certificates SHOULD also be included.
 
-Certificate hashes are encoded using the following protobuf message:
-```proto
-syntax = "proto2";
-
-message WebTransport {
-  repeated bytes cert_hashes = 1;
-}
-```
-
-On receipt of the `e` message, the server MUST verify the list of certificate hashes. If the list is empty, it MUST fail the handshake. For every certificate in the list, it checks if it possesses a certificate with the corresponding hash. If so, it continues with the handshake. However, if there is even a single certificate hash in the list that it cannot associate with a certificate, it MUST abort the handshake.
+On receipt of the `webtransport_certhashes` extension, the client MUST verify that the certificate hash of the certificate that was used on the connection is contained in the server's list. If the client was willing to accept multiple certificate hashes, but cannot determine which certificate was actually used to establish the connection (this will commonly be the case for browser clients), it MUST verify that all certificate hashes are contained in the server's list. If verification fails, it MUST abort the handshake.
 
 For the client, the libp2p connection is fully established once it has sent the last Noise handshake message. For the server, receipt (and successful verification) of that message completes the handshake.
