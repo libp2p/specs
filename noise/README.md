@@ -200,16 +200,17 @@ The Noise Protocol Framework caters for sending early data alongside handshake
 messages. We leverage this construct to transmit:
 
 1. the libp2p identity key along with a signature, to authenticate each party to
-   the other, and
-2. extensions to the Noise handshake
+   the other.
+2. extensions used by the libp2p stack.
 
-Note that when sending extensions with the first message of the handshake
-pattern, the data is transmitted unencrypted. When sending the payload in
-message 3 (closing message), for the initiator, and in message 2, for the
-responder, the data will be send encrypted with forward secrecy.
-It should be stressed, that while the second message of the handshake pattern
-has forward secrecy, the sender has not yet authenticated the responder,
-so this payload might be sent to any party, including an active attacker.
+The extensions are inserted into the first message of the handshake pattern
+**that guarantees secrecy**. Specifically, this means that the initiator MUST NOT
+send extensions in their first message. 
+The initiator sends its extensions in message 3 (closing message), and the 
+responder sends theirs in message 2 (their only message). It should be stressed,
+that while the second message of the handshake pattern has forward secrecy, 
+the sender has not authenticated the responder yet, so this payload might be
+sent to any party, including an active attacker.
 
 When decrypted, the payload contains a serialized [protobuf][protobuf]
 `NoiseHandshakePayload` message with the following schema:
