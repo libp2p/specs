@@ -292,10 +292,9 @@ mechanism, this specification defines an extension registry, modeled after
 [RFC 9000](https://datatracker.ietf.org/doc/html/rfc9000#section-19.21)
 (for QUIC).
 
-This spec currently defines 3 extension code points for the `NoiseExtensions`
-protobuf. Note that this document only defines the code point, and leaves
-it up to the protocol using that code point to define semantics associated
-with that code point.
+Note that this document only defines the `NoiseExtensions` code points, and
+leaves it up to the protocol using that code point to define semantics
+associated with these code point.
 
 Code points above 1024 MAY be used for experimentation. Code points up to
 this value MUST be registered in this document before deployment.
