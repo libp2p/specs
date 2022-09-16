@@ -295,7 +295,7 @@ After [Connection Establishment](#connection-establishment):
 
    More specifically _A_ and _B_ set the Noise _Prologue_ to
    `libp2p-webrtc-noise:<FINGERPRINTS>` before starting the actual Noise
-   handshake. `<FINGERPRINTS>` is the concatenation of the of the two TLS
+   handshake. `<FINGERPRINTS>` is the concatenation of the two TLS
    fingerprints of _A_ and _B_ in their multihash byte representation, sorted in
    ascending order.
 
