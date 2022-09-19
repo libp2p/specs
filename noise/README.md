@@ -217,6 +217,8 @@ When decrypted, the payload contains a serialized [protobuf][protobuf]
 `NoiseHandshakePayload` message with the following schema:
 
 ``` protobuf
+syntax = "proto2";
+
 message NoiseHandshakePayload {
   bytes identity_key = 1;
   bytes identity_sig = 2;
