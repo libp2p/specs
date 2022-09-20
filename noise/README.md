@@ -220,9 +220,9 @@ When decrypted, the payload contains a serialized [protobuf][protobuf]
 syntax = "proto2";
 
 message NoiseHandshakePayload {
-  bytes identity_key = 1;
-  bytes identity_sig = 2;
-  bytes data         = 3;
+  optional bytes identity_key = 1;
+  optional bytes identity_sig = 2;
+  optional bytes data         = 3;
 }
 ```
 
