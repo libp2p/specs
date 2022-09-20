@@ -35,6 +35,7 @@ and spec status.
         - [Noise case](#noise-case)
     - [Security](#security)
     - [Protocol coupling](#protocol-coupling)
+    - [Alternative options considered](#alternative-options-considered)
 
 ## Overview
 
@@ -236,6 +237,13 @@ libp2p, the muxer and security are always needed at the same time, and it is a
 small price to pay to gain efficiency by reducing one RTT.
 
 
+## Alternative options considered
+
+Instead of ALPN for muxer selection to reduce RTT, other options such as TLS
+extension and X.509 extension are considered. The pros and cons are explored
+and the discussion details can be found at [#454].
+
+
 
 [#426]: https://github.com/libp2p/specs/issues/426
 [connections]: https://github.com/libp2p/specs/tree/master/connections
@@ -244,6 +252,7 @@ small price to pay to gain efficiency by reducing one RTT.
 [Noise-Early-Data]: https://github.com/libp2p/specs/tree/master/noise#the-libp2p-handshake-payload
 [ECH]: https://datatracker.ietf.org/doc/draft-ietf-tls-esni/
 [handshake-payload]: https://github.com/libp2p/specs/tree/master/noise#the-libp2p-handshake-payload
+[#454]: https://github.com/libp2p/specs/issues/454
 
 
 
