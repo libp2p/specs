@@ -256,9 +256,14 @@ message Message {
 }
 ```
 
-Note that "a STOP_SENDING frame requests that the receiving endpoint send a
-RESET_STREAM frame.". See [QUIC RFC - 3.5 Solicited State
-Transitions](https://www.rfc-editor.org/rfc/rfc9000.html#section-3.5).
+Note that in contrast to QUIC (see [QUIC RFC - 3.5 Solicited State
+Transitions](https://www.rfc-editor.org/rfc/rfc9000.html#section-3.5)) a libp2p
+WebRTC endpoint receiving a `STOP_SENDING` frame SHOULD NOT send a
+`RESET_STREAM` frame in reply. The `STOP_SENDING` frame is used for accurate
+accounting of the number of bytes sent for connection-level flow control in
+QUIC. The libp2p WebRTC message framing is not concerned with flow-control and
+thus does not need the `RESET_STREAM` frame to be send in reply to a
+`STOP_SENDING` frame.
 
 Encoded messages including their length prefix MUST NOT exceed 16kiB to support
 all major browsers. See ["Understanding message size
