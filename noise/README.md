@@ -452,6 +452,14 @@ unsupported types like RSA.
 - Removed Noise Pipes and related handshake patterns
 - Removed padding within encrypted payloads
 
+### r3 - 2022-09-20
+
+- Change Protobuf definition to proto2 (due to the layout of the protobuf used, this is backwards-compatible change)
+
+### r4 - 2022-09-22
+
+- Add Noise extension registry
+
 
 [peer-id-spec]: ../peer-ids/peer-ids.md
 [peer-id-spec-signing-rules]: ../peer-ids/peer-ids.md#how-keys-are-encoded-and-messages-signed
