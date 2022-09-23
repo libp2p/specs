@@ -308,6 +308,27 @@ https://datatracker.ietf.org/doc/html/rfc8122#section-5). The hash function used
 in WebRTC and the hash function used in the multiaddr `/certhash` component MUST
 be the same. On mismatch the final Noise handshake MUST fail.
 
+## Test vectors
+
+### Noise prologue
+
+#### 1. Both client and server use SHA-256 
+
+```
+client_fingerprint = "3e79af40d6059617a0d83b83a52ce73b0c1f37a72c6043ad2969e2351bdca870"
+server_fingerprint = "30fc9f469c207419dfdd0aab5f27a86c973c94e40548db9375cca2e915973b99"
+
+prologue = "6c69627032702d7765627274632d6e6f6973653a122030fc9f469c207419dfdd0aab5f27a86c973c94e40548db9375cca2e915973b9912203e79af40d6059617a0d83b83a52ce73b0c1f37a72c6043ad2969e2351bdca870"
+```
+
+Flipped version (testing the sorting requirement):
+```
+client_fingerprint = "30fc9f469c207419dfdd0aab5f27a86c973c94e40548db9375cca2e915973b99"
+server_fingerprint = "3e79af40d6059617a0d83b83a52ce73b0c1f37a72c6043ad2969e2351bdca870"
+
+prologue = "6c69627032702d7765627274632d6e6f6973653a122030fc9f469c207419dfdd0aab5f27a86c973c94e40548db9375cca2e915973b9912203e79af40d6059617a0d83b83a52ce73b0c1f37a72c6043ad2969e2351bdca870"
+```
+
 ### Open Questions
 
 - Can a _Browser_ access the fingerprint of its TLS certificate?
