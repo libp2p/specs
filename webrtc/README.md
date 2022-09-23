@@ -312,6 +312,8 @@ be the same. On mismatch the final Noise handshake MUST fail.
 
 ### Noise prologue
 
+All of these test vectors represent hex-encoded bytes.
+
 #### 1. Both client and server use SHA-256 
 
 ```
