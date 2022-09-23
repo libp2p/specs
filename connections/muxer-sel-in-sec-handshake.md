@@ -166,8 +166,9 @@ format of he early data for this purpose is specified in the protobuf in the
 The early data message is encoded in the "protobuf2" syntax as shown in the
 following. The protobuf definition is an extension to [handshake-payload]. The
 existing byte array early data (the "data" field) will be replaced by a
-structured NoiseExtension schema. The supported muxers and selected muxer are
-populated in the "stream_muxers" field.
+structured NoiseExtensions protobuf message. The supported muxers and selected
+muxer are populated in the "stream_muxers" field. The details of the early
+data message can be find in [Noise-handshake-payload]
 
 The muxers are ordered by preference, with the most prefered muxer at the
 beginning.
@@ -175,14 +176,15 @@ beginning.
 ```protobuf
 syntax = "proto2";
 
-message NoiseExtension {
-    repeated string stream_muxers = 3; 
+message NoiseExtensions {
+    repeated bytes webtransport_certhashes = 1;
+    repeated string stream_muxers = 2; 
 }
 
 message NoiseHandshakePayload {
-	bytes identity_key = 1;
-	bytes identity_sig = 2;
-	NoiseExtension noise_extension = 4;
+  optional bytes identity_key = 1;
+  optional bytes identity_sig = 2;
+  optional NoiseExtensions extensions = 4;
 }
 ```
 
@@ -253,6 +255,7 @@ and the discussion details can be found at [#454].
 [ECH]: https://datatracker.ietf.org/doc/draft-ietf-tls-esni/
 [handshake-payload]: https://github.com/libp2p/specs/tree/master/noise#the-libp2p-handshake-payload
 [#454]: https://github.com/libp2p/specs/issues/454
+[Noise-handshake-payload]: https://github.com/libp2p/specs/blob/b0818fa956f9940a7cdee18198e0daf1645d8276/noise/README.md#libp2p-data-in-handshake-messages
 
 
 

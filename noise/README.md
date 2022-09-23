@@ -220,6 +220,7 @@ syntax = "proto2";
 
 message NoiseExtensions {
     repeated bytes webtransport_certhashes = 1;
+    repeated string stream_muxers = 2;
 }
 
 message NoiseHandshakePayload {
