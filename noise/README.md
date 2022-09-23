@@ -5,7 +5,7 @@
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r3, 2022-09-20  |
+| 3A              | Recommendation | Active | r4, 2022-09-22  |
 
 Authors: [@yusefnapora]
 
@@ -201,17 +201,16 @@ messages. We leverage this construct to transmit:
 
 1. the libp2p identity key along with a signature, to authenticate each party to
    the other.
-2. arbitrary data private to the libp2p stack. This facility is not exposed to
-   userland. Examples of usage include streamlining muxer selection.
+2. extensions used by the libp2p stack.
 
-These payloads MUST be inserted into the first message of the handshake pattern
-**that guarantees secrecy**. In practice, this means that the initiator must not
-send a payload in their first message. Instead, the initiator will send its
-payload in message 3 (closing message), whereas the responder will send theirs
-in message 2 (their only message). It should be stressed, that the second
-message of the handshake pattern has forward secrecy, however the sender has not
-authenticated the responder, so this payload might be sent to any party,
-including an active attacker.
+The extensions are inserted into the first message of the handshake pattern
+**that guarantees secrecy**. Specifically, this means that the initiator MUST NOT
+send extensions in their first message. 
+The initiator sends its extensions in message 3 (closing message), and the 
+responder sends theirs in message 2 (their only message). It should be stressed,
+that while the second message of the handshake pattern has forward secrecy, 
+the sender has not authenticated the responder yet, so this payload might be
+sent to any party, including an active attacker.
 
 When decrypted, the payload contains a serialized [protobuf][protobuf]
 `NoiseHandshakePayload` message with the following schema:
@@ -219,10 +218,14 @@ When decrypted, the payload contains a serialized [protobuf][protobuf]
 ``` protobuf
 syntax = "proto2";
 
+message NoiseExtensions {
+    repeated bytes webtransport_certhashes = 1;
+}
+
 message NoiseHandshakePayload {
   optional bytes identity_key = 1;
   optional bytes identity_sig = 2;
-  optional bytes data         = 3;
+  optional NoiseExtensions extensions = 4;
 }
 ```
 
@@ -235,9 +238,8 @@ spec][peer-id-spec-signing-rules]. The data to be signed is the UTF-8 string
 `noise-libp2p-static-key:`, followed by the Noise static public key, encoded
 according to the rules defined in [section 5 of RFC 7748][rfc-7748-sec-5].
 
-The `data` field contains the "early data" provided to the Noise module when
-initiating the handshake, if any. The structure of this data is opaque to
-noise-libp2p and is defined in the connection establishment specs.
+The `extensions` field contains Noise extensions and is described in
+[Noise Extensions](#noise-extensions).
 
 Upon receiving the handshake payload, peers MUST decode the public key from the
 `identity_key` field into a usable form. The key MUST then be used to validate
@@ -282,6 +284,23 @@ Authentication section](#static-key-authentication) and may include other
 internal libp2p data.
 
 The XX handshake MUST be supported by noise-libp2p implementations.
+
+### Noise Extensions
+
+Since the Noise handshake pattern itself doesn't define any extensibility
+mechanism, this specification defines an extension registry, modeled after
+[RFC 6066](https://www.rfc-editor.org/rfc/rfc6066) (for TLS) and
+[RFC 9000](https://datatracker.ietf.org/doc/html/rfc9000#section-19.21)
+(for QUIC).
+
+Note that this document only defines the `NoiseExtensions` code points, and
+leaves it up to the protocol using that code point to define semantics
+associated with these code point.
+
+Code points above 1024 MAY be used for experimentation. Code points up to
+this value MUST be registered in this document before deployment.
+
+
 
 ## Cryptographic Primitives
 
@@ -432,6 +451,14 @@ unsupported types like RSA.
 
 - Removed Noise Pipes and related handshake patterns
 - Removed padding within encrypted payloads
+
+### r3 - 2022-09-20
+
+- Change Protobuf definition to proto2 (due to the layout of the protobuf used, this is backwards-compatible change)
+
+### r4 - 2022-09-22
+
+- Add Noise extension registry
 
 
 [peer-id-spec]: ../peer-ids/peer-ids.md
