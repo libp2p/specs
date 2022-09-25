@@ -295,9 +295,12 @@ authenticate the remote peer by its libp2p identity.
 
 After [Connection Establishment](#connection-establishment):
 
-1. _A_ opens a WebRTC datachannel.
+1. _A_ and _B_ open a WebRTC data channel with `id: 0` and `negotiated: true`
+   ([`pc.createDataChannel("", {negotiated: true, id:
+   0});`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createDataChannel)).
 
-2. _A_ starts a Noise `XX` handshake using _A_'s and _B_'s libp2p identity. See
+2. _A_ starts a Noise `XX` handshake using _A_'s and _B_'s libp2p identity on
+   the new channel. See
    [noise-libp2p](https://github.com/libp2p/specs/tree/master/noise).
 
    Instead of exchanging the TLS certificate fingerprints on the established
