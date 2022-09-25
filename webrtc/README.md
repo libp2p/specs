@@ -215,7 +215,9 @@ server node _R_.
 - Instead of using trickle ICE, we could as well wait for the candidate
   gathering. See
   https://github.com/pion/webrtc/blob/c1467e4871c78ee3f463b50d858d13dc6f2874a4/examples/insertable-streams/main.go#L141-L142
-  as one example.
+  as one example. In the browser, one can wait for the
+  [`icegatheringstatechange`
+  event](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/icegatheringstatechange_event).
 
 ## Multiplexing
 
