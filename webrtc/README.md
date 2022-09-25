@@ -106,10 +106,10 @@ fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
    https://bugs.chromium.org/p/chromium/issues/detail?id=823036
 
 5. _A_ establishes the connection to _B_. The random string used as a _username_
-   and _password_ can be used by _B_ to identify the connection, i.e.
-   demultiplex incoming UDP datagrams per incoming connection. _B_ uses the same
-   random string for the username and password in the STUN message from _B_ to
-   _A_.
+   and _password_ in combination with the IP and port of _A_ can be used by _B_
+   to identify the connection, i.e. demultiplex incoming UDP datagrams per
+   incoming connection. _B_ uses the same random string for the username and
+   password in the STUN message from _B_ to _A_.
 
 6. _B_ does not know the TLS fingerprint of _A_. _B_ upgrades the incoming
    connection from _A_ as an _insecure_ connection, learning _A_'s TLS
