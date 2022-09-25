@@ -166,15 +166,6 @@ fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
   WebRTC connection from a remote node without previously receiving an SDP
   packet from such host?
 
-- Can _Browser_ generate a _valid_ SDP packet for the remote node based on the
-  remote's Multiaddr, where that Multiaddr contains the IP, UDP port and TLS
-  certificate fingerprint (e.g.
-  `/ip6/2001:db8::/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`)? _Valid_ in
-  the sense that this generated SDP packet can then be used to establish a
-  WebRTC connection to the remote.
-
-  Yes.
-
 ### Browser to Browser
 
 Scenario: Browser _A_ wants to connect to Browser node _B_ with the help of
