@@ -323,6 +323,11 @@ https://datatracker.ietf.org/doc/html/rfc8122#section-5). The hash function used
 in WebRTC and the hash function used in the multiaddr `/certhash` component MUST
 be the same. On mismatch the final Noise handshake MUST fail.
 
+Implementations MAY open streams before completion of the Noise handshake.
+Applications MUST take special care what application data they send, since at
+this point the peer is not yet authenticated. Similarly, the receiving side MAY
+accept streams before completion of the handshake.
+
 ### Open Questions
 
 - Can a _Browser_ access the fingerprint of its TLS certificate?
