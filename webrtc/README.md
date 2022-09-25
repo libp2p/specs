@@ -212,6 +212,11 @@ server node _R_.
   could they exchange their multiaddr and construct the remote's SDP packet
   based on it?
 
+- Instead of using trickle ICE, we could as well wait for the candidate
+  gathering. See
+  https://github.com/pion/webrtc/blob/c1467e4871c78ee3f463b50d858d13dc6f2874a4/examples/insertable-streams/main.go#L141-L142
+  as one example.
+
 ## Multiplexing
 
 The WebRTC browser APIs do not support half-closing of streams nor resets of the
