@@ -99,22 +99,22 @@ extesion of TLS handshake is used to select the muxer.
    certificate with each application protocol, if desired.
 
 For the purpose of muxer selection, the types of muxers are coded as protocol
-names in the form of a list of strings, and inserted in the ALPN "NextProtos"
+names in the form of a list of strings, and inserted in the ALPN extension
 field. An example list as following:
 
     ["yamux/1.0.0", "/mplex/6.7.0", "libp2p"]
 
-The NextProtos list is ordered by preference, with the most prefered muxer at
+The muxer list is ordered by preference, with the most prefered muxer at
 the beginning. The "libp2p" protocol code MUST always be the last item in the
-ALPN NextProtos list. See [#tls-case] for details on the special "libp2p" protocol code.
+muxer list . See [#tls-case] for details on the special "libp2p" protocol code.
 
 The server chooses the supported protocol by going through its prefered
 protocol list and searchs if the protocol is supported by the client too. if no
 mutually supported protcol is found the TLS handshake will fail.
 
-If the selected NextProto is "libp2p" then the muxer selection process returns
-an empty result, and the multistream-selection protocol MUST be run to negotiate
-the muxer.
+If the selected item from the muxer list is "libp2p" then the muxer selection
+process returns an empty result, and the multistream-selection protocol MUST be
+run to negotiate the muxer.
 
 
 ### Muxer selection over Noise
@@ -195,12 +195,13 @@ libp2p versions which do not support this improved approach.
 
 ### TLS case
 
-In the current version of libp2p, the "NextProtos" field is populated with a
+In the current version of libp2p, the ALPN extension field is populated with a
 key "libp2p". By appending the key of "libp2p" to the end of the supported
 muxer list, the TLS handshaking process is not broken when peers run different
-versions of libp2p, because the minimum overlap of the peer's NextProtos sets
-is always satisfied. When one peer runs the old version and the other peer runs
-the version that supports this feature, the negotiated protocol is "libp2p".
+versions of libp2p, because the minimum overlap of the peer's supported muxer
+sets is always satisfied. When one peer runs the old version and the other peer
+runs the version that supports this feature, the negotiated protocol is
+"libp2p".
 
 In the case "libp2p" is the result of TLS ALPN, an empty result MUST be
 returned to the upgrade process to indicate that no muxer was selected. And the
@@ -219,7 +220,7 @@ MUST fall back to the multistream-selection protocol to select the muxer.
 
 ## Security
 
-The muxer list carried in TLS NextProtos field is part of the ClientHello
+The muxer list carried in TLS ALPN extension field is part of the ClientHello
 message which is not encrypted. This feature will expose the supported muxers
 in plain text, but this is not a weakening of securiy posture. In the fuure
 when [ECH] is ready the muxer info can be protected too.
