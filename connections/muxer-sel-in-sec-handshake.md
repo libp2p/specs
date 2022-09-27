@@ -106,7 +106,7 @@ field. An example list as following:
 
 The NextProtos list is ordered by preference, with the most prefered muxer at
 the beginning. The "libp2p" protocol code MUST always be the last item in the
-ALPN NextProtos list.
+ALPN NextProtos list. See [#tls-case] for details on the special "libp2p" protocol code.
 
 The server chooses the supported protocol by going through its prefered
 protocol list and searchs if the protocol is supported by the client too. if no
