@@ -120,11 +120,11 @@ the muxer.
 ### Muxer selection over Noise
 
 The libp2p Noise implementation allows the Noise handshake process to carry
-early data. [Noise-Early-Data] is carried in the first and second message of
+early data. [Noise-Early-Data] is carried in the second and third message of
 the XX handshake pattern as illustrated in the following message sequence chart.
-The first message carries early data in the form of a list of muxers supported
-by the initiator, ordered by preference. The responder sends its supported
-muxer list in the second message to the initiator. After the Noise handshake
+The second message carries early data in the form of a list of muxers supported
+by the responder, ordered by preference. The initiator sends its supported
+muxer list in the third message to the responder. After the Noise handshake
 process is fully done, the initiator and responder will both process the
 received eraly data and select the muxer to be used, they both iterate through
 the initiator's prefered muxer list in order, and if any muxer is also
@@ -137,9 +137,9 @@ Example: Noise handshake between peers that have a mutually supported muxer.
     Responder supports: ["yamux/1.0.0"]
 
     XX:
-    -> e ["yamux/1.0.0", "/mplex/6.7.0"]
-    <- e, ee, s, es, ["yamux/1.0.0"]
-    -> s, se, 
+    -> e
+    <- e, ee, s, es, ["yamux/1.0.0", "/mplex/6.7.0"] 
+    -> s, se, ["yamux/1.0.0"]
 
     After handshake is done, both parties can arrive on the same conclusion
     and select "yamux/1.0.0" as the muxer to use.
@@ -150,9 +150,9 @@ muxers.
     Responder supports: ["yamux/1.0.0"]
 
     XX:
-    -> e ["/mplex/6.7.0"]
-    <- e, ee, s, es, ["yamux/1.0.0"]
-    -> s, se, 
+    -> e
+    <- e, ee, s, es, ["/mplex/6.7.0"]
+    -> s, se, ["yamux/1.0.0"]
     
     After handshaking is done, early data processing will find no mutually
     supported muxer, and falls back to multistream-selection protocol.
