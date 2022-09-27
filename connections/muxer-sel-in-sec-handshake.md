@@ -133,8 +133,8 @@ muxer is found, the muxer selection process MUST fall back to multistream
 -selection protocol.
 
 Example: Noise handshake between peers that have a mutually supported muxer.
-    Initiator supports: ["yamux/1.0.0", "/mplex/6.7.0"]
-    Responder supports: ["yamux/1.0.0"]
+    Responder supports: ["yamux/1.0.0", "/mplex/6.7.0"]
+    Initiator supports: ["yamux/1.0.0"]
 
     XX:
     -> e
@@ -146,8 +146,8 @@ Example: Noise handshake between peers that have a mutually supported muxer.
 
 Example: Noise handshake between peers that don't have mutually supported
 muxers.
-    Initiator supports: ["/mplex/6.7.0"]
-    Responder supports: ["yamux/1.0.0"]
+    Responder supports: ["/mplex/6.7.0"]
+    Initiator supports: ["yamux/1.0.0"]
 
     XX:
     -> e
