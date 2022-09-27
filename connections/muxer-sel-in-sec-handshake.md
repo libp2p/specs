@@ -102,7 +102,7 @@ For the purpose of muxer selection, the types of muxers are coded as protocol
 names in the form of a list of strings, and inserted in the ALPN "NextProtos"
 field. An example list as following:
 
-    ["yamux/1.0.0", "/mplex/6.7.0", "libp2p"]
+    ["/yamux/1.0.0", "/mplex/6.7.0", "libp2p"]
 
 The NextProtos list is ordered by preference, with the most prefered muxer at
 the beginning. The "libp2p" protocol code MUST always be the last item in the
