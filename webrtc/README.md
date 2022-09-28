@@ -299,16 +299,13 @@ After [Connection Establishment](#connection-establishment):
    the new channel. See
    [noise-libp2p](https://github.com/libp2p/specs/tree/master/noise).
 
-   Instead of exchanging the TLS certificate fingerprints on the established
-   Noise channel once the Noise handshake succeeded, _A_ and _B_ use the [Noise
-   Prologue](https://noiseprotocol.org/noise.html#prologue) mechanism, thus
-   saving one round trip.
-
-   More specifically _A_ and _B_ set the Noise _Prologue_ to
+   _A_ and _B_ use the [Noise
+   Prologue](https://noiseprotocol.org/noise.html#prologue) mechanism. More
+   specifically _A_ and _B_ set the Noise _Prologue_ to
    `libp2p-webrtc-noise:<FINGERPRINTS>` before starting the actual Noise
-   handshake. `<FINGERPRINTS>` is the concatenation of the two TLS
-   fingerprints of _A_ and _B_ in their multihash byte representation, sorted in
-   ascending order.
+   handshake. `<FINGERPRINTS>` is the concatenation of the two TLS fingerprints
+   of _A_ and _B_ in their multihash byte representation, sorted in ascending
+   order.
 
 3. On success of the authentication handshake, the used datachannel is
    closed and the plain WebRTC connection is used with its multiplexing
