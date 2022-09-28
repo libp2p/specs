@@ -322,21 +322,19 @@ be achieved with the [WebTransport](#✈️-webtransport) protocol.
 **High priority for: IPFS**
 
 **What?** Establishing a connection and performing the initial handshake
-should be as cheap and fast as possible. Supporting things like
-*selective* stream opening, *preemption*, *speculative* negotiation,
-*upfront* negotiation, protocol table *pinning*, etc. may enable us to
-achieve lower latencies when establishing connections, and even the
-0-RTT holy grail in some cases. These features are being discussed in
-the *Protocol Select* protocol design.
+should be as cheap and fast as possible. On TCP, The current libp2p
+handshakes spends one round-trip negotiating the security protocol, and
+another roundtrip negotiating the stream multiplexer.
+By using advanced features of the handshake protocol, we might even be
+able to reach the holy grail of a 0-RTT handshake in some cases.
 
-**Why?** Multistream 1.0 is chatty and naïve. Streams are essential to
-libp2p, and negotiating them is currently inefficient in a number of
-scenarios. Also, bootstrapping a multiplexed connection is currently
-guesswork (we test protocols one by one, incurring in significant
-ping-pong).
+**Why?** Applications rely on quick connection establishment. libp2p
+shouldn't make them wait for any longer than absolutely necessary.
 
 **Links:**
 
+- [security protocol in multiaddr](https://github.com/libp2p/specs/pull/353)
+- [muxer selection in security handshake](https://github.com/libp2p/specs/pull/446)
 - [Protocol Select specification](https://github.com/libp2p/specs/pull/349)
 
 ### 🛣️ Peer Routing Records
