@@ -111,13 +111,21 @@ fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
    incoming connection. _B_ uses the same random string for the username and
    password in the STUN message from _B_ to _A_.
 
-6. _B_ does not know the TLS fingerprint of _A_. _B_ upgrades the incoming
-   connection from _A_ as an _insecure_ connection, learning _A_'s TLS
-   fingerprint through the WebRTC DTLS handshake. At this point the DTLS
-   handshake provides confidentiality and integrity but not authenticity.
+6. _A_ and _B_ execute the DTLS handshake as part of the standard WebRTC
+   connection establishment.
 
-7. Messages on an `RTCDataChannel` are framed using the message framing
-   mechanism described in [Multiplexing](#multiplexing).
+   At this point _B_ does not know the TLS certificate fingerprint of _A_. Thus
+   _B_ can not verify _A_'s TLS certificate fingerprint during the DTLS
+   handshake. Instead _B_ needs to _disable certificate fingerprint
+   verification_ (see e.g. [Pion's `disableCertificateFingerprintVerification`
+   option](https://github.com/pion/webrtc/blob/360b0f1745c7244850ed638f423cda716a81cedf/settingengine.go#L62)).
+
+   On success of the DTLS handshake the connection provides confidentiality and
+   integrity but not authenticity. The latter is guaranteed through the
+   succeeding Noise handshake.
+
+7. Messages on the established `RTCDataChannel` are framed using the message
+   framing mechanism described in [Multiplexing](#multiplexing).
 
 8. The remote is authenticated via an additional Noise handshake. See
    [Connection Security](#connection-security).
