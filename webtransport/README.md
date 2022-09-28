@@ -6,7 +6,7 @@
 
 Authors: [@marten-seemann]
 
-Interest Group: TODO
+Interest Group: [@MarcoPolo], [@mxinden]
 
 See the [lifecycle document](../00-framework-01-spec-lifecycle.md) for context about maturity level
 and spec status.
