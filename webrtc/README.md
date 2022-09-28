@@ -307,6 +307,13 @@ After [Connection Establishment](#connection-establishment):
    of _A_ and _B_ in their multihash byte representation, sorted in ascending
    order.
 
+  On Chrome _A_ can access its TLS certificate fingerprint directly via
+  `RTCCertificate#getFingerprints`. Firefox does not allow _A_ to do so. Browser
+  compatibility can be found
+  [here](https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate). In
+  practice, this is not an issue since the fingerprint is embedded in the local
+  SDP string.
+
 3. On success of the authentication handshake, the used datachannel is
    closed and the plain WebRTC connection is used with its multiplexing
    capabilities via datachannels. See [Multiplexing](#multiplexing).
@@ -322,15 +329,6 @@ this point the peer is not yet authenticated. Similarly, the receiving side MAY
 accept streams before completion of the handshake.
 
 ### Open Questions
-
-- Can a _Browser_ access the fingerprint of its TLS certificate?
-
-  Chrome allows you to access the fingerprint of any locally-created certificate
-  directly via `RTCCertificate#getFingerprints`. Firefox does not allow you to
-  do so. Browser compatibility can be found
-  [here](https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate). In
-  practice, this is not an issue since the fingerprint is embedded in the local
-  SDP string.
 
 - Is the above proposed additional handshake secure? See also alternative
   proposed Handshake for
