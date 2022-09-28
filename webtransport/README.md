@@ -15,7 +15,7 @@ and spec status.
 
 WebTransport is a way for browsers to establish a stream-multiplexed and bidirectional connection to servers using QUIC.
 
-The WebTransport protocol is currently under development at the IETF. Chrome has implemented and shipped support for [draft-02](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http3/).
+The WebTransport protocol is currently under development at the IETF. Chrome has implemented and shipped support for [draft-02](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http3/), and Firefox [is working](https://bugzilla.mozilla.org/show_bug.cgi?id=1709355) on WebTransport support.
 
 The most exciting feature for libp2p (other than the numberous performance benefits that QUIC gives us) is that the W3C added a browser API allowing browsers to establish connections to nodes with self-signed certificates, provided they know the hash of the certificate in advance: [`serverCertificateHashes`](https://www.w3.org/TR/webtransport/#dom-webtransportoptions-servercertificatehashes). This API is already [implemented in Chrome](https://chromestatus.com/feature/5690646332440576). Firefox is working on a WebTransport implementation and is [likely to implement](https://github.com/mozilla/standards-positions/issues/167#issuecomment-1015951396) `serverCertificateHashes` as well.
 
