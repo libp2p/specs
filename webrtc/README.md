@@ -426,3 +426,4 @@ accept streams before completion of the handshake.
   protocols. These benefits outweigh the drawback of additional overhead.
 
 [QUIC RFC]: https://www.rfc-editor.org/rfc/rfc9000.html
+[uvarint-spec]: https://github.com/multiformats/unsigned-varint
