@@ -75,19 +75,19 @@ connect to all other nodes.
 Scenario: Browser _A_ wants to connect to server node _B_ where _B_ is publicly
 reachable but _B_ does not have a TLS certificate trusted by _A_.
 
-As a preparation browser _A_ [generates a
-certificate](https://www.w3.org/TR/webrtc/#dom-rtcpeerconnection-generatecertificate)
-and [gets the certificate's
-fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
-
 1. Browser _A_ discovers server node _B_'s multiaddr, containing _B_'s IP, UDP
   port, TLS certificate fingerprint and libp2p peer ID (e.g.
   `/ip6/2001:db8::/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`),
   through some external mechanism.
 
-2. _A_ instantiates a `RTCPeerConnection`, passing its local certificate as a
-   parameter. See
+2. _A_ instantiates a `RTCPeerConnection`. See
    [`RTCPeerConnection()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection).
+
+   _A_ MAY reuse the same certificate across `RTCPeerConnection`s. Though one
+   should note that reusing the certificate can be used to identify _A_ across
+   connections by on-path observers given that WebRTC uses TLS 1.2. Thus this
+   specification RECOMMENDS that _A_, i.e. the browser, does not reuse the same
+   certificate across `RTCPeerConnection`.
 
 3. _A_ constructs _B_'s SDP offer locally based on _B_'s multiaddr and sets it
    via
