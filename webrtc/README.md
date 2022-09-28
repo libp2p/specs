@@ -167,10 +167,6 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
   - https://datatracker.ietf.org/doc/html/rfc5389#section-16.2.1
   - https://datatracker.ietf.org/doc/html/rfc5389#section-16.1.2
 
-- Do the major (Go / Rust / ...) WebRTC implementations allow us to accept a
-  WebRTC connection from a remote node without previously receiving an SDP
-  packet from such host?
-
 ### Browser to Browser
 
 Scenario: Browser _A_ wants to connect to Browser node _B_ with the help of
