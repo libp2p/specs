@@ -326,10 +326,6 @@ accept streams before completion of the handshake.
 
 ### Open Questions
 
-- Is the above proposed additional handshake secure? See also alternative
-  proposed Handshake for
-  [WebTransport](https://github.com/libp2p/specs/pull/404).
-
 - Would it be more efficient for _B_ to initiate the Noise handshake? In other
   words, who is able to write on an established WebRTC connection first? _A_ or
   _B_?
