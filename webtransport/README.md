@@ -49,4 +49,4 @@ In order to verify that the end-to-end encryption of the connection, the peers n
 
 On receipt of the `webtransport_certhashes` extension, the client MUST verify that the certificate hash of the certificate that was used on the connection is contained in the server's list. If the client was willing to accept multiple certificate hashes, but cannot determine which certificate was actually used to establish the connection (this will commonly be the case for browser clients), it MUST verify that all certificate hashes are contained in the server's list. If verification fails, it MUST abort the handshake.
 
-For the client, the libp2p connection is fully established once it has sent the last Noise handshake message. For the server, receipt (and successful verification) of that message completes the handshake.
+For the client, the libp2p connection is fully established once it has sent the last Noise handshake message. For the server, processing of that message completes the handshake.
