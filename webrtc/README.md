@@ -75,12 +75,21 @@ connect to all other nodes.
 Scenario: Browser _A_ wants to connect to server node _B_ where _B_ is publicly
 reachable but _B_ does not have a TLS certificate trusted by _A_.
 
-1. Browser _A_ discovers server node _B_'s multiaddr, containing _B_'s IP, UDP
+1. Server node _B_ generates a TLS certificate, listens on a UDP port and
+   advertises the corresponding multiaddress (see [#Addressing]) through some
+   external mechanism.
+
+   Given that _B_ is publicly reachable, _B_ acts as a [ICE
+   Lite](https://www.rfc-editor.org/rfc/rfc5245) agent. It listens on a UDP port
+   for incoming STUN and SCTP packets and multiplexes based on source IP and
+   source port.
+
+2. Browser _A_ discovers server node _B_'s multiaddr, containing _B_'s IP, UDP
   port, TLS certificate fingerprint and libp2p peer ID (e.g.
   `/ip6/2001:db8::/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`),
   through some external mechanism.
 
-2. _A_ instantiates a `RTCPeerConnection`. See
+3. _A_ instantiates a `RTCPeerConnection`. See
    [`RTCPeerConnection()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection).
 
    _A_ MAY reuse the same certificate across `RTCPeerConnection`s. Though one
@@ -89,11 +98,11 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    specification RECOMMENDS that _A_, i.e. the browser, does not reuse the same
    certificate across `RTCPeerConnection`.
 
-3. _A_ constructs _B_'s SDP offer locally based on _B_'s multiaddr and sets it
+4. _A_ constructs _B_'s SDP offer locally based on _B_'s multiaddr and sets it
    via
    [`RTCPeerConnection.setRemoteDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setRemoteDescription).
 
-4. _A_ creates a local offer via
+5. _A_ creates a local offer via
    [`RTCPeerConnection.createOffer()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createOffer).
    _A_ generates a random string and sets that string as the username (_ufrag_
    or _username fragment_) and password on the SDP of the local offer. Finally
@@ -105,13 +114,13 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    Firefox, Chrome) due to use-cases in the wild. See also
    https://bugs.chromium.org/p/chromium/issues/detail?id=823036
 
-5. _A_ establishes the connection to _B_. The random string used as a _username_
+6. _A_ establishes the connection to _B_. The random string used as a _username_
    and _password_ in combination with the IP and port of _A_ can be used by _B_
    to identify the connection, i.e. demultiplex incoming UDP datagrams per
    incoming connection. _B_ uses the same random string for the username and
    password in the STUN message from _B_ to _A_.
 
-6. _A_ and _B_ execute the DTLS handshake as part of the standard WebRTC
+7. _A_ and _B_ execute the DTLS handshake as part of the standard WebRTC
    connection establishment.
 
    At this point _B_ does not know the TLS certificate fingerprint of _A_. Thus
@@ -124,10 +133,10 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    integrity but not authenticity. The latter is guaranteed through the
    succeeding Noise handshake.
 
-7. Messages on the established `RTCDataChannel` are framed using the message
+8. Messages on the established `RTCDataChannel` are framed using the message
    framing mechanism described in [Multiplexing](#multiplexing).
 
-8. The remote is authenticated via an additional Noise handshake. See
+9. The remote is authenticated via an additional Noise handshake. See
    [Connection Security](#connection-security).
 
 #### Open Questions
@@ -157,18 +166,6 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
   See also:
   - https://datatracker.ietf.org/doc/html/rfc5389#section-16.2.1
   - https://datatracker.ietf.org/doc/html/rfc5389#section-16.1.2
-
-- Do the major WebRTC server implementations support using the same UDP port for
-  multiple WebRTC connections, thus requiring multiplexing multiple WebRTC
-  connections on the same UDP port?
-
-  This is related to [ICE Lite](https://www.rfc-editor.org/rfc/rfc5245), having
-  a host only advertise a single address, namely the host address, which is
-  assumed to be public.
-
-  The [Go WebRTC](https://github.com/pion/webrtc/) implementation and the [Rust
-  WebRTC](https://github.com/webrtc-rs/webrtc) implementation support this. It
-  is unclear whether this is supported in any of the NodeJS implementations.
 
 - Do the major (Go / Rust / ...) WebRTC implementations allow us to accept a
   WebRTC connection from a remote node without previously receiving an SDP
