@@ -143,7 +143,7 @@ It's important to note that decapsulation returns the original multiaddr up to
 the last occurrence of the decapsulated multiaddr. This may remove more than
 just the decapsulated component itself if there are more protocols encapsulated
 within it. Using our example above, decapsulating either `/tcp/1234/ws` _or_
-`/tcp/1234` from `/ip4/7.7.7.7/tcp/ws` will result in `/ip4/7.7.7.7`. This is
+`/tcp/1234` from `/ip4/7.7.7.7/tcp/1234/ws` will result in `/ip4/7.7.7.7`. This is
 unsurprising if you consider the utility of the `/ip4/7.7.7.7/ws` address that
 would result from simply removing the `tcp` component.
 

@@ -72,15 +72,19 @@ security, multiplexing, and other purposes.
 
 The protocols described below all use [protocol buffers](https://developers.google.com/protocol-buffers/docs/proto?hl=en) (aka protobuf) to define message schemas. Version `proto2` is used unless stated otherwise.
 
+- [autonat][spec_autonat] - NAT detection
 - [identify][spec_identify] -  Exchange keys and addresses with other peers
 - [kademlia][spec_kademlia] - The Kademlia Distributed Hash Table (DHT) subsystem
+- [mdns][spec_mdns] - Local peer discovery with zero configuration using multicast DNS
 - [mplex][spec_mplex] - The friendly stream multiplexer
+- [noise][spec_noise] - The libp2p Noise handshake
 - [plaintext][spec_plaintext] - An insecure transport for non-production usage
 - [pnet][spec_pnet] - Private networking in libp2p using pre-shared keys
 - [pubsub][spec_pubsub] - PubSub interface for libp2p
   - [gossipsub][spec_gossipsub] - An extensible baseline PubSub protocol
     - [episub][spec_episub] - Proximity Aware Epidemic PubSub for libp2p
 - [relay][spec_relay] - Circuit Switching for libp2p (similar to TURN)
+  - [dcutr][spec_dcutr] - Direct Connection Upgrade through Relay protocol
 - [rendezvous][spec_rendezvous] - Rendezvous Protocol for generalized
   peer discovery
 - [secio][spec_secio] - SECIO, a transport security protocol for libp2p
@@ -120,4 +124,8 @@ you feel an issue isn't the appropriate place for your topic, please join our
 [spec_connections]: ./connections/README.md
 [spec_plaintext]: ./plaintext/README.md
 [spec_addressing]: ./addressing/README.md
+[spec_noise]: ./noise/README.md
+[spec_mdns]: ./discovery/mdns.md
+[spec_autonat]: ./autonat/README.md
+[spec_dcutr]: ./relay/DCUtR.md
 [spec_webrtc]: ./webrtc/README.md

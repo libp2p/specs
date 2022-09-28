@@ -74,7 +74,7 @@ In order to prove ownership of its host key, an endpoint sends two values:
 
 The public host key allows the peer to calculate the peer ID of the peer it is connecting to. Clients MUST verify that the peer ID derived from the certificate matches the peer ID they intended to connect to, and MUST abort the connection if there is a mismatch.
 
-The peer signs the concatenation of the string `libp2p-tls-handshake:` and the encoded public key that it used to generate the certificate carrying the libp2p Public Key Extension, using its private host key. The public key is encoded as a `SubjectPublicKeyInfo` structure as described in RFC 5280, Section 4.1:
+The peer signs the concatenation of the string `libp2p-tls-handshake:` and the encoded public key that is used to generate the certificate carrying the libp2p Public Key Extension, using its private host key. The public key is encoded as a `SubjectPublicKeyInfo` structure as described in RFC 5280, Section 4.1:
 
 ```asn1
 SubjectPublicKeyInfo ::= SEQUENCE {
@@ -114,7 +114,11 @@ message PublicKey {
 }
 ```
 
-**TODO: PublicKey.Data looks underspecified. Define precisely how to marshal the key.**
+How the public key is encoded into the `Data` bytes depends on the Key Type.
+- `Ed25519`: Only the 32 bytes of the public key
+- `Secp256k1`: Only the compressed form of the public key. 33 bytes.
+- The rest of the keys are encoded as a [SubjectPublicKeyInfo structure](https://www.rfc-editor.org/rfc/rfc5280.html#section-4.1) in PKIX, ASN.1 DER form.
+
 
 ## Future Extensibility
 
