@@ -23,7 +23,8 @@ The most exciting feature for libp2p (other than the improved performance and ho
 
 Since most libp2p nodes don't possess a TLS certificate signed by a Certificate Authority, servers use a self-signed certificates. According to the [w3c WebTransport certification](https://www.w3.org/TR/webtransport/), the validity of the certificate MUST be at most 14 days, and must not use an RSA key. Nodes then include the hash of one (or more) certificates in their multiaddr (see [Addressing](#addressing)).
 
-Servers need to take care to regularly renew their certificate. In the following, the RECOMMENDED logic for rolling certificates is described. At first boot of the node, it creates a self-signed certificate with a validity of 14 days, and publishes a multiaddr containing the hash of that certificate. After 10 days, the node prepares the next certificate, setting the `NotBefore` date of that certificate to the expiration date (or shortly before that) of the first certificate, and an expiration of 14 days after that. The node continues using the old certificate until the expiry date, but it already advertises a multiaddr containing both certificate hashes. This way, clients will be able to connect to the node, even if they cache the multiaddr for multiple days.
+Servers need to take care to regularly renew their certificate. In the following, the RECOMMENDED logic for rolling certificates is described. At first boot of the node, it creates one self-signed certificate with a validity of 14 days, starting immediately, and another certificate with the 14 day valididity period starting on the expiry date of the first certificate. The node advertises a multiaddr containing the certificate hashes of these two certificates.
+Once the first certificate has expired, the node prepares the next certificate, and updates the multiaddr it advertises.
 
 ## Addressing
 
