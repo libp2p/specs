@@ -279,9 +279,9 @@ heuristic of the value to make the decision.
 There are two things at play with regard to provider record (and therefore content)
 liveness and reachability:
 
-Content providers need to make sure that their content is reachable, despite peer churn;
-and nodes that store and serve provider records need to make sure that the Multihashes whose 
-records they store are still served by the content provider.
+Content needs to be reachable, despite peer churn;
+and nodes that store and serve provider records should not serve records for stale content,
+i.e., content that the original provider does not wish to make available anymore.
 
 The following two parameters help cover both of these cases.
 1. **Provider Record Republish Interval:** The content provider 
