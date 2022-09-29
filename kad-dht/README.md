@@ -75,13 +75,21 @@ nodes, unrestricted nodes should operate in _server mode_ and restricted nodes,
 e.g. those with intermittent availability, high latency, low bandwidth, low
 CPU/RAM/Storage, etc., should operate in _client mode_.
 
-As an example, running the libp2p Kademlia protocol on top of
-publicly routable nodes, e.g. servers in a datacenter, should operate in _server
+As an example, publicly routable nodes running the libp2p Kademlia protocol, 
+e.g. servers in a datacenter, should operate in _server
 mode_ and non-publicly routable nodes, e.g. laptops behind a NAT and firewall,
 should operate in _client mode_. The concrete factors used to classify nodes into
 _clients_ and _servers_ depend on the characteristics of the network topology
 and the properties of the Kademlia DHT. Factors to take into account are e.g.
 network size, replication factor and republishing period.
+
+For instance, setting the replication factor to a low value would require more
+reliable peers, whereas having higher replication factor could allow for less 
+reliable peers at the cost of more overhead. Ultimately, peers that act as 
+servers should help the network (i.e., provide positive utility in terms of 
+availability, reachability, bandwidth). Any factor that slows down network
+operations (e.g., a node not being reachable, or overloaded) for the majority
+of times it is being contacted should instead be operating as a client node.
 
 Nodes, both those operating in _client_ and _server mode_, add another node to
 their routing table if and only if that node operates in _server mode_. This
@@ -271,22 +279,26 @@ heuristic of the value to make the decision.
 There are two things at play with regard to provider record (and therefore content)
 liveness and reachability:
 
-Content providers need to make sure that their content is reachable, despite peer churn
+Content providers need to make sure that their content is reachable, despite peer churn;
 and nodes that store and serve provider records need to make sure that the Multihashes whose 
 records they store are still served by the content provider.
 
 The following two parameters help cover both of these cases.
-1. **Provider Record Republish Interval (24hrs):** The content provider 
+1. **Provider Record Republish Interval:** The content provider 
 needs to make sure that the nodes chosen to store the provider record 
-remain online when clients ask for the record. In order to 
+are still online when clients ask for the record. In order to 
 guarantee this, while taking into account the peer churn, content providers
-republish the records they want to provide every 24 hours.
-2. **Provider Record Expiration Interval (48hrs):** The network needs to provide
+republish the records they want to provide. Choosing the particular value for the
+Republish interval is network-specific and depends on several parameters, such as
+peer reliability and churn. For the IPFS network it is currently set to 22 hours.
+2. **Provider Record Expiration Interval:** The network needs to provide
 content that content providers are still interested in providing. In other words,
 nodes should not keep records for content that content providers have stopped 
 providing (aka stale records). In order to guarantee this, provider records 
-_expire_ after 48 hours, i.e., nodes stop serving those records, 
-unless the content provider has republished the provider record.
+should _expire_ after some interval, i.e., nodes should stop serving those records, 
+unless the content provider has republished the provider record. Again, the specific
+setting depends on the characteristics of the network. In the IPFS DHT the Expiration 
+Interval is set to 48hrs.
 
 The values chosen for those parameters should be subject to continuous monitoring 
 and investigation. Ultimately, the values of those parameters should balance 
@@ -297,6 +309,16 @@ in [provider-record-measurements].
 
 Provider records are managed through the `ADD_PROVIDER` and `GET_PROVIDERS`
 messages.
+
+It is also worth noting that the keys for provider records are multihashes. This
+is because:
+
+- Provider records are used as a rendezvous point for all the parties who have
+advertised that they store some piece of content.
+- The same multihash can be in different CIDs (e.g. CIDv0 vs CIDv1 of a SHA-256 dag-pb object,
+or the same multihash but with different codecs such as dag-pb vs raw).
+- Therefore, the rendezvous point should converge on the minimal thing everyone agrees on,
+which is the multihash, not the CID.
 
 #### Content provider advertisement
 
@@ -312,9 +334,11 @@ Each peer that receives the `ADD_PROVIDER` RPC should validate that the received
 the `PeerInfo` in its datastore. Implementations may choose to not store the
 addresses of the providing peer e.g. to reduce the amount of required storage or
 to prevent storing potentially outdated address information. Implementations that choose
-to keep the network address (i.e., the `multiaddress`) of the providing peer should do it for **the
-first 10 mins** after the provider record (re-)publication. The setting of 10 mins follows
-the DHT Routing Table refresh interval. After that, peers provide 
+to keep the network address (i.e., the `multiaddress`) of the providing peer should do it for
+a period of time that they are confident the network addresses of peers do not change after the 
+provider record has been (re-)published. As with previous constant values, this is dependent
+on the network's characteristics. A safe value here is the Routing Table Refresh Interval. 
+In the kubo IPFS implementation, this is set to 30 mins. After that period, peers provide 
 the provider's `peerID` only, in order to avoid pointing to stale network addresses 
 (i.e., the case where the peer has moved to a new network address).
 
