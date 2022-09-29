@@ -31,7 +31,6 @@ third-party ownership of data.
         - [🧱 Composable routing](#🧱-composable-routing)
         - [💣 Attack resistance, threat models and security](#💣-attack-resistance-threat-models-and-security)
         - [📈 Proving we are scalable and interoperable](#📈-proving-we-are-scalable-and-interoperable)
-        - [🌐 Browser use cases](#🌐-browser-use-cases)
         - [🌡️ Opt-in telemetry protocol](#🌡️-opt-in-telemetry-protocol)
         - [📩 Message-oriented transports](#📩-message-oriented-transports)
         - [☎️ Reducing the dial fail rate](#️-reducing-the-dial-fail-rate)
@@ -488,28 +487,6 @@ Example targets/KPIs:
 rock-solid foundation for the future of P2P networks; to quantitatively
 measure the impact of our changes on the large scale; to combat the
 perception in some circles that libp2p is "immature".
-
-### 🌐 Browser use cases
-
-**What?** This spans a number of concerns. First, we should improve
-developer experience and make libp2p more accessible in browser
-environments. This entails reducing footprint (e.g. bundle size) and
-creating examples and documentation on how to bundle js-libp2p with
-popular frontend tooling (webpack, parcel, etc.). Developers should be
-able to cherry-pick the features to incorporate in their bundle, and
-tree-shaking should produce good results.
-
-Targeting the [WASM runtime](#libp2p-as-a-wasm-library)
-deserves a special mention, as we're likely to see more user interest in
-this area. Finally, we should continue supporting the
-[TCP](https://github.com/mozilla/libdweb/issues/5) and
-[UDP](https://github.com/mozilla/libdweb/issues/4) socket
-advances made by Mozilla's
-[libdweb](https://github.com/mozilla/libdweb/) team.
-
-**Why?** Browsers are and will continue to be the most used computer interface.
-Not fully supporting the browser platform will hurt most of the projects betting
-on libp2p.
 
 ### 🌡️ Opt-in telemetry protocol
 
