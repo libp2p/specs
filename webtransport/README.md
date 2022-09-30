@@ -25,12 +25,12 @@ The most exciting feature for libp2p (other than the numerous performance benefi
 
 Since most libp2p nodes don't possess a TLS certificate signed by a Certificate Authority, servers use a self-signed certificates. According to the [w3c WebTransport certification](https://www.w3.org/TR/webtransport/), the validity of the certificate MUST be at most 14 days, and must not use an RSA key. Nodes then include the hash of one (or more) certificates in their multiaddr (see [Addressing](#addressing)).
 
-Servers need to take care to regularly renew their certificate. In the following, the RECOMMENDED logic for rolling certificates is described. At first boot of the node, it creates one self-signed certificate with a validity of 14 days, starting immediately, and another certificate with the 14 day valididity period starting on the expiry date of the first certificate. The node advertises a multiaddr containing the certificate hashes of these two certificates.
+Servers need to take care of regularly renewing their certificate. In the following, the RECOMMENDED logic for rolling certificates is described. At first boot of the node, it creates one self-signed certificate with a validity of 14 days, starting immediately, and another certificate with the 14 day validity period starting on the expiry date of the first certificate. The node advertises a multiaddress containing the certificate hashes of these two certificates.
 Once the first certificate has expired, the node starts using the already generated next certificate. At the same time, it again generates a new certificate for the following period and updates the multiaddress it advertises.
 
 ## Addressing
 
-Webtransport multiaddresses are composed of a QUIC multiaddr, followed by `/webtransport` and a list of multihashes of the certificates that the server uses.
+WebTransport multiaddresses are composed of a QUIC multiaddress, followed by `/webtransport` and a list of multihashes of the certificates that the server uses.
 Examples:
 * `/ip4/1.2.3.4/udp/443/quic/webtransport/certhash/<hash1>`
 * `/ip6/fe80::1ff:fe23:4567:890a/udp/1234/quic/webtransport/certhash/<hash1>/certhash/<hash2>/certhash/<hash3>`
