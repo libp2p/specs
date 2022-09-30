@@ -23,9 +23,17 @@ The most exciting feature for libp2p (other than the numerous performance benefi
 
 ## Certificates
 
-Since most libp2p nodes don't possess a TLS certificate signed by a Certificate Authority, servers use a self-signed certificates. According to the [w3c WebTransport certification](https://www.w3.org/TR/webtransport/), the validity of the certificate MUST be at most 14 days, and must not use an RSA key. Nodes then include the hash of one (or more) certificates in their multiaddr (see [Addressing](#addressing)).
+According to the [w3c WebTransport specification](https://www.w3.org/TR/webtransport/), there are two ways for browser to validate the certificate used on a WebTransport connection. 
+1. by verifying the chain of trust of the certificate. This means that the certificate has to be signed by a CA (Certificate Authority) that the browser trusts. This is how browsers verify certificates when establishing a regular HTTPS connection.
+2. by verifying that the cryptographic hash of the certificate matches a specific value, using the [`serverCertificateHashes`](https://www.w3.org/TR/webtransport/#dom-webtransportoptions-servercertificatehashes) option.
 
-Servers need to take care of regularly renewing their certificate. In the following, the RECOMMENDED logic for rolling certificates is described. At first boot of the node, it creates one self-signed certificate with a validity of 14 days, starting immediately, and another certificate with the 14 day validity period starting on the expiry date of the first certificate. The node advertises a multiaddress containing the certificate hashes of these two certificates.
+libp2p nodes that possess a CA-signed TLS certificate MAY use that certificate on WebTransport connections.
+
+The rest of this section applies to nodes that wish to use self-signed certificates and make use of the verification by certificate hash.
+
+According to the w3c specification, the validity of the certificate MUST be at most 14 days, and MUST NOT use an RSA key. Nodes then include the hash of one (or more) certificates in their multiaddr (see [Addressing](#addressing)).
+
+Servers need to take care of regularly renewing their certificates. In the following, the RECOMMENDED logic for rolling certificates is described. At first boot of the node, it creates one self-signed certificate with a validity of 14 days, starting immediately, and another certificate with the 14 day validity period starting on the expiry date of the first certificate. The node advertises a multiaddress containing the certificate hashes of these two certificates.
 Once the first certificate has expired, the node starts using the already generated next certificate. At the same time, it again generates a new certificate for the following period and updates the multiaddress it advertises.
 
 ## Addressing
