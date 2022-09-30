@@ -35,7 +35,7 @@ Examples:
 
 ## WebTransport HTTP endpoint
 
-WebTransport needs a HTTPS URL to establish a WebTransport session, e.g. `https://example.com/webtransport`. As multiaddrs don't allow the encoding of URLs, this spec standardizes the endpoint. The HTTP endpoint of a libp2p WebTransport server MUST be located at `/.well-known/libp2p-webtransport`.
+WebTransport needs a HTTPS URL to establish a WebTransport session, e.g. `https://example.com/webtransport`. At the point of writing multiaddresses don't allow the encoding of URLs, therefore this spec standardizes the endpoint. The HTTP endpoint of a libp2p WebTransport server MUST be located at `/.well-known/libp2p-webtransport`.
 
 To allow future evolution of the way we run the libp2p handshake over WebTransport, we use a URL parameter. The handshake described in this document MUST be signaled by setting the `type` URL parameter to `noise`.
 
