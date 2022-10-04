@@ -322,9 +322,9 @@ be achieved with the [WebTransport](#✈️-webtransport) protocol.
 **High priority for: IPFS**
 
 **What?** Establishing a connection and performing the initial handshake
-should be as cheap and fast as possible. On TCP, The current libp2p
-handshakes spends one round-trip negotiating the security protocol, and
-another roundtrip negotiating the stream multiplexer.
+should be as cheap and fast as possible. On TCP, the current libp2p
+handshake spends one round-trip negotiating the security protocol, and
+another round-trip negotiating the stream multiplexer.
 By using advanced features of the handshake protocol, we might even be
 able to reach the holy grail of a 0-RTT handshake in some cases.
 
@@ -333,8 +333,8 @@ shouldn't make them wait for any longer than absolutely necessary.
 
 **Links:**
 
-- [security protocol in multiaddr](https://github.com/libp2p/specs/pull/353)
-- [muxer selection in security handshake](https://github.com/libp2p/specs/pull/446)
+- [Security protocol in multiaddr](https://github.com/libp2p/specs/pull/353)
+- [Muxer selection in security handshake](https://github.com/libp2p/specs/pull/446)
 - [Protocol Select specification](https://github.com/libp2p/specs/pull/349)
 
 ### 🛣️ Peer Routing Records
