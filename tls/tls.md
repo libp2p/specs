@@ -122,9 +122,9 @@ How the public key is encoded into the `Data` bytes depends on the Key Type.
 
 ## Test vectors
 
-The following items presents test vectors that a compatible implementation should pass.
+The following items present test vectors that a compatible implementation should pass.
 Due to the randomness required when signing certificates, it is hard to provide testcases for generating certificates.
-These test cases verify that implements can correctly parse certificates with all key types.
+These test cases verify that implementations can correctly parse certificates with all key types.
 Implementations are encouraged to also perform roundtrip tests on their own certificate generation.
 
 All certificates in these testcases are HEX encoded.
