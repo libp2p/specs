@@ -277,6 +277,23 @@ overriding the default value of `ordered` `true` to `false` when creating a new
 data channel via
 [`RTCPeerConnection.createDataChannel`](https://www.w3.org/TR/webrtc/#dom-peerconnection-createdatachannel).
 
+### Head-of-line blocking
+
+WebRTC datachannels and the underlying SCTP is message-oriented and not
+stream-oriented (e.g. see
+[`RTCDataChannel.send()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel/send)
+and
+[`RTCDataChannel.onmessage()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel#example)).
+libp2p streams on the other hand are byte oriented. Thus we run into the risk of
+head-of-line blocking.
+
+Given that the browser does not give us access to the MTU on a given connection,
+we can not make an informed decision on the optimal message size. For now
+implementations SHOULD choose a small message size. See [QUIC's "Packet Size"
+section](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport-29#section-14)
+for recommendations. Long term we hope to be able to give better recommendations
+based on real-world experiments.
+
 ### Open Questions
 
 - There are two ways to open a `RTCDataChannel`, either via `negotiated: true`
