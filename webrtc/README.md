@@ -288,11 +288,15 @@ libp2p streams on the other hand are byte oriented. Thus we run into the risk of
 head-of-line blocking.
 
 Given that the browser does not give us access to the MTU on a given connection,
-we can not make an informed decision on the optimal message size. For now
-implementations SHOULD choose a small message size. See [QUIC's "Packet Size"
-section](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport-29#section-14)
-for recommendations. Long term we hope to be able to give better recommendations
-based on real-world experiments.
+we can not make an informed decision on the optimal message size.
+
+We follow the recommendation of QUIC, requiring ["a minimum IP packet size of at
+least 1280
+bytes"](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport-29#section-14).
+An SCTP packet common header is 12 bytes long. An SCTP data chunk header size is
+16 bytes. Thus implementations SHOULD choose a message size equal or below 1252
+bytes. Long term we hope to be able to give better recommendations based on
+real-world experiments.
 
 ### Open Questions
 
