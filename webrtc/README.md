@@ -92,11 +92,9 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
 3. _A_ instantiates a `RTCPeerConnection`. See
    [`RTCPeerConnection()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection).
 
-   _A_ MAY reuse the same certificate across `RTCPeerConnection`s. Though one
-   should note that reusing the certificate can be used to identify _A_ across
-   connections by on-path observers given that WebRTC uses TLS 1.2. Thus this
-   specification RECOMMENDS that _A_, i.e. the browser, does not reuse the same
-   certificate across `RTCPeerConnection`.
+   _A_ (i.e. the browser) SHOULD NOT reuse the same certificate across
+   `RTCPeerConnection`s. Reusing the certificate can be used to identify _A_
+   across connections by on-path observers given that WebRTC uses TLS 1.2.
 
 4. _A_ constructs _B_'s SDP offer locally based on _B_'s multiaddr and sets it
    via
