@@ -170,16 +170,34 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
 Scenario: Browser _A_ wants to connect to Browser node _B_ with the help of
 server node _R_.
 
-- Replace STUN with libp2p's identify and AutoNAT
-  - https://github.com/libp2p/specs/tree/master/identify
-  - https://github.com/libp2p/specs/blob/master/autonat/README.md
-- Replace TURN with libp2p's Circuit Relay v2
-  - https://github.com/libp2p/specs/blob/master/relay/circuit-v2.md
-- Use DCUtR over Circuit Relay v2 to transmit SDP information
-  1. Transform ICE candidates in SDP to multiaddresses.
-  2. Transmit the set of multiaddresses to the remote via DCUtR.
-  3. Transform the set of multiaddresses back to the remotes SDP.
-  4. https://github.com/libp2p/specs/blob/master/relay/DCUtR.md
+_Note that this section is a draft only for now, will be removed before merging
+the first iteration of the specification (browser-to-server) and reintroduced in
+the second iteration i.e. sufficiently specifying browser-to-server._
+
+1. _B_ runs inside a browser and can thus not listen for incoming connections.
+   _B_ connects to a public server node _R_ and uses the Circuit Relay v2
+   protocol to make a reservation.
+
+2. _B_ advertises its relayed address through some external mechanism.
+
+3. _A_ discovers _B_'s relayed address. _A_ connects to _R_ and establishes a
+   relayed connection to _B_ via the Circtui Relay v2 protocol.
+
+4. _A_ and _B_ both create a `RTCPeerConnection` and generate an _offer_ and an
+   _answer_ respectively. See `icegatheringstatechange` below on how these may
+   already contain the addresses of the loca node.
+
+5. _A_ and _B_ exchange the generated _offer_ and _answer_ through some protocol
+   (e.g. an altered DCUtR) via the relayed connection.
+
+6. _A_ and _B_ set the exchanged _offer_ and _answer_ and thus initiate the
+   connection establishment.
+
+7. Messages on the established `RTCDataChannel` are framed using the message
+   framing mechanism described in [Multiplexing](#multiplexing).
+
+8. The remote is authenticated via an additional Noise handshake. See
+   [Connection Security](#connection-security).
 
 #### Open Questions
 
