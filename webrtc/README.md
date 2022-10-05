@@ -319,29 +319,6 @@ assigned to them (via their DTLS role). Thus instead of a maximum of `~2^16`
 streams throughout the lifetime of a WebRTC connection, `~2^16` is the maximum
 number of *concurrent* streams of a WebRTC connection.
 
-### Open Questions
-
-- There are two ways to open a `RTCDataChannel`, either via `negotiated: true`
-  and thus out-of-band channel ID negotiation or `negotiated: false` and thus
-  in-band channel ID negotiation.
-
-  Is the assumption correct that in-band stream ID negotiation requires an
-  additional round trip? If so how about using out-of-band channel id
-  negotiation only (thus no additional round trip) based on the DTLS role?
-
-  > When one side wants to open a channel using out-of-band negotiation, it
-  > picks a stream. Unless otherwise defined or negotiated, the streams are
-  > picked based on the DTLS role (the client picks even stream identifiers, and
-  > the server picks odd stream identifiers).
-
-  https://www.rfc-editor.org/rfc/rfc8831#name-opening-a-data-channel
-
-- Do browsers allow reuse of `RTCDataChannel` IDs? If so, should we allow libp2p
-  WebRTC implementations to reuse channel IDs of previously closed channels?
-  Motivation would be to have more than 2^16 channels throughout the lifetime of
-  a WebRTC connection. Note that this would still restrict a connection to at
-  most 2^16 concurrent channels.
-
 ## Connection Security
 
 Note that the below uses the message framing described in
