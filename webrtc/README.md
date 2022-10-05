@@ -44,7 +44,7 @@ Interest Group: [@marten-seemann]
 
 ## Requirements
 
-- Loading a remote nodes certificate into ones browser trust-store is not an
+- Loading a remote node's certificate into one's browser trust-store is not an
   option, i.e. doesn't scale.
 
 - No dependency on central STUN and/or TURN servers.
