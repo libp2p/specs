@@ -298,6 +298,27 @@ An SCTP packet common header is 12 bytes long. An SCTP data chunk header size is
 bytes. Long term we hope to be able to give better recommendations based on
 real-world experiments.
 
+### `RTCDataChannel` negotiation
+
+`RTCDataChannel`s are negotiated out-of-band by setting `negotiated: true` when
+creating a `RTCDataChannel` via `RTCPeerConnection.createDataChannel`.
+
+The 16-bit numeric `RTCDataChannel` `id` space is split between _A_ and _B_ as
+recommended by the [WebRTC
+RFC](https://www.rfc-editor.org/rfc/rfc8831#section-6.5):
+
+> the stream [ids] are picked based on the DTLS role (the client picks even
+> stream identifiers, and the server picks odd stream identifiers).
+
+Note that `id` `0` is reserved for the additional connection security handshake.
+See [Connection Security](#connection-security).
+
+Given the small `id` space, implementations SHOULD reuse `RTCDataChannel` `id`s
+of previously closed `RTCDataChannel`s once they used up the maximum `id`
+assigned to them (via their DTLS role). Thus instead of a maximum of `~2^16`
+streams throughout the lifetime of a WebRTC connection, `~2^16` is the maximum
+number of *concurrent* streams of a WebRTC connection.
+
 ### Open Questions
 
 - There are two ways to open a `RTCDataChannel`, either via `negotiated: true`
