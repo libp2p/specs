@@ -321,24 +321,22 @@ real-world experiments.
 
 ### `RTCDataChannel` negotiation
 
-`RTCDataChannel`s are negotiated out-of-band by setting `negotiated: true` when
-creating a `RTCDataChannel` via `RTCPeerConnection.createDataChannel`.
+`RTCDataChannel`s are negotiated in-band by the WebRTC user agent (e.g. Firefox,
+Pion, ...). In other words libp2p WebRTC implementations MUST NOT change the
+default value `negotiated: false` when creating a `RTCDataChannel` via
+`RTCPeerConnection.createDataChannel`.
 
-The 16-bit numeric `RTCDataChannel` `id` space is split between _A_ and _B_ as
-recommended by the [WebRTC
-RFC](https://www.rfc-editor.org/rfc/rfc8831#section-6.5):
+The WebRTC user agent (i.e. not the application) decides on the `RTCDataChannel`
+ID based on the local node's connection role. For the interested reader see
+[RF8832 Protocol
+Overview](https://www.rfc-editor.org/rfc/rfc8832.html#section-4). User agents
+can reuse IDs once their `RTCDataChannel` closes. E.g. see [Chromium
+implementation](https://source.chromium.org/chromium/chromium/src/+/main:third_party/webrtc/pc/sctp_data_channel.cc;drc=9eb3b57e381e6c525ca8bd1494de5eb20fac58c7;l=104)
 
-> the stream [ids] are picked based on the DTLS role (the client picks even
-> stream identifiers, and the server picks odd stream identifiers).
-
-Note that `id` `0` is reserved for the additional connection security handshake.
-See [Connection Security](#connection-security).
-
-Given the small `id` space, implementations SHOULD reuse `RTCDataChannel` `id`s
-of previously closed `RTCDataChannel`s once they used up the maximum `id`
-assigned to them (via their DTLS role). Thus instead of a maximum of `~2^16`
-streams throughout the lifetime of a WebRTC connection, `~2^16` is the maximum
-number of *concurrent* streams of a WebRTC connection.
+According to RFC 8832 a `RTCDataChannel` initiator "MAY start sending messages
+containing user data without waiting for the reception of the corresponding
+DATA_CHANNEL_ACK message", thus using `negotiated: false` does not imply an
+additional round trip for each new `RTCDataChannel`.
 
 ## Connection Security
 
