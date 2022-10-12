@@ -6,11 +6,12 @@
 
 Authors: [@marten-seemann]
 
-Interest Group: [@MarcoPolo], [@mxinden]
+Interest Group: [@MarcoPolo], [@mxinden], [@elenaf9]
 
 [@marten-seemann]: https://github.com/marten-seemann
 [@MarcoPolo]: https://github.com/MarcoPolo
 [@mxinden]: https://github.com/mxinden
+[@elenaf9]: https://github.com/elenaf9
 
 
 See the [lifecycle document](../00-framework-01-spec-lifecycle.md) for context about maturity level
