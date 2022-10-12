@@ -31,7 +31,7 @@ third-party ownership of data.
         - [🧱 Composable routing](#🧱-composable-routing)
         - [💣 Attack resistance, threat models and security](#💣-attack-resistance-threat-models-and-security)
         - [📈 Proving we are scalable and interoperable](#📈-proving-we-are-scalable-and-interoperable)
-        - [🌡️ Opt-in telemetry protocol](#🌡️-opt-in-telemetry-protocol)
+        - [🌡️ Telemetry protocol](#🌡️-telemetry-protocol)
         - [📩 Message-oriented transports](#📩-message-oriented-transports)
         - [☎️ Reducing the dial fail rate](#️-reducing-the-dial-fail-rate)
         - [🔀 Peer exchange protocol](#🔀-peer-exchange-protocol)
@@ -463,7 +463,7 @@ cluster operation, code instrumentation and metrics collection at scale.
 But some magnitudes are cost-ineffective to test in a dedicated
 infrastructure. We might have to resort to capturing empirical evidence
 from live networks. [This ties in with the opt-in telemetry
-protocol](#opt-in-telemetry-protocol) and the extension of
+protocol](#telemetry-protocol) and the extension of
 IPTB into IPTL (TestLab).
 
 And we cannot forget negative testing. This includes chaos engineering
@@ -486,26 +486,29 @@ rock-solid foundation for the future of P2P networks; to quantitatively
 measure the impact of our changes on the large scale; to combat the
 perception in some circles that libp2p is "immature".
 
-### 🌡️ Opt-in telemetry protocol
+### 🌡️ Telemetry protocol
 
-**What?** By developing a *decentralized* telemetry protocol that nodes can opt
-into, we could build a world-wide real-time visualisation of our global libp2p
+**What?** By developing a *privacy-preserving* telemetry protocol,
+libp2p networks could build a world-wide real-time visualisation of the
 network, à la [Torflow](https://torflow.uncharted.software), [Kaspersky's
 Cybermap](https://cybermap.kaspersky.com/), or [Checkpoint's
 Threatmap](https://threatmap.checkpoint.com/).
 
-This might surface interesting facts about the backbone of the Internet;
-perhaps even correlations with the [Submarine Cable
-Map](https://www.submarinecablemap.com/). Imagine [RIPE
-Atlas](https://atlas.ripe.net/results/maps/network-coverage/)
-but for libp2p networks.
+The privacy properties of this protocol need to be strong enough that
+metrics collection can be enabled by default (with an easy switch to disable
+it for users who disagree with that assessment). As an example, the 
+[IETF PPM working group](https://datatracker.ietf.org/wg/ppm/documents/)
+is currently doing interesting work standardizing such a protocol, using
+advanced cryptography and a distributed setup.
 
 Nodes could probe and collect stats about the connections it maintains
-with other peers: latency, traceroute, IP address, etc., publishing raw
-data on a global pubsub channel like a heartbeat, where a webapp is
-listening over a websockets channel.
+with other peers: latency, traceroute, IP address, hole punching success
+rates etc. The resulting protocol should expose a way for applications
+running on top of libp2p to use this framework for collecting application-
+specific metrics.
 
-**Why?** To gain real-time insight into the global libp2p deployment.
+**Why?** To gain real-time insight into libp2p networks and the applications
+using the stack.
 
 ### 📩 Message-oriented transports
 
