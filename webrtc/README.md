@@ -388,6 +388,13 @@ _B_'s multiaddr. For now implementations MAY assume both _A_ and _B_ to use
 sha-256. Future iterations of this specification may add support for other hash
 algorithms in a backwards compatible way.
 
+Implementations SHOULD setup all the necessary callbacks (e.g.
+[`ondatachannel`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/datachannel_event))
+before starting the Noise handshake. This is to avoid scenarios like one where
+_A_ initiates a stream before _B_ got a chance to set the `ondatachannel`
+callback. This would result in _B_ ignoring all the messages coming from _A_
+targeting that stream.
+
 Implementations MAY open streams before completion of the Noise handshake.
 Applications MUST take special care what application data they send, since at
 this point the peer is not yet authenticated. Similarly, the receiving side MAY
