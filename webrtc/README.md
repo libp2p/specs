@@ -199,6 +199,11 @@ the second iteration i.e. sufficiently specifying browser-to-server._
 8. The remote is authenticated via an additional Noise handshake. See
    [Connection Security](#connection-security).
 
+The above browser-to-browser WebRTC connection establishment replaces the
+existing [libp2p WebRTC star](https://github.com/libp2p/js-libp2p-webrtc-star)
+and [libp2p WebRTC direct](https://github.com/libp2p/js-libp2p-webrtc-direct)
+protocols.
+
 #### Open Questions
 
 - Can a browser know upfront its UDP port which it is listening for incoming
