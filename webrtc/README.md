@@ -330,8 +330,9 @@ The WebRTC user agent (i.e. not the application) decides on the `RTCDataChannel`
 ID based on the local node's connection role. For the interested reader see
 [RF8832 Protocol
 Overview](https://www.rfc-editor.org/rfc/rfc8832.html#section-4). User agents
-can reuse IDs once their `RTCDataChannel` closes. E.g. see [Chromium
-implementation](https://source.chromium.org/chromium/chromium/src/+/main:third_party/webrtc/pc/sctp_data_channel.cc;drc=9eb3b57e381e6c525ca8bd1494de5eb20fac58c7;l=104)
+can reuse IDs once their `RTCDataChannel` closes: "Streams are available for
+reuse after a reset has been performed". See [RFC 8831 6.7 Closing a Data
+Channel ](https://datatracker.ietf.org/doc/html/rfc8831#section-6.7)
 
 According to RFC 8832 a `RTCDataChannel` initiator "MAY start sending messages
 containing user data without waiting for the reception of the corresponding
