@@ -13,17 +13,17 @@ and spec status.
 
 ## Introduction
 
-[WebTransport](https://datatracker.ietf.org/doc/draft-ietf-webtrans-overview/) is a way for browsers to establish a stream-multiplexed and bidirectional connection to servers. The WebTransport protocol is currently under development at the IETF. The primary way to do by running on top of a HTTP/3 connection [WebTransport over HTTP/3](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http3/). For situations where it is not possible to establish a HTTP/3 connection, there's a HTTP/2 fallback ([WebTransport using HTTP/2](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http2/)).
+[WebTransport](https://datatracker.ietf.org/doc/draft-ietf-webtrans-overview/) is a way for browsers to establish a stream-multiplexed and bidirectional connection to servers. The WebTransport protocol is currently under development at the IETF. The primary way to do this is by running on top of a HTTP/3 connection [WebTransport over HTTP/3](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http3/). For situations where it is not possible to establish a HTTP/3 connection (e.g. when UDP is blocked), there's a HTTP/2 fallback ([WebTransport using HTTP/2](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http2/)).
 
 In this document, we mean WebTransport over HTTP/3 when using the term WebTransport.
 
 Chrome has implemented and shipped support for [draft-02](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http3/02/), and Firefox [is working](https://bugzilla.mozilla.org/show_bug.cgi?id=1709355) on WebTransport support.
 
-The most exciting feature for libp2p (other than the numerous performance benefits that QUIC gives us) is that the W3C added a browser API allowing browsers to establish connections to nodes with self-signed certificates, provided they know the hash of the certificate in advance: [`serverCertificateHashes`](https://www.w3.org/TR/webtransport/#dom-webtransportoptions-servercertificatehashes). This API is already [implemented in Chrome](https://chromestatus.com/feature/5690646332440576). Firefox is working on a WebTransport implementation and is [likely to implement](https://github.com/mozilla/standards-positions/issues/167#issuecomment-1015951396) `serverCertificateHashes` as well.
+The most exciting feature for libp2p (other than the numerous performance benefits that QUIC gives us) is that the W3C added a browser API allowing browsers to establish connections to nodes with self-signed certificates, provided they know the hash of the certificate in advance: [`serverCertificateHashes`](https://www.w3.org/TR/webtransport/#dom-webtransportoptions-servercertificatehashes). This API is already [implemented in Chrome](https://chromestatus.com/feature/5690646332440576), and Firefox is [likely to implement](https://github.com/mozilla/standards-positions/issues/167#issuecomment-1015951396) this part of the specification as well.
 
 ## Certificates
 
-According to the [w3c WebTransport specification](https://www.w3.org/TR/webtransport/), there are two ways for browser to validate the certificate used on a WebTransport connection. 
+According to the [w3c WebTransport specification](https://www.w3.org/TR/webtransport/), there are two ways for a browser to validate the certificate used on a WebTransport connection. 
 1. by verifying the chain of trust of the certificate. This means that the certificate has to be signed by a CA (Certificate Authority) that the browser trusts. This is how browsers verify certificates when establishing a regular HTTPS connection.
 2. by verifying that the cryptographic hash of the certificate matches a specific value, using the [`serverCertificateHashes`](https://www.w3.org/TR/webtransport/#dom-webtransportoptions-servercertificatehashes) option.
 
