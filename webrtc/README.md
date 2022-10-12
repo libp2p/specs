@@ -349,8 +349,7 @@ After [Connection Establishment](#connection-establishment):
    ([`pc.createDataChannel("", {negotiated: true, id:
    0});`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createDataChannel)).
 
-2. _A_ starts a Noise `XX` handshake using _A_'s and _B_'s libp2p identity on
-   the new channel. See
+2. _B_ starts a Noise `XX` handshake on the new channel. See
    [noise-libp2p](https://github.com/libp2p/specs/tree/master/noise).
 
    _A_ and _B_ use the [Noise
@@ -383,10 +382,6 @@ this point the peer is not yet authenticated. Similarly, the receiving side MAY
 accept streams before completion of the handshake.
 
 ### Open Questions
-
-- Would it be more efficient for _B_ to initiate the Noise handshake? In other
-  words, who is able to write on an established WebRTC connection first? _A_ or
-  _B_?
 
 - On the server side, can one derive the TLS certificate in a deterministic way
   based on a node's libp2p private key? Benefit would be that a node only needs
