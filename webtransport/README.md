@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity                 | Status | Latest Revision |
 |-----------------|--------------------------|--------|-----------------|
-| 1A              | Candidate Recommendation | Active | r0, 2022-09-28  |
+| 1A              | Candidate Recommendation | Active | r0, 2022-10-12  |
 
 Authors: [@marten-seemann]
 
@@ -27,7 +27,7 @@ According to the [w3c WebTransport specification](https://www.w3.org/TR/webtrans
 1. by verifying the chain of trust of the certificate. This means that the certificate has to be signed by a CA (Certificate Authority) that the browser trusts. This is how browsers verify certificates when establishing a regular HTTPS connection.
 2. by verifying that the cryptographic hash of the certificate matches a specific value, using the [`serverCertificateHashes`](https://www.w3.org/TR/webtransport/#dom-webtransportoptions-servercertificatehashes) option.
 
-libp2p nodes that possess a CA-signed TLS certificate MAY use that certificate on WebTransport connections.
+libp2p nodes that possess a CA-signed TLS certificate MAY use that certificate on WebTransport connections. These nodes SHOULD NOT add a `/certhash` component (see [Addressing](#addressing)) to addresses they advertise, since this will cause clients to verify the certificate by the hash (instead of verifying the certificate chain).
 
 The rest of this section applies to nodes that wish to use self-signed certificates and make use of the verification by certificate hash.
 
@@ -38,10 +38,11 @@ Once the first certificate has expired, the node starts using the already genera
 
 ## Addressing
 
-WebTransport multiaddresses are composed of a QUIC multiaddress, followed by `/webtransport` and a list of multihashes of the certificates that the server uses.
+WebTransport multiaddresses are composed of a QUIC multiaddress, followed by `/webtransport` and a list of multihashes of the certificates that the server uses (if not using a CA-signed certificate).
 Examples:
-* `/ip4/1.2.3.4/udp/443/quic/webtransport/certhash/<hash1>`
-* `/ip6/fe80::1ff:fe23:4567:890a/udp/1234/quic/webtransport/certhash/<hash1>/certhash/<hash2>/certhash/<hash3>`
+* `/ip4/1.2.3.4/udp/443/quic/webtransport` (when using a CA-signed certificates)
+* `/ip4/1.2.3.4/udp/1234/quic/webtransport/certhash/<hash1>` (when using single self-signed certificates)
+* `/ip6/fe80::1ff:fe23:4567:890a/udp/1234/quic/webtransport/certhash/<hash1>/certhash/<hash2>/certhash/<hash3>` (when using single self-signed certificates)
 
 ## WebTransport HTTP endpoint
 
