@@ -329,10 +329,12 @@ default value `negotiated: false` when creating a `RTCDataChannel` via
 The WebRTC user agent (i.e. not the application) decides on the `RTCDataChannel`
 ID based on the local node's connection role. For the interested reader see
 [RF8832 Protocol
-Overview](https://www.rfc-editor.org/rfc/rfc8832.html#section-4). User agents
-can reuse IDs once their `RTCDataChannel` closes: "Streams are available for
-reuse after a reset has been performed". See [RFC 8831 6.7 Closing a Data
-Channel ](https://datatracker.ietf.org/doc/html/rfc8831#section-6.7)
+Overview](https://www.rfc-editor.org/rfc/rfc8832.html#section-4). It is
+RECOMMENDED that user agents reuse IDs once their `RTCDataChannel` closes. IDs
+MAY be reused according to RFC 8831: "Streams are available for reuse after a
+reset has been performed", see [RFC 8831 6.7 Closing a Data Channel
+](https://datatracker.ietf.org/doc/html/rfc8831#section-6.7). Up to 65535
+(`2^16`) concurrent data channels can be opened at any given time.
 
 According to RFC 8832 a `RTCDataChannel` initiator "MAY start sending messages
 containing user data without waiting for the reception of the corresponding
