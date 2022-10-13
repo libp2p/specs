@@ -369,13 +369,6 @@ Applications MUST take special care what application data they send, since at
 this point the peer is not yet authenticated. Similarly, the receiving side MAY
 accept streams before completion of the handshake.
 
-### Open Questions
-
-- On the server side, can one derive the TLS certificate in a deterministic way
-  based on a node's libp2p private key? Benefit would be that a node only needs
-  to persist the libp2p private key and not the TLS key material while still
-  maintaining a fixed TLS certificate fingerprint.
-
 ## General Open Questions
 
 - Should libp2p's WebRTC stack limit itself to using UDP only, or support WebRTC
