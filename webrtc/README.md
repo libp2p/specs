@@ -16,16 +16,13 @@ Interest Group: [@marten-seemann]
     - [Addressing](#addressing)
     - [Connection Establishment](#connection-establishment)
         - [Browser to public Server](#browser-to-public-server)
-            - [Open Questions](#open-questions)
         - [Browser to Browser](#browser-to-browser)
-            - [Open Questions](#open-questions-1)
+            - [Open Questions](#open-questions)
     - [Multiplexing](#multiplexing)
         - [Ordering](#ordering)
         - [Head-of-line blocking](#head-of-line-blocking)
         - [`RTCDataChannel` negotiation](#rtcdatachannel-negotiation)
     - [Connection Security](#connection-security)
-        - [Open Questions](#open-questions-2)
-    - [General Open Questions](#general-open-questions)
     - [Previous, ongoing and related work](#previous-ongoing-and-related-work)
 - [FAQ](#faq)
 
@@ -139,6 +136,9 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
 
 9. The remote is authenticated via an additional Noise handshake. See
    [Connection Security section](#connection-security).
+
+WebRTC can run both on UDP and TCP. libp2p WebRTC implementations MUST support
+UDP and MAY support TCP.
 
 ### Browser to Browser
 
@@ -368,14 +368,6 @@ Implementations MAY open streams before completion of the Noise handshake.
 Applications MUST take special care what application data they send, since at
 this point the peer is not yet authenticated. Similarly, the receiving side MAY
 accept streams before completion of the handshake.
-
-## General Open Questions
-
-- Should libp2p's WebRTC stack limit itself to using UDP only, or support WebRTC
-  on top of both UDP and TCP?
-
-- Is the fact that Firefox does not allow a WebRTC to `localhost` an issue? See
-  https://bugzilla.mozilla.org/show_bug.cgi?id=831926.
 
 ## Previous, ongoing and related work
 
