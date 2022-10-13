@@ -113,6 +113,13 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    incoming connection. _B_ uses the same random string for the username and
    password in the STUN message from _B_ to _A_.
 
+   Note that this step requires _B_ to allocate memory for each incoming STUN
+   message from _A_. This could be leveraged for a **DOS attack** where _A_ is
+   sending many STUN messages with different ufrags using different UDP source
+   ports, forcing _B_ to allocate a new peer connection for each. _B_ SHOULD
+   have a rate limiting mechanism in place as a defense measure. See also
+   https://datatracker.ietf.org/doc/html/rfc5389#section-16.1.2.
+
 7. _A_ and _B_ execute the DTLS handshake as part of the standard WebRTC
    connection establishment.
 
@@ -132,34 +139,6 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
 
 9. The remote is authenticated via an additional Noise handshake. See
    [Connection Security section](#connection-security).
-
-#### Open Questions
-
-- Is the fact that the server accepts STUN messages from the client prone to
-  attacks?
-
-    - Can an attacker launch an **amplification attack** with the STUN endpoint
-      of the server?
-
-      The QUIC protocol defends against amplification attacks by requiring:
-
-      > an endpoint MUST limit the amount of data it sends to the unvalidated
-      > address to three times the amount of data received from that address.
-
-      https://datatracker.ietf.org/doc/html/rfc9000#section-8
-
-      For WebRTC in libp2p one could require the client (_A_) to add additional
-      bytes to its STUN message, e.g. in the STUN username and password, thus
-      making an amplification attack less attractive.
-
-    - Can a client run a **DOS attack** by sending many STUN messages with
-      different ufrags using different UDP source ports, forcing the server to
-      allocate a new peer connection for each? Would rate limiting suffice to
-      defend against this attack?
-
-  See also:
-  - https://datatracker.ietf.org/doc/html/rfc5389#section-16.2.1
-  - https://datatracker.ietf.org/doc/html/rfc5389#section-16.1.2
 
 ### Browser to Browser
 
@@ -494,6 +473,22 @@ accept streams before completion of the handshake.
 
   As a peer-to-peer networking library, libp2p should rely as little as possible
   on central infrastructure.
+
+- _Can an attacker launch an amplification attack with the STUN endpoint of
+  the server?_
+
+  We follow the reasoning of the QUIC protocol, namely requiring:
+
+  > an endpoint MUST limit the amount of data it sends to the unvalidated
+  > address to three times the amount of data received from that address.
+
+  https://datatracker.ietf.org/doc/html/rfc9000#section-8
+
+  This is the case for STUN response messages which are only slight larger than
+  the request messages. See also
+  https://datatracker.ietf.org/doc/html/rfc5389#section-16.1.2.
+
+
 
 [QUIC RFC]: https://www.rfc-editor.org/rfc/rfc9000.html
 [uvarint-spec]: https://github.com/multiformats/unsigned-varint
