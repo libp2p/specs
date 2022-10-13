@@ -13,7 +13,6 @@ Interest Group: [@marten-seemann]
 
 - [WebRTC](#webrtc)
     - [Motivation](#motivation)
-    - [Requirements](#requirements)
     - [Addressing](#addressing)
     - [Connection Establishment](#connection-establishment)
         - [Browser to public Server](#browser-to-public-server)
@@ -22,6 +21,8 @@ Interest Group: [@marten-seemann]
             - [Open Questions](#open-questions-1)
     - [Multiplexing](#multiplexing)
         - [Ordering](#ordering)
+        - [Head-of-line blocking](#head-of-line-blocking)
+        - [`RTCDataChannel` negotiation](#rtcdatachannel-negotiation)
     - [Connection Security](#connection-security)
         - [Open Questions](#open-questions-2)
     - [General Open Questions](#general-open-questions)
@@ -89,15 +90,16 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    `RTCPeerConnection`s. Reusing the certificate can be used to identify _A_
    across connections by on-path observers given that WebRTC uses TLS 1.2.
 
-4. _A_ constructs _B_'s SDP offer locally based on _B_'s multiaddr and sets it
-   via
+4. _A_ constructs _B_'s SDP offer locally based on _B_'s multiaddr. _A_
+   generates a random string and sets that string as the username (_ufrag_ or
+   _username fragment_) and password on the SDP of the remote offer. Finally _A_
+   sets the remote offer via
    [`RTCPeerConnection.setRemoteDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setRemoteDescription).
 
 5. _A_ creates a local offer via
    [`RTCPeerConnection.createOffer()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createOffer).
-   _A_ generates a random string and sets that string as the username (_ufrag_
-   or _username fragment_) and password on the SDP of the local offer. Finally
-   _A_ sets the modified offer via
+   _A_ sets the same username as password on the local offer as done in (4) on
+   the remote offer. Finally _A_ sets the modified offer via
    [`RTCPeerConnection.setLocalDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setLocalDescription).
 
    Note that this process, oftentimes referred to as "SDP munging" is disallowed
@@ -122,13 +124,14 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
 
    On success of the DTLS handshake the connection provides confidentiality and
    integrity but not authenticity. The latter is guaranteed through the
-   succeeding Noise handshake.
+   succeeding Noise handshake. See [Connection Security
+   section](#connection-security).
 
 8. Messages on the established `RTCDataChannel` are framed using the message
    framing mechanism described in [Multiplexing](#multiplexing).
 
 9. The remote is authenticated via an additional Noise handshake. See
-   [Connection Security](#connection-security).
+   [Connection Security section](#connection-security).
 
 #### Open Questions
 
