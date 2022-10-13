@@ -42,13 +42,6 @@ Interest Group: [@marten-seemann]
 2. **Hole punching in the browser**: Enable two browsers or a browser and a
    server node to connect even though one or both are behind a NAT / firewall.
 
-## Requirements
-
-- Loading a remote node's certificate into one's browser trust-store is not an
-  option, i.e. doesn't scale.
-
-- No dependency on central TURN servers.
-
 ## Addressing
 
 WebRTC multiaddresses are composed of an IP and UDP address component, followed
@@ -485,6 +478,19 @@ accept streams before completion of the handshake.
   use libp2p's identify and AutoNAT protocol instead of relying on STUN._
 
   No, a browser uses a new UDP port for each `RTCPeerConnection`.
+
+- _Why not load a remote node's certificate into one's browser trust-store and
+  then connect e.g. via WebSocket._
+
+  This would require a mechanism to discover remote node's certificates upfront.
+  More importantly, this does not scale with the number of connections a typical
+  peer-to-peer application establishes.
+
+- _Why not use a central TURN servers? Why rely on libp2p's Circuit Relay v2
+  instead?_
+
+  As a peer-to-peer networking library, libp2p should rely as little as possible
+  on central infrastructure.
 
 [QUIC RFC]: https://www.rfc-editor.org/rfc/rfc9000.html
 [uvarint-spec]: https://github.com/multiformats/unsigned-varint
