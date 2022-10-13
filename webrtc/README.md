@@ -47,7 +47,7 @@ Interest Group: [@marten-seemann]
 - Loading a remote node's certificate into one's browser trust-store is not an
   option, i.e. doesn't scale.
 
-- No dependency on central STUN and/or TURN servers.
+- No dependency on central TURN servers.
 
 ## Addressing
 
@@ -205,13 +205,6 @@ and [libp2p WebRTC direct](https://github.com/libp2p/js-libp2p-webrtc-direct)
 protocols.
 
 #### Open Questions
-
-- Can a browser know upfront its UDP port which it is listening for incoming
-  connections on? Does the browser reuse the UDP port across many WebRTC
-  connections? If that is the case one could connect to any public node, with
-  the remote telling the local node what port it is perceived on.
-
-  No, a browser uses a new UDP port for each `RTCPeerConnection`.
 
 - Can _Browser_ control the lifecycle of its local TLS certificate, i.e. can
   _Browser_ use the same TLS certificate for multiple WebRTC connections?
@@ -484,6 +477,14 @@ accept streams before completion of the handshake.
   Using Protobuf allows us to evolve the protocol in a backwards compatibile way
   going forward. Using Protobuf is consistent with the many other libp2p
   protocols. These benefits outweigh the drawback of additional overhead.
+
+- _Can a browser know upfront its UDP port which it is listening for incoming
+  connections on? Does the browser reuse the UDP port across many WebRTC
+  connections? If that is the case one could connect to any public node, with
+  the remote telling the local node what port it is perceived on. Thus one could
+  use libp2p's identify and AutoNAT protocol instead of relying on STUN._
+
+  No, a browser uses a new UDP port for each `RTCPeerConnection`.
 
 [QUIC RFC]: https://www.rfc-editor.org/rfc/rfc9000.html
 [uvarint-spec]: https://github.com/multiformats/unsigned-varint
