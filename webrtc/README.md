@@ -114,7 +114,7 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    password in the STUN message from _B_ to _A_.
 
    Note that this step requires _B_ to allocate memory for each incoming STUN
-   message from _A_. This could be leveraged for a **DOS attack** where _A_ is
+   message from _A_. This could be leveraged for a DOS attack where _A_ is
    sending many STUN messages with different ufrags using different UDP source
    ports, forcing _B_ to allocate a new peer connection for each. _B_ SHOULD
    have a rate limiting mechanism in place as a defense measure. See also
@@ -334,12 +334,12 @@ After [Connection Establishment](#connection-establishment):
    of the two TLS fingerprints of _A_ (Noise handshake responder) and then _B_
    (Noise handshake initiator), in their multihash byte representation.
 
-  On Chrome _A_ can access its TLS certificate fingerprint directly via
-  `RTCCertificate#getFingerprints`. Firefox does not allow _A_ to do so. Browser
-  compatibility can be found
-  [here](https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate). In
-  practice, this is not an issue since the fingerprint is embedded in the local
-  SDP string.
+   On Chrome _A_ can access its TLS certificate fingerprint directly via
+   `RTCCertificate#getFingerprints`. Firefox does not allow _A_ to do so. Browser
+   compatibility can be found
+   [here](https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate). In
+   practice, this is not an issue since the fingerprint is embedded in the local
+   SDP string.
 
 3. On success of the authentication handshake, the used datachannel is
    closed and the plain WebRTC connection is used with its multiplexing
@@ -488,7 +488,9 @@ accept streams before completion of the handshake.
   the request messages. See also
   https://datatracker.ietf.org/doc/html/rfc5389#section-16.1.2.
 
+- _Why does B start the Noise handshake and not A?_
 
+  Given that WebRTC uses DTLS 1.2, _B_ is the one that can send data first.
 
 [QUIC RFC]: https://www.rfc-editor.org/rfc/rfc9000.html
 [uvarint-spec]: https://github.com/multiformats/unsigned-varint
