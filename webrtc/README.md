@@ -328,6 +328,21 @@ accept streams before completion of the handshake.
     WASM): https://github.com/wngr/libp2p-webrtc
   - WebRTC using STUN and TURN: https://github.com/libp2p/js-libp2p-webrtc-star
 
+## Test vectors
+
+### Noise prologue
+
+All of these test vectors represent hex-encoded bytes.
+
+#### 1. Both client and server use SHA-256
+
+```
+client_fingerprint = "3e79af40d6059617a0d83b83a52ce73b0c1f37a72c6043ad2969e2351bdca870"
+server_fingerprint = "30fc9f469c207419dfdd0aab5f27a86c973c94e40548db9375cca2e915973b99"
+
+prologue = "6c69627032702d7765627274632d6e6f6973653a12203e79af40d6059617a0d83b83a52ce73b0c1f37a72c6043ad2969e2351bdca870122030fc9f469c207419dfdd0aab5f27a86c973c94e40548db9375cca2e915973b99"
+```
+
 # FAQ
 
 - _Why exchange the TLS certificate fingerprint in the multiaddr? Why not
