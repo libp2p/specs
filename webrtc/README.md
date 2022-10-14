@@ -8,6 +8,9 @@ Authors: [@mxinden]
 
 Interest Group: [@marten-seemann]
 
+[@marten-seemann]: https://github.com/marten-seemann
+[@mxinden]: https://github.com/mxinden/
+
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
 **Table of Contents**
 
