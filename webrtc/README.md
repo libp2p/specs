@@ -13,18 +13,16 @@ Interest Group: [@marten-seemann]
 
 - [WebRTC](#webrtc)
     - [Motivation](#motivation)
-    - [Requirements](#requirements)
     - [Addressing](#addressing)
     - [Connection Establishment](#connection-establishment)
         - [Browser to public Server](#browser-to-public-server)
-            - [Open Questions](#open-questions)
         - [Browser to Browser](#browser-to-browser)
-            - [Open Questions](#open-questions-1)
+            - [Open Questions](#open-questions)
     - [Multiplexing](#multiplexing)
         - [Ordering](#ordering)
+        - [Head-of-line blocking](#head-of-line-blocking)
+        - [`RTCDataChannel` negotiation](#rtcdatachannel-negotiation)
     - [Connection Security](#connection-security)
-        - [Open Questions](#open-questions-2)
-    - [General Open Questions](#general-open-questions)
     - [Previous, ongoing and related work](#previous-ongoing-and-related-work)
 - [FAQ](#faq)
 
@@ -41,13 +39,6 @@ Interest Group: [@marten-seemann]
 
 2. **Hole punching in the browser**: Enable two browsers or a browser and a
    server node to connect even though one or both are behind a NAT / firewall.
-
-## Requirements
-
-- Loading a remote nodes certificate into ones browser trust-store is not an
-  option, i.e. doesn't scale.
-
-- No dependency on central STUN and/or TURN servers.
 
 ## Addressing
 
@@ -75,29 +66,37 @@ connect to all other nodes.
 Scenario: Browser _A_ wants to connect to server node _B_ where _B_ is publicly
 reachable but _B_ does not have a TLS certificate trusted by _A_.
 
-As a preparation browser _A_ [generates a
-certificate](https://www.w3.org/TR/webrtc/#dom-rtcpeerconnection-generatecertificate)
-and [gets the certificate's
-fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
+1. Server node _B_ generates a TLS certificate, listens on a UDP port and
+   advertises the corresponding multiaddress (see [#Addressing]) through some
+   external mechanism.
 
-1. Browser _A_ discovers server node _B_'s multiaddr, containing _B_'s IP, UDP
+   Given that _B_ is publicly reachable, _B_ acts as a [ICE
+   Lite](https://www.rfc-editor.org/rfc/rfc5245) agent. It listens on a UDP port
+   for incoming STUN and SCTP packets and multiplexes based on source IP and
+   source port.
+
+2. Browser _A_ discovers server node _B_'s multiaddr, containing _B_'s IP, UDP
   port, TLS certificate fingerprint and libp2p peer ID (e.g.
   `/ip6/2001:db8::/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`),
   through some external mechanism.
 
-2. _A_ instantiates a `RTCPeerConnection`, passing its local certificate as a
-   parameter. See
+3. _A_ instantiates a `RTCPeerConnection`. See
    [`RTCPeerConnection()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection).
 
-3. _A_ constructs _B_'s SDP offer locally based on _B_'s multiaddr and sets it
-   via
+   _A_ (i.e. the browser) SHOULD NOT reuse the same certificate across
+   `RTCPeerConnection`s. Reusing the certificate can be used to identify _A_
+   across connections by on-path observers given that WebRTC uses TLS 1.2.
+
+4. _A_ constructs _B_'s SDP offer locally based on _B_'s multiaddr. _A_
+   generates a random string and sets that string as the username (_ufrag_ or
+   _username fragment_) and password on the SDP of the remote offer. Finally _A_
+   sets the remote offer via
    [`RTCPeerConnection.setRemoteDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setRemoteDescription).
 
-4. _A_ creates a local offer via
+5. _A_ creates a local offer via
    [`RTCPeerConnection.createOffer()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createOffer).
-   _A_ generates a random string and sets that string as the username (_ufrag_
-   or _username fragment_) and password on the SDP of the local offer. Finally
-   _A_ sets the modified offer via
+   _A_ sets the same username as password on the local offer as done in (4) on
+   the remote offer. Finally _A_ sets the modified offer via
    [`RTCPeerConnection.setLocalDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setLocalDescription).
 
    Note that this process, oftentimes referred to as "SDP munging" is disallowed
@@ -105,100 +104,82 @@ fingerprint](https://www.w3.org/TR/webrtc/#dom-rtccertificate-getfingerprints).
    Firefox, Chrome) due to use-cases in the wild. See also
    https://bugs.chromium.org/p/chromium/issues/detail?id=823036
 
-5. _A_ establishes the connection to _B_. The random string used as a _username_
-   and _password_ can be used by _B_ to identify the connection, i.e.
-   demultiplex incoming UDP datagrams per incoming connection. _B_ uses the same
-   random string for the username and password in the STUN message from _B_ to
-   _A_.
+6. _A_ establishes the connection to _B_. The random string used as a _username_
+   and _password_ in combination with the IP and port of _A_ can be used by _B_
+   to identify the connection, i.e. demultiplex incoming UDP datagrams per
+   incoming connection. _B_ uses the same random string for the username and
+   password in the STUN message from _B_ to _A_.
 
-6. _B_ does not know the TLS fingerprint of _A_. _B_ upgrades the incoming
-   connection from _A_ as an _insecure_ connection, learning _A_'s TLS
-   fingerprint through the WebRTC DTLS handshake. At this point the DTLS
-   handshake provides confidentiality and integrity but not authenticity.
+   Note that this step requires _B_ to allocate memory for each incoming STUN
+   message from _A_. This could be leveraged for a DOS attack where _A_ is
+   sending many STUN messages with different ufrags using different UDP source
+   ports, forcing _B_ to allocate a new peer connection for each. _B_ SHOULD
+   have a rate limiting mechanism in place as a defense measure. See also
+   https://datatracker.ietf.org/doc/html/rfc5389#section-16.1.2.
 
-7. Messages on an `RTCDataChannel` are framed using the message framing
-   mechanism described in [Multiplexing](#multiplexing).
+7. _A_ and _B_ execute the DTLS handshake as part of the standard WebRTC
+   connection establishment.
 
-8. The remote is authenticated via an additional Noise handshake. See
-   [Connection Security](#connection-security).
+   At this point _B_ does not know the TLS certificate fingerprint of _A_. Thus
+   _B_ can not verify _A_'s TLS certificate fingerprint during the DTLS
+   handshake. Instead _B_ needs to _disable certificate fingerprint
+   verification_ (see e.g. [Pion's `disableCertificateFingerprintVerification`
+   option](https://github.com/pion/webrtc/blob/360b0f1745c7244850ed638f423cda716a81cedf/settingengine.go#L62)).
 
-#### Open Questions
+   On success of the DTLS handshake the connection provides confidentiality and
+   integrity but not authenticity. The latter is guaranteed through the
+   succeeding Noise handshake. See [Connection Security
+   section](#connection-security).
 
-- Is the fact that the server accepts STUN messages from the client prone to
-  attacks?
+8. Messages on the established `RTCDataChannel` are framed using the message
+   framing mechanism described in [Multiplexing](#multiplexing).
 
-    - Can an attacker launch an **amplification attack** with the STUN endpoint
-      of the server?
+9. The remote is authenticated via an additional Noise handshake. See
+   [Connection Security section](#connection-security).
 
-      The QUIC protocol defends against amplification attacks by requiring:
-
-      > an endpoint MUST limit the amount of data it sends to the unvalidated
-      > address to three times the amount of data received from that address.
-
-      https://datatracker.ietf.org/doc/html/rfc9000#section-8
-
-      For WebRTC in libp2p one could require the client (_A_) to add additional
-      bytes to its STUN message, e.g. in the STUN username and password, thus
-      making an amplification attack less attractive.
-
-    - Can a client run a **DOS attack** by sending many STUN messages with
-      different ufrags using different UDP source ports, forcing the server to
-      allocate a new peer connection for each? Would rate limiting suffice to
-      defend against this attack?
-
-  See also:
-  - https://datatracker.ietf.org/doc/html/rfc5389#section-16.2.1
-  - https://datatracker.ietf.org/doc/html/rfc5389#section-16.1.2
-
-- Do the major WebRTC server implementations support using the same UDP port for
-  multiple WebRTC connections, thus requiring multiplexing multiple WebRTC
-  connections on the same UDP port?
-
-  This is related to [ICE Lite](https://www.rfc-editor.org/rfc/rfc5245), having
-  a host only advertise a single address, namely the host address, which is
-  assumed to be public.
-
-  The [Go WebRTC](https://github.com/pion/webrtc/) implementation and the [Rust
-  WebRTC](https://github.com/webrtc-rs/webrtc) implementation support this. It
-  is unclear whether this is supported in any of the NodeJS implementations.
-
-- Do the major (Go / Rust / ...) WebRTC implementations allow us to accept a
-  WebRTC connection from a remote node without previously receiving an SDP
-  packet from such host?
-
-- Can _Browser_ generate a _valid_ SDP packet for the remote node based on the
-  remote's Multiaddr, where that Multiaddr contains the IP, UDP port and TLS
-  certificate fingerprint (e.g.
-  `/ip6/2001:db8::/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`)? _Valid_ in
-  the sense that this generated SDP packet can then be used to establish a
-  WebRTC connection to the remote.
-
-  Yes.
+WebRTC can run both on UDP and TCP. libp2p WebRTC implementations MUST support
+UDP and MAY support TCP.
 
 ### Browser to Browser
 
 Scenario: Browser _A_ wants to connect to Browser node _B_ with the help of
 server node _R_.
 
-- Replace STUN with libp2p's identify and AutoNAT
-  - https://github.com/libp2p/specs/tree/master/identify
-  - https://github.com/libp2p/specs/blob/master/autonat/README.md
-- Replace TURN with libp2p's Circuit Relay v2
-  - https://github.com/libp2p/specs/blob/master/relay/circuit-v2.md
-- Use DCUtR over Circuit Relay v2 to transmit SDP information
-  1. Transform ICE candidates in SDP to multiaddresses.
-  2. Transmit the set of multiaddresses to the remote via DCUtR.
-  3. Transform the set of multiaddresses back to the remotes SDP.
-  4. https://github.com/libp2p/specs/blob/master/relay/DCUtR.md
+_Note that this section is a draft only for now, will be removed before merging
+the first iteration of the specification (browser-to-server) and reintroduced in
+the second iteration i.e. sufficiently specifying browser-to-server._
+
+1. _B_ runs inside a browser and can thus not listen for incoming connections.
+   _B_ connects to a public server node _R_ and uses the Circuit Relay v2
+   protocol to make a reservation.
+
+2. _B_ advertises its relayed address through some external mechanism.
+
+3. _A_ discovers _B_'s relayed address. _A_ connects to _R_ and establishes a
+   relayed connection to _B_ via the Circtui Relay v2 protocol.
+
+4. _A_ and _B_ both create a `RTCPeerConnection` and generate an _offer_ and an
+   _answer_ respectively. See `icegatheringstatechange` below on how these may
+   already contain the addresses of the loca node.
+
+5. _A_ and _B_ exchange the generated _offer_ and _answer_ through some protocol
+   (e.g. an altered DCUtR) via the relayed connection.
+
+6. _A_ and _B_ set the exchanged _offer_ and _answer_ and thus initiate the
+   connection establishment.
+
+7. Messages on the established `RTCDataChannel` are framed using the message
+   framing mechanism described in [Multiplexing](#multiplexing).
+
+8. The remote is authenticated via an additional Noise handshake. See
+   [Connection Security](#connection-security).
+
+The above browser-to-browser WebRTC connection establishment replaces the
+existing [libp2p WebRTC star](https://github.com/libp2p/js-libp2p-webrtc-star)
+and [libp2p WebRTC direct](https://github.com/libp2p/js-libp2p-webrtc-direct)
+protocols.
 
 #### Open Questions
-
-- Can a browser know upfront its UDP port which it is listening for incoming
-  connections on? Does the browser reuse the UDP port across many WebRTC
-  connections? If that is the case one could connect to any public node, with
-  the remote telling the local node what port it is perceived on.
-
-  No, a browser uses a new UDP port for each `RTCPeerConnection`.
 
 - Can _Browser_ control the lifecycle of its local TLS certificate, i.e. can
   _Browser_ use the same TLS certificate for multiple WebRTC connections?
@@ -211,6 +192,13 @@ server node _R_.
   Circuit Relay v2 and DCUtR? Instead of exchanging the original SDP packets,
   could they exchange their multiaddr and construct the remote's SDP packet
   based on it?
+
+- Instead of using trickle ICE, we could as well wait for the candidate
+  gathering. See
+  https://github.com/pion/webrtc/blob/c1467e4871c78ee3f463b50d858d13dc6f2874a4/examples/insertable-streams/main.go#L141-L142
+  as one example. In the browser, one can wait for the
+  [`icegatheringstatechange`
+  event](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/icegatheringstatechange_event).
 
 ## Multiplexing
 
@@ -256,9 +244,14 @@ message Message {
 }
 ```
 
-Note that "a STOP_SENDING frame requests that the receiving endpoint send a
-RESET_STREAM frame.". See [QUIC RFC - 3.5 Solicited State
-Transitions](https://www.rfc-editor.org/rfc/rfc9000.html#section-3.5).
+Note that in contrast to QUIC (see [QUIC RFC - 3.5 Solicited State
+Transitions](https://www.rfc-editor.org/rfc/rfc9000.html#section-3.5)) a libp2p
+WebRTC endpoint receiving a `STOP_SENDING` frame SHOULD NOT send a
+`RESET_STREAM` frame in reply. The `STOP_SENDING` frame is used for accurate
+accounting of the number of bytes sent for connection-level flow control in
+QUIC. The libp2p WebRTC message framing is not concerned with flow-control and
+thus does not need the `RESET_STREAM` frame to be send in reply to a
+`STOP_SENDING` frame.
 
 Encoded messages including their length prefix MUST NOT exceed 16kiB to support
 all major browsers. See ["Understanding message size
@@ -273,6 +266,49 @@ overriding the default value of `ordered` `true` to `false` when creating a new
 data channel via
 [`RTCPeerConnection.createDataChannel`](https://www.w3.org/TR/webrtc/#dom-peerconnection-createdatachannel).
 
+### Head-of-line blocking
+
+WebRTC datachannels and the underlying SCTP is message-oriented and not
+stream-oriented (e.g. see
+[`RTCDataChannel.send()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel/send)
+and
+[`RTCDataChannel.onmessage()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel#example)).
+libp2p streams on the other hand are byte oriented. Thus we run into the risk of
+head-of-line blocking.
+
+Given that the browser does not give us access to the MTU on a given connection,
+we can not make an informed decision on the optimal message size.
+
+We follow the recommendation of QUIC, requiring ["a minimum IP packet size of at
+least 1280
+bytes"](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport-29#section-14).
+An SCTP packet common header is 12 bytes long. An SCTP data chunk header size is
+16 bytes. Thus implementations SHOULD choose a message size equal or below 1252
+bytes. Long term we hope to be able to give better recommendations based on
+real-world experiments.
+
+### `RTCDataChannel` negotiation
+
+`RTCDataChannel`s are negotiated in-band by the WebRTC user agent (e.g. Firefox,
+Pion, ...). In other words libp2p WebRTC implementations MUST NOT change the
+default value `negotiated: false` when creating a `RTCDataChannel` via
+`RTCPeerConnection.createDataChannel`.
+
+The WebRTC user agent (i.e. not the application) decides on the `RTCDataChannel`
+ID based on the local node's connection role. For the interested reader see
+[RF8832 Protocol
+Overview](https://www.rfc-editor.org/rfc/rfc8832.html#section-4). It is
+RECOMMENDED that user agents reuse IDs once their `RTCDataChannel` closes. IDs
+MAY be reused according to RFC 8831: "Streams are available for reuse after a
+reset has been performed", see [RFC 8831 6.7 Closing a Data Channel
+](https://datatracker.ietf.org/doc/html/rfc8831#section-6.7). Up to 65535
+(`2^16`) concurrent data channels can be opened at any given time.
+
+According to RFC 8832 a `RTCDataChannel` initiator "MAY start sending messages
+containing user data without waiting for the reception of the corresponding
+DATA_CHANNEL_ACK message", thus using `negotiated: false` does not imply an
+additional round trip for each new `RTCDataChannel`.
+
 ## Connection Security
 
 Note that the below uses the message framing described in
@@ -283,21 +319,27 @@ authenticate the remote peer by its libp2p identity.
 
 After [Connection Establishment](#connection-establishment):
 
-1. _A_ opens a WebRTC datachannel.
+1. _A_ and _B_ open a WebRTC data channel with `id: 0` and `negotiated: true`
+   ([`pc.createDataChannel("", {negotiated: true, id:
+   0});`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createDataChannel)).
 
-2. _A_ starts a Noise `XX` handshake using _A_'s and _B_'s libp2p identity. See
+2. _B_ starts a Noise `XX` handshake on the new channel. See
    [noise-libp2p](https://github.com/libp2p/specs/tree/master/noise).
 
-   Instead of exchanging the TLS certificate fingerprints on the established
-   Noise channel once the Noise handshake succeeded, _A_ and _B_ use the [Noise
-   Prologue](https://noiseprotocol.org/noise.html#prologue) mechanism, thus
-   saving one round trip.
+   _A_ and _B_ use the [Noise
+   Prologue](https://noiseprotocol.org/noise.html#prologue) mechanism. More
+   specifically _A_ and _B_ set the Noise _Prologue_ to
+   `libp2p-webrtc-noise:<FINGERPRINT_A><FINGERPRINT_B>` before starting the
+   actual Noise handshake. `<FINGERPRINT_A><FINGERPRINT_B>` is the concatenation
+   of the two TLS fingerprints of _A_ (Noise handshake responder) and then _B_
+   (Noise handshake initiator), in their multihash byte representation.
 
-   More specifically _A_ and _B_ set the Noise _Prologue_ to
-   `libp2p-webrtc-noise:<FINGERPRINTS>` before starting the actual Noise
-   handshake. `<FINGERPRINTS>` is the concatenation of the two TLS
-   fingerprints of _A_ and _B_ in their multihash byte representation, sorted in
-   ascending order.
+   On Chrome _A_ can access its TLS certificate fingerprint directly via
+   `RTCCertificate#getFingerprints`. Firefox does not allow _A_ to do so. Browser
+   compatibility can be found
+   [here](https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate). In
+   practice, this is not an issue since the fingerprint is embedded in the local
+   SDP string.
 
 3. On success of the authentication handshake, the used datachannel is
    closed and the plain WebRTC connection is used with its multiplexing
@@ -308,13 +350,42 @@ https://datatracker.ietf.org/doc/html/rfc8122#section-5). The hash function used
 in WebRTC and the hash function used in the multiaddr `/certhash` component MUST
 be the same. On mismatch the final Noise handshake MUST fail.
 
+_A_ knows _B_'s fingerprint hash algorithm through _B_'s multiaddr. _B_ could
+infer _A_'s fingerprint hash algorithm through _A_'s TLS certificate signature.
+Or _B_ could assume _A_ to use the same hash algorithm it discovers through
+_B_'s multiaddr. For now implementations MAY assume both _A_ and _B_ to use
+sha-256. Future iterations of this specification may add support for other hash
+algorithms in a backwards compatible way.
+
+Implementations SHOULD setup all the necessary callbacks (e.g.
+[`ondatachannel`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/datachannel_event))
+before starting the Noise handshake. This is to avoid scenarios like one where
+_A_ initiates a stream before _B_ got a chance to set the `ondatachannel`
+callback. This would result in _B_ ignoring all the messages coming from _A_
+targeting that stream.
+
+Implementations MAY open streams before completion of the Noise handshake.
+Applications MUST take special care what application data they send, since at
+this point the peer is not yet authenticated. Similarly, the receiving side MAY
+accept streams before completion of the handshake.
+
+## Previous, ongoing and related work
+
+- Proof of concept for the server side in rust-libp2p:
+  https://github.com/libp2p/rust-libp2p/pull/2622
+
+- Proof of concept for the server side (native) and the client side (Rust in
+  WASM): https://github.com/wngr/libp2p-webrtc
+
+- WebRTC using STUN and TURN: https://github.com/libp2p/js-libp2p-webrtc-star
+
 ## Test vectors
 
 ### Noise prologue
 
 All of these test vectors represent hex-encoded bytes.
 
-#### 1. Both client and server use SHA-256 
+#### 1. Both client and server use SHA-256
 
 ```
 client_fingerprint = "3e79af40d6059617a0d83b83a52ce73b0c1f37a72c6043ad2969e2351bdca870"
@@ -330,48 +401,6 @@ server_fingerprint = "3e79af40d6059617a0d83b83a52ce73b0c1f37a72c6043ad2969e2351b
 
 prologue = "6c69627032702d7765627274632d6e6f6973653a122030fc9f469c207419dfdd0aab5f27a86c973c94e40548db9375cca2e915973b9912203e79af40d6059617a0d83b83a52ce73b0c1f37a72c6043ad2969e2351bdca870"
 ```
-
-### Open Questions
-
-- Can a _Browser_ access the fingerprint of its TLS certificate?
-
-  Chrome allows you to access the fingerprint of any locally-created certificate
-  directly via `RTCCertificate#getFingerprints`. Firefox does not allow you to
-  do so. Browser compatibility can be found
-  [here](https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate). In
-  practice, this is not an issue since the fingerprint is embedded in the local
-  SDP string.
-
-- Is the above proposed additional handshake secure? See also alternative
-  proposed Handshake for
-  [WebTransport](https://github.com/libp2p/specs/pull/404).
-
-- Would it be more efficient for _B_ to initiate the Noise handshake? In other
-  words, who is able to write on an established WebRTC connection first? _A_ or
-  _B_?
-
-- On the server side, can one derive the TLS certificate in a deterministic way
-  based on a node's libp2p private key? Benefit would be that a node only needs
-  to persist the libp2p private key and not the TLS key material while still
-  maintaining a fixed TLS certificate fingerprint.
-
-## General Open Questions
-
-- Should libp2p's WebRTC stack limit itself to using UDP only, or support WebRTC
-  on top of both UDP and TCP?
-
-- Is the fact that Firefox does not allow a WebRTC to `localhost` an issue? See
-  https://bugzilla.mozilla.org/show_bug.cgi?id=831926.
-
-## Previous, ongoing and related work
-
-- Proof of concept for the server side in rust-libp2p:
-  https://github.com/libp2p/rust-libp2p/pull/2622
-
-- Proof of concept for the server side (native) and the client side (Rust in
-  WASM): https://github.com/wngr/libp2p-webrtc
-
-- WebRTC using STUN and TURN: https://github.com/libp2p/js-libp2p-webrtc-star
 
 # FAQ
 
@@ -432,4 +461,44 @@ prologue = "6c69627032702d7765627274632d6e6f6973653a122030fc9f469c207419dfdd0aab
   going forward. Using Protobuf is consistent with the many other libp2p
   protocols. These benefits outweigh the drawback of additional overhead.
 
+- _Can a browser know upfront its UDP port which it is listening for incoming
+  connections on? Does the browser reuse the UDP port across many WebRTC
+  connections? If that is the case one could connect to any public node, with
+  the remote telling the local node what port it is perceived on. Thus one could
+  use libp2p's identify and AutoNAT protocol instead of relying on STUN._
+
+  No, a browser uses a new UDP port for each `RTCPeerConnection`.
+
+- _Why not load a remote node's certificate into one's browser trust-store and
+  then connect e.g. via WebSocket._
+
+  This would require a mechanism to discover remote node's certificates upfront.
+  More importantly, this does not scale with the number of connections a typical
+  peer-to-peer application establishes.
+
+- _Why not use a central TURN servers? Why rely on libp2p's Circuit Relay v2
+  instead?_
+
+  As a peer-to-peer networking library, libp2p should rely as little as possible
+  on central infrastructure.
+
+- _Can an attacker launch an amplification attack with the STUN endpoint of
+  the server?_
+
+  We follow the reasoning of the QUIC protocol, namely requiring:
+
+  > an endpoint MUST limit the amount of data it sends to the unvalidated
+  > address to three times the amount of data received from that address.
+
+  https://datatracker.ietf.org/doc/html/rfc9000#section-8
+
+  This is the case for STUN response messages which are only slight larger than
+  the request messages. See also
+  https://datatracker.ietf.org/doc/html/rfc5389#section-16.1.2.
+
+- _Why does B start the Noise handshake and not A?_
+
+  Given that WebRTC uses DTLS 1.2, _B_ is the one that can send data first.
+
 [QUIC RFC]: https://www.rfc-editor.org/rfc/rfc9000.html
+[uvarint-spec]: https://github.com/multiformats/unsigned-varint

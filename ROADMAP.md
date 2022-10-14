@@ -20,21 +20,24 @@ third-party ownership of data.
         - [📮 Offline message queue / postbox](#📮-offline-message-queue--postbox)
         - [🤖 libp2p as a WASM library](#🤖-libp2p-as-a-wasm-library)
     - [Evolve](#evolve)
-        - [🕸 Unprecedented global connectivity](#🕸-unprecedented-global-connectivity)
+        - [✈️ WebTransport](#✈️-webtransport)
         - [⏱ Full Observability](#⏱-full-observability)
         - [🧪 Automated compatibility testing](#🧪-automated-compatibility-testing)
+        - [Stream Migration Protocol](#stream-migration-protocol)
+        - [WebRTC](#webrtc)
         - [🤝 Low latency, efficient connection handshake](#🤝-low-latency-efficient-connection-handshake)
         - [🛣️ Peer Routing Records](#🛣️-peer-routing-records)
         - [🗣️ Polite peering](#🗣️-polite-peering)
         - [🧱 Composable routing](#🧱-composable-routing)
         - [💣 Attack resistance, threat models and security](#💣-attack-resistance-threat-models-and-security)
         - [📈 Proving we are scalable and interoperable](#📈-proving-we-are-scalable-and-interoperable)
-        - [🌐 Browser use cases](#🌐-browser-use-cases)
-        - [🌡️ Opt-in telemetry protocol](#🌡️-opt-in-telemetry-protocol)
+        - [🌡️ Telemetry protocol](#🌡️-telemetry-protocol)
         - [📩 Message-oriented transports](#📩-message-oriented-transports)
         - [☎️ Reducing the dial fail rate](#️-reducing-the-dial-fail-rate)
         - [🔀 Peer exchange protocol](#🔀-peer-exchange-protocol)
         - [🏹 RPC and other common node communication patterns](#🏹-rpc-and-other-common-node-communication-patterns)
+    - [Done](#done)
+        - [🕸 Hole punching on TCP and QUIC](#🕸-hole-punching-on-tcp-and-quic)
 
 ## Visionary
 
@@ -43,7 +46,7 @@ third-party ownership of data.
 This is the stuff that moves libp2p from "a networking toolbox to build P2P
 applications" to the thing that fundamentally reshapes the architecture of the
 Internet; our dreams and aspirations, the North star we should always keep in
-sight; this is what motivates us and it's speaks intimately to our mission
+sight; this is what motivates us and it speaks intimately to our mission
 statement; the libp2p analogy of IPFS working on Mars
 
 ### 🖧 Decentralizing networks
@@ -223,35 +226,25 @@ model.
 
 This is the stuff pushing the existing libp2p stack forward.
 
-### 🕸 Unprecedented global connectivity
+### ✈️ WebTransport
 
 **Status**: In progress
 
-**What?** A DHT crawl measurements (Nov 22nd 2019) showed that out
-of 4344 peers, 2754 were undialable (\~63%). This evidence correlates
-with feedback from the IPFS and Filecoin teams.
+**What?** WebTransport is a browser-API offering low-latency, bidirectional
+client-server messaging running on top of QUIC. The browser API allows the
+establishment of connections to servers that don't have a TLS certificate
+signed by a certificate authority if the hash of the certificate is known in
+advance.
 
-We need to implement additional mechanisms for Firewall and NAT traversal to
-have the highest probability of being able to establish a direct connection.
-Mechanisms we wish to add include:
-
-- Project Flare stack (via *Circuit Relay v2*, *Direct Connection Upgrade
-  through Relay*, *AutoNAT*, *Stream Migration*, ...)
-
-- WebRTC
-
-**Why?** Good connectivity is the bread-and-butter of libp2p. Focusing
-on solving these issues will bring more stability and robustness to the
-rest of the system.
+**Why?** This allows libp2p nodes running in the browser (using js-libp2p) to
+connect to the rest of the libp2p network.
 
 **Links:**
 
-- [Hole punching long-term
-  vision](https://github.com/mxinden/specs/blob/hole-punching/connections/hole-punching.md).
-
-- [NAT traversal tracking issue](https://github.com/libp2p/specs/issues/312).
-
-- [WebRTC tracking issue](https://github.com/libp2p/specs/issues/220)
+- [IETF draft](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http3/)
+- [W3C Browser API](https://w3c.github.io/webtransport/)
+- [libp2p spec discussion](https://github.com/libp2p/specs/pull/404)
+- [webtransport-go](https://github.com/marten-seemann/webtransport-go/)
 
 ### ⏱ Full Observability
 
@@ -290,26 +283,57 @@ the [libp2p test-plans repository].
 
 - [First proof of concept](https://github.com/libp2p/test-plans/pull/20)
 
+### Stream Migration Protocol
+
+**What?** A protocol to migrate a stream from one connection to another.
+
+**Why?** Among others, this allows the migration of streams from a relayed
+connection to a direct connection.
+
+**Links:***
+
+- Tracking issue https://github.com/libp2p/specs/issues/328
+- Specification draft https://github.com/libp2p/specs/pull/406#discussion_r852835671
+
+### WebRTC
+
+**Status**: In progress
+
+**What?** WebRTC is a transport protocol supported by all major browsers. Those
+browsers allow the establishment of connections to remote endpoints that don't
+have a TLS certificate signed by a trusted certificate authority. In addition
+WebRTC includes hole punching capabilities.
+
+**Why?** In most p2p networks the majority of nodes do not have a signed TLS
+certificate. With WebRTC browsers will thus be able to connect to these
+previously unreachable nodes. In addition, being able to hole punch allows
+browsers to connect to nodes behind firewalls and NATs e.g. other browsers. Note
+that the former, namely connecting without trusted TLS certificate, can as well
+be achieved with the [WebTransport](#✈️-webtransport) protocol.
+
+**Links:**
+
+- Tracking issue https://github.com/libp2p/specs/issues/220
+- Specification draft https://github.com/libp2p/specs/pull/412
+
 ### 🤝 Low latency, efficient connection handshake
 
 **High priority for: IPFS**
 
 **What?** Establishing a connection and performing the initial handshake
-should be as cheap and fast as possible. Supporting things like
-*selective* stream opening, *preemption*, *speculative* negotiation,
-*upfront* negotiation, protocol table *pinning*, etc. may enable us to
-achieve lower latencies when establishing connections, and even the
-0-RTT holy grail in some cases. These features are being discussed in
-the *Protocol Select* protocol design.
+should be as cheap and fast as possible. On TCP, the current libp2p
+handshake spends one round-trip negotiating the security protocol, and
+another round-trip negotiating the stream multiplexer.
+By using advanced features of the handshake protocol, we might even be
+able to reach the holy grail of a 0-RTT handshake in some cases.
 
-**Why?** Multistream 1.0 is chatty and naïve. Streams are essential to
-libp2p, and negotiating them is currently inefficient in a number of
-scenarios. Also, bootstrapping a multiplexed connection is currently
-guesswork (we test protocols one by one, incurring in significant
-ping-pong).
+**Why?** Applications rely on quick connection establishment. libp2p
+shouldn't make them wait for any longer than absolutely necessary.
 
 **Links:**
 
+- [Security protocol in multiaddr](https://github.com/libp2p/specs/pull/353)
+- [Muxer selection in security handshake](https://github.com/libp2p/specs/pull/446)
 - [Protocol Select specification](https://github.com/libp2p/specs/pull/349)
 
 ### 🛣️ Peer Routing Records
@@ -439,7 +463,7 @@ cluster operation, code instrumentation and metrics collection at scale.
 But some magnitudes are cost-ineffective to test in a dedicated
 infrastructure. We might have to resort to capturing empirical evidence
 from live networks. [This ties in with the opt-in telemetry
-protocol](#opt-in-telemetry-protocol) and the extension of
+protocol](#telemetry-protocol) and the extension of
 IPTB into IPTL (TestLab).
 
 And we cannot forget negative testing. This includes chaos engineering
@@ -462,51 +486,29 @@ rock-solid foundation for the future of P2P networks; to quantitatively
 measure the impact of our changes on the large scale; to combat the
 perception in some circles that libp2p is "immature".
 
-### 🌐 Browser use cases
+### 🌡️ Telemetry protocol
 
-**What?** This spans a number of concerns. First, we should improve
-developer experience and make libp2p more accessible in browser
-environments. This entails reducing footprint (e.g. bundle size) and
-creating examples and documentation on how to bundle js-libp2p with
-popular frontend tooling (webpack, parcel, etc.). Developers should be
-able to cherry-pick the features to incorporate in their bundle, and
-tree-shaking should produce good results.
-
-In terms of transports, hardening our WebRTC support and enabling it by
-default will bring a huge boost to general browser connectivity.
-
-Targeting the [WASM runtime](#libp2p-as-a-wasm-library)
-deserves a special mention, as we're likely to see more user interest in
-this area. Finally, we should continue supporting the
-[TCP](https://github.com/mozilla/libdweb/issues/5) and
-[UDP](https://github.com/mozilla/libdweb/issues/4) socket
-advances made by Mozilla's
-[libdweb](https://github.com/mozilla/libdweb/) team.
-
-**Why?** Browsers are and will continue to be the most used computer interface.
-Not fully supporting the browser platform will hurt most of the projects betting
-on libp2p.
-
-### 🌡️ Opt-in telemetry protocol
-
-**What?** By developing a *decentralized* telemetry protocol that nodes can opt
-into, we could build a world-wide real-time visualisation of our global libp2p
+**What?** By developing a *privacy-preserving* telemetry protocol,
+libp2p networks could build a world-wide real-time visualisation of the
 network, à la [Torflow](https://torflow.uncharted.software), [Kaspersky's
 Cybermap](https://cybermap.kaspersky.com/), or [Checkpoint's
 Threatmap](https://threatmap.checkpoint.com/).
 
-This might surface interesting facts about the backbone of the Internet;
-perhaps even correlations with the [Submarine Cable
-Map](https://www.submarinecablemap.com/). Imagine [RIPE
-Atlas](https://atlas.ripe.net/results/maps/network-coverage/)
-but for libp2p networks.
+The privacy properties of this protocol need to be strong enough that
+metrics collection can be enabled by default (with an easy switch to disable
+it for users who disagree with that assessment). As an example, the 
+[IETF PPM working group](https://datatracker.ietf.org/wg/ppm/documents/)
+is currently doing interesting work standardizing such a protocol, using
+advanced cryptography and a distributed setup.
 
 Nodes could probe and collect stats about the connections it maintains
-with other peers: latency, traceroute, IP address, etc., publishing raw
-data on a global pubsub channel like a heartbeat, where a webapp is
-listening over a websockets channel.
+with other peers: latency, traceroute, IP address, hole punching success
+rates etc. The resulting protocol should expose a way for applications
+running on top of libp2p to use this framework for collecting application-
+specific metrics.
 
-**Why?** To gain real-time insight into the global libp2p deployment.
+**Why?** To gain real-time insight into libp2p networks and the applications
+using the stack.
 
 ### 📩 Message-oriented transports
 
@@ -520,7 +522,7 @@ Progressing with this work entails designing the abstractions, and
 implementing, at least, a UDP transport, [as the community has
 demanded](https://github.com/libp2p/go-libp2p/issues/353).
 
-**Why?** Current the libp2p API precludes us from modelling
+**Why?** Currently the libp2p API precludes us from modelling
 message-oriented transports like UDP or Bluetooth.
 
 ### ☎️ Reducing the dial fail rate
@@ -618,3 +620,31 @@ networking to get started with libp2p.
 [libp2p specification]: https://github.com/libp2p/specs/
 [testground project]: https://github.com/testground/testground
 [libp2p test-plans repository]: https://github.com/libp2p/test-plans
+
+## Done
+
+### 🕸 Hole punching on TCP and QUIC
+
+**Status**: Done
+
+**What?** A DHT crawl measurements (Nov 22nd 2019) showed that out
+of 4344 peers, 2754 were undialable (\~63%). This evidence correlates
+with feedback from the IPFS and Filecoin teams.
+
+We need to implement additional mechanisms for Firewall and NAT traversal to
+have the highest probability of being able to establish a direct connection.
+Mechanisms we wish to add include:
+
+- Project Flare stack (via *Circuit Relay v2*, *Direct Connection Upgrade
+  through Relay*, *AutoNAT*, *Stream Migration*, ...)
+
+**Why?** Good connectivity is the bread-and-butter of libp2p. Focusing on
+solving these issues for TCP and QUIC will bring more stability and robustness
+to the rest of the system.
+
+**Links:**
+
+- [Hole punching long-term
+  vision](https://github.com/libp2p/specs/blob/master/connections/hole-punching.md).
+
+- [NAT traversal tracking issue](https://github.com/libp2p/specs/issues/312).

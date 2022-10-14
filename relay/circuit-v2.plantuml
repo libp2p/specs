@@ -1,0 +1,30 @@
+@startuml
+participant A
+participant R
+participant B
+
+skinparam backgroundColor white
+skinparam sequenceMessageAlign center
+
+== Reservation ==
+
+A -> R: [hop] RESERVE
+R -> A: [hop] STATUS:OK
+
+hnote over A: Reservation timeout approaching.
+hnote over A: Refresh.
+
+A -> R: [hop] RESERVE
+R -> A: [hop] STATUS:OK
+
+hnote over A: ...
+
+== Circuit Establishment ==
+
+B -> R: [hop] CONNECT to A
+R -> A: [stop] CONNECT from B
+A -> R: [stop] STATUS:OK
+R -> B: [hop] STATUS:OK
+
+B <-> A: Connection
+@enduml
