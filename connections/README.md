@@ -76,7 +76,7 @@ verifiable by the other peer.
 libp2p connection. They must support backpressure, which prevents receivers from
 being flooded by data from eager senders. They can also be "half closed",
 meaning that a stream can be closed for writing data but still open to receiving
-data and vice versa.
+data and vice versa. See [Stream Behaviour](#stream-behaviour) for details.
 
 Support for multiple streams ensures that a single connection between peers can
 support a wide variety of interactions, each with their own protocol. This is
