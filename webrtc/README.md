@@ -22,6 +22,7 @@ Interest Group: [@marten-seemann]
         - [Ordering](#ordering)
         - [Head-of-line blocking](#head-of-line-blocking)
         - [`RTCDataChannel` negotiation](#rtcdatachannel-negotiation)
+        - [`RTCDataChannel` label](#rtcdatachannel-label)
     - [Connection Security](#connection-security)
     - [Previous, ongoing and related work](#previous-ongoing-and-related-work)
 - [FAQ](#faq)
