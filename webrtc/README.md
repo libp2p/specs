@@ -309,6 +309,15 @@ containing user data without waiting for the reception of the corresponding
 DATA_CHANNEL_ACK message", thus using `negotiated: false` does not imply an
 additional round trip for each new `RTCDataChannel`.
 
+### `RTCDataChannel` label
+
+`RTCPeerConnection.createDataChannel()` requires passing a `label` for the
+to-be-created `RTCDataChannel`. When calling `createDataChannel` implementations
+MUST pass an empty string. When receiving an `RTCDataChannel` via
+`RTCPeerConnection.ondatachannel` implementations MUST NOT require `label` to be
+an empty string. This allows future versions of this specification to make use
+of the `RTCDataChannel` `label` property.
+
 ## Connection Security
 
 Note that the below uses the message framing described in
