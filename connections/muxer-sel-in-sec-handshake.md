@@ -61,7 +61,7 @@ security protocol to be used.
 2. The selected security protocol performs handshaking and establishs a secure
 tunnel
 3. The multistream-selection protocol then will run again for muxer selection.
-4. Connection then is upgraded to a capable connection by the selected muxer.
+4. The selected muxer is then used on the secured connection.
 
 
 ## Improved muxer selection
