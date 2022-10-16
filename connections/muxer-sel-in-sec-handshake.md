@@ -44,7 +44,7 @@ goal of the improvement is to reduce the number of RTTs that takes to select the
 muxer of a connection. The solution relies on the ability of the security
 protocol's handshake process to negotiate higher level protocols, which enables
 the muxer selection to be carried out along with security protocol handshake.
-The proposed solution saves the RTT of multistream selection for muxers.
+With this improvement, negotiation of the stream multiplexer doesn't consume any additional roundtrips.
 
 For more context and the status of this work, please refer to [#426]
 
