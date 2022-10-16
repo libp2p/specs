@@ -39,7 +39,7 @@ and spec status.
 
 ## Overview
 
-This document discribes an imporvement on the stream multiplexer negotiation
+This document describes an improvement on the stream multiplexer negotiation
 process. The goal of the improvement is to reduce the number of RTTs that takes
 to negotiate the stream multiplexer for a transport that does not natively
 support stream multiplexing. The solution relies on the ability of the security
@@ -61,12 +61,12 @@ pervious libp2p versions which do not support this improved approach.
 
 The current connection upgrade process is described in detail in [connections].
 As shown in this [sequence-chart], after a network connection is established,
-the following will happen to upgrade the conntection to a secured and stream-
-multiplexed onnection.
+the following will happen to upgrade the connection to a secured and stream-
+multiplexed connection.
 
 1. The multistream-selection protocol is run over the connection to select the
 security protocol to be used.
-2. The selected security protocol performs handshaking and establishs a secure
+2. The selected security protocol performs handshaking and establishes a secure
 tunnel
 3. The multistream-selection protocol then will run again for multiplexer
 negotiation.
@@ -95,7 +95,7 @@ to negotiate the multiplexer.
 ### Multiplexer negotiation over TLS
 
 When the security protocol selected by the upgrader is TLS, the [ALPN]
-extesion of TLS handshake is used to select the multiplexer.
+extension of TLS handshake is used to select the multiplexer.
 
    With ALPN, the client sends the list of supported application
    protocols as part of the TLS ClientHello message.  The server chooses
@@ -111,20 +111,21 @@ field. An example list as following:
 
     ["/yamux/1.0.0", "/mplex/6.7.0", "libp2p"]
 
-The multiplexer list is ordered by preference, with the most prefered multiplexer at
-the beginning. The "libp2p" protocol code MUST always be the last item in the
-multiplexer list . See [#tls-case] for details on the special "libp2p" protocol code.
+The multiplexer list is ordered by preference, with the most preferred
+multiplexer at the beginning. The "libp2p" protocol code MUST always be the
+last item in the multiplexer list . See [#tls-case] for details on the special
+"libp2p" protocol code.
 
-The server SHOULD choose the supported protocol by going through its prefered
+The server SHOULD choose the supported protocol by going through its preferred
 protocol list and search if the protocol is supported by the client too. If no
-mutually supported protcol is found the TLS handshake will fail.
+mutually supported protocol is found the TLS handshake will fail.
 
-If the selected item from the multiplexer list is "libp2p" then the multiplexer negotiation 
-process returns an empty result, and the multistream-selection protocol MUST be
-run to negotiate the multiplexer.
+If the selected item from the multiplexer list is "libp2p" then the multiplexer
+negotiation process returns an empty result, and the multistream-selection
+protocol MUST be run to negotiate the multiplexer.
 
 
-### multiplexer negotiation over Noise
+### Multiplexer negotiation over Noise
 
 The libp2p Noise Specification allows the Noise handshake process to carry
 early data. [Noise-Early-Data] is carried in the second and third message of
@@ -133,8 +134,8 @@ The second message carries early data in the form of a list of multiplexers supp
 by the responder, ordered by preference. The initiator sends its supported
 multiplexer list in the third message to the responder. After the Noise handshake
 process is fully done, the initiator and responder will both process the
-received eraly data and select the multiplexer to be used, they both iterate through
-the initiator's prefered multiplexer list in order, and if any multiplexer is also
+received early data and select the multiplexer to be used, they both iterate through
+the initiator's preferred multiplexer list in order, and if any multiplexer is also
 supported by the responder, that multiplexer is selected. If no mutually supported
 multiplexer is found, the multiplexer negotiation process MUST fall back to multistream
 -selection protocol.
@@ -204,10 +205,10 @@ do not support this sepcification.
 
 The multiplexer list carried in TLS ALPN extension field is part of the ClientHello
 message which is not encrypted. This feature will expose the supported multiplexers
-in plain text, but this is not a weakening of securiy posture. In the fuure
+in plain text, but this is not a weakening of security posture. In the future
 when [ECH] is ready the multiplexer info can be protected too.
 
-The early data in Noise handshake is only sent afer the peers establish a
+The early data in Noise handshake is only sent after the peers establish a
 shared key, in the second and third handshake messages in the XX pattern. So
 the early data is encrypted and the multiplexer info carried over is protected.
 These is no security weakening in this case either.
