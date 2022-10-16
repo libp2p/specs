@@ -46,7 +46,6 @@ protocol's handshake process to negotiate higher level protocols, which enables
 the muxer selection to be carried out along with security protocol handshake.
 With this improvement, negotiation of the stream multiplexer doesn't consume any additional roundtrips.
 
-For more context and the status of this work, please refer to [#426]
 
 
 ## Design
