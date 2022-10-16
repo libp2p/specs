@@ -1,4 +1,4 @@
-# Muxer selection in security handshake
+# Muxer negotiation in security handshake
 
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
