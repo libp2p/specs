@@ -21,14 +21,14 @@ and spec status.
 
 ## Table of Contents
 
-- [multiplexer selection in security handshake](#multiplexer-selection-in-security-handshake)
+- [multiplexer negotiation in security handshake](#multiplexer-negotiation-in-security-handshake)
     - [Table of Contents](#table-of-contents)
     - [Overview](#overview)
     - [Design](#design)
         - [Current connection upgrade process](#current-connection-upgrade-process)
-        - [Improved multiplexer selection](#improved-multiplexer-selection)
-            - [Multiplexer selection over TLS](#multiplexer-selection-over-tls)
-            - [Multiplexer selection over Noise](#multiplexer-selection-over-noise)
+        - [Improved multiplexer negotiation](#improved-multiplexer-negotiation)
+            - [Multiplexer negotiation over TLS](#multiplexer-negotiation-over-tls)
+            - [Multiplexer negotiation over Noise](#multiplexer-negotiation-over-noise)
                 - [Early data specification](#early-data-specification)
     - [Cross version support](#cross-version-support)
         - [TLS case](#tls-case)
@@ -48,7 +48,11 @@ the multiplexer negotiation to be carried out along with the security protocol
 handshake. With this improvement, the negotiation of the stream multiplexer
 doesn't consume any additional roundtrips.
 
-For more context and the status of this work, please refer to [#426]
+This feature aggregates the multiplexer negotiation function and security
+handshake function. It introduces coupling between different functions.
+
+The improved multiplexer negotiation approach MUST be interoperable with
+pervious libp2p versions which do not support this improved approach.
 
 
 ## Design
@@ -64,31 +68,31 @@ multiplexed onnection.
 security protocol to be used.
 2. The selected security protocol performs handshaking and establishs a secure
 tunnel
-3. The multistream-selection protocol then will run again for multiplexer selection.
-4. Connection then is upgraded to a capable connection by the selected multiplexer.
+3. The multistream-selection protocol then will run again for multiplexer
+negotiation.
+4. The selected multiplexer is then used on the secured connection.
 
-
-## Improved multiplexer selection
+## Improved multiplexer negotiation 
 
 The security protocol's ability of supporting higher level abstract protocol
 negotiation (for example, TLS's support of ALPN, and Noise's support of Early
 Data) makes it possible to collapse the step 2 and step 3 in the previous
-section into one step. multiplexer selection can be performed as part of the security
-protocol handshake, thus there is no need to perform another mutistream
--selection negotiation for multiplexer selection.
+section into one step. multiplexer negotiation can be performed as part of the
+security protocol handshake, thus there is no need to perform another mutistream
+-selection negotiation for multiplexer negotiation.
 
 In order to achieve the above stated goal, each candidate multiplexer will be
-represented by a protocol name/code, and the candidate multiplexers are supplied to
-the security protocol's handshake process as a list of protocol names.
+represented by a protocol name/code, and the candidate multiplexers are supplied
+to the security protocol's handshake process as a list of protocol names.
 
 If the client and server agree upon the common multiplexer to be used, then the
-result of the multiplexer selection is a multiplexer code represented by the selected
-protocol name. If no agreement is reached upon by the client and server
-then an empty multiplexer code is returned and the connection upgrade process
-MUST fall back to the multistream-selection protocol to negotiate the multiplexer.
+result of the multiplexer negotiation is used as the selected stream
+multiplexer. If no agreement is reached upon by the client and server then the
+connection upgrade process MUST fall back to the multistream-selection protocol
+to negotiate the multiplexer.
 
 
-### multiplexer selection over TLS
+### Multiplexer negotiation over TLS
 
 When the security protocol selected by the upgrader is TLS, the [ALPN]
 extesion of TLS handshake is used to select the multiplexer.
@@ -101,7 +105,7 @@ extesion of TLS handshake is used to select the multiplexer.
    round-trips, and allows the server to associate a different
    certificate with each application protocol, if desired.
 
-For the purpose of multiplexer selection, the types of multiplexers are coded as protocol
+For the purpose of multiplexer negotiation, the types of multiplexers are coded as protocol
 names in the form of a list of strings, and inserted in the ALPN extension
 field. An example list as following:
 
@@ -111,18 +115,18 @@ The multiplexer list is ordered by preference, with the most prefered multiplexe
 the beginning. The "libp2p" protocol code MUST always be the last item in the
 multiplexer list . See [#tls-case] for details on the special "libp2p" protocol code.
 
-The server chooses the supported protocol by going through its prefered
-protocol list and searchs if the protocol is supported by the client too. if no
+The server SHOULD choose the supported protocol by going through its prefered
+protocol list and search if the protocol is supported by the client too. If no
 mutually supported protcol is found the TLS handshake will fail.
 
-If the selected item from the multiplexer list is "libp2p" then the multiplexer selection
+If the selected item from the multiplexer list is "libp2p" then the multiplexer negotiation 
 process returns an empty result, and the multistream-selection protocol MUST be
 run to negotiate the multiplexer.
 
 
-### multiplexer selection over Noise
+### multiplexer negotiation over Noise
 
-The libp2p Noise implementation allows the Noise handshake process to carry
+The libp2p Noise Specification allows the Noise handshake process to carry
 early data. [Noise-Early-Data] is carried in the second and third message of
 the XX handshake pattern as illustrated in the following message sequence chart.
 The second message carries early data in the form of a list of multiplexers supported
@@ -132,17 +136,17 @@ process is fully done, the initiator and responder will both process the
 received eraly data and select the multiplexer to be used, they both iterate through
 the initiator's prefered multiplexer list in order, and if any multiplexer is also
 supported by the responder, that multiplexer is selected. If no mutually supported
-multiplexer is found, the multiplexer selection process MUST fall back to multistream
+multiplexer is found, the multiplexer negotiation process MUST fall back to multistream
 -selection protocol.
 
 Example: Noise handshake between peers that have a mutually supported multiplexer.
-    Responder supports: ["yamux/1.0.0", "/mplex/6.7.0"]
-    Initiator supports: ["yamux/1.0.0"]
+    Initiator supports: ["yamux/1.0.0", "/mplex/6.7.0"]
+    Responder supports: ["/mplex/6.7.0", "yamux/1.0.0"]
 
     XX:
     -> e
-    <- e, ee, s, es, ["yamux/1.0.0", "/mplex/6.7.0"] 
-    -> s, se, ["yamux/1.0.0"]
+    <- e, ee, s, es, ["/mplex/6.7.0", "yamux/1.0.0"] 
+    -> s, se, ["yamux/1.0.0", "/mplex/6.7.0"] 
 
     After handshake is done, both parties can arrive on the same conclusion
     and select "yamux/1.0.0" as the multiplexer to use.
@@ -160,56 +164,29 @@ multiplexers.
     After handshaking is done, early data processing will find no mutually
     supported multiplexer, and falls back to multistream-selection protocol.
 
-The multiplexer selection logic is run outside of the Noise handshake process. The
-format of he early data for this purpose is specified in the protobuf in the
-[Early-data-specification] section.
+The multiplexer selection logic is run after the Noise handshake has finished
+mutual authentication of the peers. The format of he early data is specified in
+the protobuf in the [Early-data-specification] section.
 
-#### Early data specification
-
-The early data message is encoded in the "protobuf2" syntax as shown in the
-following. The protobuf definition is an extension to [handshake-payload]. The
-existing byte array early data (the "data" field) will be replaced by a
-structured NoiseExtensions protobuf message. The supported multiplexers and selected
-multiplexer are populated in the "stream_multiplexers" field. The details of the early
-data message can be find in [Noise-handshake-payload]
-
-The multiplexers are ordered by preference, with the most prefered multiplexer at the
-beginning.
-
-```protobuf
-syntax = "proto2";
-
-message NoiseExtensions {
-    repeated bytes webtransport_certhashes = 1;
-    repeated string stream_multiplexers = 2; 
-}
-
-message NoiseHandshakePayload {
-  optional bytes identity_key = 1;
-  optional bytes identity_sig = 2;
-  optional NoiseExtensions extensions = 4;
-}
-```
-
-## Cross version support
-
-The improved multiplexer selection approach MUST be interoperable with pervious
-libp2p versions which do not support this improved approach.
+The details of the early data message format can be find in
+[Noise-handshake-payload]
 
 ### TLS case
 
 In the current version of libp2p, the ALPN extension field is populated with a
 key "libp2p". By appending the key of "libp2p" to the end of the supported
-multiplexer list, the TLS handshaking process is not broken when peers run different
-versions of libp2p, because the minimum overlap of the peer's supported multiplexer
-sets is always satisfied. When one peer runs the old version and the other peer
-runs the version that supports this feature, the negotiated protocol is
-"libp2p".
+multiplexer list, the TLS handshaking process is not broken when peers run
+different versions of libp2p, because the minimum overlap of the peer's
+supported multiplexer sets is always satisfied. When one peer runs the old
+version and the other peer runs the version that supports this feature, the
+negotiated protocol is "libp2p".
 
 In the case "libp2p" is the result of TLS ALPN, an empty result MUST be
-returned to the upgrade process to indicate that no multiplexer was selected. And the
-upgrade process MUST fall back to the multistream-selection protocol to
-to negotiate the multiplexer to be selected.
+returned to the upgrade process to indicate that no multiplexer was selected.
+And the upgrade process MUST fall back to the multistream-selection protocol to
+to negotiate the multiplexer to be selected. This fallback behavior ensures
+backward compatibility with previous versions that do not support the feature
+specified by this document.
 
 ### Noise case
 
@@ -220,6 +197,8 @@ against an empty string and will return empty multiplexer selection result.
 
 In the case an empty multiplexer selection result is returned, the upgrade process
 MUST fall back to the multistream-selection protocol to select the multiplexer.
+This fallback behavior ensures backward compatibility with previous versions that
+do not support this sepcification.
 
 ## Security
 
