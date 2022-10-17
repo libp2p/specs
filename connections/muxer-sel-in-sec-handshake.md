@@ -49,10 +49,10 @@ handshake. With this improvement, the negotiation of the stream multiplexer
 doesn't consume any additional roundtrips.
 
 This feature aggregates the multiplexer negotiation function and security
-handshake function. It introduces coupling between different functions.
+handshake function. It introduces coupling between those two functions.
 
 The improved multiplexer negotiation approach MUST be interoperable with
-pervious libp2p versions which do not support this improved approach.
+pervious libp2p versions which do not support this improvement.
 
 
 ## Design
@@ -68,16 +68,16 @@ multiplexed connection.
 security protocol to be used.
 2. The selected security protocol performs handshaking and establishes a secure
 tunnel
-3. The multistream-selection protocol then will run again for multiplexer
+3. The multistream-selection protocol then will run again for stream multiplexer
 negotiation.
-4. The selected multiplexer is then used on the secured connection.
+4. The selected stream multiplexer is then used on the secured connection.
 
 ## Improved multiplexer negotiation 
 
 The security protocol's ability of supporting higher level abstract protocol
 negotiation (for example, TLS's support of ALPN, and Noise's support of Early
 Data) makes it possible to collapse the step 2 and step 3 in the previous
-section into one step. multiplexer negotiation can be performed as part of the
+section into one step. Multiplexer negotiation can be performed as part of the
 security protocol handshake, thus there is no need to perform another mutistream
 -selection negotiation for multiplexer negotiation.
 
@@ -105,9 +105,10 @@ extension of TLS handshake is used to select the multiplexer.
    round-trips, and allows the server to associate a different
    certificate with each application protocol, if desired.
 
-For the purpose of multiplexer negotiation, the types of multiplexers are coded as protocol
-names in the form of a list of strings, and inserted in the ALPN extension
-field. An example list as following:
+For the purpose of multiplexer negotiation, the types of multiplexers are coded
+as protocol names in the form of a list of strings, and inserted in the ALPN
+extension field.
+    An example list:
 
     ["/yamux/1.0.0", "/mplex/6.7.0", "libp2p"]
 
@@ -135,22 +136,22 @@ by the responder, ordered by preference. The initiator sends its supported
 multiplexer list in the third message to the responder. After the Noise handshake
 process is fully done, the initiator and responder will both process the
 received early data and select the multiplexer to be used, they both iterate through
-the initiator's preferred multiplexer list in order, and if any multiplexer is also
-supported by the responder, that multiplexer is selected. If no mutually supported
+the responder's preferred multiplexer list in order, and if the multiplexer is also
+supported by the initiator, that multiplexer is selected. If no mutually supported
 multiplexer is found, the multiplexer negotiation process MUST fall back to multistream
 -selection protocol.
 
 Example: Noise handshake between peers that have a mutually supported multiplexer.
-    Initiator supports: ["yamux/1.0.0", "/mplex/6.7.0"]
-    Responder supports: ["/mplex/6.7.0", "yamux/1.0.0"]
+    Initiator supports: ["/yamux/1.0.0", "/mplex/6.7.0"]
+    Responder supports: ["/mplex/6.7.0", "/yamux/1.0.0"]
 
     XX:
     -> e
-    <- e, ee, s, es, ["/mplex/6.7.0", "yamux/1.0.0"] 
-    -> s, se, ["yamux/1.0.0", "/mplex/6.7.0"] 
+    <- e, ee, s, es, ["/mplex/6.7.0", "/yamux/1.0.0"] 
+    -> s, se, ["/yamux/1.0.0", "/mplex/6.7.0"] 
 
     After handshake is done, both parties can arrive on the same conclusion
-    and select "yamux/1.0.0" as the multiplexer to use.
+    and select "/mplex/6.7.0" as the multiplexer to use.
 
 Example: Noise handshake between peers that don't have mutually supported
 multiplexers.
