@@ -187,7 +187,7 @@ supported multiplexer sets is always satisfied. When one peer runs the old
 version and the other peer runs the version that supports this feature, the
 negotiated protocol is "libp2p".
 
-In the case "libp2p" is the result of TLS ALPN, an empty result MUST be
+In the case that "libp2p" is the result of TLS ALPN, an empty result MUST be
 returned to the upgrade process to indicate that no multiplexer was selected.
 And the upgrade process MUST fall back to the multistream-selection protocol to
 to negotiate the multiplexer to be selected. This fallback behavior ensures
@@ -201,10 +201,10 @@ version that supports this feature talks to an older version which does not
 support this feature, the multiplexer selection process on the new version runs
 against an empty string and will return empty multiplexer selection result.
 
-In the case an empty multiplexer selection result is returned, the upgrade process
-MUST fall back to the multistream-selection protocol to select the multiplexer.
-This fallback behavior ensures backward compatibility with previous versions that
-do not support this sepcification.
+In the case an empty multiplexer selection result is returned, the upgrade
+process MUST fall back to the multistream-selection protocol to select the
+multiplexer.  This fallback behavior ensures backward compatibility with
+previous versions that do not support this sepcification.
 
 ## Security
 
@@ -246,10 +246,4 @@ and the discussion details can be found at [#454].
 [handshake-payload]: https://github.com/libp2p/specs/tree/master/noise#the-libp2p-handshake-payload
 [#454]: https://github.com/libp2p/specs/issues/454
 [Noise-handshake-payload]: https://github.com/libp2p/specs/blob/b0818fa956f9940a7cdee18198e0daf1645d8276/noise/README.md#libp2p-data-in-handshake-messages
-
-
-
-
-
-
 
