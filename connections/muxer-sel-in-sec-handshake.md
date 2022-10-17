@@ -131,17 +131,21 @@ protocol MUST be run to negotiate the multiplexer.
 The libp2p Noise Specification allows the Noise handshake process to carry
 early data. [Noise-Early-Data] is carried in the second and third message of
 the XX handshake pattern as illustrated in the following message sequence chart.
-The second message carries early data in the form of a list of multiplexers supported
-by the responder, ordered by preference. The initiator sends its supported
-multiplexer list in the third message to the responder. After the Noise handshake
-process is fully done, the initiator and responder will both process the
-received early data and select the multiplexer to be used, they both iterate through
-the responder's preferred multiplexer list in order, and if the multiplexer is also
-supported by the initiator, that multiplexer is selected. If no mutually supported
-multiplexer is found, the multiplexer negotiation process MUST fall back to multistream
--selection protocol.
+The second message carries early data in the form of a list of multiplexers
+supported by the responder, ordered by preference. The initiator sends its
+supported multiplexer list in the third message to the responder.
 
-Example: Noise handshake between peers that have a mutually supported multiplexer.
+For security reasons the early data is not processed until the Noise handshake
+is finished. After the Noise handshake process is fully done, the initiator and
+responder will both process the received early data and select the multiplexer
+to be used. They both iterate through
+the responder's preferred multiplexer list in order, and if the multiplexer is
+also supported by the initiator, that multiplexer is selected. If no mutually
+supported multiplexer is found, the multiplexer negotiation process MUST fall
+back to multistream-selection protocol.
+
+Example: Noise handshake between peers that have a mutually supported
+multiplexer.
     Initiator supports: ["/yamux/1.0.0", "/mplex/6.7.0"]
     Responder supports: ["/mplex/6.7.0", "/yamux/1.0.0"]
 
@@ -168,7 +172,7 @@ multiplexers.
 
 The multiplexer selection logic is run after the Noise handshake has finished
 mutual authentication of the peers. The format of he early data is specified in
-the protobuf in the [Early-data-specification] section.
+the protobuf definition found in the [Early-data-specification] section.
 
 The details of the early data message format can be find in
 [Noise-handshake-payload]
@@ -204,10 +208,11 @@ do not support this sepcification.
 
 ## Security
 
-The multiplexer list carried in TLS ALPN extension field is part of the ClientHello
-message which is not encrypted. This feature will expose the supported multiplexers
-in plain text, but this is not a weakening of security posture. In the future
-when [ECH] is ready the multiplexer info can be protected too.
+The multiplexer list carried in TLS ALPN extension field is part of the
+ClientHello message which is not encrypted. This feature will expose the
+supported multiplexers in plain text, but this is not a weakening of security
+posture. In the future when [ECH] is ready the multiplexer info can be
+protected too.
 
 The early data in Noise handshake is only sent after the peers establish a
 shared key, in the second and third handshake messages in the XX pattern. So
@@ -220,14 +225,14 @@ These is no security weakening in this case either.
 This feature aggregates the multistream-selecion function and security
 handshake function. From function separation point of view, it introduces
 coupling between different functions. But the argument is that in the case of
-libp2p, the multiplexer and security are always needed at the same time, and it is a
-small price to pay to gain efficiency by reducing one RTT.
+libp2p, the multiplexer and security are always needed at the same time, and
+it is a small price to pay to gain efficiency by reducing one RTT.
 
 
 ## Alternative options considered
 
-Instead of ALPN for multiplexer selection to reduce RTT, other options such as TLS
-extension and X.509 extension are considered. The pros and cons are explored
+Instead of ALPN for multiplexer selection to reduce RTT, other options such as
+TLS extension and X.509 extension are considered. The pros and cons are explored
 and the discussion details can be found at [#454].
 
 
