@@ -34,7 +34,6 @@ and spec status.
         - [TLS case](#tls-case)
         - [Noise case](#noise-case)
     - [Security](#security)
-    - [Protocol coupling](#protocol-coupling)
     - [Alternative options considered](#alternative-options-considered)
 
 ## Overview
@@ -204,7 +203,7 @@ against an empty string and will return empty multiplexer selection result.
 In the case an empty multiplexer selection result is returned, the upgrade
 process MUST fall back to the multistream-selection protocol to select the
 multiplexer.  This fallback behavior ensures backward compatibility with
-previous versions that do not support this sepcification.
+previous versions that do not support this specification.
 
 ## Security
 
@@ -218,15 +217,6 @@ The early data in Noise handshake is only sent after the peers establish a
 shared key, in the second and third handshake messages in the XX pattern. So
 the early data is encrypted and the multiplexer info carried over is protected.
 These is no security weakening in this case either.
-
-
-## Protocol coupling
-
-This feature aggregates the multistream-selecion function and security
-handshake function. From function separation point of view, it introduces
-coupling between different functions. But the argument is that in the case of
-libp2p, the multiplexer and security are always needed at the same time, and
-it is a small price to pay to gain efficiency by reducing one RTT.
 
 
 ## Alternative options considered
