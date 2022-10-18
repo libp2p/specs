@@ -29,7 +29,6 @@ and spec status.
         - [Improved multiplexer negotiation](#improved-multiplexer-negotiation)
             - [Multiplexer negotiation over TLS](#multiplexer-negotiation-over-tls)
             - [Multiplexer negotiation over Noise](#multiplexer-negotiation-over-noise)
-                - [Early data specification](#early-data-specification)
     - [Cross version support](#cross-version-support)
         - [TLS case](#tls-case)
         - [Noise case](#noise-case)
@@ -39,8 +38,8 @@ and spec status.
 ## Overview
 
 This document describes an improvement on the stream multiplexer negotiation
-process. The goal of the improvement is to reduce the number of RTTs that takes
-to negotiate the stream multiplexer for a transport that does not natively
+process. The goal of the improvement is to reduce the number of RTTs to
+negotiate the stream multiplexer for a transport that does not natively
 support stream multiplexing. The solution relies on the ability of the security
 protocol's handshake process to negotiate higher level protocols, which enables
 the multiplexer negotiation to be carried out along with the security protocol
@@ -51,7 +50,7 @@ This feature aggregates the multiplexer negotiation function and security
 handshake function. It introduces coupling between those two functions.
 
 The improved multiplexer negotiation approach MUST be interoperable with
-pervious libp2p versions which do not support this improvement.
+previous libp2p versions which do not support this improvement.
 
 
 ## Design
@@ -77,7 +76,7 @@ The security protocol's ability of supporting higher level abstract protocol
 negotiation (for example, TLS's support of ALPN, and Noise's support of Early
 Data) makes it possible to collapse the step 2 and step 3 in the previous
 section into one step. Multiplexer negotiation can be performed as part of the
-security protocol handshake, thus there is no need to perform another mutistream
+security protocol handshake, thus there is no need to perform another multistream
 -selection negotiation for multiplexer negotiation.
 
 In order to achieve the above stated goal, each candidate multiplexer will be
@@ -170,7 +169,7 @@ multiplexers.
     supported multiplexer, and falls back to multistream-selection protocol.
 
 The multiplexer selection logic is run after the Noise handshake has finished
-mutual authentication of the peers. The format of he early data is specified in
+mutual authentication of the peers. The format of the early data is specified in
 the protobuf definition found in the [Early-data-specification] section.
 
 The details of the early data message format can be find in
@@ -188,7 +187,7 @@ negotiated protocol is "libp2p".
 
 In the case that "libp2p" is the result of TLS ALPN, an empty result MUST be
 returned to the upgrade process to indicate that no multiplexer was selected.
-And the upgrade process MUST fall back to the multistream-selection protocol to
+And the upgrade process MUST fall back to the multistream-selection protocol
 to negotiate the multiplexer to be selected. This fallback behavior ensures
 backward compatibility with previous versions that do not support the feature
 specified by this document.
@@ -207,7 +206,7 @@ previous versions that do not support this specification.
 
 ## Security
 
-The multiplexer list carried in TLS ALPN extension field is part of the
+The multiplexer list carried in the TLS ALPN extension field is part of the
 ClientHello message which is not encrypted. This feature will expose the
 supported multiplexers in plain text, but this is not a weakening of security
 posture. In the future when [ECH] is ready the multiplexer info can be
@@ -216,7 +215,7 @@ protected too.
 The early data in Noise handshake is only sent after the peers establish a
 shared key, in the second and third handshake messages in the XX pattern. So
 the early data is encrypted and the multiplexer info carried over is protected.
-These is no security weakening in this case either.
+There is no security weakening in this case either.
 
 
 ## Alternative options considered
