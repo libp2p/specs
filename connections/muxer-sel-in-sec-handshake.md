@@ -168,11 +168,10 @@ multiplexers.
     After handshaking is done, early data processing will find no mutually
     supported multiplexer, and falls back to multistream-selection protocol.
 
-The multiplexer selection logic is run after the Noise handshake has finished
-mutual authentication of the peers. The format of the early data is specified in
-the protobuf definition found in the [Early-data-specification] section.
+The multiplexer selection logic SHOULD run after the Noise handshake has
+finished mutual authentication of the peers to enhance security.
 
-The details of the early data message format can be find in [Noise-handshake-payload]
+The format of the early data is specified in [Noise-handshake-payload]
 
 In the previous versions that do not support this feature, the Noise handshake
 messages carry an empty field of muxer list in the early data extension. When a
