@@ -52,10 +52,10 @@ These tenets form the foundation for features and initiatives listed below.  As 
 ### Implementation Roadmaps
 
 This roadmap doesn't provide a timeline for project adoption across libp2p implementations. For specific sequencing and dates, see the different implementation roadmaps:
+- [libp2p/test-plans](https://github.com/libp2p/test-plans/blob/master/ROADMAP.md)
 - [go-libp2p](https://github.com/libp2p/go-libp2p/blob/master/ROADMAP.md)
 - [js-libp2p](https://github.com/libp2p/js-libp2p/blob/master/ROADMAP.md)
 - [rust-libp2p](https://github.com/libp2p/rust-libp2p/blob/master/ROADMAP.md)
-- [libp2p/test-plans](https://github.com/libp2p/test-plans/blob/master/ROADMAP.md)
 * (other implementations: feel free to add)
 
 ## Visionary
