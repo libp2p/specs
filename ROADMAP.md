@@ -10,6 +10,7 @@ third-party data ownership.
 ## Table of Contents <!-- omit in toc -->
 
 - [Core Tenets](#core-tenets)
+  - [Implementation Roadmaps](#implementation-roadmaps)
 - [Visionary](#visionary)
   - [🖧 Decentralizing networks](#-decentralizing-networks)
   - [🤫 A spyproof libp2p](#-a-spyproof-libp2p)
@@ -49,6 +50,11 @@ Before we dive into what libp2p should support and enable, let's outline the cor
   - We thoroughly specify the libp2p framework and its suite of supported protocols, independent of language or implementation. Through specifications we coordinate and drive future developments.
 - Performant
   - We aim to make libp2p as performant as possible and strive to ensure comparable performance to widely used protocols on the Internet. We avoid regressions and performance degradations in new releases.
+
+### Implementation Roadmaps
+- [go-libp2p](https://github.com/libp2p/go-libp2p/blob/master/ROADMAP.md)
+- [js-libp2p](https://github.com/libp2p/js-libp2p/blob/master/ROADMAP.md)
+- [rust-libp2p](https://github.com/libp2p/rust-libp2p/blob/master/ROADMAP.md)
 
 ## Visionary
 
