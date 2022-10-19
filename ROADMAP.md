@@ -41,20 +41,22 @@ third-party data ownership.
   - [🕸 Hole punching on TCP and QUIC](#-hole-punching-on-tcp-and-quic)
 
 ## Core Tenets
-Before we dive into what libp2p should support and enable, let's outline the core tenets that underpin the project. These values are our commitments and as maintainers, we commit to ensuring libp2p is:
-- Secure
-  - We strive to ensure that libp2p is reliable & secure for users & applications. We seek to minimize vulnerabilities and act quickly to address issues.
-- Stable
-  - We do not break deployed features and maintain cross version compatibility across libp2p releases.
-- Specified
-  - We thoroughly specify the libp2p framework and its suite of supported protocols, independent of language or implementation. Through specifications we coordinate and drive future developments.
-- Performant
-  - We aim to make libp2p as performant as possible and strive to ensure comparable performance to widely used protocols on the Internet. We avoid regressions and performance degradations in new releases.
+Before we dive into what libp2p should support and enable, let's outline the core tenets that underpin the project. As maintainers, we commit to ensuring libp2p is:
+- 🔒 Secure - Building on libp2p *improves* an application's security posture. We minimize vulnerabilities and act rapidly to address and report issues.
+- 🪨 Stable - Releases do not unknowingly break deployed features. We maintain cross-version compatibility across libp2p releases and implementations. Deprecations are well-communicated.
+- 🥽 Specified - We thoroughly specify the libp2p framework and its suite of supported protocols, independent of language or implementation. Through specifications, we coordinate and drive future developments.
+- 🚀 Performant - We ensure comparable performance to widely used protocols on the Internet. We avoid performance degradations in new releases.
+
+These tenets form the foundation for features and initiatives listed below.  As a result, we generally prioritize filling any gaps in these tenets above other work.
 
 ### Implementation Roadmaps
+
+This roadmap doesn't provide a timeline for project adoption across libp2p implementations. For specific sequencing and dates, see the different implementation roadmaps:
 - [go-libp2p](https://github.com/libp2p/go-libp2p/blob/master/ROADMAP.md)
 - [js-libp2p](https://github.com/libp2p/js-libp2p/blob/master/ROADMAP.md)
 - [rust-libp2p](https://github.com/libp2p/rust-libp2p/blob/master/ROADMAP.md)
+- [libp2p/test-plans](https://github.com/libp2p/test-plans/blob/master/ROADMAP.md)
+* (other implementations: feel free to add)
 
 ## Visionary
 
