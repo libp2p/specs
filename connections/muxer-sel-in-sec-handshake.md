@@ -73,8 +73,8 @@ The security protocol's ability of supporting higher level abstract protocol
 negotiation (for example, TLS's support of ALPN, and Noise's support of Early
 Data) makes it possible to collapse the step 2 and step 3 in the previous
 section into one step. Multiplexer negotiation can be performed as part of the
-security protocol handshake, thus there is no need to perform another multistream
--selection negotiation for multiplexer negotiation.
+security protocol handshake, thus there is no need to perform another
+multistream-selection negotiation for multiplexer negotiation.
 
 In order to achieve the above stated goal, each candidate multiplexer will be
 represented by a protocol name/code, and the candidate multiplexers are supplied
@@ -85,7 +85,6 @@ result of the multiplexer negotiation is used as the selected stream
 multiplexer. If no agreement is reached upon by the client and server then the
 connection upgrade process MUST fall back to the multistream-selection protocol
 to negotiate the multiplexer.
-
 
 ### Multiplexer negotiation over TLS
 
@@ -108,47 +107,40 @@ extension field.
     ["/yamux/1.0.0", "/mplex/6.7.0", "libp2p"]
 
 The multiplexer list is ordered by preference, with the most preferred
-multiplexer at the beginning. The "libp2p" protocol code MUST always be the
-last item in the multiplexer list. The reason for adding this special
-protocol code is to ensure backward compatibility. In the previous versions
-that do not support this feature, the ALPN extension field is alwasy populated
-with a key "libp2p". By appending the key of "libp2p" to the end of the
-supported multiplexer list, the overlap of the peer's supported ALPN protocols
-is always satisfied when different versions of libp2p are negotiating a TLS
-connection. 
+multiplexer at the beginning. The server SHOULD choose the supported protocol by
+going through its preferred protocol list and search if the protocol is
+supported by the client too. If no mutually supported protocol is found the TLS
+handshake will fail.
 
-In the case that "libp2p" is the result of TLS ALPN, an empty result MUST be
-returned to the upgrade process to indicate that no multiplexer was selected.
-And the upgrade process MUST fall back to the multistream-selection protocol
-to negotiate the multiplexer to be selected. This fallback behavior ensures
-backward compatibility with previous versions that do not support the feature
-specified by this document.
+The "libp2p" protocol code MUST always be the last item in the multiplexer list.
+The reason for adding this special protocol code is to ensure backward
+compatibility. In the previous versions that do not support this feature, the
+ALPN extension field is alwasy populated with a key "libp2p". By appending the
+key of "libp2p" to the end of the supported multiplexer list, the overlap of the
+peer's supported ALPN protocols is always guaranteed when different versions of
+libp2p are negotiating a TLS connection.
 
-The server SHOULD choose the supported protocol by going through its preferred
-protocol list and search if the protocol is supported by the client too. If no
-mutually supported protocol is found the TLS handshake will fail.
-
-If the selected item from the multiplexer list is "libp2p" then the multiplexer
-negotiation process returns an empty result, and the multistream-selection
-protocol MUST be run to negotiate the multiplexer.
-
+In the case that "libp2p" is the result of TLS ALPN, The upgrade process MUST
+fall back to the multistream-selection protocol to negotiate the multiplexer to
+be used. This fallback behavior ensures backward compatibility.
 
 ### Multiplexer negotiation over Noise
 
-The libp2p Noise Specification allows the Noise handshake process to carry
+The libp2p Noise Specification allows the Noise handshake messages to carry
 early data. [Noise-Early-Data] is carried in the second and third message of
 the XX handshake pattern as illustrated in the following message sequence chart.
 The second message carries early data in the form of a list of multiplexers
 supported by the responder, ordered by preference. The initiator sends its
-supported multiplexer list in the third message to the responder.
+supported multiplexer list in the third message of the handshake process.
 
-For security reasons the early data is not processed until the Noise handshake
-is finished. After the Noise handshake process is fully done, the initiator and
-responder will both process the received early data and select the multiplexer
-to be used. They both iterate through the responder's preferred multiplexer
-list in order, and if the multiplexer is also supported by the initiator, that
-multiplexer is selected. If no mutually supported multiplexer is found, the
-multiplexer negotiation process MUST fall back to multistream-selection protocol.
+For security reasons the early data SHALL not be processed until the Noise
+handshake is finished. After the Noise handshake process is fully done, the
+initiator and responder will both process the received early data and select the
+multiplexer to be used. They both iterate through the responder's preferred
+multiplexer list in order, and if the multiplexer is also supported by the
+initiator, that multiplexer is selected. If no mutually supported multiplexer is
+found, the multiplexer negotiation process MUST fall back to multistream
+-selection protocol.
 
 Example: Noise handshake between peers that have a mutually supported
 multiplexer.
@@ -180,28 +172,26 @@ The multiplexer selection logic is run after the Noise handshake has finished
 mutual authentication of the peers. The format of the early data is specified in
 the protobuf definition found in the [Early-data-specification] section.
 
-The details of the early data message format can be find in
-[Noise-handshake-payload]
+The details of the early data message format can be find in [Noise-handshake-payload]
 
 In the previous versions that do not support this feature, the Noise handshake
 messages carry an empty field of muxer list in the early data extension. When a
 version that supports this feature talks to an older version which does not
-support this feature, the multiplexer selection process on the new version runs
-against an empty list and will return empty multiplexer selection result.
-In this case, backward compatibility is achieved by falling back to the
-multistream-selection process.
+support this feature, the multiplexer selection process on both peers will
+generate an empty list and they MUST fall back to the multistream-selection
+process to ensure backward compatibility.
 
 ## Security
 
 The multiplexer list carried in the TLS ALPN extension field is part of the
 ClientHello message which is not encrypted. This feature will expose the
 supported multiplexers in plain text, but this is not a weakening of security
-posture. In the future when [ECH] is ready the multiplexer info can be
-protected too.
+posture. In the future when [ECH] is ready the multiplexer info can be protected
+too.
 
 The early data in Noise handshake is only sent after the peers establish a
-shared key, in the second and third handshake messages in the XX pattern. So
-the early data is encrypted and the multiplexer info carried over is protected.
+shared key, in the second and third handshake messages in the XX pattern. So the
+early data is encrypted and the multiplexer info carried over is protected.
 There is no security weakening in this case either.
 
 
