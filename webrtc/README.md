@@ -334,7 +334,9 @@ accept streams before completion of the handshake.
 
 All of these test vectors represent hex-encoded bytes.
 
-#### 1. Both client and server use SHA-256
+#### Both client and server use SHA-256
+
+Here client is _A_ and server is _B_.
 
 ```
 client_fingerprint = "3e79af40d6059617a0d83b83a52ce73b0c1f37a72c6043ad2969e2351bdca870"
