@@ -75,9 +75,9 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    source port.
 
 2. Browser _A_ discovers server node _B_'s multiaddr, containing _B_'s IP, UDP
-  port, TLS certificate fingerprint and libp2p peer ID (e.g.
-  `/ip6/2001:db8::/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`),
-  through some external mechanism.
+  port, TLS certificate fingerprint and optionally libp2p peer ID (e.g.
+  `/ip6/2001:db8::/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`), through some
+  external mechanism.
 
 3. _A_ instantiates a `RTCPeerConnection`. See
    [`RTCPeerConnection()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection).
