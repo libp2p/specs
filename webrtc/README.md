@@ -88,14 +88,14 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
 
 4. _A_ constructs _B_'s SDP answer locally based on _B_'s multiaddr. _A_
    generates a random string and sets that string as the username (_ufrag_ or
-   _username fragment_) and password on the SDP of the remote offer. Finally _A_
-   sets the remote offer via
+   _username fragment_) and password on the SDP of the remote's answer. Finally _A_
+   sets the remote answer via
    [`RTCPeerConnection.setRemoteDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setRemoteDescription).
 
 5. _A_ creates a local offer via
    [`RTCPeerConnection.createOffer()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createOffer).
-   _A_ sets the same username as password on the local offer as done in (4) on
-   the remote offer. Finally _A_ sets the modified offer via
+   _A_ sets the same username and password on the local offer as done in (4) on
+   the remote answer. Finally _A_ sets the modified offer via
    [`RTCPeerConnection.setLocalDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setLocalDescription).
 
    Note that this process, oftentimes referred to as "SDP munging" is disallowed
