@@ -103,11 +103,26 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    Firefox, Chrome) due to use-cases in the wild. See also
    https://bugs.chromium.org/p/chromium/issues/detail?id=823036
 
-6. _A_ establishes the connection to _B_. The random string used as a _username_
-   and _password_ in combination with the IP and port of _A_ can be used by _B_
+6. Once _A_ sets the SDP offer and answer, it will start sending STUN requests
+   to _B_. _B_ reads the _ufrag_ from the incoming STUN request's _username_
+   field. _B_ then infers _A_'s SDP offer using the IP, port, and _ufrag_ of the
+   request as follows:
+
+   1. _B_ sets the the `ice-ufrag` and `ice-pwd` equal to the value read from
+      the `username` field.
+
+   2. _B_ sets an arbitrary sha-256 digest as the remote fingerprint as it does
+      not verify fingerprints at this point.
+
+   3. _B_ sets the connection field (`c`) to the IP and port of the incoming
+      request `c=IN <ip> <port>`.
+
+   _B_ sets this offer as the remote description. _B_ generates an answer and
+   sets it as the local description.
+
+   The _ufrag_ in combination with the IP and port of _A_ can be used by _B_
    to identify the connection, i.e. demultiplex incoming UDP datagrams per
-   incoming connection. _B_ uses the same random string for the username and
-   password in the STUN message from _B_ to _A_.
+   incoming connection.
 
    Note that this step requires _B_ to allocate memory for each incoming STUN
    message from _A_. This could be leveraged for a DOS attack where _A_ is
