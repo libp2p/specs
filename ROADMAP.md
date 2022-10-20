@@ -1,53 +1,72 @@
-# Roadmap
+# Roadmap <!-- omit in toc -->
 
 The libp2p project is creating a set of modular, loosely-coupled building blocks
 (based on a shared core) for modern peer-to-peer networking. Our goal is to
 enable a new generation of decentralized applications in which network nodes are
-full peers, providing and consuming data, and routing traffic for one another,
-all without the need for centralized infrastructure points or reliance on
-third-party ownership of data.
+full peers, provide and consume data, and route traffic for one another,
+all without the need for centralized infrastructure or reliance on
+third-party data ownership.
 
-**Table of Contents**
+## Table of Contents <!-- omit in toc -->
 
-- [Roadmap](#roadmap)
-    - [Visionary](#visionary)
-        - [🖧 Decentralizing networks](#🖧-decentralizing-networks)
-        - [🤫 A spyproof libp2p](#🤫-a-spyproof-libp2p)
-        - [📱 libp2p in mobile devices](#📱-libp2p-in-mobile-devices)
-        - [💡 libp2p in IoT](#💡-libp2p-in-iot)
-        - [🎓 libp2p as a platform for Networks Research & Innovation](#🎓-libp2p-as-a-platform-for-networks-research--innovation)
-        - [🚑 Self-healing networks](#🚑-self-healing-networks)
-        - [📮 Offline message queue / postbox](#📮-offline-message-queue--postbox)
-        - [🤖 libp2p as a WASM library](#🤖-libp2p-as-a-wasm-library)
-    - [Evolve](#evolve)
-        - [✈️ WebTransport](#✈️-webtransport)
-        - [⏱ Full Observability](#⏱-full-observability)
-        - [🧪 Automated compatibility testing](#🧪-automated-compatibility-testing)
-        - [Stream Migration Protocol](#stream-migration-protocol)
-        - [WebRTC](#webrtc)
-        - [🤝 Low latency, efficient connection handshake](#🤝-low-latency-efficient-connection-handshake)
-        - [🛣️ Peer Routing Records](#🛣️-peer-routing-records)
-        - [🗣️ Polite peering](#🗣️-polite-peering)
-        - [🧱 Composable routing](#🧱-composable-routing)
-        - [💣 Attack resistance, threat models and security](#💣-attack-resistance-threat-models-and-security)
-        - [📈 Proving we are scalable and interoperable](#📈-proving-we-are-scalable-and-interoperable)
-        - [🌡️ Telemetry protocol](#🌡️-telemetry-protocol)
-        - [📩 Message-oriented transports](#📩-message-oriented-transports)
-        - [☎️ Reducing the dial fail rate](#️-reducing-the-dial-fail-rate)
-        - [🔀 Peer exchange protocol](#🔀-peer-exchange-protocol)
-        - [🏹 RPC and other common node communication patterns](#🏹-rpc-and-other-common-node-communication-patterns)
-    - [Done](#done)
-        - [🕸 Hole punching on TCP and QUIC](#🕸-hole-punching-on-tcp-and-quic)
+- [Core Tenets](#core-tenets)
+  - [Implementation Roadmaps](#implementation-roadmaps)
+- [Visionary](#visionary)
+  - [🖧 Decentralizing networks](#-decentralizing-networks)
+  - [🤫 A spyproof libp2p](#-a-spyproof-libp2p)
+  - [📱 libp2p in mobile devices](#-libp2p-in-mobile-devices)
+  - [💡 libp2p in IoT](#-libp2p-in-iot)
+  - [🎓 libp2p as a platform for Networks Research & Innovation](#-libp2p-as-a-platform-for-networks-research--innovation)
+  - [🚑 Self-healing networks](#-self-healing-networks)
+  - [📮 Offline message queue / postbox](#-offline-message-queue--postbox)
+- [Evolve](#evolve)
+  - [✈️ WebTransport](#️-webtransport)
+  - [⏱ Full Observability](#-full-observability)
+  - [🧪 Automated compatibility testing](#-automated-compatibility-testing)
+  - [Stream Migration Protocol](#stream-migration-protocol)
+  - [WebRTC](#webrtc)
+  - [🤖 libp2p as a Wasm library](#-libp2p-as-a-wasm-library)
+  - [🤝 Low latency, efficient connection handshake](#-low-latency-efficient-connection-handshake)
+  - [🛣️ Peer Routing Records](#️-peer-routing-records)
+  - [🗣️ Polite peering](#️-polite-peering)
+  - [🧱 Composable routing](#-composable-routing)
+  - [💣 Attack resistance, threat models and security](#-attack-resistance-threat-models-and-security)
+  - [📈 Proving we are scalable and interoperable](#-proving-we-are-scalable-and-interoperable)
+  - [🌡️ Telemetry protocol](#️-telemetry-protocol)
+  - [📩 Message-oriented transports](#-message-oriented-transports)
+  - [☎️ Reducing the dial fail rate](#️-reducing-the-dial-fail-rate)
+  - [🔀 Peer exchange protocol](#-peer-exchange-protocol)
+  - [🏹 RPC and other common node communication patterns](#-rpc-and-other-common-node-communication-patterns)
+- [Done](#done)
+  - [🕸 Hole punching on TCP and QUIC](#-hole-punching-on-tcp-and-quic)
+
+## Core Tenets
+Before we dive into what libp2p should support and enable, let's outline the core tenets that underpin the project. As maintainers, we commit to ensuring libp2p is:
+- 🔒 Secure - Building on libp2p *improves* an application's security posture. We minimize vulnerabilities and act rapidly to address and report issues.
+- 🪨 Stable - Releases do not unknowingly break deployed features. We maintain cross-version compatibility across libp2p releases and implementations. Deprecations are well-communicated.
+- 🥽 Specified - We thoroughly specify the libp2p framework and its suite of supported protocols, independent of language or implementation. Through specifications, we coordinate and drive future developments.
+- 🚀 Performant - We ensure comparable performance to widely used protocols on the Internet. We avoid performance degradations in new releases.
+
+These tenets form the foundation for features and initiatives listed below.  As a result, we generally prioritize filling any gaps in these tenets above other work.
+
+### Implementation Roadmaps
+
+This roadmap doesn't provide a timeline for project adoption across libp2p implementations. For specific sequencing and dates, see the different implementation roadmaps:
+- [libp2p/test-plans](https://github.com/libp2p/test-plans/blob/master/ROADMAP.md)
+- [go-libp2p](https://github.com/libp2p/go-libp2p/blob/master/ROADMAP.md)
+- [js-libp2p](https://github.com/libp2p/js-libp2p/blob/master/ROADMAP.md)
+- [rust-libp2p](https://github.com/libp2p/rust-libp2p/blob/master/ROADMAP.md)
+* (other implementations: feel free to add)
 
 ## Visionary
 
 **Our long term roadmap**.
 
-This is the stuff that moves libp2p from "a networking toolbox to build P2P
-applications" to the thing that fundamentally reshapes the architecture of the
-Internet; our dreams and aspirations, the North star we should always keep in
-sight; this is what motivates us and it speaks intimately to our mission
-statement; the libp2p analogy of IPFS working on Mars
+These are the goals that move libp2p from "a networking toolbox for building P2P
+applications" to a project that fundamentally reshapes the architecture of the
+Internet. They are our dreams, aspirations, and the North star we should always keep in
+sight. This is what motivates us and it speaks intimately to our mission
+statement; the libp2p analogy of [IPFS working on Mars](https://github.com/ipfs/roadmap/blob/master/README.md#-interplanetary-web---mars-2024-d3-e3-i4).
 
 ### 🖧 Decentralizing networks
 
@@ -192,39 +211,11 @@ roaming, etc.
 
 -   https://github.com/libp2p/notes/issues/2
 
-### 🤖 libp2p as a WASM library
-
-**What?** This point encompasses two things:
-
-1. Preparing [existing
-   implementations](https://github.com/libp2p/rust-libp2p/issues/23) to run in
-   WASM environments (mainly the browser).
-
-2. Evaluating if it's feasible to build a canonical implementation of
-   libp2p, that is maintained in a single language, compiling down to
-   WebAssembly so that it can be used from any other programming
-   language -- as long as the user is building a WASM application.
-   (The feasibility of this idea is unknown as this time;
-   particularly the VM doesn't expose a socket API, but the
-   Emscripten SDK emulates IP sockets over WebSockets.)
-
-**Why?** Aside from targeting WASM use cases, having one canonical
-implementation of libp2p that can *run anywhere* could help focus the
-team's time on building new features, instead of keeping a multitude of
-implementations across different languages in sync, i.e. create more
-value and impact. WASM also presents a huge vector for making libp2p the
-de-facto networking stack, for cases where WASM is a suitable deployment
-model.
-
-**Links:**
-
-- [WASM support in rust-libp2p](https://github.com/libp2p/rust-libp2p/issues/23).
-
 ## Evolve
 
 **Our short-term roadmap**.
 
-This is the stuff pushing the existing libp2p stack forward.
+These are the projects pushing the existing libp2p stack forward.
 
 ### ✈️ WebTransport
 
@@ -315,6 +306,31 @@ be achieved with the [WebTransport](#✈️-webtransport) protocol.
 
 - Tracking issue https://github.com/libp2p/specs/issues/220
 - Specification draft https://github.com/libp2p/specs/pull/412
+
+### 🤖 libp2p as a Wasm library
+
+**What?** This point encompasses two things:
+
+1. Preparing [existing
+   implementations](https://github.com/libp2p/rust-libp2p/issues/2617) to run in
+   Wasm environments (mainly the browser).
+
+2. Evaluating if it's feasible to build a canonical implementation of
+   libp2p, that is maintained in a single language, compiling down to
+   WebAssembly so that it can be used from any other programming
+   language -- as long as the user is building a Wasm application.
+
+**Why?** Aside from targeting Wasm use cases, having one canonical
+implementation of libp2p that can *run anywhere* could help focus the
+team's time on building new features, instead of keeping a multitude of
+implementations across different languages in sync, i.e. create more
+value and impact. Wasm also presents a huge vector for making libp2p the
+de-facto networking stack, for cases where Wasm is a suitable deployment
+model.
+
+**Links:**
+
+- [Wasm support in rust-libp2p](https://github.com/libp2p/rust-libp2p/issues/2617).
 
 ### 🤝 Low latency, efficient connection handshake
 
