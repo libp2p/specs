@@ -86,7 +86,7 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    `RTCPeerConnection`s. Reusing the certificate can be used to identify _A_
    across connections by on-path observers given that WebRTC uses TLS 1.2.
 
-4. _A_ constructs _B_'s SDP offer locally based on _B_'s multiaddr. _A_
+4. _A_ constructs _B_'s SDP answer locally based on _B_'s multiaddr. _A_
    generates a random string and sets that string as the username (_ufrag_ or
    _username fragment_) and password on the SDP of the remote offer. Finally _A_
    sets the remote offer via
