@@ -34,7 +34,7 @@ Interest Group: [@marten-seemann]
 
 1. **No need for trusted TLS certificates.** Enable browsers to connect to
    public server nodes without those server nodes providing a TLS certificate
-   within the browsers trustchain. Note that we can not do this today with our
+   within the browser's trustchain. Note that we can not do this today with our
    Websocket transport as the browser requires the remote to have a trusted TLS
    certificate. Nor can we establish a plain TCP or QUIC connection from within
    a browser.
