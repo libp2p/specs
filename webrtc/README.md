@@ -66,7 +66,7 @@ Scenario: Browser _A_ wants to connect to server node _B_ where _B_ is publicly
 reachable but _B_ does not have a TLS certificate trusted by _A_.
 
 1. Server node _B_ generates a TLS certificate, listens on a UDP port and
-   advertises the corresponding multiaddress (see [#Addressing]) through some
+   advertises the corresponding multiaddress (see [#addressing]) through some
    external mechanism.
 
    Given that _B_ is publicly reachable, _B_ acts as a [ICE
