@@ -237,9 +237,18 @@ we can not make an informed decision on the optimal message size.
 We follow the recommendation of QUIC, requiring ["a minimum IP packet size of at
 least 1280
 bytes"](https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport-29#section-14).
-An SCTP packet common header is 12 bytes long. An SCTP data chunk header size is
-16 bytes. Thus implementations SHOULD choose a message size equal or below 1252
-bytes. Long term we hope to be able to give better recommendations based on
+We calculate with an IPv4 minimum header size of 20 bytes and an IPv6 header
+size of 40 bytes. We calculate with a UDP header size of 8 bytes. An SCTP packet
+common header is 12 bytes long. An SCTP data chunk header size is 16 bytes.
+
+- IPv4: `1280 bytes - 20 bytes - 8 bytes - 12 bytes - 16 bytes = 1224 bytes`
+- IPv6: `1280 bytes - 40 bytes - 8 bytes - 12 bytes - 16 bytes = 1204 bytes`
+
+Thus implementations SHOULD choose a message size equal or below 1204 bytes. Or,
+in case the implementation can differentiate by IP version, equal or below 1224
+bytes on IPv4 and 1224 bytes on IPv6.
+
+Long term we hope to be able to give better recommendations based on
 real-world experiments.
 
 ### `RTCDataChannel` negotiation
