@@ -244,9 +244,10 @@ common header is 12 bytes long. An SCTP data chunk header size is 16 bytes.
 - IPv4: `1280 bytes - 20 bytes - 8 bytes - 12 bytes - 16 bytes = 1224 bytes`
 - IPv6: `1280 bytes - 40 bytes - 8 bytes - 12 bytes - 16 bytes = 1204 bytes`
 
-Thus implementations SHOULD choose a message size equal or below 1204 bytes. Or,
-in case the implementation can differentiate by IP version, equal or below 1224
-bytes on IPv4 and 1224 bytes on IPv6.
+Thus for payloads that would suffer from head-of-line blocking, implementations
+SHOULD choose a message size equal or below 1204 bytes. Or, in case the
+implementation can differentiate by IP version, equal or below 1224 bytes on
+IPv4 and 1224 bytes on IPv6.
 
 Long term we hope to be able to give better recommendations based on
 real-world experiments.
