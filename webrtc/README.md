@@ -325,12 +325,11 @@ https://datatracker.ietf.org/doc/html/rfc8122#section-5). The hash function used
 in WebRTC and the hash function used in the multiaddr `/certhash` component MUST
 be the same. On mismatch the final Noise handshake MUST fail.
 
-_A_ knows _B_'s fingerprint hash algorithm through _B_'s multiaddr. _B_ could
-infer _A_'s fingerprint hash algorithm through _A_'s TLS certificate signature.
-Or _B_ could assume _A_ to use the same hash algorithm it discovers through
-_B_'s multiaddr. For now implementations MAY assume both _A_ and _B_ to use
-sha-256. Future iterations of this specification may add support for other hash
-algorithms in a backwards compatible way.
+_A_ knows _B_'s fingerprint hash algorithm through _B_'s multiaddr. _A_ MUST use
+the same hash algorithm to calculate the fingerprint of its (i.e. _A_'s) TLS
+certificate. _B_ assumes _A_ to use the same hash algorithm it discovers through
+_B_'s multiaddr. For now implementations MUST support sha-256. Future iterations
+of this specification may add support for other hash algorithms.
 
 Implementations SHOULD setup all the necessary callbacks (e.g.
 [`ondatachannel`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/datachannel_event))
