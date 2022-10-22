@@ -87,10 +87,16 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    `RTCPeerConnection`s. Reusing the certificate can be used to identify _A_
    across connections by on-path observers given that WebRTC uses TLS 1.2.
 
-4. _A_ constructs _B_'s SDP answer locally based on _B_'s multiaddr. _A_
-   generates a random string and sets that string as the username (_ufrag_ or
-   _username fragment_) and password on the SDP of the remote's answer. Finally _A_
-   sets the remote answer via
+4. _A_ constructs _B_'s SDP answer locally based on _B_'s multiaddr.
+
+   _A_ generates a random string prefixed with "libp2p-webrtc-v1:". The prefix
+   allows us to use the ufrag as an upgrade mechanism to role out a new version
+   of the libp2p WebRTC protocol on a live network. While a hack, this might be
+   very useful in the future.
+
+   _A_ sets the above string as the username (_ufrag_ or _username fragment_)
+   and password on the SDP of the remote's answer. Finally _A_ sets the remote
+   answer via
    [`RTCPeerConnection.setRemoteDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setRemoteDescription).
 
 5. _A_ creates a local offer via
