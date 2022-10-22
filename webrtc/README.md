@@ -71,9 +71,9 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    external mechanism.
 
    Given that _B_ is publicly reachable, _B_ acts as a [ICE
-   Lite](https://www.rfc-editor.org/rfc/rfc5245) agent. It listens on a UDP port
-   for incoming STUN and SCTP packets and multiplexes based on source IP and
-   source port.
+   Lite](https://www.rfc-editor.org/rfc/rfc5245) agent. It binds to a UDP port
+   waiting for incoming STUN and SCTP packets and multiplexes based on source IP
+   and source port.
 
 2. Browser _A_ discovers server node _B_'s multiaddr, containing _B_'s IP, UDP
   port, TLS certificate fingerprint and optionally libp2p peer ID (e.g.
