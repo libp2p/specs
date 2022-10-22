@@ -37,7 +37,8 @@ Interest Group: [@marten-seemann]
    within the browser's trustchain. Note that we can not do this today with our
    Websocket transport as the browser requires the remote to have a trusted TLS
    certificate. Nor can we establish a plain TCP or QUIC connection from within
-   a browser.
+   a browser. We can establish a WebTransport connection from the browser (see
+   [WebTransport specification](../webtransport)).
 
 ## Addressing
 
