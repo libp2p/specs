@@ -303,8 +303,9 @@ After [Connection Establishment](#connection-establishment):
    _A_ and _B_ use the [Noise
    Prologue](https://noiseprotocol.org/noise.html#prologue) mechanism. More
    specifically _A_ and _B_ set the Noise _Prologue_ to
-   `libp2p-webrtc-noise:<FINGERPRINT_A><FINGERPRINT_B>` before starting the
-   actual Noise handshake. `<FINGERPRINT_A><FINGERPRINT_B>` is the concatenation
+   `<PREFIX><FINGERPRINT_A><FINGERPRINT_B>` before starting the actual Noise
+   handshake. `<PREFIX>` is the UTF-8 byte representation of the string
+   `libp2p-webrtc-noise:`. `<FINGERPRINT_A><FINGERPRINT_B>` is the concatenation
    of the two TLS fingerprints of _A_ (Noise handshake responder) and then _B_
    (Noise handshake initiator), in their multihash byte representation.
 
