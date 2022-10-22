@@ -189,7 +189,7 @@ message Message {
     // being discarded on receipt.
     STOP_SENDING = 1;
     // The sender abruptly terminates the sending part of the stream. The
-    // receiver can discard any data that it already received on that stream.
+    // receiver MAY discard any data that it already received on that stream.
     RESET_STREAM = 2;
   }
 
