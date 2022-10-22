@@ -161,7 +161,7 @@ The WebRTC browser APIs do not support half-closing of streams nor resets of the
 sending part of streams.
 [`RTCDataChannel.close()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel/close)
 flushes the remaining messages and closes the local write and read side. After
-calling `RTCDataChannel.close()` one can no longer read from the channel. This
+calling `RTCDataChannel.close()` one can no longer read from nor write to the channel. This
 lack of functionality is problematic, given that libp2p protocols running on top
 of transport protocols, like WebRTC, expect to be able to half-close or reset a
 stream. See [Connection Establishment in
