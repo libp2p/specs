@@ -152,7 +152,7 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    succeeding Noise handshake. See [Connection Security
    section](#connection-security).
 
-8. Messages on the established `RTCDataChannel` are framed using the message
+8. Messages on each `RTCDataChannel` are framed using the message
    framing mechanism described in [Multiplexing](#multiplexing).
 
 9. The remote is authenticated via an additional Noise handshake. See
