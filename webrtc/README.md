@@ -95,7 +95,7 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    very useful in the future. _A_ sets the string as the username (_ufrag_ or _username fragment_)
    and password on the SDP of the remote's answer.
 
-   _A_ MUST sets the `a=max-message-size:16384` SDP attribute. See reasoning
+   _A_ MUST set the `a=max-message-size:16384` SDP attribute. See reasoning
    [multiplexing](#multiplexing) for rational.
 
    Finally _A_ sets the remote answer via
@@ -106,7 +106,7 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    _A_ sets the same username and password on the local offer as done in (4) on
    the remote answer.
 
-   _A_ MUST sets the `a=max-message-size:16384` SDP attribute. See reasoning
+   _A_ MUST set the `a=max-message-size:16384` SDP attribute. See reasoning
    [multiplexing](#multiplexing) for rational.
 
    Finally _A_ sets the modified offer via
