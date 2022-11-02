@@ -89,7 +89,7 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
 
 4. _A_ constructs _B_'s SDP answer locally based on _B_'s multiaddr.
 
-   _A_ generates a random string prefixed with "libp2p-webrtc-v1:". The prefix
+   _A_ generates a random string prefixed with "libp2p+webrtc+v1/". The prefix
    allows us to use the ufrag as an upgrade mechanism to role out a new version
    of the libp2p WebRTC protocol on a live network. While a hack, this might be
    very useful in the future.
