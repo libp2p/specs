@@ -92,17 +92,24 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    _A_ generates a random string prefixed with "libp2p+webrtc+v1/". The prefix
    allows us to use the ufrag as an upgrade mechanism to role out a new version
    of the libp2p WebRTC protocol on a live network. While a hack, this might be
-   very useful in the future.
+   very useful in the future. _A_ sets the string as the username (_ufrag_ or _username fragment_)
+   and password on the SDP of the remote's answer.
 
-   _A_ sets the above string as the username (_ufrag_ or _username fragment_)
-   and password on the SDP of the remote's answer. Finally _A_ sets the remote
-   answer via
+   _A_ MUST sets the `a=max-message-size:16384` SDP attribute. See reasoning
+   [multiplexing](#multiplexing) for rational.
+
+   Finally _A_ sets the remote answer via
    [`RTCPeerConnection.setRemoteDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setRemoteDescription).
 
 5. _A_ creates a local offer via
    [`RTCPeerConnection.createOffer()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createOffer).
    _A_ sets the same username and password on the local offer as done in (4) on
-   the remote answer. Finally _A_ sets the modified offer via
+   the remote answer.
+
+   _A_ MUST sets the `a=max-message-size:16384` SDP attribute. See reasoning
+   [multiplexing](#multiplexing) for rational.
+
+   Finally _A_ sets the modified offer via
    [`RTCPeerConnection.setLocalDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setLocalDescription).
 
    Note that this process, oftentimes referred to as "SDP munging" is disallowed
@@ -123,6 +130,9 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
 
    3. _B_ sets the connection field (`c`) to the IP and port of the incoming
       request `c=IN <ip> <port>`.
+
+   4. _B_ sets the `a=max-message-size:16384` SDP attribute. See reasoning
+      [multiplexing](#multiplexing) for rational.
 
    _B_ sets this offer as the remote description. _B_ generates an answer and
    sets it as the local description.
