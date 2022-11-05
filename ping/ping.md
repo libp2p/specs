@@ -28,7 +28,7 @@ side of the stream after sending the last payload, and the server SHOULD finish
 writing the echoed payload and then exit the loop and close the stream.
 
 The client MUST NOT keep more than one outbound stream for the ping protocol per
-peer.  The server SHOULD accept at most 2 streams per peer since cross stream
+peer. The server SHOULD accept at most 2 streams per peer since cross stream
 behavior is not linearizable for client and server. In other words, the client
 closing stream A and then opening stream B, might be perceived by the server as
 the client opening stream B and then closing stream A.
