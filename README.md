@@ -72,6 +72,7 @@ security, multiplexing, and other purposes.
 
 The protocols described below all use [protocol buffers](https://developers.google.com/protocol-buffers/docs/proto?hl=en) (aka protobuf) to define message schemas. Version `proto2` is used unless stated otherwise.
 
+- [ping][spec_ping] - Ping protocol
 - [autonat][spec_autonat] - NAT detection
 - [identify][spec_identify] -  Exchange keys and addresses with other peers
 - [kademlia][spec_kademlia] - The Kademlia Distributed Hash Table (DHT) subsystem
@@ -129,3 +130,4 @@ you feel an issue isn't the appropriate place for your topic, please join our
 [spec_autonat]: ./autonat/README.md
 [spec_dcutr]: ./relay/DCUtR.md
 [spec_webtransport]: ./webtransport/README.md
+[spec_ping]: ./ping/ping.md
