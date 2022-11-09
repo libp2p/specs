@@ -166,5 +166,5 @@ connections across the various permutations of the two dimensions.
 [ipfs-kademlia]: https://docs.ipfs.io/concepts/dht/
 [Kademlia]: https://github.com/libp2p/specs/blob/master/kad-dht/README.md
 [Gossipsub]: ../pubsub/gossipsub/README.md
-[WebRTC]: https://github.com/libp2p/specs/issues/220
+[WebRTC]: ../webrtc/README.md
 [WebTransport]: https://github.com/libp2p/specs/pull/404
