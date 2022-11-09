@@ -60,7 +60,7 @@ Conceptually, it is very simple. When a peer starts (or detects a network change
    As the this field doesn't carry any meaning, it is sufficient to ensure the uniqueness of this identifier. Peers SHOULD generate a random, lower-case alphanumeric string of least 32 characters in length when booting up their node. Peers SHOULD NOT use their Peer ID here because a future Peer ID could exceed the DNS label limit of 63 characters.
 
 If a [private network](https://github.com/libp2p/specs/blob/master/pnet/Private-Networks-PSK-V1.md) is in use, then the `service-name` contains the base-16 encoding of the network's fingerprint  as in `_p2p-X._udp.local`. 
-The prevents public and private networks from discovering each other's peers.
+This prevents public and private networks from discovering each other's peers.
 
 ## Peer Discovery
 
