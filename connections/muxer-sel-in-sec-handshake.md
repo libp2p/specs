@@ -173,12 +173,6 @@ finished mutual authentication of the peers to enhance security.
 
 The format of the early data is specified in [Noise-handshake-payload]
 
-In the previous versions that do not support this feature, the Noise handshake
-messages carry an empty field of muxer list in the early data extension. When a
-version that supports this feature talks to an older version which does not
-support this feature, the multiplexer selection process on both peers will
-generate an empty list and they MUST fall back to the multistream-selection
-process to ensure backward compatibility.
 
 ## Security
 
