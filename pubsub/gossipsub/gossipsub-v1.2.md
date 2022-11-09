@@ -70,8 +70,9 @@ also ensure that `D_non_choke` peers remain unchoked in each mesh topic.
 
 Upon receiving a `CHOKE` message, the router MUST no longer forward messages to
 the peer that sent the `CHOKE` message, while it is still in the mesh. Instead
-it MUST always send an IHAVE message (provided it does not hit the IHAVE
-message limit) in the next gossipsub heartbeat to the peer.
+it MUST always send an IHAVE message (provided there are messages to send and
+it does not hit the IHAVE message limit) in the next gossipsub heartbeat to the
+peer.
 
 A peer MUST NOT send a `CHOKE` message to another peer that is not currently
 grafted into it's mesh.
