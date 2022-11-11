@@ -137,6 +137,7 @@ For more details see the implementation [PR](https://github.com/libp2p/go-libp2p
 
 # Prior art
 
+- Historical discussion: https://pl-strflt.notion.site/libp2p-HTTP-4f7d7ff3350a462a875bbfc41b3d4134
 - rust-libp2p's request-response protocol: https://github.com/libp2p/rust-libp2p/tree/master/protocols/request-response.
 - go-libp2p's [go-libp2p-http].
 - The Indexer project uses [go-libp2p-stream](https://github.com/libp2p/go-libp2p-gostream) to do [HTTP over libp2p](https://github.com/filecoin-project/storetheindex/blob/main/dagsync/p2p/protocol/head/head.go).
