@@ -22,6 +22,7 @@ Interest Group: [@marcopolo], [@mxinden], [@marten-seemann]
   - [Choosing between libp2p streams vs plain HTTPS](#choosing-between-libp2p-streams-vs-plain-https)
 - [Implementation recommendations](#implementation-recommendations)
   - [Example – Go](#example--go)
+- [Future work](#future-work)
 - [Prior art](#prior-art)
 
 # Context
@@ -42,24 +43,31 @@ as _plain https_) or on top of a libp2p stream.
 
 ## Why not two separate stacks?
 
-Having libp2p as the abstraction over _how_ the HTTP request gets sent gives developers a lot of benefits for free, such as:
+Having libp2p as the abstraction over _how_ the HTTP request gets sent gives
+developers a lot of benefits for free, such as:
 
 1. NAT traversal: You can make an HTTP request to a peer that's behind a NAT.
-1. Fewer connections: If you already have a libp2p connection, we can use that to create a stream for the HTTP request. The HTTP request will be faster since you don't have to pay the two round trips to establish the connection.
-1. Allows JS clients to make HTTPS requests to _any_ peer via WebTransport or WebRTC.
-1. Allows more reuse of the protocol logic, just like how applications can integrate GossipSub, bitswap, graphsync, and Kademlia.
+1. Fewer connections: If you already have a libp2p connection, we can use that
+   to create a stream for the HTTP request. The HTTP request will be faster since
+   you don't have to pay the two round trips to establish the connection.
+1. Allows JS clients to make HTTPS requests to _any_ peer via WebTransport or
+   WebRTC.
+1. Allows more reuse of the protocol logic, just like how applications can
+   integrate GossipSub, bitswap, graphsync, and Kademlia.
 1. You get mutual authentication of peer IDs automatically.
 
 
 ## Why HTTP rather than a custom request/response protocol?
 
-HTTP has been around for 30+ years, and it isn't going anywhere. Developers are already very familiar with it. There's is no need to reinvent the wheel here.
+HTTP has been around for 30+ years, and it isn't going anywhere. Developers are
+already very familiar with it. There's is no need to reinvent the wheel here.
 
 # Implementation
 
 ## HTTP over libp2p streams
 
-If we have an existing libp2p connection that supports streams, we can run the HTTP protocol as follows:
+If we have an existing libp2p connection that supports streams, we can run the
+HTTP protocol as follows:
 
 Client:
 1. Open a new stream to the target peer.
@@ -70,7 +78,8 @@ Client:
 
 Server:
 1. Register a stream handler for the `/libp2p-http` protocol.
-1. On receiving a new stream speaking `/libp2p-http`, parse the HTTP request and pass it to the HTTP handler.
+1. On receiving a new stream speaking `/libp2p-http`, parse the HTTP request and
+   pass it to the HTTP handler.
 1. Write the response from the HTTP handler to the stream.
 1. Close the stream when finished writing the response.
 
@@ -78,7 +87,9 @@ Server:
 
 This is nothing more than a thin wrapper over standard HTTP. The only thing
 libp2p should do here is ensure that we verify the peer's TLS certificate as
-defined by the [tls spec](../tls/tls.md). This SHOULD be interoperable with standard HTTP clients who pass a correct TLS cert. For example curl should work fine:
+defined by the [tls spec](../tls/tls.md). This SHOULD be interoperable with
+standard HTTP clients who pass a correct TLS cert. For example curl should work
+fine:
 
 ```
 $ curl --insecure --cert ./client.cert --key ./client.key https://127.0.0.1:9561/echo -d "Hello World"
@@ -96,13 +107,15 @@ connection or a libp2p connection or expose this as an option to users.
 
 # Implementation recommendations
 
-Each implementation should decide how this works, but the general recommendations are:
+Each implementation should decide how this works, but the general
+recommendations are:
 
 1. Make this look and feel like a normal HTTP client and server. There's no
-benefit of doing things differently here, and the familiarity will let people
-build things faster.
+   benefit of doing things differently here, and the familiarity will let people
+   build things faster.
 
-1. Aim to make the returned libp2p+HTTP objects interop with the general HTTP ecosystem of the language.
+1. Aim to make the returned libp2p+HTTP objects interop with the general HTTP
+   ecosystem of the language.
 
 ## Example – Go
 
@@ -134,6 +147,19 @@ We can create a client that accepts standard types
 ```
 
 For more details see the implementation [PR](https://github.com/libp2p/go-libp2p/pull/1874).
+
+# Future work
+
+This spec aims to define HTTP as the request/response protocol abstraction for
+libp2p. It also defines how libp2p+HTTP can run on top of the existing libp2p
+stream abstraction _or_ a plain HTTPS connection with a certificate that
+includes the libp2p extension.
+
+The next step is to define how to use a plain HTTPS connection with a server
+certificate that doesn't have the libp2p extension (e.g. a certificate you get
+from letsencrypt) in both interactive and static contexts. Some ideas are
+[outlined
+here](https://github.com/libp2p/specs/pull/477#issuecomment-1311988037).
 
 # Prior art
 
