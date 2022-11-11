@@ -45,7 +45,7 @@ as _plain https_) or on top of a libp2p stream.
 Having libp2p as the abstraction over _how_ the HTTP request gets sent gives developers a lot of benefits for free, such as:
 
 1. NAT traversal: You can make an HTTP request to a peer that's behind a NAT.
-1. Fewer connections: If you already have a libp2p connection, we can use use that to create a stream for the HTTP request. The HTTP request will be faster since you don't have to pay the two round trips to establish the connection.
+1. Fewer connections: If you already have a libp2p connection, we can use that to create a stream for the HTTP request. The HTTP request will be faster since you don't have to pay the two round trips to establish the connection.
 1. Allows JS clients to make HTTPS requests to _any_ peer via WebTransport or WebRTC.
 1. Allows more reuse of the protocol logic, just like how applications can integrate GossipSub, bitswap, graphsync, and Kademlia.
 1. You get mutual authentication of peer IDs automatically.
