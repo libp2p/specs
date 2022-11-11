@@ -29,10 +29,11 @@ Interest Group: [@marcopolo], [@mxinden], [@marten-seemann]
 HTTP is everywhere. Especially in CDNs, cloud offerings, and caches.
 
 HTTP on libp2p and libp2p on HTTP are both commonly requested features. This has
-come up recently at IPFS Camp and especially in the [data transfer track]. One
-aspect of the discussion makes it seem like you can use HTTP _OR_ use libp2p,
-but that isn't the case. Before this spec you could use the HTTP protocol on top
-of a libp2p stream (with little to no extra cost). And this spec outlines how to use libp2p _on top of_ HTTP.
+come up recently at [IPFS Camp 2022](https://2022.ipfs.camp/) and especially in
+the [data transfer track]. One aspect of the discussion makes it seem like you
+can use HTTP _OR_ use libp2p, but that isn't the case. Before this spec you
+could use the HTTP protocol on top of a libp2p stream (with little to no extra
+cost). And this spec outlines how to use libp2p _on top of_ HTTP.
 
 This spec defines a new libp2p abstraction for stateless request/response
 protocols. This abstraction is notably nothing new, it is simply HTTP. Being
@@ -44,12 +45,11 @@ as _plain https_) or on top of a libp2p stream.
 Having libp2p as the abstraction over _how_ the HTTP request gets sent gives developers a lot of benefits for free, such as:
 
 1. NAT traversal: You can make an HTTP request to a peer that's behind a NAT.
-1. Fewer connections: If you already have a libp2p connection, we can use use that to create a stream for the HTTP request. So that HTTP request will be much faster (You don't have to pay the two round trips to establish the connection)
-1. Allows JS clients to make HTTPS requests to _any_ peer via WebTransport.
+1. Fewer connections: If you already have a libp2p connection, we can use use that to create a stream for the HTTP request. The HTTP request will be faster since you don't have to pay the two round trips to establish the connection.
+1. Allows JS clients to make HTTPS requests to _any_ peer via WebTransport or WebRTC.
 1. Allows more reuse of the protocol logic, just like how applications can integrate GossipSub, bitswap, graphsync, and Kademlia.
 1. You get mutual authentication of peer IDs automatically.
 
-Get the benefits of libp2p (webtransport, fewer connections, webrtc, nat traversal)
 
 ## Why HTTP rather than a custom request/response protocol?
 
@@ -69,9 +69,10 @@ Client:
 1. Close the stream when the response is received.
 
 Server:
-1. Register the `/libp2p-http` protocol.
-1. One a new stream speaking `/libp2p-http` pass the stream to an HTTP handler.
-1. Close the stream when finished uploading the request.
+1. Register a stream handler for the `/libp2p-http` protocol.
+1. On receiving a new stream speaking `/libp2p-http`, parse the HTTP request and pass it to the HTTP handler.
+1. Write the response from the HTTP handler to the stream.
+1. Close the stream when finished writing the response.
 
 ## libp2p over plain HTTPS
 
