@@ -132,6 +132,8 @@ We can create a client that accepts standard types
 	resp, err := client.Post("/echo", "application/octet-stream", bytes.NewReader([]byte("Hello World")))
 ```
 
+For more details see the implementation [PR](https://github.com/libp2p/go-libp2p/pull/1874).
+
 # Prior art
 
 - rust-libp2p's request-response protocol: https://github.com/libp2p/rust-libp2p/tree/master/protocols/request-response
