@@ -91,13 +91,10 @@ to negotiate the multiplexer.
 When the security protocol selected by the upgrader is TLS, the [ALPN]
 extension of TLS handshake is used to select the multiplexer.
 
-   With ALPN, the client sends the list of supported application
-   protocols as part of the TLS ClientHello message.  The server chooses
-   a protocol and sends the selected protocol as part of the TLS
-   ServerHello message.  The application protocol negotiation can thus
-   be accomplished within the TLS handshake, without adding network
-   round-trips, and allows the server to associate a different
-   certificate with each application protocol, if desired.
+The ALPN TLS extension allows the client to send a list of supported application
+protocols as part of the TLS ClientHello message.  The server chooses
+a protocol and sends the selected protocol as part of the TLS
+ServerHello message.
 
 For the purpose of multiplexer negotiation, the types of multiplexers are coded
 as protocol names in the form of a list of strings, and inserted in the ALPN
