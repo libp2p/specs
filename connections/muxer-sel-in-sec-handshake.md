@@ -34,20 +34,12 @@ and spec status.
 
 ## Overview
 
-This document describes an improvement on the stream multiplexer negotiation
-process. The goal of the improvement is to reduce the number of RTTs to
-negotiate the stream multiplexer for a transport that does not natively
-support stream multiplexing. The solution relies on the ability of the security
-protocol's handshake process to negotiate higher level protocols, which enables
-the multiplexer negotiation to be carried out along with the security protocol
-handshake. With this improvement, the negotiation of the stream multiplexer
-doesn't consume any additional roundtrips.
-
-This feature aggregates the multiplexer negotiation function and security
-handshake function. It introduces coupling between those two functions.
-
-The improved multiplexer negotiation approach MUST be interoperable with
-previous libp2p versions which do not support this improvement.
+Transports that don't support native stream multiplexing (e.g. TCP, WebSocket) negotiate
+a stream multiplexer after completion of the cryptographic handshake, as described in [connections]. 
+Negotiation the stream multiplexer takes one network roundtrip.
+This document defines a backwards-compatible optimization, which allows running the
+multiplexer negotiation during the cryptographic handshake, thereby reducing the latency of
+connection establishment by one roundtrip.
 
 
 ## Design
