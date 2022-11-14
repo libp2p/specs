@@ -67,7 +67,7 @@ tunnel
 negotiation.
 4. The selected stream multiplexer is then used on the secured connection.
 
-## Improved multiplexer negotiation 
+### Improved multiplexer negotiation 
 
 The security protocol's ability of supporting higher level abstract protocol
 negotiation (for example, TLS's support of ALPN, and Noise's support of Early
