@@ -149,16 +149,17 @@ finished mutual authentication of the peers to enhance security.
 The format of the early data is specified in [Noise-handshake-payload]
 
 
-## Security
+## Privacy
 
-The multiplexer list carried in the TLS ALPN extension field is part of the
-ClientHello message which is not encrypted. This feature will expose the
-supported multiplexers in plain text, but this is not a weakening of security
-posture. In the future when [ECH] is ready the multiplexer info can be protected
-too.
+The list of multiplexers carried in the TLS ALPN extension field is part of the
+ClientHello message which is not encrypted. Using this optimiziation therefore
+exposes the list of supported multiplexers to an on-path observer. This leak can
+be considered insignificant, since a libp2p node reveals its list of supported
+multiplexers to any node that connects to it.
 
-Early data in the Noise handshake is sent after the peers have established a
-shared key, so an on-path observer won't be able to read the early data.
+The NoiseExtensions sent in the Noise handshake is sent after the peers have 
+established a shared key, so an on-path observer won't be able to obtain the
+list of multiplexers.
 
 
 ## Alternative options considered
