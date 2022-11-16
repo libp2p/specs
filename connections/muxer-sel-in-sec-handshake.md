@@ -68,10 +68,6 @@ section into one step. Multiplexer negotiation can be performed as part of the
 security protocol handshake, thus there is no need to perform another
 multistream-selection negotiation for multiplexer negotiation.
 
-In order to achieve the above stated goal, each candidate multiplexer will be
-represented by a protocol name/code, and the candidate multiplexers are supplied
-to the security protocol's handshake process as a list of protocol names.
-
 If the client and server agree upon the common multiplexer to be used, then the
 result of the multiplexer negotiation is used as the selected stream
 multiplexer. If no agreement is reached upon by the client and server then the
@@ -88,30 +84,20 @@ protocols as part of the TLS ClientHello message.  The server chooses
 a protocol and sends the selected protocol as part of the TLS
 ServerHello message.
 
-For the purpose of multiplexer negotiation, the types of multiplexers are coded
-as protocol names in the form of a list of strings, and inserted in the ALPN
-extension field.
+For the purpose of multiplexer negotiation, the protocol IDs of the stream 
+multiplexers are sent, followed by "libp2p".
     An example list:
 
     ["/yamux/1.0.0", "/mplex/6.7.0", "libp2p"]
 
-The multiplexer list is ordered by preference, with the most preferred
-multiplexer at the beginning. The server SHOULD choose the supported protocol by
-going through its preferred protocol list and search if the protocol is
-supported by the client too. If no mutually supported protocol is found the TLS
-handshake will fail.
+The multiplexer list is ordered by the client's preference, with the most preferred
+multiplexer at the beginning. The server SHOULD pick the first protocol from the
+list that it supports.
 
 The "libp2p" protocol code MUST always be the last item in the multiplexer list.
-The reason for adding this special protocol code is to ensure backward
-compatibility. In the previous versions that do not support this feature, the
-ALPN extension field is alwasy populated with a key "libp2p". By appending the
-key of "libp2p" to the end of the supported multiplexer list, the overlap of the
-peer's supported ALPN protocols is always guaranteed when different versions of
-libp2p are negotiating a TLS connection.
-
-In the case that "libp2p" is the result of TLS ALPN, The upgrade process MUST
-fall back to the multistream-selection protocol to negotiate the multiplexer to
-be used. This fallback behavior ensures backward compatibility.
+According to [tls], nodes that don't implement the optimization described in this document
+use "libp2p" for their ALPN. If "libp2p" is the result of the ALPN process, nodes MUST use
+multistream negotiation of the stream multiplexer as described in [connections].
 
 ### Multiplexer negotiation over Noise
 
@@ -171,10 +157,8 @@ supported multiplexers in plain text, but this is not a weakening of security
 posture. In the future when [ECH] is ready the multiplexer info can be protected
 too.
 
-The early data in Noise handshake is only sent after the peers establish a
-shared key, in the second and third handshake messages in the XX pattern. So the
-early data is encrypted and the multiplexer info carried over is protected.
-There is no security weakening in this case either.
+Early data in the Noise handshake is sent after the peers have established a
+shared key, so an on-path observer won't be able to read the early data.
 
 
 ## Alternative options considered
