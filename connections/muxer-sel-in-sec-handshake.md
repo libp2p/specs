@@ -36,7 +36,7 @@ and spec status.
 
 Transports that don't support native stream multiplexing (e.g. TCP, WebSocket) negotiate
 a stream multiplexer after completion of the cryptographic handshake, as described in [connections]. 
-Negotiation the stream multiplexer takes one network roundtrip.
+Negotiating the stream multiplexer takes one network roundtrip.
 This document defines a backwards-compatible optimization, which allows running the
 multiplexer negotiation during the cryptographic handshake, thereby reducing the latency of
 connection establishment by one roundtrip.
@@ -88,7 +88,7 @@ For the purpose of multiplexer negotiation, the protocol IDs of the stream
 multiplexers are sent, followed by "libp2p".
     An example list:
 
-    ["/yamux/1.0.0", "/mplex/6.7.0", "libp2p"]
+    [ "/yamux", "/mplex", "libp2p" ]
 
 The multiplexer list is ordered by the client's preference, with the most preferred
 multiplexer at the beginning. The server SHOULD pick the first protocol from the
@@ -106,39 +106,34 @@ early data. [Noise-Early-Data] is carried in the second and third message of
 the XX handshake pattern as illustrated in the following message sequence chart.
 The second message carries early data in the form of a list of multiplexers
 supported by the responder, ordered by preference. The initiator sends its
-supported multiplexer list in the third message of the handshake process.
+supported multiplexer list in the third message of the handshake process. It
+MAY choose a single multiplexer from the responder's list and only send that
+value.
 
-For security reasons the early data SHALL not be processed until the Noise
-handshake is finished. After the Noise handshake process is fully done, the
-initiator and responder will both process the received early data and select the
-multiplexer to be used. They both iterate through the responder's preferred
-multiplexer list in order, and if the multiplexer is also supported by the
-initiator, that multiplexer is selected. If no mutually supported multiplexer is
-found, the multiplexer negotiation process MUST fall back to multistream
--selection protocol.
+The multiplexer to use is determined by picking the first item from the
+initiator's list that both parties support.
 
 Example: Noise handshake between peers that have a mutually supported
 multiplexer.
-    Initiator supports: ["/yamux/1.0.0", "/mplex/6.7.0"]
-    Responder supports: ["/mplex/6.7.0", "/yamux/1.0.0"]
+    Initiator supports: [ "/yamux", "/mplex" ]
+    Responder supports: [ "/mplex", "/yamux" ]
 
     XX:
     -> e
-    <- e, ee, s, es, ["/mplex/6.7.0", "/yamux/1.0.0"] 
-    -> s, se, ["/yamux/1.0.0", "/mplex/6.7.0"] 
+    <- e, ee, s, es, [ "/mplex", "/yamux" ] 
+    -> s, se, [ "/yamux", "/mplex" ] 
 
-    After handshake is done, both parties can arrive on the same conclusion
-    and select "/mplex/6.7.0" as the multiplexer to use.
+    Negotiated: "/yamux"
 
 Example: Noise handshake between peers that don't have mutually supported
 multiplexers.
-    Responder supports: ["/mplex/6.7.0"]
-    Initiator supports: ["yamux/1.0.0"]
+    Responder supports: [ "/mplex" ]
+    Initiator supports: [ "yamux" ]
 
     XX:
     -> e
-    <- e, ee, s, es, ["/mplex/6.7.0"]
-    -> s, se, ["yamux/1.0.0"]
+    <- e, ee, s, es, [ "/mplex" ]
+    -> s, se, [ "yamux" ]
     
     After handshaking is done, early data processing will find no mutually
     supported multiplexer, and falls back to multistream-selection protocol.
