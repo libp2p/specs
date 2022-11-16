@@ -5,9 +5,9 @@
 |-----------------|---------------|--------|-----------------|
 | 1A              | Working Draft | Active | r1, 2022-09-07  |
 
-Authors: [@julian88110]
+Authors: [@julian88110], [@marten-seemann]
 
-Interest Group: [@marten-seemann], [@marcopolo], [@mxinden]
+Interest Group: [@marcopolo], [@mxinden]
 
 [@marten-seemann]: https://github.com/marten-seemann
 [@marcopolo]: https://github.com/marcopolo
