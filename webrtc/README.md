@@ -1,9 +1,8 @@
 # WebRTC
 
-| Lifecycle Stage | Maturity      | Status | Latest Revision |
-|-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r0, 2022-10-14  |
-
+| Lifecycle Stage | Maturity                  | Status | Latest Revision |
+|-----------------|---------------------------|--------|-----------------|
+| 2A              | Candidate Recommendation  | Active | r0, 2022-10-14  |
 Authors: [@mxinden]
 
 Interest Group: [@marten-seemann]
@@ -15,17 +14,20 @@ Interest Group: [@marten-seemann]
 **Table of Contents**
 
 - [WebRTC](#webrtc)
-    - [Motivation](#motivation)
-    - [Addressing](#addressing)
-    - [Connection Establishment](#connection-establishment)
-        - [Browser to public Server](#browser-to-public-server)
-    - [Multiplexing](#multiplexing)
-        - [Ordering](#ordering)
-        - [Head-of-line blocking](#head-of-line-blocking)
-        - [`RTCDataChannel` negotiation](#rtcdatachannel-negotiation)
-        - [`RTCDataChannel` label](#rtcdatachannel-label)
-    - [Connection Security](#connection-security)
-    - [Previous, ongoing and related work](#previous-ongoing-and-related-work)
+  - [Motivation](#motivation)
+  - [Addressing](#addressing)
+  - [Connection Establishment](#connection-establishment)
+    - [Browser to public Server](#browser-to-public-server)
+  - [Multiplexing](#multiplexing)
+    - [Ordering](#ordering)
+    - [Head-of-line blocking](#head-of-line-blocking)
+    - [`RTCDataChannel` negotiation](#rtcdatachannel-negotiation)
+    - [`RTCDataChannel` label](#rtcdatachannel-label)
+  - [Connection Security](#connection-security)
+  - [Previous, ongoing and related work](#previous-ongoing-and-related-work)
+  - [Test vectors](#test-vectors)
+    - [Noise prologue](#noise-prologue)
+      - [Both client and server use SHA-256](#both-client-and-server-use-sha-256)
 - [FAQ](#faq)
 
 <!-- markdown-toc end -->
