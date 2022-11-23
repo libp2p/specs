@@ -1,9 +1,9 @@
-# Addressing in libp2p
+# Addressing in libp2p  <!-- omit in toc -->
 > How network addresses are encoded and used in libp2p
 
-| Lifecycle Stage | Maturity      | Status | Latest Revision |
-|-----------------|---------------|--------|-----------------|
-| 1A              | Recommendation | Active | r0, 2021-07-22  |
+| Lifecycle Stage | Maturity       | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
+| 3A              | Recommendation | Active | r0, 2021-07-22  |
 
 
 Authors: [@yusefnapora]
@@ -18,25 +18,23 @@ and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
 
-## Table of Contents
+## Table of Contents  <!-- omit in toc -->
 
-- [Addressing in libp2p](#addressing-in-libp2p)
-    - [Table of Contents](#table-of-contents)
-    - [Overview](#overview)
-    - [multiaddr in libp2p](#multiaddr-in-libp2p)
-        - [multiaddr basics](#multiaddr-basics)
-        - [Composing multiaddrs](#composing-multiaddrs)
-            - [Encapsulation](#encapsulation)
-            - [Decapsulation](#decapsulation)
-        - [The p2p multiaddr](#the-p2p-multiaddr)
-            - [Historical Note: the `ipfs` multiaddr Protocol](#historical-note-the-ipfs-multiaddr-protocol)
-    - [Transport multiaddrs](#transport-multiaddrs)
-        - [IP and Name Resolution](#ip-and-name-resolution)
-            - [dnsaddr Links](#dnsaddr-links)
-        - [TCP](#tcp)
-        - [WebSockets](#websockets)
-        - [QUIC](#quic)
-        - [`p2p-circuit` Relay Addresses](#p2p-circuit-relay-addresses)
+- [Overview](#overview)
+- [multiaddr in libp2p](#multiaddr-in-libp2p)
+  - [multiaddr basics](#multiaddr-basics)
+  - [Composing multiaddrs](#composing-multiaddrs)
+    - [Encapsulation](#encapsulation)
+    - [Decapsulation](#decapsulation)
+  - [The p2p multiaddr](#the-p2p-multiaddr)
+    - [Historical Note: the `ipfs` multiaddr Protocol](#historical-note-the-ipfs-multiaddr-protocol)
+- [Transport multiaddrs](#transport-multiaddrs)
+  - [IP and Name Resolution](#ip-and-name-resolution)
+    - [dnsaddr Links](#dnsaddr-links)
+  - [TCP](#tcp)
+  - [WebSockets](#websockets)
+  - [QUIC](#quic)
+  - [`p2p-circuit` Relay Addresses](#p2p-circuit-relay-addresses)
 
 ## Overview
 

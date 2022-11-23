@@ -1,8 +1,8 @@
-# Direct Connection Upgrade through Relay
+# Direct Connection Upgrade through Relay  <!-- omit in toc -->
 
-| Lifecycle Stage | Maturity      | Status | Latest Revision    |
-|-----------------|---------------|--------|--------------------|
-| 1A              | Working Draft | Active | r1, 2021-11-20     |
+| Lifecycle Stage | Maturity       | Status | Latest Revision    |
+|-----------------|----------------|--------|--------------------|
+| 3A              | Recommendation | Active | r1, 2021-11-20     |
 
 Authors: [@vyzo]
 
@@ -18,15 +18,13 @@ Interest Group: [@raulk], [@stebalien], [@whyrusleeping], [@mxinden], [@marten-s
 See the [lifecycle document](https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md)
 for context about maturity level and spec status.
 
-## Table of Contents
+## Table of Contents  <!-- omit in toc -->
 
-- [Direct Connection Upgrade through Relay](#direct-connection-upgrade-through-relay)
-    - [Table of Contents](#table-of-contents)
-    - [Introduction](#introduction)
-    - [The Protocol](#the-protocol)
-        - [RPC messages](#rpc-messages)
-    - [FAQ](#faq)
-    - [References](#references)
+- [Introduction](#introduction)
+- [The Protocol](#the-protocol)
+  - [RPC messages](#rpc-messages)
+- [FAQ](#faq)
+- [References](#references)
 
 ## Introduction
 
