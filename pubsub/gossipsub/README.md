@@ -34,3 +34,4 @@ Legend: ✅ = complete, 🏗 = in progress, ❕ = not started yet
 Additional tooling:
 
 - Simulator developed in Gerbil: [vyzo/gerbil-simsub](https://github.com/vyzo/gerbil-simsub)
+- Formal specification developed in ACL2s: [gossipsubfm/gossipsubfm](https://github.com/gossipsubfm/gossipsubfm)
