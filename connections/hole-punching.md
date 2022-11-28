@@ -1,9 +1,9 @@
 # Hole punching
 
 
-| Lifecycle Stage | Maturity      | Status | Latest Revision |
-|-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r1, 2022-06-13  |
+| Lifecycle Stage | Maturity       | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
+| 3A              | Recommendation | Active | r1, 2022-06-13  |
 
 Authors: [@mxinden]
 

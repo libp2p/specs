@@ -1,10 +1,10 @@
-# Circuit Relay v2
+# Circuit Relay v2  <!-- omit in toc -->
 
 This is the version 2 of the libp2p Circuit Relay protocol.
 
-| Lifecycle Stage | Maturity       | Status | Latest Revision |
-|-----------------|----------------|--------|-----------------|
-| 1A              | DRAFT          | Active | r1, 2021-12-17  |
+| Lifecycle Stage | Maturity        | Status | Latest Revision |
+|-----------------|-----------------|--------|-----------------|
+| 3A              | Recommendation  | Active | r1, 2021-12-17  |
 
 Authors: [@vyzo]
 
@@ -20,13 +20,15 @@ and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
 
-## Table of Contents
+## Table of Contents  <!-- omit in toc -->
 
 - [Introduction](#introduction)
   - [Rationale](#rationale)
 - [The Protocol](#the-protocol)
   - [Interaction](#interaction)
   - [Hop Protocol](#hop-protocol)
+    - [Reservation](#reservation)
+    - [Connection Initiation](#connection-initiation)
   - [Stop Protocol](#stop-protocol)
   - [Reservation Vouchers](#reservation-vouchers)
 - [Protobuf](#protobuf)

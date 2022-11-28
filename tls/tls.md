@@ -1,8 +1,8 @@
-# libp2p TLS Handshake
+# libp2p TLS Handshake  <!-- omit in toc -->
 
-| Lifecycle Stage | Maturity                 | Status | Latest Revision |
-|-----------------|--------------------------|--------|-----------------|
-| 2A              | Candidate Recommendation | Active | r0, 2019-03-23  |
+| Lifecycle Stage | Maturity       | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
+| 3A              | Recommendation | Active | r0, 2019-03-23  |
 
 Authors: [@marten-seemann]
 
@@ -21,16 +21,18 @@ and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
 
-## Table of Contents
+## Table of Contents  <!-- omit in toc -->
 
-- [libp2p TLS Handshake](#libp2p-tls-handshake)
-    - [Table of Contents](#table-of-contents)
-    - [Introduction](#introduction)
-    - [Handshake Protocol](#handshake-protocol)
-    - [Peer Authentication](#peer-authentication)
-        - [libp2p Public Key Extension](#libp2p-public-key-extension)
-    - [Test vectors](#test-vectors)
-    - [Future Extensibility](#future-extensibility)
+- [Introduction](#introduction)
+- [Handshake Protocol](#handshake-protocol)
+- [Peer Authentication](#peer-authentication)
+  - [libp2p Public Key Extension](#libp2p-public-key-extension)
+- [Test vectors](#test-vectors)
+  - [1. Valid certificate authenticating an ED25519 Peer ID](#1-valid-certificate-authenticating-an-ed25519-peer-id)
+  - [2. Valid certificate authenticating an ECDSA Peer ID](#2-valid-certificate-authenticating-an-ecdsa-peer-id)
+  - [3. Valid certificate authenticating a secp256k1 Peer ID](#3-valid-certificate-authenticating-a-secp256k1-peer-id)
+  - [4. Invalid certificate](#4-invalid-certificate)
+- [Future Extensibility](#future-extensibility)
 
 ## Introduction
 

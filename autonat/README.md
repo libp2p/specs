@@ -1,9 +1,9 @@
-# NAT Discovery
+# NAT Discovery  <!-- omit in toc -->
 > How we detect if we're behind a NAT.
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 1A              | Recommendation | Active | r0, 2021-08-26  |
+| 3A              | Recommendation | Active | r0, 2021-08-26  |
 
 
 Authors: [@marten-seemann]
@@ -22,7 +22,7 @@ and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
 
-## Table of Contents
+## Table of Contents  <!-- omit in toc -->
 
 - [Overview](#overview)
 - [AutoNAT Protocol](#autonat-protocol)
