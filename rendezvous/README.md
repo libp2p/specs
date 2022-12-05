@@ -16,7 +16,7 @@ Interest Group: [@daviddias], [@whyrusleeping], [@Stebalien], [@jacobheun], [@yu
 [@yusefnapora]: https://github.com/yusefnapora
 [@vasco-santos]: https://github.com/vasco-santos
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
@@ -37,11 +37,10 @@ and spec status.
 ## Overview
 
 The protocol described in this specification is intended to provide a
-lightweight mechanism for generalized peer discovery. It can be used
-for bootstrap purposes, real time peer discovery, application specific
-routing, and so on.  Any node implementing the rendezvous protocol can
-act as a rendezvous point, allowing the discovery of relevant peers in
-a decentralized fashion.
+lightweight mechanism for generalized peer discovery. It can be used for 
+purposes like bootstrapping, real-time peer discovery, and application-specific 
+routing. Any node implementing the rendezvous protocol can act as a rendezvous 
+point, allowing the discovery of relevant peers in a decentralized manner.
 
 ## Use Cases
 
@@ -49,82 +48,81 @@ Depending on the application, the protocol could be used in the
 following context:
 - During bootstrap, a node can use known rendezvous points to discover
   peers that provide critical services. For instance, rendezvous can
-  be used to discover circuit relays for connectivity restricted
+  be used to discover circuit relays for connectivity-restricted
   nodes.
 - During initialization, a node can use rendezvous to discover
   peers to connect with the rest of the application. For instance,
-  rendezvous can be used to discover pubsub peers within a topic.
-- In a real time setting, applications can poll rendezvous points in
+  rendezvous can discover pubsub peers within a topic.
+- In a real-time setting, applications can poll rendezvous points in
   order to discover new peers in a timely fashion.
-- In an application specific routing setting, rendezvous points can be
+- In an application-specific routing setting, rendezvous points can be
   used to progressively discover peers that can answer specific queries
   or host shards of content.
 
 ### Replacing ws-star-rendezvous
 
 We intend to replace ws-star-rendezvous with a few rendezvous daemons
-and a fleet of p2p-circuit relays.  Real-time applications will
+and a fleet of p2p-circuit relays. Real-time applications will
 utilize rendezvous both for bootstrap and in a real-time setting.
 During bootstrap, rendezvous will be used to discover circuit relays
-that provide connectivity for browser nodes.  Subsequently, rendezvous
-will be utilized throughout the lifetime of the application for real
-time peer discovery by registering and polling rendezvous points.
+that provide connectivity for browser nodes. Subsequently, rendezvous
+will be utilized throughout the application's lifetime for real-time peer 
+discovery by registering and polling rendezvous points.
 This allows us to replace a fragile centralized component with a
 horizontally scalable ensemble of daemons.
 
 ### Rendezvous and pubsub
 
 Rendezvous can be naturally combined with pubsub for effective
-real-time discovery.  At a basic level, rendezvous can be used to
-bootstrap pubsub: nodes can utilize rendezvous in order to discover
-their peers within a topic.  Alternatively, pubsub can also be used as
-a mechanism for building rendezvous services. In this scenerio, a
-number of rendezvous points can federate using pubsub for internal
-real-time distribution, while still providing a simple interface to
-clients.
+real-time discovery. At a basic level, rendezvous can 
+bootstrap pubsub: nodes can utilize rendezvous to discover
+their peers within a topic. Alternatively, pubsub can also be used to build 
+rendezvous services. In this scenario, several rendezvous points can federate 
+using pubsub for internal real-time distribution while still providing a simple 
+interface to clients.
 
 ## The Protocol
 
 The rendezvous protocol provides facilities for real-time peer
-discovery within application specific namespaces. Peers connect to the
+discovery within application-specific namespaces. Peers connect to the
 rendezvous point and register their presence in one or more
 namespaces. It is not allowed to register arbitrary peers in a
 namespace; only the peer initiating the registration can register
-itself. The register message contains a serialized [signed peer record](https://github.com/libp2p/specs/blob/377f05a/RFC/0002-signed-envelopes.md)
-created by the peer, which can be validated by others.
+itself. The register message contains a serialized 
+[signed peer record](https://github.com/libp2p/specs/blob/377f05a/RFC/0002-signed-envelopes.md)
+created by the peer, which others can validate.
 
-Peers registered with the rendezvous point can be discovered by other
-nodes by querying the rendezvous point. The query specifies the
-namespace for limiting application scope and optionally a maximum
+Other nodes can discover peers registered with the rendezvous point by 
+querying the rendezvous point. The query specifies the
+namespace for limiting application scope and, optionally, a maximum
 number of peers to return. The namespace can be omitted in the query,
 which asks for all peers registered to the rendezvous point.
 
-The query can also include a cookie, obtained from the response to a
+The query can also include a cookie obtained from the response to a
 previous query, such that only registrations that weren't included in
-the previous response will be returned. This allows peers to
-progressively refresh their network view without overhead, which
-greatly simplifies real time discovery. It also allows for pagination
-of query responses, so that large numbers of peer registrations can be
-managed.
+the previous response will be returned. This lets peers
+progressively refresh their network view without overhead, simplifying 
+real-time discovery. It also allows for the pagination
+of query responses so peers can manage large numbers of peer registrations.
 
 The rendezvous protocol runs over libp2p streams using the protocol id `/rendezvous/1.0.0`.
 
 ### Registration Lifetime
 
-Registration lifetime is controlled by an optional TTL parameter in
-the `REGISTER` message.  If a TTL is specified, then the registration
-persists until the TTL expires.  If no TTL was specified, then a default
-of 2hrs is implied. There may be a rendezvous point-specific upper bound
-on TTL, with a minimum such value of 72hrs. If the TTL of a registration
-is inadmissible, the rendezvous point may reject the registration with
-an `E_INVALID_TTL` status.
+An optional TTL parameter in
+the `REGISTER` message controls the registration lifetime. If a TTL is 
+specified, then the registration persists until the TTL expires. If no 
+TTL was set, then a default of 2hrs is implied. There may be a rendezvous 
+point-specific upper bound on TTL, with a maximum value of 72hrs. If the 
+TTL of a registration is inadmissible, the rendezvous point may reject 
+the registration with an `E_INVALID_TTL` status.
 
 Peers can refresh their registrations at any time with a new
 `REGISTER` message; the TTL of the new message supersedes previous
 registrations. Peers can also cancel existing registrations at any
 time with an explicit `UNREGISTER` message. An `UNREGISTER` message does
 **not** have an explicit response. `UNREGISTER` messages for a namespace
-that a client is currently not registered for should be treated as a no-op.
+that a client is not registered for should be treated as a no-op.
 
 The registration response includes the actual TTL of the registration,
 so that peers know when to refresh.
@@ -147,8 +145,8 @@ C -> R: REGISTER{another-app, {QmC, AddrC}}
 R -> C: {OK}
 ```
 
-Another client `D` can discover peers in `my-app` by sending a `DISCOVER` message; the
-rendezvous point responds with the list of current peer reigstrations and a cookie.
+Another client, `D` can discover peers in `my-app` by sending a `DISCOVER` message; the
+rendezvous point responds with the list of current peer registrations and a cookie.
 ```
 D -> R: DISCOVER{ns: my-app}
 R -> D: {[REGISTER{my-app, {QmA, Addr}}
@@ -166,8 +164,8 @@ R -> D: {[REGISTER{my-app, {QmA, Addr}}
          c2}
 ```
 
-If `D` wants to progressively poll for real time discovery, it can use
-the cookie obtained from a previous response in order to only ask for
+If `D` wants to poll for real-time discovery progressively, it can use
+the cookie obtained from a previous response only ask for
 new registrations.
 
 So here we consider a new client `E` registering after the first query,
@@ -182,11 +180,11 @@ R -> D: {[REGISTER{my-app, {QmE, AddrE}}],
 
 ### Spam mitigation
 
-The protocol as described so far is susceptible to spam attacks from
+The protocol, as described so far, is susceptible to spam attacks from
 adversarial actors who generate a large number of peer identities and
-register under a namespace of interest (eg: the relay namespace).
+register under a namespace of interest (e.g., the relay namespace).
 
-It is TBD how exactly such attacks will be mitigated.
+It is TBD how exactly the protocol will mitigate such attacks.
 See https://github.com/libp2p/specs/issues/341 for a discussion on this
 topic.
 
@@ -254,18 +252,18 @@ message Message {
 
 ## Recommendations for Rendezvous Points configurations
 
-Rendezvous points should have well defined configurations to enable libp2p
+Rendezvous points should have well-defined configurations to enable libp2p
 nodes running the rendezvous protocol to have friendly defaults, as well as to
 guarantee the security and efficiency of a Rendezvous point. This will be
 particularly important in a federation, where rendezvous points should share
 the same expectations.
 
-Regarding the validation of registrations, rendezvous points should have:
+Regarding the validation of registrations, rendezvous points should have the following:
 - a minimum acceptable **ttl** of `2H`
 - a maximum acceptable **ttl** of `72H`
 - a maximum **namespace** length of `255`
 
-Rendezvous points are also recommend to allow:
+Rendezvous points are also recommended to allow:
 - a maximum of `1000` registration for each peer
   - defend against trivial DoS attacks
 - a maximum of `1000` peers should be returned per namespace query
