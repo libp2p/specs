@@ -83,6 +83,8 @@ message Identify {
 }
 ```
 
+Implementations must reject `Identify` messages bigger than 4096 bytes.
+
 ### protocolVersion
 
 The protocol version identifies the family of protocols used by the peer. The
