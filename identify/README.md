@@ -94,11 +94,17 @@ protocol families / networks.
 
 Example value: `/my-network/0.1.0`.
 
+Implementations should discard non-ASCII characters and trim the string
+to 64 characters.
+
 ### agentVersion
 
 This is a free-form string, identifying the implementation of the peer.
 The usual format is `agent-name/version`, where `agent-name` is
 the name of the program or library and `version` is its semantic version.
+
+Implementations should discard non-ASCII characters and trim the string
+to 64 characters.
 
 ### publicKey
 
@@ -124,6 +130,9 @@ observable source address.
 ### protocols
 
 This is a list of protocols supported by the peer.
+
+Implementations should discard non-ASCII characters and trim each string
+to 64 characters.
 
 A node should only advertise a protocol if it's willing to receive inbound
 streams on that protocol. This is relevant for asymmetrical protocols. For
