@@ -123,7 +123,6 @@ and the discussion details can be found at [#454].
 [ALPN]: https://datatracker.ietf.org/doc/html/rfc7301
 [Noise-Early-Data]: https://github.com/libp2p/specs/tree/master/noise#libp2p-data-in-handshake-messages
 [ECH]: https://datatracker.ietf.org/doc/draft-ietf-tls-esni/
-[handshake-payload]: https://github.com/libp2p/specs/tree/master/noise#the-libp2p-handshake-payload
 [#454]: https://github.com/libp2p/specs/issues/454
 [Noise-handshake-payload]: https://github.com/libp2p/specs/tree/master/noise#the-libp2p-handshake-payload
 
