@@ -1,4 +1,4 @@
-# Stream multiplexer negotiation in security handshake
+# Stream multiplexer negotiation in security handshake <!-- omit in toc -->
 
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
