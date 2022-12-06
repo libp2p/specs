@@ -44,21 +44,6 @@ connection establishment by one roundtrip.
 
 ## Design
 
-### Improved multiplexer negotiation 
-
-The security protocol's ability of supporting higher level abstract protocol
-negotiation (for example, TLS's support of ALPN, and Noise's support of Early
-Data) makes it possible to collapse the step 2 and step 3 in the previous
-section into one step. Multiplexer negotiation can be performed as part of the
-security protocol handshake, thus there is no need to perform another
-multistream-selection negotiation for multiplexer negotiation.
-
-If the client and server agree upon the common multiplexer to be used, then the
-result of the multiplexer negotiation is used as the selected stream
-multiplexer. If no agreement is reached upon by the client and server then the
-connection upgrade process MUST fall back to the multistream-selection protocol
-to negotiate the multiplexer.
-
 ### Multiplexer negotiation over TLS
 
 When the security protocol selected by the upgrader is TLS, the [ALPN]
