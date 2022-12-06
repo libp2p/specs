@@ -44,10 +44,9 @@ connection establishment by one roundtrip.
 
 ## Design
 
-### Multiplexer negotiation over TLS
+### Multiplexer Negotiation over TLS
 
-When the security protocol selected by the upgrader is TLS, the [ALPN]
-extension of TLS handshake is used to select the multiplexer.
+When using TLS, the [ALPN] extension is used to negotiate the multiplexer.
 
 The ALPN TLS extension allows the client to send a list of supported application
 protocols as part of the TLS ClientHello message.  The server chooses
@@ -55,19 +54,21 @@ a protocol and sends the selected protocol as part of the TLS
 ServerHello message.
 
 For the purpose of multiplexer negotiation, the protocol IDs of the stream 
-multiplexers are sent, followed by "libp2p".
-    An example list:
+multiplexers are sent, followed by "libp2p". The multiplexer list is ordered by
+the client's preference, with the most preferred multiplexer at the beginning.
+The server SHOULD respect the client's preference and pick the first protocol
+from the list that it supports.
 
-    [ "/yamux", "/mplex", "libp2p" ]
-
-The multiplexer list is ordered by the client's preference, with the most preferred
-multiplexer at the beginning. The server SHOULD pick the first protocol from the
-list that it supports.
+Example for a node supporting both yamux and mplex, with a preference for yamux:
+```json
+[ "/yamux/1.0.0", "/mplex/6.7.0", "libp2p" ]
+```
 
 The "libp2p" protocol code MUST always be the last item in the multiplexer list.
-According to [tls], nodes that don't implement the optimization described in this document
-use "libp2p" for their ALPN. If "libp2p" is the result of the ALPN process, nodes MUST use
-multistream negotiation of the stream multiplexer as described in [connections].
+According to [tls], nodes that don't implement the optimization described in
+this document use "libp2p" for their ALPN. If "libp2p" is the result of the
+ALPN process, nodes MUST use multistream negotiation of the stream multiplexer
+as described in [connections].
 
 ### Multiplexer negotiation over Noise
 
