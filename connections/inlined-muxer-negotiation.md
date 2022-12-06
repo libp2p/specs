@@ -70,49 +70,36 @@ this document use "libp2p" for their ALPN. If "libp2p" is the result of the
 ALPN process, nodes MUST use multistream negotiation of the stream multiplexer
 as described in [connections].
 
-### Multiplexer negotiation over Noise
+### Multiplexer Negotiation over Noise
 
-The libp2p Noise Specification allows the Noise handshake messages to carry
+The libp2p Noise Specification allows Noise handshake messages to carry
 early data. [Noise-Early-Data] is carried in the second and third message of
 the XX handshake pattern as illustrated in the following message sequence chart.
 The second message carries early data in the form of a list of multiplexers
-supported by the responder, ordered by preference. The initiator sends its
-supported multiplexer list in the third message of the handshake process. It
+supported by the responder.The initiator sends its supported multiplexer list 
+in the third message of the handshake process, ordered by its preference. It
 MAY choose a single multiplexer from the responder's list and only send that
 value.
 
 The multiplexer to use is determined by picking the first item from the
 initiator's list that both parties support.
 
-Example: Noise handshake between peers that have a mutually supported
-multiplexer.
-    Initiator supports: [ "/yamux", "/mplex" ]
-    Responder supports: [ "/mplex", "/yamux" ]
+Example: Noise handshake two clients that both support mplex and yamux. The
+client prefers yamux, whereas the server prefers mplex. 
 
-    XX:
-    -> e
-    <- e, ee, s, es, [ "/mplex", "/yamux" ] 
-    -> s, se, [ "/yamux", "/mplex" ] 
+```
+XX:
+-> e
+<- e, ee, s, es, [ "/mplex/6.7.0", "/yamux/1.0.0" ] 
+-> s, se, [ "/yamux/1.0.0", "/mplex/6.7.0" ] 
+```
 
-    Negotiated: "/yamux"
+The result of this negotiation is "/mplex/6.7.0".
 
-Example: Noise handshake between peers that don't have mutually supported
-multiplexers.
-    Responder supports: [ "/mplex" ]
-    Initiator supports: [ "yamux" ]
+If there is no overlap between the multiplexers support by client and server,
+the handshake MUST fail.
 
-    XX:
-    -> e
-    <- e, ee, s, es, [ "/mplex" ]
-    -> s, se, [ "yamux" ]
-    
-    After handshaking is done, early data processing will find no mutually
-    supported multiplexer, and falls back to multistream-selection protocol.
-
-The multiplexer selection logic SHOULD run after the Noise handshake has
-finished mutual authentication of the peers to enhance security.
-
-The format of the early data is specified in [Noise-handshake-payload]
+The format of the early data is specified in [Noise-handshake-payload].
 
 
 ## Privacy
@@ -131,7 +118,7 @@ list of multiplexers.
 ## Alternative options considered
 
 Instead of ALPN for multiplexer selection to reduce RTT, other options such as
-TLS extension and X.509 extension are considered. The pros and cons are explored
+TLS extension and X.509 extension were considered. The pros and cons are explored
 and the discussion details can be found at [#454].
 
 
