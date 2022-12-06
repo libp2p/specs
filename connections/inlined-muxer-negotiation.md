@@ -3,7 +3,7 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r1, 2022-09-07  |
+| 1A              | Working Draft | Active | r1, 2022-12-07  |
 
 Authors: [@julian88110], [@marten-seemann]
 
@@ -43,21 +43,6 @@ connection establishment by one roundtrip.
 
 
 ## Design
-
-### Current connection upgrade process
-
-The current connection upgrade process is described in detail in [connections].
-As shown in this [sequence-chart], after a network connection is established,
-the following will happen to upgrade the connection to a secured and stream-
-multiplexed connection.
-
-1. The multistream-selection protocol is run over the connection to select the
-security protocol to be used.
-2. The selected security protocol performs handshaking and establishes a secure
-tunnel
-3. The multistream-selection protocol then will run again for stream multiplexer
-negotiation.
-4. The selected stream multiplexer is then used on the secured connection.
 
 ### Improved multiplexer negotiation 
 
