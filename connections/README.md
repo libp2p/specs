@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r0, 2019-06-20  |
+| 1A              | Working Draft | Active | r1, 2022-12-07  |
 
 Authors: [@yusefnapora]
 
