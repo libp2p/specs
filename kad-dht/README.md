@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r1, 2021-10-30  |
+| 3A              | Recommendation | Active | r2, 2022-12-09  |
 
 Authors: [@raulk], [@jhiesey], [@mxinden]
 
@@ -284,21 +284,26 @@ and nodes that store and serve provider records should not serve records for sta
 i.e., content that the original provider does not wish to make available anymore.
 
 The following two parameters help cover both of these cases.
+
 1. **Provider Record Republish Interval:** The content provider 
 needs to make sure that the nodes chosen to store the provider record 
 are still online when clients ask for the record. In order to 
 guarantee this, while taking into account the peer churn, content providers
 republish the records they want to provide. Choosing the particular value for the
 Republish interval is network-specific and depends on several parameters, such as
-peer reliability and churn. For the IPFS network it is currently set to 22 hours.
+peer reliability and churn.
+
+   - For the IPFS network it is currently set to **22 hours**.
+
 2. **Provider Record Expiration Interval:** The network needs to provide
 content that content providers are still interested in providing. In other words,
 nodes should not keep records for content that content providers have stopped 
 providing (aka stale records). In order to guarantee this, provider records 
 should _expire_ after some interval, i.e., nodes should stop serving those records, 
 unless the content provider has republished the provider record. Again, the specific
-setting depends on the characteristics of the network. In the IPFS DHT the Expiration 
-Interval is set to 48hrs.
+setting depends on the characteristics of the network.
+
+   - In the IPFS DHT the Expiration Interval is set to **48 hours**.
 
 The values chosen for those parameters should be subject to continuous monitoring 
 and investigation. Ultimately, the values of those parameters should balance 
