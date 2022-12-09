@@ -7,21 +7,21 @@
 
 <a href="http://protocol.ai"><img src="https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square" /></a>
 <a href="http://libp2p.io/"><img src="https://img.shields.io/badge/project-libp2p-yellow.svg?style=flat-square" /></a>
-<a href="http://webchat.freenode.net/?channels=%23libp2p"><img src="https://img.shields.io/badge/freenode-%23libp2p-yellow.svg?style=flat-square" /></a>
+<a href="https://matrix.to/#/#welcome-j4p2p:matrix.org"><img src="https://img.shields.io/badge/matrix-🚪_Прихожая-yellow.svg?style=flat-square" /></a>
 <a href="https://discuss.libp2p.io"><img src="https://img.shields.io/discourse/https/discuss.libp2p.io/posts.svg" /></a>
 
 ## Overview
 
-This repository contains the specifications for [`libp2p`](https://libp2p.io), a
-framework and suite of protocols for building peer-to-peer network applications.
-libp2p has several [implementations][libp2p_implementations], with more in development.
+Данный репозиторий являеться переводом спецификации для [`libp2p`](https://libp2p.io). Оригинальный репозиторий: [libp2p/specs](https://github.com/libp2p/specs).
 
-The main goal of this repository is to provide accurate reference documentation
-for the aspects of libp2p that are independent of language or implementation.
-This includes wire protocols, addressing conventions, and other "network level"
-concerns.
+Libp2p - это фреймворк для построения peer-to-peer приложений, с использование различных протоколов.
+libp2p имеет несколько [реализаций][libp2p_implementations], и еще
+многие в разработке.
 
-For user-facing documentation, please see https://docs.libp2p.io
+Главной целью репозитория - это предоставить перевод технической документации для различных аспектов libp2p не зависимо от реализации или языка программирования.
+Включая протоклы передачи данных, соглашение об адресации и других вопросов сетевого уровня.
+
+Если вы ищите пользовательскую документацию, то она здесь: https://docs.libp2p.io
 
 In addition to describing the current state of libp2p, the specs repository
 serves as a coordination point and a venue to drive future developments in
