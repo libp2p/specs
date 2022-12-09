@@ -16,7 +16,7 @@ Interest Group: [@vyzo], [@vasco], [@stebalien], [@aarsh], [@raulk]
 [@vasco]: https://github.com/vasco
 [@vyzo]: https://github.com/vyzo
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
@@ -151,7 +151,7 @@ connections across the various permutations of the two dimensions.
 
 - **Why use both [AutoNAT] and [STUN], why not settle on one for both TCP / QUIC
   and WebRTC based hole punching?**
-  
+
   On browser platforms libp2p implementations do not control the local WebRTC
   stack. This same stack can only operate with [STUN] and not [AutoNAT]. One
   could use [STUN] instead of [AutoNAT] for TCP and QUIC hole punching though.

@@ -15,7 +15,7 @@ Interest Group: [@mxinden], [@stebalien], [@raulk]
 [@stebalien]: https://github.com/stebalien
 [@raulk]: https://github.com/raulk
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md

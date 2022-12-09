@@ -28,7 +28,7 @@ Interest Group: [@raulk], [@tomaka], [@romanb], [@shahankhatch], [@Mikerah],
 [@mhchia]: https://github.com/mhchia
 
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
@@ -81,14 +81,14 @@ a component that layers security and stream multiplexing over "raw" connections
 like TCP sockets. When peers connect, the upgrader uses a protocol called
 multistream-select to negotiate which security and multiplexing protocols to
 use. The upgrade process is described in the [connection establishment
-spec][conn-spec]. 
+spec][conn-spec].
 
 The transport upgrade process is likely to evolve soon, as we are in the process
 of designing multiselect 2, a successor to multistream-select. Some noise-libp2p
 features are designed to enable proposed features of multiselect 2, however
 noise-libp2p is fully compatible with the current upgrade process and
 multistream-select. See the [Negotiation section](#negotiation) for details
-about protocol negotiation. 
+about protocol negotiation.
 
 Every Noise connection begins with a handshake between an initiating peer and a
 responding peer, or in libp2p terms, a dialer and a listener. Over the course of
@@ -205,10 +205,10 @@ messages. We leverage this construct to transmit:
 
 The extensions are inserted into the first message of the handshake pattern
 **that guarantees secrecy**. Specifically, this means that the initiator MUST NOT
-send extensions in their first message. 
-The initiator sends its extensions in message 3 (closing message), and the 
+send extensions in their first message.
+The initiator sends its extensions in message 3 (closing message), and the
 responder sends theirs in message 2 (their only message). It should be stressed,
-that while the second message of the handshake pattern has forward secrecy, 
+that while the second message of the handshake pattern has forward secrecy,
 the sender has not authenticated the responder yet, so this payload might be
 sent to any party, including an active attacker.
 
@@ -256,7 +256,7 @@ knowledge of the other's static public key.
 
 `noise-libp2p` supports the [XX handshake pattern](#xx), which provides mutual
 authentication and encryption of static keys and handshake payloads and is
-resistant to replay attacks. 
+resistant to replay attacks.
 
 Prior revisions of this spec included a compound protocol involving the `IK` and
 `XXfallback `patterns, but this was [removed](#why-the-xx-handshake-pattern) due
@@ -264,7 +264,7 @@ to the benefits not justifying the considerable additional complexity.
 
 #### XX
 
-``` 
+```
 XX:
   -> e
   <- e, ee, s, es
@@ -336,7 +336,7 @@ The `noise_message_len` field stores the length in bytes of the `noise_message`
 field, encoded as a 16-bit big-endian unsigned integer.
 
 The `noise_message` field contains a [Noise Message as defined in the Noise
-spec][npf-message-format], which has a maximum length of 65535 bytes. 
+spec][npf-message-format], which has a maximum length of 65535 bytes.
 
 During the handshake phase, `noise_message` will be a Noise handshake message.
 Noise handshake messages may contain encrypted payloads. If so, they will have
@@ -351,7 +351,7 @@ payload plus 16 bytes of authentication data.
 
 During the handshake phase, the initiator (Alice) will initialize a Noise
 [`HandshakeState` object][npf-handshake-state] with the [Noise protocol
-name](#noise-protocol-name) `Noise_XX_25519_ChaChaPoly_SHA256`. 
+name](#noise-protocol-name) `Noise_XX_25519_ChaChaPoly_SHA256`.
 
 Alice and Bob exchange handshake messages, during which they [authenticate each
 other's static Noise keys](#static-key-authentication). Handshake messages are

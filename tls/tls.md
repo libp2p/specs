@@ -16,7 +16,7 @@ Interest Group: [@Stebalien], [@jacobheun], [@raulk], [@Kubuxu], [@yusefnapora]
 [@yusefnapora]: https://github.com/yusefnapora
 
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
@@ -97,7 +97,7 @@ The public host key and the signature are ANS.1-encoded into the SignedKey data 
 ```asn1
 SignedKey ::= SEQUENCE {
   publicKey OCTET STRING,
-  signature OCTET STRING 
+  signature OCTET STRING
 }
 ```
 

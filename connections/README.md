@@ -14,7 +14,7 @@ Interest Group: [@JustMaier], [@vasco-santos] [@bigs], [@mgoelzer]
 [@bigs]: https://github.com/bigs
 [@mgoelzer]: https://github.com/mgoelzer
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
@@ -100,7 +100,7 @@ One of libp2p's core design goals is to be adaptable to many network
 environments, including those that don't yet exist. To provide this flexibility,
 the connection upgrade process supports multiple protocols for connection
 security and stream multiplexing and allows peers to select which to use for
-each connection. 
+each connection.
 
 The process of selecting protocols is called **protocol negotiation**. In
 addition to its role in the connection upgrade process, protocol negotiation is
@@ -114,7 +114,7 @@ Each protocol supported by a peer is identified using a unique string called a
 path-like structure containing a short name and a version number, separated by
 `/` characters. For example: `/yamux/1.0.0` identifies version 1.0.0 of the
 [`yamux` stream multiplexing protocol][yamux]. multistream-select itself has a
-protocol id of `/multistream/1.0.0`. 
+protocol id of `/multistream/1.0.0`.
 
 Including a version number in the protocol id simplifies the case where you want
 to concurrently support multiple versions of a protocol, perhaps a stable version
@@ -281,7 +281,7 @@ The recommended baseline **stream multiplexer** is [yamux][yamux], which
 provides a very simple programmatic API and is supported in most libp2p
 implementations.
 
-### State Management 
+### State Management
 
 While the connection establishment process itself does not require any
 persistent state, some state management is useful to assist bootstrapping and

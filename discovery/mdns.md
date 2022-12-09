@@ -16,7 +16,7 @@ Interest Group: [@yusefnapora], [@raulk], [@daviddias], [@jacobheun]
 [@daviddias]: https://github.com/daviddias
 [@jacobheun]: https://github.com/jacobheun
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
@@ -59,7 +59,7 @@ Conceptually, it is very simple. When a peer starts (or detects a network change
 
    As the this field doesn't carry any meaning, it is sufficient to ensure the uniqueness of this identifier. Peers SHOULD generate a random, lower-case alphanumeric string of least 32 characters in length when booting up their node. Peers SHOULD NOT use their Peer ID here because a future Peer ID could exceed the DNS label limit of 63 characters.
 
-If a [private network](https://github.com/libp2p/specs/blob/master/pnet/Private-Networks-PSK-V1.md) is in use, then the `service-name` contains the base-16 encoding of the network's fingerprint  as in `_p2p-X._udp.local`. 
+If a [private network](https://github.com/libp2p/specs/blob/master/pnet/Private-Networks-PSK-V1.md) is in use, then the `service-name` contains the base-16 encoding of the network's fingerprint  as in `_p2p-X._udp.local`.
 This prevents public and private networks from discovering each other's peers.
 
 ## Peer Discovery
@@ -98,8 +98,8 @@ A peer responds with the answer
 
 ```
     _services._dns-sd._udp.local PTR <service-name>
-```   
-   
+```
+
 ### Find All Response
 
 On receipt of a `find all peers` query, the following **additional records** should be included
@@ -122,7 +122,7 @@ Many existing tools ignore the Additional Records, and always send individual qu
 ## Issues
 
 [ ] mDNS requires link-local addresses. Loopback and "NAT busting" addresses should not sent and must be ignored on receipt?
- 
+
 ## References
 
 - [RFC 1035 - Domain Names (DNS)](https://tools.ietf.org/html/rfc1035)
