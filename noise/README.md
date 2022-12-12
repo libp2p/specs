@@ -5,7 +5,7 @@
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r4, 2022-09-22  |
+| 3A              | Recommendation | Active | r5, 2022-12-07  |
 
 Authors: [@yusefnapora]
 
@@ -220,6 +220,7 @@ syntax = "proto2";
 
 message NoiseExtensions {
     repeated bytes webtransport_certhashes = 1;
+    repeated string stream_muxers = 2;
 }
 
 message NoiseHandshakePayload {

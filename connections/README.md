@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r0, 2019-06-20  |
+| 1A              | Working Draft | Active | r1, 2022-12-07  |
 
 Authors: [@yusefnapora]
 
@@ -234,6 +234,11 @@ Note: In the case where both peers initially act as initiators, e.g. during NAT
 hole punching, tie-breaking is done via the [multistream-select simultaneous
 open protocol extension][simopen].
 
+### Inlining Muxer Negotiation
+
+If both peers support it, it's possible to shortcut the muxer selection by moving
+it into the security handshake. Details are specified in [inlined-muxer-negotiation].
+
 
 ## Opening New Streams Over a Connection
 
@@ -409,3 +414,4 @@ updated to incorporate the changes.
 [simopen]: ./simopen.md
 [resource-manager-issue]: https://github.com/libp2p/go-libp2p/issues/635
 [hole-punching]: ./hole-punching.md
+[inlined-muxer-selection]: ./inlined-muxer-negotiation.md
