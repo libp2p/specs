@@ -19,7 +19,7 @@ Interest Group: [@yusefnapora], [@raulk], [@vyzo], [@Stebalien], [@jamesray1], [
 [@vasco-santos]: https://github.com/vasco-santos
 [@protolambda]: https://github.com/protolambda
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
@@ -140,7 +140,7 @@ conjunction with `from` to derive a unique `message_id` (in the default
 configuration).
 
 Henceforth, we define the term **origin-stamped messaging** to refer to messages
-whose `from` and `seqno` fields are populated.  
+whose `from` and `seqno` fields are populated.
 
 The `data` (optional) field is an opaque blob of data representing the payload.
 It can contain any data that the publisher wants it to.
@@ -175,7 +175,7 @@ By default, **origin-stamping** is in force. This strategy relies on the string
 concatenation of the `from` and `seqno` fields, to uniquely identify a message
 based on the *author*.
 
-Alternatively, a user-defined `message_id_fn` may be supplied, where 
+Alternatively, a user-defined `message_id_fn` may be supplied, where
 `message_id_fn(Message) => message_id`. Such a function could compute the hash
 of the `data` field within the `Message`, and thus one could reify
 **content-addressed messaging**.
@@ -259,7 +259,7 @@ is configurable per topic.
 
 The intersection of signing behaviours across the two axes (signature creation
 and signature verification) gives way to four signature policy options:
- 
+
 * `StrictSign`, `StrictNoSign`. Deterministic, usage encouraged.
 * `LaxSign`, `LaxNoSign`. Non-deterministic, legacy, usage discouraged. Mostly
   for backwards compatibility. Will be deprecated. If the implementation decides
@@ -270,7 +270,7 @@ and signature verification) gives way to four signature policy options:
 On the producing side:
   - Build messages with the `signature`, `key` (`from` may be enough for
     certain inlineable public key types), `from` and `seqno` fields.
-  
+
 On the consuming side:
   - Enforce the fields to be present, reject otherwise.
   - Propagate only if the fields are valid and signature can be verified,
@@ -282,7 +282,7 @@ On the producing side:
   - Build messages without the `signature`, `key`, `from` and `seqno` fields.
   - The corresponding protobuf key-value pairs are absent from the marshalled
     message, not just empty.
-  
+
 On the consuming side:
   - Enforce the fields to be absent, reject otherwise.
   - Propagate only if the fields are absent, reject otherwise.
@@ -300,7 +300,7 @@ Always sign, and verify incoming signatures, and but accept unsigned messages.
 On the producing side:
   - Build messages with the `signature`, `key` (`from` may be enough), `from`
     and `seqno` fields.
-  
+
 On the consuming side:
   - `signature` may be absent, and not verified.
   - Verify `signature`, iff the `signature` is present, then reject if
@@ -322,7 +322,7 @@ On the consuming side:
     `signature` is invalid.
 
 > **[[ Margin note: ]]** For content-addressed messaging, `StrictNoSign` is the
-> most appropriate policy option, coupled with a user-defined `message_id_fn`, 
+> most appropriate policy option, coupled with a user-defined `message_id_fn`,
 > and a validator function to verify protocol-defined signatures.
 >
 > When publisher anonymity is being sought, `StrictNoSign` is also the most

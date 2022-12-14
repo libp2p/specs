@@ -13,7 +13,7 @@ Interest Group: [@mxinden, @Stebalien, @raulk, @marten-seemann, @vyzo]
 [@yusefnapora]: https://github.com/yusefnapora
 [@mxinden]: https://github.com/mxinden/
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
@@ -166,7 +166,7 @@ within](#encapsulation) another multiaddr.
 For example, the above `p2p` address can be combined with the transport address
 on which the node is listening:
 
-``` 
+```
 /ip4/7.7.7.7/tcp/1234/p2p/QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N
 ```
 
@@ -199,7 +199,7 @@ appreciated.
 
 Most libp2p transports use the IP protocol as a foundational layer, and as a
 result, most transport multiaddrs will begin with a component that represents an
-IPv4 or IPv6 address. 
+IPv4 or IPv6 address.
 
 This may be an actual address, such as `/ip4/7.7.7.7` or
 `/ip6/fe80::883:a581:fff1:833`, or it could be something that resolves to an IP
@@ -219,7 +219,7 @@ resolvable or "name-based" protocols:
 
 When the `/dns` protocol is used, the lookup may result in both IPv4 and IPv6
 addresses, in which case IPv6 will be preferred. To explicitly resolve to IPv4
-or IPv6 addresses, use the `/dns4` or `/dns6` protocols, respectively. 
+or IPv6 addresses, use the `/dns4` or `/dns6` protocols, respectively.
 
 Note that in some restricted environments, such as inside a web browser, libp2p
 may not have access to the resolved IP addresses at all, in which case the
@@ -269,7 +269,7 @@ wherever TCP/IP sockets are accessible.
 
 Addresses for the TCP transport are of the form `<ip-multiaddr>/tcp/<tcp-port>`,
 where `<ip-multiaddr>` is a multiaddr that resolves to an IP address, as
-described in the [IP and Name Resolution section](#ip-and-name-resolution). 
+described in the [IP and Name Resolution section](#ip-and-name-resolution).
 The `<tcp-port>` argument must be a 16-bit unsigned integer.
 
 ### WebSockets
@@ -288,7 +288,7 @@ multiaddr format mirrors this arrangement.
 
 A libp2p QUIC multiaddr is of the form `<ip-multiaddr>/udp/<udp-port>/quic`,
 where `<ip-multiaddr>` is a multiaddr that resolves to an IP address, as
-described in the [IP and Name Resolution section](#ip-and-name-resolution). 
+described in the [IP and Name Resolution section](#ip-and-name-resolution).
 The `<udp-port>` argument must be a 16-bit unsigned integer in network byte order.
 
 
@@ -318,7 +318,7 @@ destination peer.
 
 A full example would be:
 
-``` 
+```
 /ip4/127.0.0.1/tcp/5002/p2p/QmdPU7PfRyKehdrP5A3WqmjyD6bhVpU1mLGKppa2FjGDjZ/p2p-circuit/p2p/QmVT6GYwjeeAF5TR485Yc58S3xRF5EFsZ5YAF4VcP3URHt
 ```
 

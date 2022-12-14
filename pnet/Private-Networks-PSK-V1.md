@@ -15,7 +15,7 @@ Interest Group: [@yusefnapora], [@jacobheun], [@lgierth], [@daviddias]
 [@lgierth]: https://github.com/lgierth
 [@daviddias]: https://github.com/daviddias
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
@@ -40,7 +40,7 @@ In the case of an IPFS node, this key is stored inside the IPFS repo in a file n
 
 Nodes of different private networks must not be able to connect to each other. This extends to node in private network connecting to node in public network. This means that no information exchange, apart from the handshakes required for private network authentication, should take place.
 
-These guarnetee is only provided when knowledge of private key is limited to trusted party. 
+These guarnetee is only provided when knowledge of private key is limited to trusted party.
 
 #### Safeguard
 

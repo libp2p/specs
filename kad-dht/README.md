@@ -12,7 +12,7 @@ Interest Group:
 [@jhiesey]: https://github.com/jhiesey
 [@mxinden]: https://github.com/mxinden
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md

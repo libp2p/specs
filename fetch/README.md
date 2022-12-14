@@ -1,6 +1,6 @@
 # Fetch v0.0.1
 
-> The Fetch protocol is used for performing a direct peer-to-peer key-value lookup 
+> The Fetch protocol is used for performing a direct peer-to-peer key-value lookup
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
@@ -12,7 +12,7 @@ Interest Group: [Insert Your Name Here]
 
 [@aschmahmann]: https://github.com/aschmahmann
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
@@ -68,16 +68,16 @@ who doesn't want to use it to change anything about their current use.
 3. Might be abused/overused given the simple nature of the protocol
 
 ### Expected Feature Set and Tentative Technical Directions
- 
+
 Should support: `Fetch(key) (value, statusCode)`
 
 However, the level of specificity in the types of the above variables has wiggle room if people are interested.
 The `go-libp2p-pubsub-router` implementation requires:
- 
+
  `key`: At least as generic as a UTF-8 string
- 
+
  `value`: At least as generic as a byte array
- 
+
  `statusCode`: Supports at least `OK`, `NOT_FOUND`, and `ERROR`
 
 ## Wire protocol
@@ -117,7 +117,7 @@ message FetchResponse {
 - `B` does some internal lookup and responds with a `RespondLatest` message
   - If `B` finds (and elects to send) some data `v` to `A` it sends `RespondLatest{status: SUCCESS, data: v}`
   - If `B` has no data to send it responds with `RespondLatest{status: NOT_FOUND, data: null}`
-    - `A` ignores any information in the `data` field if the status is `NOT_FOUND` 
+    - `A` ignores any information in the `data` field if the status is `NOT_FOUND`
 
 Note: If at any time `A` or `B` break from the protocol in some way, either by disconnecting/closing streams or by sending
 invalid data there is no guarantee on the behavior from the other party.

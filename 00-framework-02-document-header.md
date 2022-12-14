@@ -17,7 +17,7 @@ Interest Group: [@raulk], [@vyzo], [@mgoelzer], [@jacobheun], [@tomaka]
 [@jacobheun]: https://github.com/jacobheun
 [@tomaka]: https://github.com/tomaka
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
@@ -33,7 +33,7 @@ help move it forward in its evolution.
 This document defines a header format to convey this key status information in
 an easy-to-read manner.
 
-## Example 
+## Example
 
 ```markdown
 # Spec title
@@ -54,7 +54,7 @@ Interest Group: [@interested1], [@interested2]
 [@interested1]: https://github.com/interested1
 [@interested2]: https://github.com/interested2
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
@@ -64,7 +64,7 @@ and spec status.
 
 ### Title and Short Intro
 
-Each spec begins with its title, formatted as an H1 markdown header. 
+Each spec begins with its title, formatted as an H1 markdown header.
 
 The title can optionally be followed by a short block-quote introducing the
 spec, which serves as a subtitle and should be a maximum of one or two lines.
@@ -75,7 +75,7 @@ The main status information is contained in a markdown table, using the [table
 syntax][gfm-tables] supported by [Github Flavored Markdown][gfm-spec].
 
 The status table consists of a single row, with a header containing the field
-names. 
+names.
 
 Example:
 
@@ -154,7 +154,7 @@ specs repo, an absolute URL is preferred when linking to the specs document.
 Here's an example that can be copy/pasted directly:
 
 ```markdown
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
