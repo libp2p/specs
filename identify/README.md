@@ -5,7 +5,7 @@
 
 | Lifecycle Stage | Maturity Level | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r1, 2021-08-09  |
+| 3A              | Recommendation | Active | r1, 2022-12-15  |
 
 Authors: [@vyzo]
 
@@ -83,7 +83,9 @@ message Identify {
 }
 ```
 
-Implementations must reject `Identify` messages bigger than 4096 bytes.
+Implementations SHOULD NOT send `Identify` messages bigger than 4096 bytes.
+This limit allows receivers to drop messages exceeding the limit, thus better
+defend against DOS attacks.
 
 ### protocolVersion
 
