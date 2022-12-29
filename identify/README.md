@@ -5,7 +5,7 @@
 
 | Lifecycle Stage | Maturity Level | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r1, 2022-12-15  |
+| 3A              | Recommendation | Active | r2, 2022-12-15  |
 
 Authors: [@vyzo]
 
