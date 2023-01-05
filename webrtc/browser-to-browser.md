@@ -28,6 +28,10 @@ the restriction of the browser platform and being behind a NAT and/or firewall.
    _answer_ respectively. See `icegatheringstatechange` below on how these may
    already contain the addresses of the loca node.
 
+   _A_ and _B_ SHOULD NOT reuse certificates across `RTCPeerConnection`s.
+   Reusing the certificate can be used to identify a node across connections by
+   on-path observers given that WebRTC uses TLS 1.2.
+
 3. _A_ and _B_ exchange the generated _offer_ and _answer_ through some protocol
    (e.g. an altered DCUtR) via the relayed connection.
 
@@ -70,12 +74,3 @@ protocols.
   unauthenticated channels. In other words, the browser-to-server specification
   does not consider the TLS certificate fingerprint in the server's multiaddr to
   be trusted.
-
-- Can _Browser_ control the lifecycle of its local TLS certificate, i.e. can
-  _Browser_ use the same TLS certificate for multiple WebRTC connections?
-
-  Yes. For the lifetime of the page, one can generate a certificate once and
-  reuse it across connections. See also
-  https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection#using_certificates
-
-  TODO: Reference privacy considerations.
