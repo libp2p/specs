@@ -90,6 +90,7 @@ The protocols described below all use [protocol buffers](https://developers.goog
   peer discovery
 - [secio][spec_secio] - SECIO, a transport security protocol for libp2p
 - [tls][spec_tls] - The libp2p TLS Handshake (TLS 1.3+)
+- [quic][spec_quic] - The libp2p QUIC Handshake
 - [webrtc][spec_webrtc] - The libp2p WebRTC transport
 - [WebTransport][spec_webtransport] - Using WebTransport in libp2p
 
@@ -122,6 +123,7 @@ you feel an issue isn't the appropriate place for your topic, please join our
 [spec_rendezvous]: ./rendezvous/README.md
 [spec_secio]: ./secio/README.md
 [spec_tls]: ./tls/tls.md
+[spec_quic]: ./quic/README.md
 [spec_peerids]: ./peer-ids/peer-ids.md
 [spec_connections]: ./connections/README.md
 [spec_plaintext]: ./plaintext/README.md
