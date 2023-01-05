@@ -38,5 +38,15 @@ Nodes supporting RFC 9000 use the `/quic-v1` multiaddress component.
 
 New implementations SHOULD implement support for RFC 9000. Support for draft-29 is currently being phased out of production networks, and will be deprecated at some point in the future.
 
+### ALPN
+
+"libp2p" is used as the application protocol for ALPN.
+Note that QUIC enforces the use of ALPN, so the handshake will fail if both peers can't agree on the application protocol.
+
+### Peer Authentication
+
+Peers authenticate each other using the TLS handshake logic described in the [libp2p TLS spec].
+
 [RFC9000]: https://datatracker.ietf.org/doc/html/rfc9000
 [IETF QUIC working group draft-29]: https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport-29
+[libp2p TLS spec]: ../tls
