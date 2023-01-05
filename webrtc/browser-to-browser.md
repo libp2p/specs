@@ -19,6 +19,9 @@ Scenario: Browser _A_ wants to connect to Browser node _B_ with the help of
 server node _R_. Both _A_ and _B_ can not listen for incoming connections due to
 the restriction of the browser platform and being behind a NAT and/or firewall.
 
+TODO: Define which node on a relayed connection is _A_ and which one is _B_,
+i.e. which one initiates (offer) and which one responds (answer).
+
 1. _A_ and _B_ establish a relayed connection through some protocol, e.g. the
    Circuit Relay v2 protocol. Note that further steps depend on the relayed
    connection to be authenticated, i.e. that data send on the relayed connection
