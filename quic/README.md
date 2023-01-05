@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r1, 2022-12-30  |
+| 3A              | Recommendation | Active | r1, 2022-12-30  |
 
 Authors: [@marten-seemann]
 
