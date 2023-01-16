@@ -40,12 +40,6 @@ TODO: Define which node on a relayed connection is _A_ and which one is _B_, i.e
 
 The above browser-to-browser WebRTC connection establishment replaces the existing [libp2p WebRTC star](https://github.com/libp2p/js-libp2p-webrtc-star) and [libp2p WebRTC direct](https://github.com/libp2p/js-libp2p-webrtc-direct) protocols.
 
-#### Open Questions
-
-- Instead of using trickle ICE, we could as well wait for the candidate gathering.
-  See https://github.com/pion/webrtc/blob/c1467e4871c78ee3f463b50d858d13dc6f2874a4/examples/insertable-streams/main.go#L141-L142 as one example.
-  In the browser, one can wait for the [`icegatheringstatechange` event](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/icegatheringstatechange_event).
-
 ## STUN
 
 TODO: Specify
@@ -61,6 +55,24 @@ Messages are sent prefixed with the message length in bytes, encoded as an unsig
 ``` protobuf
 // TODO: Support for offer, answer and ICE candidates
 ```
+
+## Open Questions
+
+- Do we need a mechanism for browsers to advertise support for WebRTC browser-to-browser?
+
+  Say that browser B supports WebRTC browser-to-browser.
+  B listens via a relay and advertises its relayed address.
+  A discovers B's relayed address.
+  At this point A does not know whether B is a browser and thus supports WebRTC browser-to-browser, or whether B is e.g. a laptop potentially supporting TCP and QUIC hole punching via DCUtR but not WebRTC browser-to-browser.
+  In the latter case, A can not establish a direct connection to B.
+
+  Potential solution would be for B to advertise some protocol after the `/p2p-circuit` within its Multiaddr, e.g. `/ip6/<RELAY_IP>/udp/4001/p2p/<RELAY_PEER_ID>/p2p-circuit/webrtc-direct/p2p/<B_PEER_ID>`.
+  As an alternative, A can discover B's support via the identify protocol on the relayed connection or by optimistically opening a stream using the signaling protocol.
+  Both of the latter options would on failure happen at the expense of a wasted relayed connection.
+
+- Instead of using trickle ICE, we could as well wait for the candidate gathering.
+  See https://github.com/pion/webrtc/blob/c1467e4871c78ee3f463b50d858d13dc6f2874a4/examples/insertable-streams/main.go#L141-L142 as one example.
+  In the browser, one can wait for the [`icegatheringstatechange` event](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/icegatheringstatechange_event).
 
 ## FAQ
 
