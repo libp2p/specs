@@ -34,9 +34,13 @@ TODO: Define which node on a relayed connection is _A_ and which one is _B_, i.e
 
 4. _A_ receives _B_'s answer via the signaling protocol stream and sets it locally via `RTCPeerConnection.setRemoteDescription`.
 
-5. TODO: Define ICE candidate exchange.
+5. _A_ and _B_ send their local ICE candidates via the existing signaling protocol stream.
+   Both nodes continuously read from the stream, adding incoming remote candidates via `RTCPeerConnection.addIceCandidate()`.
 
-5. Messages on `RTCDataChannel`s on the established `RTCPeerConnection` are framed using the message framing mechanism described in [Multiplexing](#multiplexing).
+6. On successful establishment or failure of the direct connection, _A_ and _B_ close the signaling protocol stream.
+   TODO: Is there value in retrying on failure?
+
+7. Messages on `RTCDataChannel`s on the established `RTCPeerConnection` are framed using the message framing mechanism described in [Multiplexing](#multiplexing).
 
 The above browser-to-browser WebRTC connection establishment replaces the existing [libp2p WebRTC star](https://github.com/libp2p/js-libp2p-webrtc-star) and [libp2p WebRTC direct](https://github.com/libp2p/js-libp2p-webrtc-direct) protocols.
 
@@ -46,14 +50,27 @@ TODO: Specify
 
 ## Signaling protocol
 
-TODO: Extend
-
-Protocol id `/webrtc-direct`
-
+The protocol id is `/webrtc-direct`.
 Messages are sent prefixed with the message length in bytes, encoded as an unsigned variable length integer as defined by the [multiformats unsigned-varint spec][uvarint-spec].
 
 ``` protobuf
-// TODO: Support for offer, answer and ICE candidates
+syntax = "proto2";
+
+message Message {
+    // Specifies type in `data` field.
+    enum Type {
+        // String of `RTCSessionDescription.sdp`
+        OFFER = 0;
+        // String of `RTCSessionDescription.sdp`
+        ANSWER = 1;
+        // String of `RTCIceCandidate.toJSON()`
+        CANDIDATE = 2;
+    }
+
+    // TODO: Consider removal of `required` for future compatibility.
+    required Type type = 1;
+    required string data = 2;
+}
 ```
 
 ## Open Questions
