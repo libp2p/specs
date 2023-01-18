@@ -8,14 +8,13 @@
 
 1. **Hole punching in the browser**: Enable two browsers or a browser and a server node to connect even though one or both are behind a NAT / firewall.
 
-   TODO: Doucment use-case where A is a browser and B is a non-browser but behind firewall and/or NAT.
-
 ## Connection Establishment
 
 ### Browser to Browser
 
 Scenario: Browser _A_ wants to connect to Browser node _B_ with the help of server node _R_.
 Both _A_ and _B_ can not listen for incoming connections due to the restriction of the browser platform and being behind a NAT and/or firewall.
+Note that _A_ or _B_ may as well be a non-browser node behind a NAT and/or firewall trying to connect to a browser node.
 
 1. _A_ and _B_ establish a relayed connection through some protocol, e.g. the Circuit Relay v2 protocol.
    The relayed connection is established from _A_ to _B_ (see same role distribution in [DCUtR] protocol).
