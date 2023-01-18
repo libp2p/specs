@@ -45,7 +45,19 @@ The above browser-to-browser WebRTC connection establishment replaces the existi
 
 ## STUN
 
-TODO: Specify
+A node needs to discover its public IP and port, which is forwarded to the remote node in order to connect to the local node.
+On non-browser libp2p nodes doing a hole punch with TCP or QUIC, the libp2p node discovers its public address via the [identify] protocol.
+One can not use the [identify] protocol on browser nodes to discover ones public IP and port given that the browser uses a new port for each connection.
+For example say that the local browser node establishes a WebRTC connection C1 via browser-to-server to a server node and runs the [identify] protocol.
+The returned observed public port P1 will most likely (depending on the NAT) be a different port than the port observed on another connection C2.
+The only browser supported mechanism to discover ones public IP and port for a given connection is the non-libp2p protocol STUN.
+This is why this specification depends on STUN, and thus the availability of one or more STUN servers for _A_ and _B_ to discovery their public addresses.
+
+There are various publicly available STUN servers.
+As an alternative one may operate dedicated STUN servers for a given libp2p network.
+Further specification of the usage of STUN is out of scope for this specifitcation.
+
+As an aside, note that _A_ and _B_ do not need to use the same STUN server in order to establish a direct WebRTC connection.
 
 ## Signaling protocol
 
@@ -102,3 +114,4 @@ message Message {
   In other words, the browser-to-server specification does not consider the TLS certificate fingerprint in the server's multiaddr to be trusted.
 
 [DCUtR]: ./../relay/DCUtR.md
+[identify]: ./../identify/README.md
