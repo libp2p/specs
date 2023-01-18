@@ -108,6 +108,14 @@ message Message {
   In contrast, the browser-to-server specification allows exchange of the server's multiaddr, containing the server's TLS certificate fingerprint, over unauthenticated channels.
   In other words, the browser-to-server specification does not consider the TLS certificate fingerprint in the server's multiaddr to be trusted.
 
+- Why use a custom signaling protocol? Why not use [DCUtR]?
+
+  DCUtR offers time synchronization through a two-step protocol (first `Connect`, then `Sync`).
+  This is not needed for WebRTC.
+
+  DCUtR does not provide a mechanism to trickle local address candidates to the remote as they are discovered.
+  Trickling candidates just-in-time allows for faster WebRTC connection establishment.
+
 [DCUtR]: ./../relay/DCUtR.md
 [identify]: ./../identify/README.md
 [multiplexing]: ./README.md#multiplexing
