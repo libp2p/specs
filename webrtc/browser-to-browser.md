@@ -99,10 +99,6 @@ message Message {
   As an alternative, A can discover B's support via the identify protocol on the relayed connection or by optimistically opening a stream using the signaling protocol.
   Both of the latter options would on failure happen at the expense of a wasted relayed connection.
 
-- Instead of using trickle ICE, we could as well wait for the candidate gathering.
-  See https://github.com/pion/webrtc/blob/c1467e4871c78ee3f463b50d858d13dc6f2874a4/examples/insertable-streams/main.go#L141-L142 as one example.
-  In the browser, one can wait for the [`icegatheringstatechange` event](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/icegatheringstatechange_event).
-
 ## FAQ
 
 - Why is there no additional Noise handshake needed?
