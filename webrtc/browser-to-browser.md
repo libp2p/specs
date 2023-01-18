@@ -17,27 +17,26 @@
 Scenario: Browser _A_ wants to connect to Browser node _B_ with the help of server node _R_.
 Both _A_ and _B_ can not listen for incoming connections due to the restriction of the browser platform and being behind a NAT and/or firewall.
 
-TODO: Define which node on a relayed connection is _A_ and which one is _B_, i.e. which one initiates (offer) and which one responds (answer).
-
 1. _A_ and _B_ establish a relayed connection through some protocol, e.g. the Circuit Relay v2 protocol.
+   The relayed connection is established from _A_ to _B_ (see same role distribution in [DCUtR] protocol).
    Note that further steps depend on the relayed connection to be authenticated, i.e. that data send on the relayed connection can be trusted.
 
-2. _A_ creates an `RTCPeerConnection`.
+2. _B_ (inbound side of relayed connection) creates an `RTCPeerConnection`.
    See [#STUN] on what STUN servers to configure at creation time.
-   _A_ creates an SDP offer via `RTCPeerConnection.createOffer()`.
-   _A_ initiates the signaling protocol to _B_ via the relayed connection from (1), see [#Signaling protocol] and sends the offer to _B_.
+   _B_ creates an SDP offer via `RTCPeerConnection.createOffer()`.
+   _B_ initiates the signaling protocol to _A_ via the relayed connection from (1), see [#Signaling protocol] and sends the offer to _A_.
 
-3. _B_ creates an `RTCPeerConnection`.
+3. _A_ (outbound side of relayed connection) creates an `RTCPeerConnection`.
    Again see [#STUN] on what STUN servers to configure at creation time.
-   _B_ receives _A_'s offer send in (2) via the signaling protocol stream and provides the offer to its `RTCPeerConnection` via `RTCPeerConnection.setRemoteDescription`.
-   _B_ then creates an answer via `RTCPeerConnection.createAnswer` and sends it to _A_ via the existing signaling protocol stream (see [#signaling protocol]).
+   _A_ receives _B_'s offer send in (2) via the signaling protocol stream and provides the offer to its `RTCPeerConnection` via `RTCPeerConnection.setRemoteDescription`.
+   _A_ then creates an answer via `RTCPeerConnection.createAnswer` and sends it to _B_ via the existing signaling protocol stream (see [#signaling protocol]).
 
-4. _A_ receives _B_'s answer via the signaling protocol stream and sets it locally via `RTCPeerConnection.setRemoteDescription`.
+4. _B_ receives _A_'s answer via the signaling protocol stream and sets it locally via `RTCPeerConnection.setRemoteDescription`.
 
-5. _A_ and _B_ send their local ICE candidates via the existing signaling protocol stream.
+5. _B_ and _A_ send their local ICE candidates via the existing signaling protocol stream.
    Both nodes continuously read from the stream, adding incoming remote candidates via `RTCPeerConnection.addIceCandidate()`.
 
-6. On successful establishment or failure of the direct connection, _A_ and _B_ close the signaling protocol stream.
+6. On successful establishment or failure of the direct connection, _B_ and _A_ close the signaling protocol stream.
    TODO: Is there value in retrying on failure?
 
 7. Messages on `RTCDataChannel`s on the established `RTCPeerConnection` are framed using the message framing mechanism described in [Multiplexing](#multiplexing).
@@ -101,3 +100,5 @@ message Message {
 
   In contrast, the browser-to-server specification allows exchange of the server's multiaddr, containing the server's TLS certificate fingerprint, over unauthenticated channels.
   In other words, the browser-to-server specification does not consider the TLS certificate fingerprint in the server's multiaddr to be trusted.
+
+[DCUtR]: ./../relay/DCUtR.md
