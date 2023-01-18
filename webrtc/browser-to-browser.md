@@ -8,6 +8,8 @@
 
 **Hole punching in the browser** - Enable two browsers or a browser and a non-browser node to connect even though one or both are behind a NAT / firewall.
 
+On a historical note, this specification replaces the existing [libp2p WebRTC star](https://github.com/libp2p/js-libp2p-webrtc-star) and [libp2p WebRTC direct](https://github.com/libp2p/js-libp2p-webrtc-direct) protocols.
+
 ## Connection Establishment
 
 ### Browser to Browser
@@ -40,8 +42,6 @@ Note that _A_ or _B_ may as well be a non-browser node behind a NAT and/or firew
    Behavior for transferring data on a relayed connection, in the case where the direct connection failed, is out of scope for this specification and dependent on the application.
 
 7. Messages on `RTCDataChannel`s on the established `RTCPeerConnection` are framed using the message framing mechanism described in [multiplexing].
-
-The above browser-to-browser WebRTC connection establishment replaces the existing [libp2p WebRTC star](https://github.com/libp2p/js-libp2p-webrtc-star) and [libp2p WebRTC direct](https://github.com/libp2p/js-libp2p-webrtc-direct) protocols.
 
 ## STUN
 
