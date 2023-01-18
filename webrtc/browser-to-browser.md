@@ -119,3 +119,4 @@ message Message {
 [DCUtR]: ./../relay/DCUtR.md
 [identify]: ./../identify/README.md
 [multiplexing]: ./README.md#multiplexing
+[uvarint-spec]: https://github.com/multiformats/unsigned-varint
