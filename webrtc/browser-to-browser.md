@@ -78,9 +78,8 @@ message Message {
         CANDIDATE = 2;
     }
 
-    // TODO: Consider removal of `required` for future compatibility.
-    required Type type = 1;
-    required string data = 2;
+    optional Type type = 1;
+    optional string data = 2;
 }
 ```
 
