@@ -37,7 +37,8 @@ Both _A_ and _B_ can not listen for incoming connections due to the restriction 
    Both nodes continuously read from the stream, adding incoming remote candidates via `RTCPeerConnection.addIceCandidate()`.
 
 6. On successful establishment or failure of the direct connection, _B_ and _A_ close the signaling protocol stream.
-   TODO: Is there value in retrying on failure?
+
+   Behavior for transferring data on a relayed connection, in the case where the direct connection failed, is out of scope for this specification.
 
 7. Messages on `RTCDataChannel`s on the established `RTCPeerConnection` are framed using the message framing mechanism described in [Multiplexing](#multiplexing).
 
