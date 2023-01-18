@@ -23,12 +23,12 @@ Note that _A_ or _B_ may as well be a non-browser node behind a NAT and/or firew
    Note that further steps depend on the relayed connection to be authenticated, i.e. that data send on the relayed connection can be trusted.
 
 2. _B_ (inbound side of relayed connection) creates an `RTCPeerConnection`.
-   See [#STUN] on what STUN servers to configure at creation time.
+   See [STUN](#stun) section on what STUN servers to configure at creation time.
    _B_ creates an SDP offer via `RTCPeerConnection.createOffer()`.
    _B_ initiates the signaling protocol to _A_ via the relayed connection from (1), see [#Signaling protocol] and sends the offer to _A_.
 
 3. _A_ (outbound side of relayed connection) creates an `RTCPeerConnection`.
-   Again see [#STUN] on what STUN servers to configure at creation time.
+   Again see [STUN](#stun) section on what STUN servers to configure at creation time.
    _A_ receives _B_'s offer sent in (2) via the signaling protocol stream and provides the offer to its `RTCPeerConnection` via `RTCPeerConnection.setRemoteDescription`.
    _A_ then creates an answer via `RTCPeerConnection.createAnswer` and sends it to _B_ via the existing signaling protocol stream (see [#signaling protocol]).
 
