@@ -6,7 +6,7 @@
 
 ## Motivation
 
-1. **Hole punching in the browser**: Enable two browsers or a browser and a server node to connect even though one or both are behind a NAT / firewall.
+**Hole punching in the browser** - Enable two browsers or a browser and a non-browser node to connect even though one or both are behind a NAT / firewall.
 
 ## Connection Establishment
 
@@ -27,7 +27,7 @@ Note that _A_ or _B_ may as well be a non-browser node behind a NAT and/or firew
 
 3. _A_ (outbound side of relayed connection) creates an `RTCPeerConnection`.
    Again see [#STUN] on what STUN servers to configure at creation time.
-   _A_ receives _B_'s offer send in (2) via the signaling protocol stream and provides the offer to its `RTCPeerConnection` via `RTCPeerConnection.setRemoteDescription`.
+   _A_ receives _B_'s offer sent in (2) via the signaling protocol stream and provides the offer to its `RTCPeerConnection` via `RTCPeerConnection.setRemoteDescription`.
    _A_ then creates an answer via `RTCPeerConnection.createAnswer` and sends it to _B_ via the existing signaling protocol stream (see [#signaling protocol]).
 
 4. _B_ receives _A_'s answer via the signaling protocol stream and sets it locally via `RTCPeerConnection.setRemoteDescription`.
@@ -37,9 +37,9 @@ Note that _A_ or _B_ may as well be a non-browser node behind a NAT and/or firew
 
 6. On successful establishment or failure of the direct connection, _B_ and _A_ close the signaling protocol stream.
 
-   Behavior for transferring data on a relayed connection, in the case where the direct connection failed, is out of scope for this specification.
+   Behavior for transferring data on a relayed connection, in the case where the direct connection failed, is out of scope for this specification and dependent on the application.
 
-7. Messages on `RTCDataChannel`s on the established `RTCPeerConnection` are framed using the message framing mechanism described in [Multiplexing](#multiplexing).
+7. Messages on `RTCDataChannel`s on the established `RTCPeerConnection` are framed using the message framing mechanism described in [multiplexing].
 
 The above browser-to-browser WebRTC connection establishment replaces the existing [libp2p WebRTC star](https://github.com/libp2p/js-libp2p-webrtc-star) and [libp2p WebRTC direct](https://github.com/libp2p/js-libp2p-webrtc-direct) protocols.
 
@@ -111,3 +111,4 @@ message Message {
 
 [DCUtR]: ./../relay/DCUtR.md
 [identify]: ./../identify/README.md
+[multiplexing]: ./README.md#multiplexing
