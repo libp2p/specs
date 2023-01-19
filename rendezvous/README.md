@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r3, 2022-12-20  |
+| 1A              | Working Draft | Active | r3, 2021-07-12  |
 
 Authors: [@vyzo]
 
@@ -39,9 +39,9 @@ and spec status.
 ## Overview
 
 The protocol described in this specification is intended to provide a
-lightweight mechanism for generalized peer discovery. It can be used for 
-purposes like bootstrapping, real-time peer discovery, and application-specific 
-routing. Any node implementing the rendezvous protocol can act as a rendezvous 
+lightweight mechanism for generalized peer discovery. It can be used for
+purposes like bootstrapping, real-time peer discovery, and application-specific
+routing. Any node implementing the rendezvous protocol can act as a rendezvous
 point, allowing the discovery of relevant peers in a decentralized manner.
 
 ## Use Cases
@@ -69,7 +69,7 @@ and a fleet of p2p-circuit relays. Real-time applications will
 utilize rendezvous both for bootstrap and in a real-time setting.
 During bootstrap, rendezvous will be used to discover circuit relays
 that provide connectivity for browser nodes. Subsequently, rendezvous
-will be utilized throughout the application's lifetime for real-time peer 
+will be utilized throughout the application's lifetime for real-time peer
 discovery by registering and polling rendezvous points.
 This allows us to replace a fragile centralized component with a
 horizontally scalable ensemble of daemons.
@@ -77,11 +77,11 @@ horizontally scalable ensemble of daemons.
 ### Rendezvous and pubsub
 
 Rendezvous can be naturally combined with pubsub for effective
-real-time discovery. At a basic level, rendezvous can 
+real-time discovery. At a basic level, rendezvous can
 bootstrap pubsub: nodes can utilize rendezvous to discover
-their peers within a topic. Alternatively, pubsub can also be used to build 
-rendezvous services. In this scenario, several rendezvous points can federate 
-using pubsub for internal real-time distribution while still providing a simple 
+their peers within a topic. Alternatively, pubsub can also be used to build
+rendezvous services. In this scenario, several rendezvous points can federate
+using pubsub for internal real-time distribution while still providing a simple
 interface to clients.
 
 ## The Protocol
@@ -91,11 +91,11 @@ discovery within application-specific namespaces. Peers connect to the
 rendezvous point and register their presence in one or more
 namespaces. It is not allowed to register arbitrary peers in a
 namespace; only the peer initiating the registration can register
-itself. The register message contains a serialized 
+itself. The register message contains a serialized
 [signed peer record](https://github.com/libp2p/specs/blob/377f05a/RFC/0002-signed-envelopes.md)
 created by the peer, which others can validate.
 
-Other nodes can discover peers registered with the rendezvous point by 
+Other nodes can discover peers registered with the rendezvous point by
 querying the rendezvous point. The query specifies the
 namespace for limiting application scope and, optionally, a maximum
 number of peers to return. The namespace can be omitted in the query,
@@ -104,7 +104,7 @@ which asks for all peers registered to the rendezvous point.
 The query can also include a cookie obtained from the response to a
 previous query, such that only registrations that weren't included in
 the previous response will be returned. This lets peers
-progressively refresh their network view without overhead, simplifying 
+progressively refresh their network view without overhead, simplifying
 real-time discovery. It also allows for the pagination
 of query responses so peers can manage large numbers of peer registrations.
 
@@ -113,11 +113,11 @@ The rendezvous protocol runs over libp2p streams using the protocol id `/rendezv
 ### Registration Lifetime
 
 An optional TTL parameter in
-the `REGISTER` message controls the registration lifetime. If a TTL is 
-specified, then the registration persists until the TTL expires. If no 
-TTL was set, then a default of 2hrs is implied. There may be a rendezvous 
-point-specific upper bound on TTL, with a maximum value of 72hrs. If the 
-TTL of a registration is inadmissible, the rendezvous point may reject 
+the `REGISTER` message controls the registration lifetime. If a TTL is
+specified, then the registration persists until the TTL expires. If no
+TTL was set, then a default of 2hrs is implied. There may be a rendezvous
+point-specific upper bound on TTL, with a maximum value of 72hrs. If the
+TTL of a registration is inadmissible, the rendezvous point may reject
 the registration with an `E_INVALID_TTL` status.
 
 Peers can refresh their registrations at any time with a new
@@ -191,7 +191,7 @@ The protocol, as described so far, is susceptible to spam attacks from
 adversarial actors who generate a large number of peer identities and
 register under a namespace of interest (e.g., the relay namespace).
 
-It is TBD how exactly such attacks will be mitigated.
+It is TBD how exactly the protocol will mitigate such attacks.
 See <https://github.com/libp2p/specs/issues/341> for a discussion on this
 topic.
 

@@ -49,7 +49,7 @@ Examples:
 
 * `/ip4/192.0.2.0/udp/443/quic/webtransport` (when using a CA-signed certificates)
 * `/ip4/192.0.2.0/udp/1234/quic/webtransport/certhash/<hash1>` (when using single self-signed certificates)
-* `/ip6/2001:DB8::1ff:fe23:4567:890a/udp/1234/quic/webtransport/certhash/<hash1>/certhash/<hash2>/certhash/<hash3>` (when using single self-signed certificates)
+* `/ip6/fe80::1ff:fe23:4567:890a/udp/1234/quic/webtransport/certhash/<hash1>/certhash/<hash2>/certhash/<hash3>` (when using single self-signed certificates)
 
 ## WebTransport HTTP endpoint
 
