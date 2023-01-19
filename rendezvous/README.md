@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r3, 2021-07-12  |
+| 1A              | Working Draft | Active | r3, 2022-12-20  |
 
 Authors: [@vyzo]
 
@@ -23,16 +23,18 @@ and spec status.
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Use Cases](#use-cases)
-   - [Replacing ws-star-rendezvous](#replacing-ws-star-rendezvous)
-   - [Rendezvous and pubsub](#rendezvous-and-pubsub)
-- [The Protocol](#the-protocol)
-   - [Registration Lifetime](#registration-lifetime)
-   - [Interaction](#interaction)
-   - [Spam mitigation](#spam-mitigation)
-   - [Protobuf](#protobuf)
-- [Recommendations for Rendezvous Points configurations](#recommendations-for-rendezvous-points-configurations)
+- [Rendezvous Protocol](#rendezvous-protocol)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Use Cases](#use-cases)
+    - [Replacing ws-star-rendezvous](#replacing-ws-star-rendezvous)
+    - [Rendezvous and pubsub](#rendezvous-and-pubsub)
+  - [The Protocol](#the-protocol)
+    - [Registration Lifetime](#registration-lifetime)
+    - [Interaction](#interaction)
+    - [Spam mitigation](#spam-mitigation)
+    - [Protobuf](#protobuf)
+  - [Recommendations for Rendezvous Points configurations](#recommendations-for-rendezvous-points-configurations)
 
 ## Overview
 
@@ -47,6 +49,7 @@ a decentralized fashion.
 
 Depending on the application, the protocol could be used in the
 following context:
+
 - During bootstrap, a node can use known rendezvous points to discover
   peers that provide critical services. For instance, rendezvous can
   be used to discover circuit relays for connectivity restricted
@@ -142,6 +145,7 @@ R -> B: {OK}
 ```
 
 Client `C` connects and registers for namespace `another-app`:
+
 ```
 C -> R: REGISTER{another-app, {QmC, AddrC}}
 R -> C: {OK}
@@ -149,6 +153,7 @@ R -> C: {OK}
 
 Another client `D` can discover peers in `my-app` by sending a `DISCOVER` message; the
 rendezvous point responds with the list of current peer reigstrations and a cookie.
+
 ```
 D -> R: DISCOVER{ns: my-app}
 R -> D: {[REGISTER{my-app, {QmA, Addr}}
@@ -158,6 +163,7 @@ R -> D: {[REGISTER{my-app, {QmA, Addr}}
 
 If `D` wants to discover all peers registered with `R`, then it can omit the namespace
 in the query:
+
 ```
 D -> R: DISCOVER{}
 R -> D: {[REGISTER{my-app, {QmA, Addr}}
@@ -172,6 +178,7 @@ new registrations.
 
 So here we consider a new client `E` registering after the first query,
 and a subsequent query that discovers just that peer by including the cookie:
+
 ```
 E -> R: REGISTER{my-app, {QmE, AddrE}}
 R -> E: {OK}
@@ -187,7 +194,7 @@ adversarial actors who generate a large number of peer identities and
 register under a namespace of interest (eg: the relay namespace).
 
 It is TBD how exactly such attacks will be mitigated.
-See https://github.com/libp2p/specs/issues/341 for a discussion on this
+See <https://github.com/libp2p/specs/issues/341> for a discussion on this
 topic.
 
 ### Protobuf
@@ -261,11 +268,13 @@ particularly important in a federation, where rendezvous points should share
 the same expectations.
 
 Regarding the validation of registrations, rendezvous points should have:
+
 - a minimum acceptable **ttl** of `2H`
 - a maximum acceptable **ttl** of `72H`
 - a maximum **namespace** length of `255`
 
 Rendezvous points are also recommend to allow:
+
 - a maximum of `1000` registration for each peer
   - defend against trivial DoS attacks
 - a maximum of `1000` peers should be returned per namespace query

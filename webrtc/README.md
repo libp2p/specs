@@ -49,7 +49,8 @@ WebRTC multiaddresses are composed of an IP and UDP address component, followed
 by `/webrtc` and a multihash of the certificate that the node uses.
 
 Examples:
-- `/ip4/1.2.3.4/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`
+
+- `/ip4/192.0.2.0/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`
 - `/ip6/fe80::1ff:fe23:4567:890a/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`
 
 The TLS certificate fingerprint in `/certhash` is a
@@ -118,7 +119,7 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    Note that this process, oftentimes referred to as "SDP munging" is disallowed
    by the specification, but not enforced across the major browsers (Safari,
    Firefox, Chrome) due to use-cases in the wild. See also
-   https://bugs.chromium.org/p/chromium/issues/detail?id=823036
+   <https://bugs.chromium.org/p/chromium/issues/detail?id=823036>
 
 6. Once _A_ sets the SDP offer and answer, it will start sending STUN requests
    to _B_. _B_ reads the _ufrag_ from the incoming STUN request's _username_
@@ -149,7 +150,7 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    sending many STUN messages with different ufrags using different UDP source
    ports, forcing _B_ to allocate a new peer connection for each. _B_ SHOULD
    have a rate limiting mechanism in place as a defense measure. See also
-   https://datatracker.ietf.org/doc/html/rfc5389#section-16.1.2.
+   <https://datatracker.ietf.org/doc/html/rfc5389#section-16.1.2>.
 
 7. _A_ and _B_ execute the DTLS handshake as part of the standard WebRTC
    connection establishment.
@@ -340,7 +341,7 @@ After [Connection Establishment](#connection-establishment):
    capabilities via datachannels. See [Multiplexing](#multiplexing).
 
 Note: WebRTC supports different hash functions to hash the TLS certificate (see
-https://datatracker.ietf.org/doc/html/rfc8122#section-5). The hash function used
+<https://datatracker.ietf.org/doc/html/rfc8122#section-5>). The hash function used
 in WebRTC and the hash function used in the multiaddr `/certhash` component MUST
 be the same. On mismatch the final Noise handshake MUST fail.
 
@@ -365,14 +366,14 @@ accept streams before completion of the handshake.
 ## Previous, ongoing and related work
 
 - Completed implementations of this specification:
-  - https://github.com/libp2p/rust-libp2p/pull/2622
+  - <https://github.com/libp2p/rust-libp2p/pull/2622>
 - Work in progress implementations of this specification:
-  - https://github.com/little-bear-labs/js-libp2p-webrtc/pull/4
-  - https://github.com/libp2p/go-libp2p/pull/1655
+  - <https://github.com/little-bear-labs/js-libp2p-webrtc/pull/4>
+  - <https://github.com/libp2p/go-libp2p/pull/1655>
 - Past related work:
   - Proof of concept for the server side (native) and the client side (Rust in
-    WASM): https://github.com/wngr/libp2p-webrtc
-  - WebRTC using STUN and TURN: https://github.com/libp2p/js-libp2p-webrtc-star
+    WASM): <https://github.com/wngr/libp2p-webrtc>
+  - WebRTC using STUN and TURN: <https://github.com/libp2p/js-libp2p-webrtc-star>
 
 ## Test vectors
 
@@ -479,11 +480,11 @@ prologue = "6c69627032702d7765627274632d6e6f6973653a12203e79af40d6059617a0d83b83
   > an endpoint MUST limit the amount of data it sends to the unvalidated
   > address to three times the amount of data received from that address.
 
-  https://datatracker.ietf.org/doc/html/rfc9000#section-8
+  <https://datatracker.ietf.org/doc/html/rfc9000#section-8>
 
   This is the case for STUN response messages which are only slight larger than
   the request messages. See also
-  https://datatracker.ietf.org/doc/html/rfc5389#section-16.1.2.
+  <https://datatracker.ietf.org/doc/html/rfc5389#section-16.1.2>.
 
 - _Why does B start the Noise handshake and not A?_
 

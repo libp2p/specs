@@ -1,17 +1,16 @@
 # Addressing in libp2p  <!-- omit in toc -->
+>
 > How network addresses are encoded and used in libp2p
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
 | 3A              | Recommendation | Active | r0, 2021-07-22  |
 
-
 Authors: [@yusefnapora]
 
 Interest Group: [@mxinden, @Stebalien, @raulk, @marten-seemann, @vyzo]
 
 [@yusefnapora]: https://github.com/yusefnapora
-[@mxinden]: https://github.com/mxinden/
 
 See the [lifecycle document][lifecycle-spec] for context about maturity level
 and spec status.
@@ -45,7 +44,7 @@ derived from public keys as described in the [peer id spec][peer-id-spec].
 
 On a particular network, at a specific point in time, a peer may have one or
 more locations, which can be represented using addresses. For example, I may be
-reachable via the global IPv4 address of 7.7.7.7 on TCP port 1234.
+reachable via the global IPv4 address of 198.51.100 on TCP port 1234.
 
 In a system that only supported TCP/IP or UDP over IP, we could easily write our
 addresses with the familiar `<ip>:<port>` notation and store them as tuples of
@@ -77,16 +76,16 @@ multiaddr](#the-p2p-multiaddr).
 A multiaddr is a sequence of instructions that can be traversed to some
 destination.
 
-For example, the `/ip4/7.7.7.7/tcp/1234` multiaddr starts with `ip4`, which is
+For example, the `/ip4/198.51.100/tcp/1234` multiaddr starts with `ip4`, which is
 the lowest-level protocol that requires an address. The `tcp` protocol runs on
 top of `ip4`, so it comes next.
 
-The multiaddr above consists of two components, the `/ip4/7.7.7.7` component,
+The multiaddr above consists of two components, the `/ip4/198.51.100` component,
 and the `/tcp/1234` component. It's not possible to split either one further;
 `/ip4` alone is an invalid multiaddr, because the `ip4` protocol was defined to
 require a 32 bit address. Similarly, `tcp` requires a 16 bit port number.
 
-Although we referred to `/ip4/7.7.7.7` and `/tcp/1234` as "components" of a
+Although we referred to `/ip4/198.51.100` and `/tcp/1234` as "components" of a
 larger TCP/IP address, each is actually a valid multiaddr according to the
 multiaddr spec. However, not every **syntactically valid multiaddr is a
 functional description of a process in the network**. As we've seen, even a
@@ -121,28 +120,28 @@ TCP/IP streams, or TCP segments themselves encapsulated within IP datagrams.
 The multiaddr format was designed so that addresses encapsulate each other in
 the same manner as the protocols that they describe. The result is an address
 that begins with the "outermost" layer of the network stack and works
-progressively "inward". For example, in the address `/ip4/7.7.7.7/tcp/80/ws`,
+progressively "inward". For example, in the address `/ip4/198.51.100/tcp/80/ws`,
 the outermost protocol is IPv4, which encapsulates TCP streams, which in turn
 encapsulate WebSockets.
 
 All multiaddr implementations provide a way to _encapsulate_ two multiaddrs into
-a composite. For example, `/ip4/7.7.7.7` can encapsulate `/tcp/42` to become
-`/ip4/7.7.7.7/tcp/42`.
+a composite. For example, `/ip4/198.51.100` can encapsulate `/tcp/42` to become
+`/ip4/198.51.100/tcp/42`.
 
 #### Decapsulation
 
 Decapsulation takes a composite multiaddr and removes an "inner" multiaddr from
 it, returning the result.
 
-For example, if we start with `/ip4/7.7.7.7/tcp/1234/ws` and decapsulate `/ws`,
-the result is `/ip4/7.7.7.7/tcp/1234`.
+For example, if we start with `/ip4/198.51.100/tcp/1234/ws` and decapsulate `/ws`,
+the result is `/ip4/198.51.100/tcp/1234`.
 
 It's important to note that decapsulation returns the original multiaddr up to
 the last occurrence of the decapsulated multiaddr. This may remove more than
 just the decapsulated component itself if there are more protocols encapsulated
 within it. Using our example above, decapsulating either `/tcp/1234/ws` _or_
-`/tcp/1234` from `/ip4/7.7.7.7/tcp/1234/ws` will result in `/ip4/7.7.7.7`. This is
-unsurprising if you consider the utility of the `/ip4/7.7.7.7/ws` address that
+`/tcp/1234` from `/ip4/198.51.100/tcp/1234/ws` will result in `/ip4/198.51.100`. This is
+unsurprising if you consider the utility of the `/ip4/198.51.100/ws` address that
 would result from simply removing the `tcp` component.
 
 ### The p2p multiaddr
@@ -166,8 +165,8 @@ within](#encapsulation) another multiaddr.
 For example, the above `p2p` address can be combined with the transport address
 on which the node is listening:
 
-``` 
-/ip4/7.7.7.7/tcp/1234/p2p/QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N
+```
+/ip4/198.51.100/tcp/1234/p2p/QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N
 ```
 
 This combination of transport address plus `p2p` address is the format in which
@@ -181,7 +180,6 @@ support for the ipfs string representation of this multiaddr component. It may b
 printed as `/ipfs/<peer-id>` instead of `/p2p/<peer-id>` in its string representation
 depending on the implementation in use. Both names resolve to the same protocol code,
 and they are equivalent in the binary form.
-
 
 ## Transport multiaddrs
 
@@ -199,9 +197,9 @@ appreciated.
 
 Most libp2p transports use the IP protocol as a foundational layer, and as a
 result, most transport multiaddrs will begin with a component that represents an
-IPv4 or IPv6 address. 
+IPv4 or IPv6 address.
 
-This may be an actual address, such as `/ip4/7.7.7.7` or
+This may be an actual address, such as `/ip4/198.51.100` or
 `/ip6/fe80::883:a581:fff1:833`, or it could be something that resolves to an IP
 address, like a domain name.
 
@@ -216,10 +214,9 @@ resolvable or "name-based" protocols:
 | `dns6`    | Resolves DNS AAAA records into IPv6 addresses.                     |
 | `dnsaddr` | Resolves multiaddrs from a special TXT record.                     |
 
-
 When the `/dns` protocol is used, the lookup may result in both IPv4 and IPv6
 addresses, in which case IPv6 will be preferred. To explicitly resolve to IPv4
-or IPv6 addresses, use the `/dns4` or `/dns6` protocols, respectively. 
+or IPv6 addresses, use the `/dns4` or `/dns6` protocols, respectively.
 
 Note that in some restricted environments, such as inside a web browser, libp2p
 may not have access to the resolved IP addresses at all, in which case the
@@ -227,8 +224,8 @@ runtime will determine what IP version is used.
 
 When a name-based multiaddr encapsulates another multiaddr, only the name-based
 component is affected by the lookup process. For example, if `example.com`
-resolves to `1.2.3.4`, libp2p will resolve the address
-`/dns4/example.com/tcp/42` to `/ip4/1.2.3.4/tcp/42`.
+resolves to `192.0.2.0`, libp2p will resolve the address
+`/dns4/example.com/tcp/42` to `/ip4/192.0.2.0/tcp/42`.
 
 #### dnsaddr Links
 
@@ -244,6 +241,7 @@ For example, resolving `/dnsaddr/libp2p.io` will perform a `TXT` lookup for
 
 For example, asking the DNS server for the TXT records of one of the bootstrap
 nodes, `ams-2.bootstrap.libp2p.io`, returns the following records:
+
 ```
 > dig +short _dnsaddr.ams-2.bootstrap.libp2p.io txt
 "dnsaddr=/dns4/ams-2.bootstrap.libp2p.io/tcp/443/wss/p2p/QmbLHAnMoJPWSCR5Zhtx6BHJX9KiKNN6tpvbUcqanj75Nb"
@@ -269,7 +267,7 @@ wherever TCP/IP sockets are accessible.
 
 Addresses for the TCP transport are of the form `<ip-multiaddr>/tcp/<tcp-port>`,
 where `<ip-multiaddr>` is a multiaddr that resolves to an IP address, as
-described in the [IP and Name Resolution section](#ip-and-name-resolution). 
+described in the [IP and Name Resolution section](#ip-and-name-resolution).
 The `<tcp-port>` argument must be a 16-bit unsigned integer.
 
 ### WebSockets
@@ -288,9 +286,8 @@ multiaddr format mirrors this arrangement.
 
 A libp2p QUIC multiaddr is of the form `<ip-multiaddr>/udp/<udp-port>/quic`,
 where `<ip-multiaddr>` is a multiaddr that resolves to an IP address, as
-described in the [IP and Name Resolution section](#ip-and-name-resolution). 
+described in the [IP and Name Resolution section](#ip-and-name-resolution).
 The `<udp-port>` argument must be a 16-bit unsigned integer in network byte order.
-
 
 ### `p2p-circuit` Relay Addresses
 
@@ -318,15 +315,14 @@ destination peer.
 
 A full example would be:
 
-``` 
-/ip4/127.0.0.1/tcp/5002/p2p/QmdPU7PfRyKehdrP5A3WqmjyD6bhVpU1mLGKppa2FjGDjZ/p2p-circuit/p2p/QmVT6GYwjeeAF5TR485Yc58S3xRF5EFsZ5YAF4VcP3URHt
+```
+/ip4/192.0.2.0/tcp/5002/p2p/QmdPU7PfRyKehdrP5A3WqmjyD6bhVpU1mLGKppa2FjGDjZ/p2p-circuit/p2p/QmVT6GYwjeeAF5TR485Yc58S3xRF5EFsZ5YAF4VcP3URHt
 ```
 
 Here, the destination peer has the peer id
 `QmVT6GYwjeeAF5TR485Yc58S3xRF5EFsZ5YAF4VcP3URHt` and is reachable through a
 relay node with peer id `QmdPU7PfRyKehdrP5A3WqmjyD6bhVpU1mLGKppa2FjGDjZ` running
 on TCP port 5002 of the IPv4 loopback interface.
-
 
 [peer-id-spec]: ../peer-ids/peer-ids.md
 [identify-spec]: ../identify/README.md

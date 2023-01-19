@@ -24,26 +24,25 @@ and spec status.
 ## Table of Contents
 
 - [Multicast DNS (mDNS)](#multicast-dns-mdns)
-    - [Table of Contents](#table-of-contents)
-    - [Overview](#overview)
-    - [Definitions](#definitions)
-    - [Peer Discovery](#peer-discovery)
-        - [Request](#request)
-        - [Response](#response)
-    - [DNS Service Discovery](#dns-service-discovery)
-        - [Meta Query](#meta-query)
-        - [Find All Response](#find-all-response)
-        - [Gotchas](#gotchas)
-    - [Issues](#issues)
-    - [References](#references)
-    - [Worked Examples](#worked-examples)
-        - [Meta Query](#meta-query-1)
-            - [Question](#question)
-            - [Answer](#answer)
-        - [Find All Peers](#find-all-peers)
-            - [Question](#question-1)
-            - [Answer](#answer-1)
-            - [Additional Records](#additional-records)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Definitions](#definitions)
+  - [Peer Discovery](#peer-discovery)
+    - [Request](#request)
+    - [Response](#response)
+  - [DNS Service Discovery](#dns-service-discovery)
+    - [Meta Query](#meta-query)
+    - [Find All Response](#find-all-response)
+    - [Gotchas](#gotchas)
+  - [Issues](#issues)
+  - [References](#references)
+    - [Meta Query](#meta-query-1)
+      - [Question](#question)
+      - [Answer](#answer)
+    - [Find All Peers](#find-all-peers)
+      - [Question](#question-1)
+      - [Answer](#answer-1)
+      - [Additional Records](#additional-records)
 
 ## Overview
 
@@ -59,7 +58,7 @@ Conceptually, it is very simple. When a peer starts (or detects a network change
 
    As the this field doesn't carry any meaning, it is sufficient to ensure the uniqueness of this identifier. Peers SHOULD generate a random, lower-case alphanumeric string of least 32 characters in length when booting up their node. Peers SHOULD NOT use their Peer ID here because a future Peer ID could exceed the DNS label limit of 63 characters.
 
-If a [private network](https://github.com/libp2p/specs/blob/master/pnet/Private-Networks-PSK-V1.md) is in use, then the `service-name` contains the base-16 encoding of the network's fingerprint  as in `_p2p-X._udp.local`. 
+If a [private network](https://github.com/libp2p/specs/blob/master/pnet/Private-Networks-PSK-V1.md) is in use, then the `service-name` contains the base-16 encoding of the network's fingerprint  as in `_p2p-X._udp.local`.
 This prevents public and private networks from discovering each other's peers.
 
 ## Peer Discovery
@@ -98,8 +97,8 @@ A peer responds with the answer
 
 ```
     _services._dns-sd._udp.local PTR <service-name>
-```   
-   
+```
+
 ### Find All Response
 
 On receipt of a `find all peers` query, the following **additional records** should be included
@@ -122,7 +121,7 @@ Many existing tools ignore the Additional Records, and always send individual qu
 ## Issues
 
 [ ] mDNS requires link-local addresses. Loopback and "NAT busting" addresses should not sent and must be ignored on receipt?
- 
+
 ## References
 
 - [RFC 1035 - Domain Names (DNS)](https://tools.ietf.org/html/rfc1035)
@@ -165,5 +164,5 @@ _p2p._udp.local IN PTR `<peer-name>`._p2p._udp.local
 
 #### Additional Records
 
-- `<peer-name>`._p2p._udp.local IN TXT dnsaddr=/ip6/fe80::7573:b0a8:46b0:bfea/tcp/4001/p2p/`id`
-- `<peer-name>`._p2p._udp.local IN TXT dnsaddr=/ip4/192.168.178.21/tcp/4001/p2p/`id`
+- `<peer-name>`._p2p._udp.local IN TXT dnsaddr=/ip6/2001:DB8::7573:b0a8:46b0:bfea/tcp/4001/p2p/`id`
+- `<peer-name>`._p2p._udp.local IN TXT dnsaddr=/ip4/192.0.2.0/tcp/4001/p2p/`id`
