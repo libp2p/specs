@@ -12,30 +12,39 @@ Interest Group: [@marcopolo], [@mxinden], [@marten-seemann]
 [@mxinden]: https://github.com/mxinden
 [@marten-seemann]: https://github.com/marten-seemann
 
-# Table of Contents <!-- omit in toc -->
+## Table of Contents <!-- omit in toc -->
 - [Protocol](#protocol)
 - [Diagram](#diagram)
 
-# Protocol
+## Protocol
 
-The ping protocol is a simple request response protocol. The client opens a
-stream, sends a payload of 32 random bytes, and the server responds with the
-same 32 bytes on that stream. The client then measures the RTT from the time it
-wrote the bytes to the time it received the bytes. The client MAY repeat the
-process by sending another payload with random bytes on the same stream, so the
-server SHOULD loop and echo the next payload. The client SHOULD close the write
-side of the stream after sending the last payload, and the server SHOULD finish
-writing the echoed payload and then exit the loop and close the stream.
+The ping protocol is a simple liveness check that peers can use to test
+the connectivity and performance between two peers. The libp2p ping protocol
+is different from the ping command line utility
+([ICMP ping](https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol)),
+as it requires an already established libp2p connection.
 
-The client MUST NOT keep more than one outbound stream for the ping protocol per
-peer. The server SHOULD accept at most 2 streams per peer since cross stream
-behavior is not linearizable for client and server. In other words, the client
-closing stream A and then opening stream B, might be perceived by the server as
-the client opening stream B and then closing stream A.
+The dialing peer sends a 32-byte payload of random binary data on an open
+stream. The listening peer echoes the same 32-byte payload back to the dialing
+peer. The dialing peer then measures the RTT from when it wrote the bytes to when
+it received them.
 
-The protocol id is `/ipfs/ping/1.0.0`.
+The dialing peer MAY repeat the process by sending another payload with random
+bytes on the same stream, where the listening peer SHOULD loop and echo the
+next payload. The dialing peer SHOULD close the write operation of the stream
+after sending the last payload, and the listening peer SHOULD finish writing
+the echoed payload and then exit the loop and close the stream.
 
-# Diagram
+The dialing peer MUST NOT keep more than one outbound stream for the ping
+protocol per peer. The listening peer SHOULD accept at most two streams per
+peer since cross-stream behavior is non-linear and stream writes occur
+asynchronously. The listening peer may perceive the dialing peer closing and
+opening the wrong streams (for instance, closing stream B and opening stream A
+even though the dialing peer is opening stream B and closing stream A).
+
+The protocol ID is `/ipfs/ping/1.0.0`.
+
+## Diagram
 
 ![Ping Protocol Diagram](./ping.svg)
 
