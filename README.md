@@ -70,7 +70,14 @@ and are used throughout the system.
 These specs define wire protocols that are used by libp2p for connectivity,
 security, multiplexing, and other purposes.
 
-The protocols described below all use [protocol buffers](https://developers.google.com/protocol-buffers/docs/proto?hl=en) (aka protobuf) to define message schemas. Version `proto2` is used unless stated otherwise.
+The protocols described below all use [protocol
+buffers](https://developers.google.com/protocol-buffers/docs/proto?hl=en) (aka
+protobuf) to define message schemas.
+
+Existing protocols may use `proto2`, and continue to use them. `proto3` is
+recommended for new protocols. `proto3` is a simplification of `proto2` and
+removes some footguns. For context and a discussion around `proto3` vs `proto2`,
+see [#465](https://github.com/libp2p/specs/issues/465).
 
 - [ping][spec_ping] - Ping protocol
 - [autonat][spec_autonat] - NAT detection
