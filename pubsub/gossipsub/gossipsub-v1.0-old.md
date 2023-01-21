@@ -375,6 +375,8 @@ control messages. The four control messages are `ControlIHave` for `IHAVE` messa
 The protobuf is as follows:
 
 ```protobuf
+syntax = "proto2";
+
 message RPC {
     // ...
 	optional ControlMessage control = 3;

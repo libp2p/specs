@@ -191,6 +191,8 @@ topic.
 ### Protobuf
 
 ```protobuf
+syntax = "proto2";
+
 message Message {
   enum MessageType {
     REGISTER = 0;

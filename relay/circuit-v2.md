@@ -347,7 +347,8 @@ The voucher itself is a [Signed Envelope](../RFC/0002-signed-envelopes.md).
 The envelope domain is `libp2p-relay-rsvp` and uses the multicodec code `0x0302`.
 
 The payload of the envelope has the following form, in canonicalized protobuf format:
-```
+```protobuf
+syntax = "proto2";
 message Voucher {
   required bytes relay = 1;
   required bytes peer = 2;
@@ -363,7 +364,8 @@ The wire representation is canonicalized, where elements of the message are writ
 
 ## Protobuf
 
-```
+```protobuf
+syntax = "proto2";
 message HopMessage {
   enum Type {
     RESERVE = 0;

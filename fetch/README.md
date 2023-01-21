@@ -88,6 +88,8 @@ The libp2p protocol ID for this protocol is `/libp2p/fetch/0.0.1`
 The messages in the Fetch protocol use on of the following protobufs (proto3 syntax):
 
 ```
+syntax = "proto2";
+
 message FetchRequest {
 	string identifier = 1;
 }

@@ -140,6 +140,8 @@ We start the description of the Wire format by illustrating a possible flow scen
 Every message in the relay protocol uses the following protobuf:
 
 ```
+syntax = "proto2";
+
 message CircuitRelay {
 
   enum Status {
