@@ -71,11 +71,11 @@ message Message {
     // Specifies type in `data` field.
     enum Type {
         // String of `RTCSessionDescription.sdp`
-        OFFER = 0;
+        SDP_OFFER = 0;
         // String of `RTCSessionDescription.sdp`
-        ANSWER = 1;
+        SDP_ANSWER = 1;
         // String of `RTCIceCandidate.toJSON()`
-        CANDIDATE = 2;
+        ICE_CANDIDATE = 2;
     }
 
     optional Type type = 1;
