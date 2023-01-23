@@ -20,7 +20,7 @@ Note that _A_ or _B_ may as well be a non-browser node behind a NAT and/or firew
 
 1. _A_ and _B_ establish a relayed connection through some protocol, e.g. the Circuit Relay v2 protocol.
    The relayed connection is established from _A_ to _B_ (see same role distribution in [DCUtR] protocol).
-   Note that further steps depend on the relayed connection to be authenticated, i.e. that data send on the relayed connection can be trusted.
+   Note that further steps depend on the relayed connection to be authenticated, i.e. that data sent on the relayed connection can be trusted.
 
 2. _B_ (inbound side of relayed connection) creates an `RTCPeerConnection`.
    See [STUN](#stun) section on what STUN servers to configure at creation time.
