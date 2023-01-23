@@ -129,6 +129,7 @@ In this case, the pruned peer will have to rely on the ambient peer discovery se
 The `ControlPrune` message is extended with a `peers` field as follows.
 
 ```protobuf
+syntax = "proto2";
 message ControlPrune {
 	optional string topicID = 1;
 	repeated PeerInfo peers = 2; // gossipsub v1.1 PX

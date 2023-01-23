@@ -73,6 +73,7 @@ whose values have changed.
 ## The Identify Message
 
 ```protobuf
+syntax = "proto2";
 message Identify {
   optional string protocolVersion = 5;
   optional string agentVersion = 6;

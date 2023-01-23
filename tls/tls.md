@@ -104,6 +104,8 @@ SignedKey ::= SEQUENCE {
 The publicKey field of `SignedKey` contains the public host key of the endpoint, encoded using the following protobuf:
 
 ```protobuf
+syntax = "proto2";
+
 enum KeyType {
 	RSA = 0;
 	Ed25519 = 1;

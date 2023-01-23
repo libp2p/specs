@@ -90,6 +90,7 @@ messages between participating peers.
 The `RPC` protobuf is as follows:
 
 ```protobuf
+syntax = "proto2";
 message RPC {
 	repeated SubOpts subscriptions = 1;
 	repeated Message publish = 2;
@@ -112,6 +113,7 @@ false signifies 'unsubscribe'.
 The RPC message can contain zero or more messages of type 'Message'. The Message protobuf looks like this:
 
 ```protobuf
+syntax = "proto2";
 message Message {
 	optional string from = 1;
 	optional bytes data = 2;
@@ -341,6 +343,7 @@ and may be removed once used.
 The `TopicDescriptor` protobuf is as follows:
 
 ```protobuf
+syntax = "proto2";
 message TopicDescriptor {
 	optional string name = 1;
 	// AuthOpts and EncOpts are unused as of Oct 2018, but
