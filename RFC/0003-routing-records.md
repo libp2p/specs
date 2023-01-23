@@ -126,10 +126,10 @@ epoch time as the `seq` value, however they MUST NOT attempt to interpret a
     seq: 1570215229,
     addresses: [
       {
-        multiaddr: "/ip4/1.2.3.4/tcp/42/p2p/QmAlice",
+        multiaddr: "/ip4/192.0.2.0/tcp/42/p2p/QmAlice",
       },
       {
-        multiaddr: "/ip4/10.0.1.2/tcp/42/p2p/QmAlice",
+        multiaddr: "/ip4/198.51.100.0/tcp/42/p2p/QmAlice",
       }
     ]
   }
@@ -208,7 +208,6 @@ And possibly:
 - `IsCertified(peer_id, multiaddr) -> Boolean`
   - has a particular address been self-certified by the given peer?
 
-
 We'll also need a method that constructs a new `RoutingState` containing our
 listen addresses and wraps it in a signed envelope. This may belong on the Host
 instead of the peer store, since it needs access to the private signing key.
@@ -273,14 +272,11 @@ filter that could be used to test whether a peer supports a given protocol
 before interacting with them directly. This could be added as a new field in the
 `RoutingState` message.
 
-
-
 [identify-spec]: ../identify/README.md
 [peer-id-spec]: ../peer-ids/peer-ids.md
 [mdns-spec]: ../discovery/mdns.md
 [rendezvous-spec]: ../rendezvous/README.md
 [pex-proposal]: https://github.com/libp2p/notes/issues/7
-[autonat]: https://github.com/libp2p/specs/issues/180
 [envelope-rfc]: ./0002-signed-envelopes.md
 [eip-778]: https://eips.ethereum.org/EIPS/eip-778
 [dht-spec]: https://github.com/libp2p/specs/blob/master/kad-dht/README.md

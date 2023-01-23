@@ -13,7 +13,6 @@ Interest Group: [@MarcoPolo], [@mxinden], [@elenaf9]
 [@mxinden]: https://github.com/mxinden
 [@elenaf9]: https://github.com/elenaf9
 
-
 See the [lifecycle document](../00-framework-01-spec-lifecycle.md) for context about maturity level
 and spec status.
 
@@ -29,7 +28,8 @@ The most exciting feature for libp2p (other than the numerous performance benefi
 
 ## Certificates
 
-According to the [w3c WebTransport specification](https://www.w3.org/TR/webtransport/), there are two ways for a browser to validate the certificate used on a WebTransport connection. 
+According to the [w3c WebTransport specification](https://www.w3.org/TR/webtransport/), there are two ways for a browser to validate the certificate used on a WebTransport connection.
+
 1. by verifying the chain of trust of the certificate. This means that the certificate has to be signed by a CA (Certificate Authority) that the browser trusts. This is how browsers verify certificates when establishing a regular HTTPS connection.
 2. by verifying that the cryptographic hash of the certificate matches a specific value, using the [`serverCertificateHashes`](https://www.w3.org/TR/webtransport/#dom-webtransportoptions-servercertificatehashes) option.
 
@@ -46,8 +46,9 @@ Once the first certificate has expired, the node starts using the already genera
 
 WebTransport multiaddresses are composed of a QUIC multiaddress, followed by `/webtransport` and a list of multihashes of the certificates that the server uses (if not using a CA-signed certificate).
 Examples:
-* `/ip4/1.2.3.4/udp/443/quic/webtransport` (when using a CA-signed certificates)
-* `/ip4/1.2.3.4/udp/1234/quic/webtransport/certhash/<hash1>` (when using single self-signed certificates)
+
+* `/ip4/192.0.2.0/udp/443/quic/webtransport` (when using a CA-signed certificates)
+* `/ip4/192.0.2.0/udp/1234/quic/webtransport/certhash/<hash1>` (when using single self-signed certificates)
 * `/ip6/fe80::1ff:fe23:4567:890a/udp/1234/quic/webtransport/certhash/<hash1>/certhash/<hash2>/certhash/<hash3>` (when using single self-signed certificates)
 
 ## WebTransport HTTP endpoint
@@ -56,12 +57,12 @@ WebTransport needs a HTTPS URL to establish a WebTransport session, e.g. `https:
 
 To allow future evolution of the way we run the libp2p handshake over WebTransport, we use a URL parameter. The handshake described in this document MUST be signaled by setting the `type` URL parameter to `noise`.
 
-Example: The WebTransport URL of a WebTransport server advertising `/ip4/1.2.3.4/udp/1443/quic/webtransport/` would be `https://1.2.3.4:1443/.well-known/libp2p-webtransport?type=noise`.
+Example: The WebTransport URL of a WebTransport server advertising `/ip4/192.0.2.0/udp/1443/quic/webtransport/` would be `https://192.0.2.0:1443/.well-known/libp2p-webtransport?type=noise`.
 
 ## Security Handshake
 
 Unfortunately, the self-signed certificate doesn't allow the nodes to authenticate each others' peer IDs. It is therefore necessary to run an additional libp2p handshake on a newly established WebTransport connection.
-The first stream that the client opens on a new WebTransport session is used to perform a libp2p handshake using Noise (https://github.com/libp2p/specs/tree/master/noise). The client SHOULD start the handshake right after sending the CONNECT request, without waiting for the server's response.
+The first stream that the client opens on a new WebTransport session is used to perform a libp2p handshake using Noise (<https://github.com/libp2p/specs/tree/master/noise>). The client SHOULD start the handshake right after sending the CONNECT request, without waiting for the server's response.
 
 In order to verify end-to-end encryption of the connection, the peers need to establish that no MITM intercepted the connection. To do so, the server MUST include the certificate hash of the currently used certificate as well as the certificate hashes of all future certificates it has already advertised to the network in the `webtransport_certhashes` Noise extension (see Noise Extension section of the [Noise spec](/noise/README.md)). The hash of recently used, but expired certificates SHOULD also be included.
 

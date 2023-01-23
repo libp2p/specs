@@ -24,26 +24,25 @@ and spec status.
 ## Table of Contents
 
 - [Multicast DNS (mDNS)](#multicast-dns-mdns)
-    - [Table of Contents](#table-of-contents)
-    - [Overview](#overview)
-    - [Definitions](#definitions)
-    - [Peer Discovery](#peer-discovery)
-        - [Request](#request)
-        - [Response](#response)
-    - [DNS Service Discovery](#dns-service-discovery)
-        - [Meta Query](#meta-query)
-        - [Find All Response](#find-all-response)
-        - [Gotchas](#gotchas)
-    - [Issues](#issues)
-    - [References](#references)
-    - [Worked Examples](#worked-examples)
-        - [Meta Query](#meta-query-1)
-            - [Question](#question)
-            - [Answer](#answer)
-        - [Find All Peers](#find-all-peers)
-            - [Question](#question-1)
-            - [Answer](#answer-1)
-            - [Additional Records](#additional-records)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Definitions](#definitions)
+  - [Peer Discovery](#peer-discovery)
+    - [Request](#request)
+    - [Response](#response)
+  - [DNS Service Discovery](#dns-service-discovery)
+    - [Meta Query](#meta-query)
+    - [Find All Response](#find-all-response)
+    - [Gotchas](#gotchas)
+  - [Issues](#issues)
+  - [References](#references)
+    - [Meta Query](#meta-query-1)
+      - [Question](#question)
+      - [Answer](#answer)
+    - [Find All Peers](#find-all-peers)
+      - [Question](#question-1)
+      - [Answer](#answer-1)
+      - [Additional Records](#additional-records)
 
 ## Overview
 
@@ -165,5 +164,5 @@ _p2p._udp.local IN PTR `<peer-name>`._p2p._udp.local
 
 #### Additional Records
 
-- `<peer-name>`._p2p._udp.local IN TXT dnsaddr=/ip6/fe80::7573:b0a8:46b0:bfea/tcp/4001/p2p/`id`
-- `<peer-name>`._p2p._udp.local IN TXT dnsaddr=/ip4/192.168.178.21/tcp/4001/p2p/`id`
+- `<peer-name>`._p2p._udp.local IN TXT dnsaddr=/ip6/2001:DB8::7573:b0a8:46b0:bfea/tcp/4001/p2p/`id`
+- `<peer-name>`._p2p._udp.local IN TXT dnsaddr=/ip4/192.0.2.0/tcp/4001/p2p/`id`
