@@ -12,8 +12,6 @@ On a historical note, this specification replaces the existing [libp2p WebRTC st
 
 ## Connection Establishment
 
-### Browser to Browser
-
 Scenario: Browser _A_ wants to connect to Browser node _B_ with the help of server node _R_.
 Both _A_ and _B_ can not listen for incoming connections due to the restriction of the browser platform and being behind a NAT and/or firewall.
 Note that _A_ and/or _B_ may as well be non-browser nodes behind NATs and/or firewalls.
