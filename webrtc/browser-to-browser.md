@@ -16,7 +16,7 @@ On a historical note, this specification replaces the existing [libp2p WebRTC st
 
 Scenario: Browser _A_ wants to connect to Browser node _B_ with the help of server node _R_.
 Both _A_ and _B_ can not listen for incoming connections due to the restriction of the browser platform and being behind a NAT and/or firewall.
-Note that _A_ or _B_ may as well be a non-browser node behind a NAT and/or firewall trying to connect to a browser node.
+Note that _A_ and/or _B_ may as well be non-browser nodes behind NATs and/or firewalls.
 
 1. _A_ and _B_ establish a relayed connection through some protocol, e.g. the Circuit Relay v2 protocol.
    The relayed connection is established from _A_ to _B_ (see same role distribution in [DCUtR] protocol).
