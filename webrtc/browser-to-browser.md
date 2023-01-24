@@ -37,7 +37,8 @@ Note that _A_ and/or _B_ may as well be non-browser nodes behind NATs and/or fir
 5. _B_ and _A_ send their local ICE candidates via the existing signaling protocol stream.
    Both nodes continuously read from the stream, adding incoming remote candidates via `RTCPeerConnection.addIceCandidate()`.
 
-6. On successful establishment or failure of the direct connection, _B_ and _A_ close the signaling protocol stream.
+6. On successful establishment of the direct connection, _A_ and _B_ close the signaling protocol stream.
+   On failure _A_ and _B_ reset the signaling protocol stream.
 
    Behavior for transferring data on a relayed connection, in the case where the direct connection failed, is out of scope for this specification and dependent on the application.
 
