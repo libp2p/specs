@@ -94,7 +94,7 @@ message Message {
 
   Potential solution would be for B to advertise some protocol after the `/p2p-circuit` within its Multiaddr, e.g. `/ip6/<RELAY_IP>/udp/4001/p2p/<RELAY_PEER_ID>/p2p-circuit/webrtc-direct/p2p/<B_PEER_ID>`.
   As an alternative, A can discover B's support via the identify protocol on the relayed connection or by optimistically opening a stream using the signaling protocol.
-  Both of the latter options would on failure happen at the expense of a wasted relayed connection.
+  Both of the latter options imply long latency (direct connection + relayed connection + stream establishment / identify exchange) on success and on failure happen at the expense of a wasted relayed connection.
 
 ## FAQ
 
