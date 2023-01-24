@@ -65,7 +65,7 @@ The protocol id is `/webrtc-direct`.
 Messages are sent prefixed with the message length in bytes, encoded as an unsigned variable length integer as defined by the [multiformats unsigned-varint spec][uvarint-spec].
 
 ``` protobuf
-syntax = "proto2";
+syntax = "proto3";
 
 message Message {
     // Specifies type in `data` field.
