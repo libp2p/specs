@@ -94,15 +94,17 @@ Support for client authentication is an optional feature. It is expected that on
 
 The protocol defined here takes 2 RTTs to authenticate the client. It is designed to be stateless on the server side. In the first round-trip, the client obtains a (pseudo-) random value from the server, which it then signs with its host key and sends back to the server, which then issues an authentication token (acting somewhat like a cookie) which can be included on future requests.
 
-The service name is `client-auth`. For the first step, the client sends a GET request to this HTTP endpoint, and the server responds with at least 8 and up to 1024 bytes of pseudorandom data:
+The service name is `client-auth`. For the first step, the client sends a GET request to this HTTP endpoint. As described in [server-authentication], the client MUST authenticate the server in this step. The server responds with at least 8 and up to 1024 bytes of pseudorandom data:
 
 ```json
 {
-	"random": <multibase-encoded random bytes>
+	"random": <multibase-encoded random bytes>,
+  "signature": <multibase-encoded signature>
 }
 ```
 
 In order to keep this exchange stateless, the server SHOULD 1. include the current timestamp or an expiry data and 2. a signature in that data. This allows it to check in step 2 that it actually generated that data.
+The client MUST check that the signature obtained in the JSON response is correct and was generated using the same key that the server used to authenticate itself.
 
 The client signs the data received in step 1, and sends a POST request with the following JSON object to the server:
 
