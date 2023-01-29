@@ -69,26 +69,22 @@ Traditionally, libp2p was built on the assumption that both peers authenticate e
 
 ### Server Authentication
 
-This document defines a simple request-response protocol to authenticate a server. This protocol is run on an already established connection. The service name of the protocol is `server-auth` (and the URI therefore is `.well-known/libp2p/server-auth`).
+Since HTTP requests are independent from each other (they are not bound to a single connection, and when using HTTP/1.1, will actually use different connections), the server needs to authenticate itself on every single request.
 
-The client send a POST request containing a random payload of at least 8 and up to 1024 bytes:
+As browsers don’t expose an API to access details of the TLS certificate used, nor allow any access to the (an exporter to) the TLS master secret, server authentication is a bit more contrived than one might initially expect.
 
-```json
-{
-	"random": <multibase-encoded random bytes>
-}
+To request the server to authenticate, the client sets the `libp2p-server-auth` HTTP header to a randomly generated ASCII string of at least 10 (and a maximum of 100) characters. The server signs the following string using its host key:
+
+```
+"libp2p-server-auth:" || the value of the libp2p-server-auth header || "libp2p-server-domain:" || the domain (including subdomains)
 ```
 
-The server signs the concatenation of `libp2p-server-auth:` (in ASCII) and that payload using its host key. It then send the following response:
+It then sets the following two HTTP headers on the response:
 
-```json
-{
-	"peer-id": <peer ID, in string reprensentation>,
-	"signature": <multibase-encoded signature>
-}
-```
+1. `libp2p-server-pubkey`: its public key (from the libp2p key pair)
+2. `libp2p-server-auth-signature`: the signature derived as described above
 
-TODO: is this the best way to encode the information? We could also put `peer-id` and / or `signature` into an HTTP header.
+When requesting server authentication, the client MUST check that these two header fields are present, and MUST check the signature. It MUST NOT process the response if either one of these checks fails
 
 ### Client Authentication
 
