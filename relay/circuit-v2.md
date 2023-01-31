@@ -348,11 +348,11 @@ The envelope domain is `libp2p-relay-rsvp` and uses the multicodec code `0x0302`
 
 The payload of the envelope has the following form, in canonicalized protobuf format:
 ```protobuf
-syntax = "proto2";
+syntax = "proto3";
 message Voucher {
-  required bytes relay = 1;
-  required bytes peer = 2;
-  required uint64 expiration = 3;
+  bytes relay = 1;
+  bytes peer = 2;
+  uint64 expiration = 3;
 }
 ```
 - the `relay` field is the peer ID of the relay.
@@ -365,7 +365,7 @@ The wire representation is canonicalized, where elements of the message are writ
 ## Protobuf
 
 ```protobuf
-syntax = "proto2";
+syntax = "proto3";
 message HopMessage {
   enum Type {
     RESERVE = 0;
@@ -373,7 +373,7 @@ message HopMessage {
     STATUS = 2;
   }
 
-  required Type type = 1;
+  Type type = 1;
 
   optional Peer peer = 2;
   optional Reservation reservation = 3;
@@ -388,7 +388,7 @@ message StopMessage {
     STATUS = 1;
   }
 
-  required Type type = 1;
+  Type type = 1;
 
   optional Peer peer = 2;
   optional Limit limit = 3;
@@ -397,12 +397,12 @@ message StopMessage {
 }
 
 message Peer {
-  required bytes id = 1;
+  bytes id = 1;
   repeated bytes addrs = 2;
 }
 
 message Reservation {
-  required uint64 expire = 1; // Unix expiration time (UTC)
+  uint64 expire = 1; // Unix expiration time (UTC)
   repeated bytes addrs = 2;   // relay addrs for reserving peer
   optional bytes voucher = 3; // reservation voucher
 }
@@ -413,6 +413,8 @@ message Limit {
 }
 
 enum Status {
+  // zero value field required for proto3 compatibility
+  UNUSED                  = 0;
   OK                      = 100;
   RESERVATION_REFUSED     = 200;
   RESOURCE_LIMIT_EXCEEDED = 201;
