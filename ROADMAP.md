@@ -20,7 +20,6 @@ third-party data ownership.
   - [🚑 Self-healing networks](#-self-healing-networks)
   - [📮 Offline message queue / postbox](#-offline-message-queue--postbox)
 - [Evolve](#evolve)
-  - [✈️ WebTransport](#️-webtransport)
   - [⏱ Full Observability](#-full-observability)
   - [🧪 Automated compatibility testing](#-automated-compatibility-testing)
   - [Stream Migration Protocol](#stream-migration-protocol)
@@ -216,26 +215,6 @@ roaming, etc.
 **Our short-term roadmap**.
 
 These are the projects pushing the existing libp2p stack forward.
-
-### ✈️ WebTransport
-
-**Status**: In progress
-
-**What?** WebTransport is a browser-API offering low-latency, bidirectional
-client-server messaging running on top of QUIC. The browser API allows the
-establishment of connections to servers that don't have a TLS certificate
-signed by a certificate authority if the hash of the certificate is known in
-advance.
-
-**Why?** This allows libp2p nodes running in the browser (using js-libp2p) to
-connect to the rest of the libp2p network.
-
-**Links:**
-
-- [IETF draft](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http3/)
-- [W3C Browser API](https://w3c.github.io/webtransport/)
-- [libp2p spec discussion](https://github.com/libp2p/specs/pull/404)
-- [webtransport-go](https://github.com/marten-seemann/webtransport-go/)
 
 ### ⏱ Full Observability
 
@@ -664,3 +643,26 @@ to the rest of the system.
   vision](https://github.com/libp2p/specs/blob/master/connections/hole-punching.md).
 
 - [NAT traversal tracking issue](https://github.com/libp2p/specs/issues/312).
+
+
+### ✈️ WebTransport
+
+**Status**: Done
+
+**What?** WebTransport is a browser-API offering low-latency, bidirectional
+client-server messaging running on top of QUIC. The browser API allows the
+establishment of connections to servers that don't have a TLS certificate
+signed by a certificate authority if the hash of the certificate is known in
+advance.
+
+**Why?** This allows libp2p nodes running in the browser (using js-libp2p-webtransport) to
+connect to the rest of the libp2p network.
+
+**Links:**
+
+- [IETF draft](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http3/)
+- [W3C Browser API](https://w3c.github.io/webtransport/)
+- [libp2p Specification](https://github.com/libp2p/specs/tree/master/webtransport)
+- [webtransport-go](https://github.com/marten-seemann/webtransport-go/)
+- [go-libp2p WebTransport](https://github.com/libp2p/go-libp2p/tree/master/p2p/transport/webtransport)
+- [js-libp2p WebTransport](https://github.com/libp2p/js-libp2p-webtransport/)
