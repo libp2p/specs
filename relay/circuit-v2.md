@@ -2,9 +2,9 @@
 
 This is the version 2 of the libp2p Circuit Relay protocol.
 
-| Lifecycle Stage | Maturity        | Status | Latest Revision |
-|-----------------|-----------------|--------|-----------------|
-| 3A              | Recommendation  | Active | r2, 2023-01-31  |
+| Lifecycle Stage | Maturity       | Status | Latest Revision |
+| --------------- | -------------- | ------ | --------------- |
+| 3A              | Recommendation | Active | r2, 2023-01-31  |
 
 Authors: [@vyzo]
 
@@ -350,9 +350,11 @@ The payload of the envelope has the following form, in canonicalized protobuf fo
 ```protobuf
 syntax = "proto3";
 message Voucher {
-  bytes relay = 1;
-  bytes peer = 2;
-  uint64 expiration = 3;
+  // These fields are marked optional for backwards compatibility with proto2.
+  // Users should make sure to always set these.
+  optional bytes relay = 1;
+  optional bytes peer = 2;
+  optional uint64 expiration = 3;
 }
 ```
 - the `relay` field is the peer ID of the relay.
@@ -373,7 +375,9 @@ message HopMessage {
     STATUS = 2;
   }
 
-  Type type = 1;
+  // This field is marked optional for backwards compatibility with proto2.
+  // Users should make sure to always set this.
+  optional Type type = 1;
 
   optional Peer peer = 2;
   optional Reservation reservation = 3;
@@ -388,7 +392,9 @@ message StopMessage {
     STATUS = 1;
   }
 
-  Type type = 1;
+  // This field is marked optional for backwards compatibility with proto2.
+  // Users should make sure to always set this.
+  optional Type type = 1;
 
   optional Peer peer = 2;
   optional Limit limit = 3;
@@ -397,12 +403,16 @@ message StopMessage {
 }
 
 message Peer {
-  bytes id = 1;
+  // This field is marked optional for backwards compatibility with proto2.
+  // Users should make sure to always set this.
+  optional bytes id = 1;
   repeated bytes addrs = 2;
 }
 
 message Reservation {
-  uint64 expire = 1; // Unix expiration time (UTC)
+  // This field is marked optional for backwards compatibility with proto2.
+  // Users should make sure to always set this.
+  optional uint64 expire = 1; // Unix expiration time (UTC)
   repeated bytes addrs = 2;   // relay addrs for reserving peer
   optional bytes voucher = 3; // reservation voucher
 }
