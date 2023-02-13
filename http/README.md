@@ -19,6 +19,14 @@ At the same time, nodes that are already connected via a libp2p connection, will
 
 Any protocol that follows request-response semantics can easily be mapped onto HTTP (mapping protocols that don’t follow a request-response flow can be more challenging). Protocols are encouraged to follow best practices for building REST APIs. Once a mapping has been defined, a single implementation can be used to serve both traditional libp2p as well as libp2p-HTTP clients.
 
+Specifically, using libp2p+HTTP will allow:
+
+1. HTTP servers to offer same endpoints over HTTP and libp2p streams, allowing clients to reuse existing libp2p connections
+1. Defining services / protocols that are run on both public nodes and on nodes behind NATs / firewalls, making use of libp2p's NAT traversal magic
+1. Use existing peer and content discovery mechanisms to advertise HTTP-enabled multiaddresses, which can then be accessed either via plain HTTP(S) or via HTTP on top of libp2p
+1. Use peer authentication (both client and server auth) for a subset of HTTP endpoints
+
+
 ## Addressing
 
 Nodes may advertise HTTP multiaddresses to signal support for libp2p over HTTP. An address might look like this: `/ip4/1.2.3.4/tcp/443/tls/sni/example.com/http/p2p/<peer id>` (for HTTP/1.1 and HTTP/2), or  `/ip4/1.2.3.4/udp/443/quic/sni/example.com/http/p2p/<peer id>` (for HTTP/3).
