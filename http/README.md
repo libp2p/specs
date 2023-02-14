@@ -21,9 +21,11 @@ Any protocol that follows request-response semantics can easily be mapped onto H
 
 Specifically, using libp2p+HTTP will allow:
 
-1. HTTP servers to offer same endpoints over HTTP and libp2p streams, allowing clients to reuse existing libp2p connections
-1. Defining services / protocols that are run on both public nodes and on nodes behind NATs / firewalls, making use of libp2p's NAT traversal magic
+1. Defining services / protocols once, and run them both via HTTP and via libp2p
+1. Leverage libp2p's connectivity story (incl. hole punching) to run these services on both public nodes and on nodes behind NATs / firewall
 1. Use existing peer and content discovery mechanisms to advertise HTTP-enabled multiaddresses, which can then be accessed either via plain HTTP(S) or via HTTP on top of libp2p
+    1. Support existing HTTP protocols like the S3 protocol. This would allow peers to fetch content seamlessly from an S3-compatible provider (S3, backblaze's B2, Cloudflare's R2)
+    1. Support edge compute directly. Many edge compute environments build on top of HTTP since it’s a stateless request/response protocol. This includes services such as Cloudflare workers, AWS Lambda, Netflify Edge functions, and many more.
 1. Use peer authentication (both client and server auth) for a subset of HTTP endpoints
 
 
