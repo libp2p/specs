@@ -41,11 +41,11 @@ Nodes can also link to a specific resource directly, similar to how a URL includ
 
 ## Namespace
 
-libp2p does not squat the global namespace. By convention, all libp2p services are located at a well-known URL: `http://example.com/.well-known/libp2p/<service name>/<path (optional)>`.
+libp2p does not squat the global namespace. By convention, all libp2p services are located at a well-known URL: `https://example.com/.well-known/libp2p/<service name>/<path (optional)>`.
 
 Putting the service name into the URL allows for future extensibility. It is easy to define new protocols, and the replace existing protocols by newer versions.
 
-Applications MAY expose services under different URIs. For example, an application might decide to generate nicer-looking (and probably more SEO-friendly) URLs, and map paths under `[https://example.com/dht/](https://example.com/dht/)` to `https://example.com/.well-known/libp2p/kad-dht-v1/`. 
+Applications MAY expose services under different URIs. For example, an application might decide to generate nicer-looking (and probably more SEO-friendly) URLs, and map paths under [`https://example.com/dht/`](https://example.com/dht/) to `https://example.com/.well-known/libp2p/kad-dht-v1/`. 
 
 ### Service Names
 
@@ -121,7 +121,7 @@ The client signs the data received in step 1, and sends a POST request with the 
 ```json
 {
   "data": <the random bytes received from the server, multibase encoded>,
-  "peer-id": <peer ID, in string reprensentation>,
+  "peer-id": <peer ID, in string representation>,
   "signature": <multibase-encoded signature>
 }
 ```
