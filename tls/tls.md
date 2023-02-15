@@ -65,8 +65,6 @@ The certificate MUST contain the [libp2p Public Key Extension](#libp2p-public-ke
 
 Certificates MUST omit the deprecated `subjectUniqueId` and `issuerUniqueId` fields. Endpoints MAY abort the connection attempt if either is present.
 
-Certificates MUST use the `NamedCurve` encoding for elliptic curve parameters. Endpoints MUST abort the connection attempt if is not used. Failure to enforce this restriction allows [“Whose Curve Is It Anyway”](https://whosecurve.com) attacks, which completely compromise the security of the connection. Similarly, hash functions with an output length less than 256 bits MUST NOT be used, due to the possibility of collision attacks. In particular, MD5 and SHA1 MUST NOT be used.
-
 Note for clients: Since clients complete the TLS handshake immediately after sending the certificate (and the TLS `ClientFinished` message), the handshake will appear as having succeeded before the server had the chance to verify the certificate. In this state, the client can already send application data. If certificate verification fails on the server side, the server will close the connection without processing any data that the client sent.
 
 ### libp2p Public Key Extension
