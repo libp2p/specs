@@ -60,7 +60,7 @@ As an aside, note that _A_ and _B_ do not need to use the same STUN server in or
 
 ## Signaling Protocol
 
-The protocol id is `/webrtc-direct`.
+The protocol id is `/webrtc-signaling`.
 Messages are sent prefixed with the message length in bytes, encoded as an unsigned variable length integer as defined by the [multiformats unsigned-varint spec][uvarint-spec].
 
 ``` protobuf
