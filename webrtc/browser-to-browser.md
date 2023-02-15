@@ -104,7 +104,7 @@ message Message {
 
   This specification (browser-to-browser) requires _A_ and _B_ to exchange their SDP offer and answer over an authenticated channel.
   Offer and answer contain the TLS certificate fingerprint.
-  The browser validates the TLS certificate fingerprint through the TLS handshake on the direct connection.
+  The browser validates the TLS certificate fingerprint through the DTLS handshake during the WebRTC connection establishment.
 
   In contrast, the browser-to-server specification allows exchange of the server's multiaddr, containing the server's TLS certificate fingerprint, over unauthenticated channels.
   In other words, the browser-to-server specification does not consider the TLS certificate fingerprint in the server's multiaddr to be trusted.
