@@ -3,7 +3,7 @@
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r0, 2021-08-26  |
+| 3A              | Recommendation | Active | r1, 2023-02-16  |
 
 
 Authors: [@marten-seemann]
@@ -52,7 +52,9 @@ The AutoNAT Protocol uses the Protocol ID `/libp2p/autonat/1.0.0`. The node
 wishing to determine its NAT status opens a stream using this protocol ID, and
 then sends a `Dial` message. The `Dial` message contains a list of multiaddresses.
 Upon receiving this message, the peer starts to dial these addresses. It MAY
-dial all of them in parallel. The peer MAY use a different IP and peer ID than
+add the observed address of the connection on which the request was received to
+the list of addresses. It MAY dial the addresses in parallel.
+The peer MAY also use a different IP and peer ID than
 it uses for its regular libp2p connection to perform these dial backs.
 
 In order to prevent attacks like the one described in [RFC 3489, Section
