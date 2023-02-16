@@ -93,6 +93,10 @@ messages. Senders SHOULD increment the sequence number for every Identify messag
 they send. After processing an Identify with a certain sequence number, receivers
 MUST ignore all Identify messages with smaller sequence numbers.
 
+To avoid persisting state across restarts, implementations MAY use unix
+epoch time as the `seq` value, however receivers MUST NOT attempt to interpret the
+sequence number value as a valid timestamp.
+
 ### protocolVersion
 
 The protocol version identifies the family of protocols used by the peer. The
