@@ -85,6 +85,7 @@ see [#465](https://github.com/libp2p/specs/issues/465).
 - [kademlia][spec_kademlia] - The Kademlia Distributed Hash Table (DHT) subsystem
 - [mdns][spec_mdns] - Local peer discovery with zero configuration using multicast DNS
 - [mplex][spec_mplex] - The friendly stream multiplexer
+- [yamux][spec_yamux] - Yet Another Multiplexer
 - [noise][spec_noise] - The libp2p Noise handshake
 - [plaintext][spec_plaintext] - An insecure transport for non-production usage
 - [pnet][spec_pnet] - Private networking in libp2p using pre-shared keys
@@ -142,3 +143,4 @@ you feel an issue isn't the appropriate place for your topic, please join our
 [spec_webrtc]: ./webrtc/README.md
 [spec_webtransport]: ./webtransport/README.md
 [spec_ping]: ./ping/ping.md
+[spec_yamux]: ./yamux/README.md
