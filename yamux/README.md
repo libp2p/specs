@@ -145,3 +145,11 @@ The Length should be set to one of the following to provide an error code:
 * 0x0 Normal termination
 * 0x1 Protocol error
 * 0x2 Internal error
+
+## Implementation considerations
+
+### ACK backlog
+
+Yamux allows for a stream to be opened (and used) before it is acknowledged by the remote.
+We defined the ACK backlog as the number of streams that a peer has opened which have not yet been acknowledged.
+Implementations SHOULD at most allow an ACK backlog of 256 streams.
