@@ -6,10 +6,11 @@
 
 Authors: [@thomaseizinger]
 
-Interest Group: [@marten-seemann]
+Interest Group: [@marten-seemann], [@wemeetagain]
 
 [@thomaseizinger]: https://github.com/thomaseizinger
 [@marten-seemann]: https://github.com/marten-seemann
+[@wemeetagain]: https://github.com/wemeetagain
 
 See the [lifecycle document][lifecycle-spec] for context about maturity level and spec status.
 
