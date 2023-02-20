@@ -166,6 +166,9 @@ The relayed connection flows in the `hop` stream between the
 connection initiator and the relay and in the `stop` stream between
 the relay and the connection termination point.
 
+_B_ and _A_ upgrade the relayed connection with a security protocol and a
+multiplexer, just like they would e.g. upgrade a TCP connection.
+
 ### Hop Protocol
 
 The Hop protocol governs interaction between clients and the relay;
