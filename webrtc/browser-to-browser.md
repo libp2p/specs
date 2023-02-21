@@ -17,28 +17,27 @@ Both _A_ and _B_ can not listen for incoming connections due to the restriction 
 Note that _A_ and/or _B_ may as well be non-browser nodes behind NATs and/or firewalls.
 However, for two non-browser nodes using TCP or QUIC hole punching with [DCUtR] will be the more efficient way to establish a direct connection.
 
-
 1. _A_ and _B_ establish a relayed connection through some protocol, e.g. the Circuit Relay v2 protocol.
-   The relayed connection is established from _A_ to _B_ (see same role distribution in [DCUtR] protocol).
+   The relayed connection is established from _A_ to _B_.
    Note that further steps depend on the relayed connection to be authenticated, i.e. that data sent on the relayed connection can be trusted.
 
-2. _B_ (inbound side of relayed connection) creates an `RTCPeerConnection`.
+2. _A_ (outbound side of relayed connection) creates an `RTCPeerConnection`.
    See [STUN](#stun) section on what STUN servers to configure at creation time.
-   _B_ creates an SDP offer via `RTCPeerConnection.createOffer()`.
-   _B_ initiates the signaling protocol to _A_ via the relayed connection from (1), see [Signaling Protocol](#signaling-protocol) and sends the offer to _A_.
+   _A_ creates an SDP offer via `RTCPeerConnection.createOffer()`.
+   _A_ initiates the signaling protocol to _B_ via the relayed connection from (1), see [Signaling Protocol](#signaling-protocol) and sends the offer to _B_.
 
-3. _A_ (outbound side of relayed connection) creates an `RTCPeerConnection`.
+3. _B_ (inbound side of relayed connection) creates an `RTCPeerConnection`.
    Again see [STUN](#stun) section on what STUN servers to configure at creation time.
-   _A_ receives _B_'s offer sent in (2) via the signaling protocol stream and provides the offer to its `RTCPeerConnection` via `RTCPeerConnection.setRemoteDescription`.
-   _A_ then creates an answer via `RTCPeerConnection.createAnswer` and sends it to _B_ via the existing signaling protocol stream (see [Signaling Protocol](#signaling-protocol)).
+   _B_ receives _A_'s offer sent in (2) via the signaling protocol stream and provides the offer to its `RTCPeerConnection` via `RTCPeerConnection.setRemoteDescription`.
+   _B_ then creates an answer via `RTCPeerConnection.createAnswer` and sends it to _A_ via the existing signaling protocol stream (see [Signaling Protocol](#signaling-protocol)).
 
-4. _B_ receives _A_'s answer via the signaling protocol stream and sets it locally via `RTCPeerConnection.setRemoteDescription`.
+4. _A_ receives _B_'s answer via the signaling protocol stream and sets it locally via `RTCPeerConnection.setRemoteDescription`.
 
-5. _B_ and _A_ send their local ICE candidates via the existing signaling protocol stream.
+5. _A_ and _B_ send their local ICE candidates via the existing signaling protocol stream.
    Both nodes continuously read from the stream, adding incoming remote candidates via `RTCPeerConnection.addIceCandidate()`.
 
-6. On successful establishment of the direct connection, _A_ and _B_ close the signaling protocol stream.
-   On failure _A_ and _B_ reset the signaling protocol stream.
+6. On successful establishment of the direct connection, _B_ and _A_ close the signaling protocol stream.
+   On failure _B_ and _A_ reset the signaling protocol stream.
 
    Behavior for transferring data on a relayed connection, in the case where the direct connection failed, is out of scope for this specification and dependent on the application.
 
@@ -116,6 +115,14 @@ message Message {
 
   DCUtR does not provide a mechanism to trickle local address candidates to the remote as they are discovered.
   Trickling candidates just-in-time allows for faster WebRTC connection establishment.
+
+- Why does _A_ and not _B_ initiate the signaling protocol?
+
+  In [DCUtR] _B_ (inbound side of the relayed connection) initiates the [DCUtR] protocol by opening the [DCUtR] protocol stream.
+  The reason is that in case _A_ is publicly reachable, _B_ might be able to use connection reversal to connect to _A_ directly.
+  This reason does not apply to the WebRTC browser-to-browser protocol.
+  Given that _A_ and _B_ at this point already have a relayed connection established, they might as well use it to exchange SDP, instead of using connection reversal and WebRTC browser-to-server.
+  Thus, for the WebRTC browser-to-browser protocol, _A_ initiates the signaling protocol by opening the signaling protocol stream.
 
 [DCUtR]: ./../relay/DCUtR.md
 [identify]: ./../identify/README.md
