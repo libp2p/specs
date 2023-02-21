@@ -6,42 +6,45 @@
 
 ## Motivation
 
-**Hole punching in the browser** - Enable two browsers or a browser and a non-browser node to connect even though one or both are behind a NAT / firewall.
+**Hole punching in the browser**
+
+Browser _A_ wants to connect to Browser node _B_ with the help of server node _R_.
+Both _A_ and _B_ can not listen for incoming connections due to the restriction of the browser platform and being behind a NAT and/or firewall.
+Note that _A_ and/or _B_ may as well be non-browser nodes behind NATs and/or firewalls.
+However, for two non-browser nodes using TCP or QUIC hole punching with [DCUtR] will be the more efficient way to establish a direct connection.
 
 On a historical note, this specification replaces the existing [libp2p WebRTC star](https://github.com/libp2p/js-libp2p-webrtc-star) and [libp2p WebRTC direct](https://github.com/libp2p/js-libp2p-webrtc-direct) protocols.
 
 ## Connection Establishment
 
-Scenario: Browser _A_ wants to connect to Browser node _B_ with the help of server node _R_.
-Both _A_ and _B_ can not listen for incoming connections due to the restriction of the browser platform and being behind a NAT and/or firewall.
-Note that _A_ and/or _B_ may as well be non-browser nodes behind NATs and/or firewalls.
-However, for two non-browser nodes using TCP or QUIC hole punching with [DCUtR] will be the more efficient way to establish a direct connection.
+1. _B_ advertises support for the WebRTC browser-to-browser protocol by appending `/webrtc-direct` to its relayed multiaddr e.g. `/ip6/fe80::883:a581:fff1:833/udp/4001/quic/p2p/<relay-peer-id>/p2p-circuit/webrtc-direct/p2p/<b-peer-id>`.
 
-1. _A_ and _B_ establish a relayed connection through some protocol, e.g. the Circuit Relay v2 protocol.
-   The relayed connection is established from _A_ to _B_.
+2. Upon discovery of _B_'s multiaddress, _A_ knows that _B_ speaks the WebRTC browser-to-browser protocol and knows how to establish a relayed connection to _B_ to run the WebRTC browser-to-browser signaling protocol on top.
+
+3. _A_ establish a relayed connection to _B_.
    Note that further steps depend on the relayed connection to be authenticated, i.e. that data sent on the relayed connection can be trusted.
 
-2. _A_ (outbound side of relayed connection) creates an `RTCPeerConnection`.
+4. _A_ (outbound side of relayed connection) creates an `RTCPeerConnection`.
    See [STUN](#stun) section on what STUN servers to configure at creation time.
    _A_ creates an SDP offer via `RTCPeerConnection.createOffer()`.
    _A_ initiates the signaling protocol to _B_ via the relayed connection from (1), see [Signaling Protocol](#signaling-protocol) and sends the offer to _B_.
 
-3. _B_ (inbound side of relayed connection) creates an `RTCPeerConnection`.
+5. _B_ (inbound side of relayed connection) creates an `RTCPeerConnection`.
    Again see [STUN](#stun) section on what STUN servers to configure at creation time.
    _B_ receives _A_'s offer sent in (2) via the signaling protocol stream and provides the offer to its `RTCPeerConnection` via `RTCPeerConnection.setRemoteDescription`.
    _B_ then creates an answer via `RTCPeerConnection.createAnswer` and sends it to _A_ via the existing signaling protocol stream (see [Signaling Protocol](#signaling-protocol)).
 
-4. _A_ receives _B_'s answer via the signaling protocol stream and sets it locally via `RTCPeerConnection.setRemoteDescription`.
+6. _A_ receives _B_'s answer via the signaling protocol stream and sets it locally via `RTCPeerConnection.setRemoteDescription`.
 
-5. _A_ and _B_ send their local ICE candidates via the existing signaling protocol stream.
+7. _A_ and _B_ send their local ICE candidates via the existing signaling protocol stream.
    Both nodes continuously read from the stream, adding incoming remote candidates via `RTCPeerConnection.addIceCandidate()`.
 
-6. On successful establishment of the direct connection, _B_ and _A_ close the signaling protocol stream.
+8. On successful establishment of the direct connection, _B_ and _A_ close the signaling protocol stream.
    On failure _B_ and _A_ reset the signaling protocol stream.
 
    Behavior for transferring data on a relayed connection, in the case where the direct connection failed, is out of scope for this specification and dependent on the application.
 
-7. Messages on `RTCDataChannel`s on the established `RTCPeerConnection` are framed using the message framing mechanism described in [multiplexing].
+9. Messages on `RTCDataChannel`s on the established `RTCPeerConnection` are framed using the message framing mechanism described in [multiplexing].
 
 ## STUN
 
@@ -82,20 +85,6 @@ message Message {
     optional string data = 2;
 }
 ```
-
-## Open Questions
-
-- Do we need a mechanism for browsers to advertise support for WebRTC browser-to-browser?
-
-  Say that browser B supports WebRTC browser-to-browser.
-  B listens via a relay and advertises its relayed address.
-  A discovers B's relayed address.
-  At this point A does not know whether B is a browser and thus supports WebRTC browser-to-browser, or whether B is e.g. a laptop potentially supporting TCP and QUIC hole punching via DCUtR but not WebRTC browser-to-browser.
-  In the latter case, A can not establish a direct connection to B.
-
-  Potential solution would be for B to advertise some protocol after the `/p2p-circuit` within its Multiaddr, e.g. `/ip6/<RELAY_IP>/udp/4001/p2p/<RELAY_PEER_ID>/p2p-circuit/webrtc-direct/p2p/<B_PEER_ID>`.
-  As an alternative, A can discover B's support via the identify protocol on the relayed connection or by optimistically opening a stream using the signaling protocol.
-  Both of the latter options imply long latency (direct connection + relayed connection + stream establishment / identify exchange) on success and on failure happen at the expense of a wasted relayed connection.
 
 ## FAQ
 
