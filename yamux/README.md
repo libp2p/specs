@@ -115,7 +115,7 @@ The corresponding ACK does not need to be received.
 This is particularly well suited for an RPC system where a client wants to open a stream and immediately fire a request without waiting for the RTT of the ACK.
 
 This does introduce the possibility of a connection being rejected after data has been sent already.
-This is a slight semantic difference from TCP, where the conection cannot be refused after it is opened.
+This is a slight semantic difference from TCP, where the connection cannot be refused after it is opened.
 Clients should be prepared to handle this by checking for an error that indicates a RST was received.
 
 #### Closing a stream
@@ -152,5 +152,5 @@ The Length should be set to one of the following to provide an error code:
 ### ACK backlog
 
 Yamux allows for a stream to be opened (and used) before it is acknowledged by the remote.
-We defined the ACK backlog as the number of streams that a peer has opened which have not yet been acknowledged.
+The ACK backlog is defined as the number of streams that a peer has opened which have not yet been acknowledged.
 Implementations SHOULD at most allow an ACK backlog of 256 streams.
