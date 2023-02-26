@@ -26,6 +26,8 @@ This allows us to preserve the specification in case the linked document is ever
 
 ## Specification
 
+The protocol string of yamux for `multistream-select` is: `/yamux/1.0.0`. 
+
 ### Framing
 
 Yamux uses a streaming connection underneath, but imposes a message framing so that it can be shared between many logical streams.
