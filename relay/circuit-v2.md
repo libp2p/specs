@@ -259,7 +259,7 @@ If more data than the limit specified in the `data` field is transferred
 over the connection, the server should reset the stream. If the reservation
 for the connection has expired the server may then apply any connection
 management policy to the connection as normal otherwise it should retain
-the connection, unless doing so would prevent it from mainting it's resource
+the connection, unless doing so would prevent it from maintaining it's resource
 quotas.
 
 ***Note: Implementations _should not_ accept reservations over already relayed connections.***
