@@ -1,4 +1,4 @@
-# WebRTC browser-to-browser
+# WebRTC W3C
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
