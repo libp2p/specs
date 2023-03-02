@@ -19,7 +19,7 @@ On a historical note, this specification replaces the existing [libp2p WebRTC st
 
 1. _B_ advertises support for the WebRTC browser-to-browser protocol by appending `/webrtc-w3c` to its relayed multiaddr e.g. `/ip6/fe80::883:a581:fff1:833/udp/4001/quic/webtransport/certhash/<hash1>/p2p/<relay-peer-id>/p2p-circuit/webrtc-w3c/p2p/<b-peer-id>`.
 
-2. Upon discovery of _B_'s multiaddress, _A_ knows that _B_ speaks the WebRTC browser-to-browser protocol and knows how to establish a relayed connection to _B_ to run the WebRTC browser-to-browser signaling protocol on top.
+2. Upon discovery of _B_'s multiaddress, _A_ learns that _B_ supports the WebRTC transport through the (constrained) W3C API and knows how to establish a relayed connection to _B_ to run the `/webrtc-w3c-signaling` protocol on top.
 
 3. _A_ establish a relayed connection to _B_.
    Note that further steps depend on the relayed connection to be authenticated, i.e. that data sent on the relayed connection can be trusted.
