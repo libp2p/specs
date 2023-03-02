@@ -367,9 +367,9 @@ accept streams before completion of the handshake.
 
 - Completed implementations of this specification:
   - <https://github.com/libp2p/rust-libp2p/pull/2622>
+  - <https://github.com/libp2p/js-libp2p-webrtc>
 - Work in progress implementations of this specification:
-  - <https://github.com/little-bear-labs/js-libp2p-webrtc/pull/4>
-  - <https://github.com/libp2p/go-libp2p/pull/1655>
+  - <https://github.com/libp2p/go-libp2p/pull/1999>
 - Past related work:
   - Proof of concept for the server side (native) and the client side (Rust in
     WASM): <https://github.com/wngr/libp2p-webrtc>
