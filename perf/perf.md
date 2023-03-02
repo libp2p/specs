@@ -34,6 +34,8 @@ client driven set of benchmarks. To not reinvent the wheel, this perf protocol
 is almost identical to Nick Bank's [_QUIC Performance_
 Internet-Draft](https://datatracker.ietf.org/doc/html/draft-banks-quic-performance#section-2.3)
 but adapted to libp2p.
+The protocol first performs an upload of a client-chosen amount of bytes. Once
+that upload has finished, the server sends back as many bytes as the client requested.
 
 
 The protocol is as a follows:
@@ -43,16 +45,17 @@ Client:
 1. Open a libp2p stream to the server.
 2. Tell the server how many bytes we want the server to send us as a single
    big-endian uint64 number. Zero is a valid number, so is the max uint64 value.
-3. Write some amount of data to the stream.
+3. Optional: Write some amount of data to the stream.
 4. Close the write side of our stream.
 5. Read from the read side of the stream. This
    should be the same number of bytes as we told the server in step 2.
 
 Server, on handling a new `perf` stream:
-1. Read the big-endian uint64 number. This is how many bytes we'll send back.
+1. Read the big-endian uint64 number. This is how many bytes we'll send back in step 3.
 2. Read from the stream until we get an `EOF` (client's write side was closed).
-3. Send the number of bytes defined in step 1 back to the client.
-4. Close the stream.
+3. Send the number of bytes defined in step 1 back to the client. This MUST NOT be run
+   concurrently with step 2.
+5. Close the stream.
 
 # Benchmarks
 
