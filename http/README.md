@@ -41,19 +41,22 @@ Nodes can also link to a specific resource directly, similar to how a URL includ
 
 ## Namespace
 
-libp2p does not squat the global namespace. By convention, all libp2p services are located at a well-known URL: `https://example.com/.well-known/libp2p/<service name>/<path (optional)>`.
+libp2p does not squat the global namespace. By convention libp2p services can be discovered by accessing the configuration file at a well-known URL (RFC 8615): `.well-known/libp2p.json` (e.g. https://example.com/.well-known/libp2p.json). This allows server operators to dynamically change the URLs of the services offered, and to not hard-code any assumptions how a certain resource is meant to be interpreted.
 
-Putting the service name into the URL allows for future extensibility. It is easy to define new protocols, and the replace existing protocols by newer versions.
+The document contains a mapping of protocols to their respective URL. For example, this configuration file would tell the client
 
-Applications MAY expose services under different URIs. For example, an application might decide to generate nicer-looking (and probably more SEO-friendly) URLs, and map paths under [`https://example.com/dht/`](https://example.com/dht/) to `https://example.com/.well-known/libp2p/kad-dht-v1/`. 
+```json
+{
+  "/kad/1.0.0": "/kademlia/",
+  "server-auth": "/libp2p/server-auth"
+}
+```
 
-### Service Names
+1. That the Kademlia protocol is available at https://example.com/kademlia and
+2. The libp2p server auth protocol (see below) is available at https://example.com/libp2p/server-auth.
 
-Traditionally, libp2p protocols have used path-like protocol identifiers, e.g. `/libp2p/autonat/1.0.0`. Due to the use of `/`s, this doesn’t work well with the naming convention defined above.
+It is valid expose a service at /. Applications then need to take special care to avoid collisions with other protocols.
 
-Protocols that wish to use the libp2p request-response mechanism MUST define a service name that is a valid URI component (according to RFC 8820).
-
-In practice, this isn’t expected cause too much friction, since current libp2p protocols were not designed to use the request-reponse mechanism, and will need to make arrangements to support it anyway (e.g. define how requests and responses are serialized).
 
 ### Privacy Properties
 
@@ -61,9 +64,7 @@ This leads to some very desirable properties:
 
 1. It is possible to run libp2p alongside a normal HTTP web service, i.e. on the same domain and port, without having to worry about collisions. 
     1. As an on-path observer only sees SNI and ALPN, this effectively hides the fact that a client is establishing a connection in order to speak libp2p.
-2. Since authentication is flexible (see below), this enables servers to
-    1. require authentication to (some) paths below `.well-known/libp2p`, and to enforce ACLs
-    2. stealth mode: return 404 for paths below `.well-known/libp2p`, *unless* the client has already authenticated itself, thereby hiding the fact that it runs a libp2p server, even if probed explicitly
+2. Since authentication is flexible (see below), this enables servers to enforce ACLs to `.well-known/libp2p.json`, thereby hiding the fact that a server is running libp2p
 
 ## Certificates
 
@@ -108,7 +109,7 @@ The service name is `client-auth`. For the first step, the client sends a GET re
 
 ```json
 {
-	"random": <multibase-encoded random bytes>,
+  "random": <multibase-encoded random bytes>,
   "signature": <multibase-encoded signature>
 }
 ```
