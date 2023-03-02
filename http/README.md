@@ -47,8 +47,10 @@ The document contains a mapping of protocols to their respective URL. For exampl
 
 ```json
 {
-  "/kad/1.0.0": "/kademlia/",
-  "server-auth": "/libp2p/server-auth"
+  "services": {
+    "/kad/1.0.0": "/kademlia/",
+    "server-auth": "/libp2p/server-auth"
+  }
 }
 ```
 
