@@ -24,7 +24,7 @@ On a historical note, this specification replaces the existing [libp2p WebRTC st
 3. _A_ establish a relayed connection to _B_.
    Note that further steps depend on the relayed connection to be authenticated, i.e. that data sent on the relayed connection can be trusted.
 
-4. _A_ (outbound side of relayed connection) creates an `RTCPeerConnection`.
+4. _A_ (outbound side of relayed connection) creates an `RTCPeerConnection` provided by a W3C compliant WebRTC implementation (e.g. a browser).
    See [STUN](#stun) section on what STUN servers to configure at creation time.
    _A_ creates an SDP offer via `RTCPeerConnection.createOffer()`.
    _A_ initiates the signaling protocol to _B_ via the relayed connection from (1), see [Signaling Protocol](#signaling-protocol) and sends the offer to _B_.
