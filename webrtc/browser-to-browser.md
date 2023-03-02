@@ -6,7 +6,7 @@
 
 ## Motivation
 
-**Hole punching in the browser**
+libp2p transport protocol using the W3C defined WebRTC connection establishment flow, among other things enabling **hole punching in the browser**.
 
 Browser _A_ wants to connect to Browser node _B_ with the help of server node _R_.
 Both _A_ and _B_ can not listen for incoming connections due to the restriction of the browser platform and being behind a NAT and/or firewall.
