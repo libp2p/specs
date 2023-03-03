@@ -9,7 +9,7 @@
 libp2p transport protocol using the W3C defined WebRTC connection establishment flow, among other things enabling **hole punching in the browser**.
 
 Browser _A_ wants to connect to Browser node _B_ with the help of server node _R_.
-Both _A_ and _B_ can not listen for incoming connections due to the restriction of the browser platform and being behind a NAT and/or firewall.
+Both _A_ and _B_ can not listen for incoming connections due to running in a constrained environment (i.e. a browser) with its only transport capability being the W3C WebRTC `RTCPeerConnection` API and being behind a NAT and/or firewall.
 Note that _A_ and/or _B_ may as well be non-browser nodes behind NATs and/or firewalls.
 However, for two non-browser nodes using TCP or QUIC hole punching with [DCUtR] will be the more efficient way to establish a direct connection.
 
