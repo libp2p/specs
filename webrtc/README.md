@@ -26,9 +26,9 @@ WebRTC flavors in libp2p:
 
 2. [WebRTC W3C](./w3c.md)
 
-  libp2p transport protocol using the W3C defined WebRTC connection
-  establishment flow, among other things enabling **hole punching in the
-  browser**.
+   libp2p transport protocol using the W3C defined WebRTC connection
+   establishment flow, among other things enabling **hole punching in the
+   browser**.
 
 ## Shared
 
