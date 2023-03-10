@@ -24,11 +24,10 @@ WebRTC flavors in libp2p:
    connection from the browser (see [WebTransport
    specification](../webtransport)).
 
-2. [WebRTC W3C](./w3c.md)
+2. [WebRTC Private-to-Private](./private-to-private.md)
 
-   libp2p transport protocol using the W3C defined WebRTC connection
-   establishment flow, among other things enabling **hole punching in the
-   browser**.
+   libp2p transport protocol enabling two private nodes (e.g. two browsers) to
+   establish a direct connection.
 
 ## Shared
 

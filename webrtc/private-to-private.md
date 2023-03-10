@@ -1,4 +1,4 @@
-# WebRTC W3C
+# WebRTC Private-to-Private
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
@@ -8,7 +8,7 @@ Authors: [@mxinden]
 
 ## Motivation
 
-libp2p transport protocol using the W3C defined WebRTC connection establishment flow, among other things enabling **hole punching in the browser**.
+libp2p transport protocol enabling two private nodes (e.g. two browsers) to establish a direct connection.
 
 Browser _A_ wants to connect to Browser node _B_ with the help of server node _R_.
 Both _A_ and _B_ can not listen for incoming connections due to running in a constrained environment (i.e. a browser) with its only transport capability being the W3C WebRTC `RTCPeerConnection` API and being behind a NAT and/or firewall.
@@ -19,9 +19,9 @@ On a historical note, this specification replaces the existing [libp2p WebRTC st
 
 ## Connection Establishment
 
-1. _B_ advertises support for the WebRTC browser-to-browser protocol by appending `/webrtc-w3c` to its relayed multiaddr e.g. `/ip6/fe80::883:a581:fff1:833/udp/4001/quic/webtransport/certhash/<hash1>/p2p/<relay-peer-id>/p2p-circuit/webrtc-w3c/p2p/<b-peer-id>`.
+1. _B_ advertises support for the WebRTC browser-to-browser protocol by appending `/webrtc-private-to-private` to its relayed multiaddr e.g. `/ip6/fe80::883:a581:fff1:833/udp/4001/quic/webtransport/certhash/<hash1>/p2p/<relay-peer-id>/p2p-circuit/webrtc-private-to-private/p2p/<b-peer-id>`.
 
-2. Upon discovery of _B_'s multiaddress, _A_ learns that _B_ supports the WebRTC transport through the (constrained) W3C API and knows how to establish a relayed connection to _B_ to run the `/webrtc-w3c-signaling` protocol on top.
+2. Upon discovery of _B_'s multiaddress, _A_ learns that _B_ supports the WebRTC transport through the (constrained) W3C API and knows how to establish a relayed connection to _B_ to run the `/webrtc-signaling` protocol on top.
 
 3. _A_ establish a relayed connection to _B_.
    Note that further steps depend on the relayed connection to be authenticated, i.e. that data sent on the relayed connection can be trusted.
@@ -66,7 +66,7 @@ As an aside, note that _A_ and _B_ do not need to use the same STUN server in or
 
 ## Signaling Protocol
 
-The protocol id is `/webrtc-w3c-signaling`.
+The protocol id is `/webrtc-signaling`.
 Messages are sent prefixed with the message length in bytes, encoded as an unsigned variable length integer as defined by the [multiformats unsigned-varint spec][uvarint-spec].
 
 ``` protobuf
