@@ -34,6 +34,7 @@ and spec status.
         - [State Management](#state-management)
             - [Peer Metadata Storage](#peer-metadata-storage)
             - [Connection Limits](#connection-limits)
+            - [Supported protocols](#supported-protocols)
         - [Connection Lifecycle Events](#connection-lifecycle-events)
     - [Hole punching](#hole-punching)
     - [Future Work](#future-work)
@@ -324,6 +325,17 @@ when you're near the limit.
 Resource allocation, measurement and enforcement policies are all an active area
 of discussion in the libp2p community, and implementations are free to develop
 whatever prioritization system makes sense.
+
+#### Supported protocols
+
+A libp2p node SHOULD scope its set of supported protocols to the underlying
+physical connection to a peer. It MAY only support a protocol based on properties
+of a physical connection to e.g. limit the use of bandwidth-heavy protocols over
+a relayed or metered connection. A libp2p node MAY offer different sets of protocols
+to different peers. It MAY revoke or add the support for a protocol at any time,
+for example to only offer certain services after learning its NAT status on a connection.
+Therefore, libp2p nodes SHOULD NOT assume that the set of protocols on a connection
+is static.
 
 ### Connection Lifecycle Events
 
