@@ -254,13 +254,16 @@ connection for the duration of any reservations and tag it to prevent
 accidental termination according to its connection management policy.
 If a relay server becomes overloaded however, it may still drop a
 connection with reservations in order to maintain its resource quotas.
-  
+
 If more data than the limit specified in the `data` field is transferred
-over the relayed connection, or the relayed connection has been open for longer than `duration`, the relay should reset the stream to the source and the stream to the destination. If the reservation
-for the connection has expired the server may then apply any connection
-management policy to the connection as normal otherwise it should retain
-the connection, unless doing so would prevent it from maintaining its resource
-quotas.
+over the relayed connection, or the relayed connection has been open for
+longer than `duration`, the relay should reset the stream to the source
+and the stream to the destination.
+
+If the reservation for the connection has expired then the relay may
+apply any connection management policy to the connection as normal otherwise
+it should retain the connection, unless doing so would prevent it from
+maintaining its resource quotas.
 
 ***Note: Implementations _should not_ accept reservations over already relayed connections.***
 
