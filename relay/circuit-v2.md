@@ -224,7 +224,7 @@ Reservation {
 }
 ```
 
-- the `expire` field contains the expiration time as a UTC UNIX time. The reservation becomes invalid after this time and it's the responsibility of the client to refresh.
+- the `expire` field contains the expiration time as a UTC UNIX time in seconds. The reservation becomes invalid after this time and it's the responsibility of the client to refresh.
 - the `addrs` field contains all the public relay addrs, including the peer ID of the relay node but not the
   trailing `p2p-circuit` part; the client can use this list to construct its
   own `p2p-circuit` relay addrs for advertising by encapsulating
