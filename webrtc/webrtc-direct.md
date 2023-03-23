@@ -1,4 +1,4 @@
-# WebRTC browser-to-server
+# WebRTC Direct
 
 | Lifecycle Stage | Maturity                  | Status | Latest Revision |
 |-----------------|---------------------------|--------|-----------------|
@@ -23,12 +23,12 @@ specification](../webtransport)).
 
 ## Addressing
 
-WebRTC multiaddresses are composed of an IP and UDP address component, followed
-by `/webrtc` and a multihash of the certificate that the node uses.
+WebRTC Direct multiaddresses are composed of an IP and UDP address component, followed
+by `/webrtc-direct` and a multihash of the certificate that the node uses.
 
 Examples:
-- `/ip4/1.2.3.4/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`
-- `/ip6/fe80::1ff:fe23:4567:890a/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`
+- `/ip4/1.2.3.4/udp/1234/webrtc-direct/certhash/<hash>/p2p/<peer-id>`
+- `/ip6/fe80::1ff:fe23:4567:890a/udp/1234/webrtc-direct/certhash/<hash>/p2p/<peer-id>`
 
 The TLS certificate fingerprint in `/certhash` is a
 [multibase](https://github.com/multiformats/multibase) encoded
@@ -58,7 +58,7 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
 
 2. Browser _A_ discovers server node _B_'s multiaddr, containing _B_'s IP, UDP
   port, TLS certificate fingerprint and optionally libp2p peer ID (e.g.
-  `/ip6/2001:db8::/udp/1234/webrtc/certhash/<hash>/p2p/<peer-id>`), through some
+  `/ip6/2001:db8::/udp/1234/webrtc-direct/certhash/<hash>/p2p/<peer-id>`), through some
   external mechanism.
 
 3. _A_ instantiates a `RTCPeerConnection`. See
@@ -253,7 +253,7 @@ prologue = "6c69627032702d7765627274632d6e6f6973653a12203e79af40d6059617a0d83b83
   adopt this optimization.
 
   Note, one can role out a new version of the libp2p WebRTC protocol through a
-  new multiaddr protocol, e.g. `/webrtc-2`.
+  new multiaddr protocol, e.g. `/webrtc-direct-2`.
 
 - _Why exchange fingerprints in an additional authentication handshake on top of
   an established WebRTC connection? Why not only exchange signatures of ones TLS

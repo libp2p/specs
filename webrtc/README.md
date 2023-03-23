@@ -13,7 +13,12 @@ Interest Group: [@marten-seemann]
 
 WebRTC flavors in libp2p:
 
-1. [WebRTC browser-to-server](./browser-to-server.md)
+1. [WebRTC](./webrtc.md)
+
+   libp2p transport protocol enabling two private nodes (e.g. two browsers) to
+   establish a direct connection.
+
+2. [WebRTC Direct](./webrtc-direct.md)
 
    libp2p transport protocol **without the need for trusted TLS certificates.**
    Enable browsers to connect to public server nodes without those server nodes
@@ -23,11 +28,6 @@ WebRTC flavors in libp2p:
    QUIC connection from within a browser. We can establish a WebTransport
    connection from the browser (see [WebTransport
    specification](../webtransport)).
-
-2. [WebRTC Private-to-Private](./private-to-private.md)
-
-   libp2p transport protocol enabling two private nodes (e.g. two browsers) to
-   establish a direct connection.
 
 ## Shared
 
