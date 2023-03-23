@@ -84,6 +84,8 @@ The `PublicKey` message uses the same definition [specified in the peer id
 spec][peer-id-spec-pubkey-message]. For reference, it is defined as follows:
 
 ``` protobuf
+syntax = "proto2";
+
 enum KeyType {
 	RSA = 0;
 	Ed25519 = 1;

@@ -506,6 +506,8 @@ The four control messages are `ControlIHave` for [`IHAVE`](#ihave) messages,
 The protobuf is as follows:
 
 ```protobuf
+syntax = "proto2";
+
 message RPC {
     // ... see definition in pubsub interface spec
 	optional ControlMessage control = 3;

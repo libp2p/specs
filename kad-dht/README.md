@@ -401,6 +401,8 @@ bytes, encoded as an unsigned variable length integer as defined by the
 All RPC messages conform to the following protobuf:
 
 ```protobuf
+syntax = "proto2";
+
 // Record represents a dht record that contains a value
 // for a key value pair
 message Record {
