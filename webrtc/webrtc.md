@@ -11,7 +11,7 @@ Authors: [@mxinden]
 libp2p transport protocol enabling two private nodes (e.g. two browsers) to establish a direct connection.
 
 Browser _A_ wants to connect to Browser node _B_ with the help of server node _R_.
-Both _A_ and _B_ can not listen for incoming connections due to running in a constrained environment (i.e. a browser) with its only transport capability being the W3C WebRTC `RTCPeerConnection` API and being behind a NAT and/or firewall.
+Both _A_ and _B_ cannot listen for incoming connections due to running in a constrained environment (i.e. a browser) with its only transport capability being the W3C WebRTC `RTCPeerConnection` API and being behind a NAT and/or firewall.
 Note that _A_ and/or _B_ may as well be non-browser nodes behind NATs and/or firewalls.
 However, for two non-browser nodes using TCP or QUIC hole punching with [DCUtR] will be the more efficient way to establish a direct connection.
 
@@ -52,7 +52,7 @@ On a historical note, this specification replaces the existing [libp2p WebRTC st
 
 A node needs to discover its public IP and port, which is forwarded to the remote node in order to connect to the local node.
 On non-browser libp2p nodes doing a hole punch with TCP or QUIC, the libp2p node discovers its public address via the [identify] protocol.
-One can not use the [identify] protocol on browser nodes to discover ones public IP and port given that the browser uses a new port for each connection.
+One cannot use the [identify] protocol on browser nodes to discover ones public IP and port given that the browser uses a new port for each connection.
 For example say that the local browser node establishes a WebRTC connection C1 via browser-to-server to a server node and runs the [identify] protocol.
 The returned observed public port P1 will most likely (depending on the NAT) be a different port than the port observed on another connection C2.
 The only browser supported mechanism to discover ones public IP and port for a given connection is the non-libp2p protocol STUN.
