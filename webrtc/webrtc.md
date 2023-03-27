@@ -57,7 +57,7 @@ On non-browser libp2p nodes doing a hole punch with TCP or QUIC, the libp2p node
 One cannot use the [identify] protocol on browser nodes to discover ones public IP and port given that the browser uses a new port for each connection.
 For example say that the local browser node establishes a WebRTC connection C1 via browser-to-server to a server node and runs the [identify] protocol.
 The returned observed public port P1 will most likely (depending on the NAT) be a different port than the port observed on another connection C2.
-The only browser supported mechanism to discover ones public IP and port for a given connection is the non-libp2p protocol STUN.
+The only browser supported mechanism to discover ones public IP and port for a given WebRTC connection is the non-libp2p protocol STUN.
 This is why this specification depends on STUN, and thus the availability of one or more STUN servers for _A_ and _B_ to discovery their public addresses.
 
 There are various publicly available STUN servers.
