@@ -29,7 +29,7 @@ WebRTC flavors in libp2p:
    connection from the browser (see [WebTransport
    specification](../webtransport)).
 
-## Shared
+## Shared concepts
 
 ### Multiplexing
 
