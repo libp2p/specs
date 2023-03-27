@@ -30,6 +30,8 @@ On a historical note, this specification replaces the existing [libp2p WebRTC st
    See [STUN](#stun) section on what STUN servers to configure at creation time.
    _A_ creates an SDP offer via `RTCPeerConnection.createOffer()`.
    _A_ initiates the signaling protocol to _B_ via the relayed connection from (1), see [Signaling Protocol](#signaling-protocol) and sends the offer to _B_.
+   Note that _A_ being the initiator of the stream is merely a convention preventing both nodes to simultaneously initiate a new connection thus potentially resulting in two WebRTC connections.
+   _A_ MUST as well be able to handle an incoming signaling protocol stream to support the case where _B_ initiates the signaling process.
 
 5. On reception of the incoming stream, _B_ (inbound side of relayed connection) creates an `RTCPeerConnection`.
    Again see [STUN](#stun) section on what STUN servers to configure at creation time.
