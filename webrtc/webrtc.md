@@ -60,8 +60,7 @@ The returned observed public port P1 will most likely (depending on the NAT) be 
 The only browser supported mechanism to discover ones public IP and port for a given WebRTC connection is the non-libp2p protocol STUN.
 This is why this specification depends on STUN, and thus the availability of one or more STUN servers for _A_ and _B_ to discovery their public addresses.
 
-There are various publicly available STUN servers.
-As an alternative one may operate dedicated STUN servers for a given libp2p network.
+Implementations MAY use one of the publicly available STUN servers, or deploy a dedicated server for a given libp2p network.
 Further specification of the usage of STUN is out of scope for this specifitcation.
 
 As an aside, note that _A_ and _B_ do not need to use the same STUN server in order to establish a direct WebRTC connection.
