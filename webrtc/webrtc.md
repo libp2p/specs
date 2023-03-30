@@ -63,7 +63,7 @@ This is why this specification depends on STUN, and thus the availability of one
 Implementations MAY use one of the publicly available STUN servers, or deploy a dedicated server for a given libp2p network.
 Further specification of the usage of STUN is out of scope for this specifitcation.
 
-It is not necessary that _A_ and _B_ do not need to use the same STUN server in order to establish a direct WebRTC connection.
+It is not necessary for _A_ and _B_ to use the same STUN server when establishing a WebRTC connection.
 
 ## Signaling Protocol
 
