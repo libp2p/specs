@@ -23,7 +23,7 @@ On a historical note, this specification replaces the existing [libp2p WebRTC st
 
 2. Upon discovery of _B_'s multiaddress, _A_ learns that _B_ supports the WebRTC transport and knows how to establish a relayed connection to _B_ to run the `/webrtc-signaling` protocol on top.
 
-3. _A_ establish a relayed connection to _B_.
+3. _A_ establishes a relayed connection to _B_.
    Note that further steps depend on the relayed connection to be authenticated, i.e. that data sent on the relayed connection can be trusted.
 
 4. _A_ (outbound side of relayed connection) creates an `RTCPeerConnection` provided by a W3C compliant WebRTC implementation (e.g. a browser).
