@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity                  | Status | Latest Revision |
 |-----------------|---------------------------|--------|-----------------|
-| 2A              | Candidate Recommendation  | Active | r0, 2022-10-14  |
+| 2A              | Candidate Recommendation  | Active | r1, 2023-04-12  |
 
 Authors: [@mxinden]
 

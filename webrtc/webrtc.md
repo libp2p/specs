@@ -1,8 +1,8 @@
 # WebRTC
 
-| Lifecycle Stage | Maturity      | Status | Latest Revision |
-|-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r0, 2023-03-03  |
+| Lifecycle Stage | Maturity                 | Status | Latest Revision |
+|-----------------|--------------------------|--------|-----------------|
+| 2A              | Candidate Recommendation | Active | r0, 2023-04-12  |
 
 Authors: [@mxinden]
 
