@@ -83,7 +83,7 @@ SHOULD include the address it successfully dialed in its response.
 The initiator uses the responses obtained from multiple peers to determine its
 NAT status. If more than 3 peers report a successfully dialed address, the node
 SHOULD assume that it is not located behind a NAT and publicly accessible. On
-the other hand, if more than 3 peers report unsuccessful dials, the node SHOULD
+the other hand, if less than 3 peers report unsuccessful dials, the node SHOULD
 assume that it is not publicly accessible.
 Nodes are encouraged to periodically re-check their status, especially after
 changing their set of addresses they're listening on.
