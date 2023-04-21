@@ -33,7 +33,10 @@ test individual addresses discovered by different sources like identify, upnp
 mappings, circuit addresses etc for reachability. Having a priority ordered list
 of addresses provides the ability to verify low priority addresses.
 Implementations can generate low priority address guesses and add them to
-requests for high priority addresses as a nice to have. 
+requests for high priority addresses as a nice to have. This is especially
+helpful when introducing a new transport. Initially, such a transport will not
+be widely supported in the network. Requests for verifying such addresses can be
+reused to get information about other addresses
 
 Compared to `autonat v1` there are two major differences
 1. `autonat v1` allowed testing reachability for the node. `autonat v2` allows
@@ -56,18 +59,18 @@ Upon receiving this message the peer attempts to dial the first address from the
 list that it is capable of dialing. It dials this address, opens a stream with
 Protocol ID `/libp2p/autonat/2.0.0/dial-attempt` and sends a `DialAttempt`
 message with the nonce received in the corresponding `AddressDialRequest`. The
-peer MUST dial the first address in the list it is capable of dialing. The peer
-MUST NOT dial any address not in the list of addresses sent in the request. The
-peer MUST ignore errors on `/libp2p/autonat/2.0.0/dial-attempt` stream
+peer MUST NOT dial any address other than the first address in the list that it
+is capable of dialing.
 
 Upon completion of the dial attempt, the peer sends a `DialResponse` message to
 the initiator node on the `/libp2p/autonat/2.0.0/dial-request` stream with the
-address that it attempted to dial and the appropriate `ResponseStatus`. see
-[Requirements For ResponseStatus](#requirements-for-responsestatus)
+index(0 based) of the address that it attempted to dial and the appropriate
+`ResponseStatus`. see [Requirements For
+ResponseStatus](#requirements-for-responsestatus)
 
-The initiator SHOULD check that the nonce received in the `DialAttempt` is the
+The initiator MUST check that the nonce received in the `DialAttempt` is the
 same as the nonce the initiator sent in the `AddressDialRequest` for the address
-received in `DialResponse`. If the nonce is different, the initiator MUST
+index received in `DialResponse`. If the nonce is different, the initiator MUST
 discard this response.
 
 
@@ -182,7 +185,7 @@ message DialResponse {
 
     ResponseStatus status = 1;
     string statusText = 2;
-    bytes addr = 3;
+    int32 addrIdx = 3;
 }
 ```
 
