@@ -1,0 +1,19 @@
+@startuml
+participant Cli
+participant Srv
+
+skinparam backgroundColor white
+skinparam sequenceMessageAlign center
+
+== Dial Request Success==
+
+Cli -> Srv: [dial] DialRequest: (Addr1, Token1), (Addr2, Token2)
+Srv -> Cli: [attempt] DialAttempt: Token2
+Srv -> Cli: [dial] DialResponse: STATUS: OK, CandidateIdx: 1
+
+== Dial Request Failure==
+
+Cli -> Srv: [dial] DialRequest: (Addr1, Token1), (Addr2, Token2)
+Srv ->x Cli: [attempt] DialAttempt: Token2
+Srv -> Cli: [dial] DialResponse: STATUS: E_DIAL_ERROR, CandidateIdx: 1
+@enduml

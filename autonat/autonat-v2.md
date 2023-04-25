@@ -47,6 +47,10 @@ actually successfully dialled an address.
 
 ## AutoNAT V2 Protocol
 
+
+![Autonat V2 Interaction](autonat-v2.svg)
+
+
 A node wishing to determine reachability of its adddresses sends a `DialRequest`
 message to a peer on a stream with protocol ID
 `/libp2p/autonat/2.0.0/dial`. 
