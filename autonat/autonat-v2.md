@@ -49,35 +49,35 @@ actually successfully dialled an address.
 
 A node wishing to determine reachability of its adddresses sends a `DialRequest`
 message to a peer on a stream with protocol ID
-`/libp2p/autonat/2.0.0/dial-request`. 
+`/libp2p/autonat/2.0.0/dial`. 
 
-This `DialRequest` message has a list of `AddressDialRequest`s. Each item in
+This `DialRequest` message has a list of `Candidate`s. Each item in
 this list contains an address and a fixed64 nonce. The list is ordered in
 descending order of priority for verfication.
 
-Upon receiving this message the peer attempts to dial the first address from the
-list that it is capable of dialing. It dials this address, opens a stream with
-Protocol ID `/libp2p/autonat/2.0.0/dial-attempt` and sends a `DialAttempt`
-message with the nonce received in the corresponding `AddressDialRequest`. The
-peer MUST NOT dial any address other than the first address in the list that it
-is capable of dialing.
+Upon receiving this message the peer attempts to dial the first candidate from
+the list of candidates that it is capable of dialing. It dials the candidate
+address, opens a stream with Protocol ID `/libp2p/autonat/2.0.0/attempt` and
+sends a `DialAttempt` message with the candidate nonce. The peer MUST NOT dial
+any candidate other than the first candidate in the list that it is capable of
+dialing.
 
 Upon completion of the dial attempt, the peer sends a `DialResponse` message to
-the initiator node on the `/libp2p/autonat/2.0.0/dial-request` stream with the
-index(0 based) of the address that it attempted to dial and the appropriate
+the initiator node on the `/libp2p/autonat/2.0.0/dial` stream with the
+index(0 based) of the candidate that it attempted to dial and the appropriate
 `ResponseStatus`. see [Requirements For
 ResponseStatus](#requirements-for-responsestatus)
 
 The initiator MUST check that the nonce received in the `DialAttempt` is the
-same as the nonce the initiator sent in the `AddressDialRequest` for the address
+same as the nonce the initiator sent in the `Candidate` for the candidate
 index received in `DialResponse`. If the nonce is different, the initiator MUST
 discard this response.
 
 
 ### Requirements for ResponseStatus
 
-On receiving a `DialRequest` the peer selects the first address on the list it
-is capable of dialing. This address is referred to as _addr_. The
+On receiving a `DialRequest` the peer selects the first candidate on the list it
+is capable of dialing. This candidate address is referred to as _addr_. The
 `ResponseStatus` sent by the peer in the `DialResponse` message MUST be set
 according to the following requirements
 
@@ -92,11 +92,12 @@ resource limit reached or blacklisting.
 requested addresses.
 
 `E_BAD_REQUEST`: the peer didn't attempt a dial because it was unable to decode
-the message. This includes inability to decode the requested address to dial.
+the message.
 
 `E_INTERNAL_ERROR`: error not classified within the above error codes occured on
 peer that prevented it from completing the request.
 
+Implementations MUST discard responses with status codes they do not understand
 
 ### Consideration for DDOS Prevention
 
@@ -138,39 +139,35 @@ All RPC messages sent over a stream are prefixed with the message length in
 bytes, encoded as an unsigned variable length integer as defined by the
 [multiformats unsigned-varint spec][uvarint-spec]. 
 
-All RPC messages are of type `Message`. A `DialRequest` message is sent as a
-`Message` with the `dialRequest` field set and the `type` field set to
-`DIAL_REQUEST`. Other message types `DialResponse` and `DialAttempt` are handled
+All RPC messages on stream `/libp2p/autonat/2.0.0/dial` are of type
+`DialMessage`. A `DialRequest` message is sent as a `DialMessage` with the `dialRequest`
+field set and the `type` field set to `DIAL_REQUEST`. `DialResponse` is handled
 similarly.
 
+On stream `/libp2p/autonat/2.0.0/attempt`, there is a single message type
+`AttemptMessage`
 
 ```proto
 syntax = "proto3";
 
-message Message {
-  enum MessageType {
+message DialMessage {
+  enum Type {
     DIAL_REQUEST  = 0;
     DIAL_RESPONSE = 1;
-    DIAL_ATTEMPT  = 2;
   }
 
-  MessageType type          = 1;
+  Type type          = 1;
   DialRequest dialRequest   = 2;
   DialResponse dialResponse = 3;
-  DialAttempt dialAttempt   = 4;
 }
 
-message AddressDialRequest {
+message Candidate {
   bytes addr = 1;
   fixed64 nonce = 2;
 }
 
 message DialRequest {
-  repeated AddressDialRequest addressDialRequests = 1;
-}
-
-message DialAttempt {
-    fixed64 nonce = 1;
+  repeated Candidate candidates = 1;
 }
 
 message DialResponse {
@@ -186,6 +183,19 @@ message DialResponse {
     ResponseStatus status = 1;
     string statusText = 2;
     int32 addrIdx = 3;
+}
+
+message AttemptMessage {
+  enum Type {
+    DIAL_ATTEMPT = 0;
+  }
+
+  Type type = 1;
+  DialAttempt dialAttempt = 2;
+}
+
+message DialAttempt {
+    fixed64 nonce = 1;
 }
 ```
 
