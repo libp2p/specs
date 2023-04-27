@@ -27,16 +27,17 @@ peers to establish a relayed connection.
 
 In `autonat v2` client sends a priority ordered list of addresses. On receiving
 this list the server dials the first address on the list that it is capable of
-dialing. `autonat v2` allows nodes to determine reachability for individual
-addresses. Using `autonat v2` nodes can build an address pipeline where they can
-test individual addresses discovered by different sources like identify, upnp
-mappings, circuit addresses etc for reachability. Having a priority ordered list
-of addresses provides the ability to verify low priority addresses.
-Implementations can generate low priority address guesses and add them to
-requests for high priority addresses as a nice to have. This is especially
-helpful when introducing a new transport. Initially, such a transport will not
-be widely supported in the network. Requests for verifying such addresses can be
-reused to get information about other addresses
+dialing. As the server dials _exactly_ one address from the list, `autonat v2`
+allows nodes to determine reachability for individual addresses. Using `autonat
+v2` nodes can build an address pipeline where they can test individual addresses
+discovered by different sources like identify, upnp mappings, circuit addresses
+etc for reachability. Having a priority ordered list of addresses provides the
+ability to verify low priority addresses. Implementations can generate low
+priority address guesses and add them to requests for high priority addresses as
+a nice to have. This is especially helpful when introducing a new transport.
+Initially, such a transport will not be widely supported in the network.
+Requests for verifying such addresses can be reused to get information about
+other addresses
 
 Compared to `autonat v1` there are two major differences
 1. `autonat v1` allowed testing reachability for the node. `autonat v2` allows
@@ -52,30 +53,33 @@ actually successfully dialled an address.
 
 
 A node wishing to determine reachability of its adddresses sends a `DialRequest`
-message to a peer on a stream with protocol ID
-`/libp2p/autonat/2.0.0/dial`. 
+message to a peer on a stream with protocol ID `/libp2p/autonat/2.0.0/dial`.
+Each `DialRequest` is sent on a new stream.
 
-This `DialRequest` message has a list of `Candidate`s. Each item in
-this list contains an address and a fixed64 nonce. The list is ordered in
-descending order of priority for verfication.
+This `DialRequest` message has a list of `Candidate`s. Each item in this list
+contains an address and a fixed64 nonce. The list is ordered in descending order
+of priority for verfication.
 
-Upon receiving this message the peer attempts to dial the first candidate from
-the list of candidates that it is capable of dialing. It dials the candidate
+Upon receiving this message the peer selects the first candidate from the list
+of candidates that it is capable of dialing. The peer MUST NOT dial any
+candidate other than this selected candidate. It dials the selected candidate's
 address, opens a stream with Protocol ID `/libp2p/autonat/2.0.0/attempt` and
-sends a `DialAttempt` message with the candidate nonce. The peer MUST NOT dial
-any candidate other than the first candidate in the list that it is capable of
-dialing.
+sends a `DialAttempt` message with the candidate nonce. The peer MUST close this
+stream after sending the `DialAttempt` message.
 
 Upon completion of the dial attempt, the peer sends a `DialResponse` message to
-the initiator node on the `/libp2p/autonat/2.0.0/dial` stream with the
-index(0 based) of the candidate that it attempted to dial and the appropriate
+the initiator node on the `/libp2p/autonat/2.0.0/dial` stream with the index(0
+based) of the candidate that it attempted to dial and the appropriate
 `ResponseStatus`. see [Requirements For
 ResponseStatus](#requirements-for-responsestatus)
 
 The initiator MUST check that the nonce received in the `DialAttempt` is the
-same as the nonce the initiator sent in the `Candidate` for the candidate
-index received in `DialResponse`. If the nonce is different, the initiator MUST
+same as the nonce the initiator sent in the `Candidate` for the candidate index
+received in `DialResponse`. If the nonce is different, the initiator MUST
 discard this response.
+
+The peer MUST close the stream after sending the response. The initiator MUST
+close the stream after receiving the response.
 
 
 ### Requirements for ResponseStatus
@@ -136,6 +140,10 @@ unreachable if more than 3 peers report unsuccessful dials.
 
 Implementations are free to use different heuristics than this one
 
+Implementations SHOULD only verify reachability for private addresses as defined
+in [RFC 1918](https://datatracker.ietf.org/doc/html/rfc1918) with peers that are
+on the same subnet
+
 
 ## RPC Messages
 
@@ -144,9 +152,9 @@ bytes, encoded as an unsigned variable length integer as defined by the
 [multiformats unsigned-varint spec][uvarint-spec]. 
 
 All RPC messages on stream `/libp2p/autonat/2.0.0/dial` are of type
-`DialMessage`. A `DialRequest` message is sent as a `DialMessage` with the `dialRequest`
-field set and the `type` field set to `DIAL_REQUEST`. `DialResponse` is handled
-similarly.
+`DialMessage`. A `DialRequest` message is sent as a `DialMessage` with the
+`dialRequest` field set and the `type` field set to `DIAL_REQUEST`.
+`DialResponse` is handled similarly.
 
 On stream `/libp2p/autonat/2.0.0/attempt`, there is a single message type
 `AttemptMessage`
@@ -185,8 +193,7 @@ message DialResponse {
     }
 
     ResponseStatus status = 1;
-    string statusText = 2;
-    int32 addrIdx = 3;
+    int32 addrIdx = 2;
 }
 
 message AttemptMessage {
