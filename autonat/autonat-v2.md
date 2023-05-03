@@ -44,8 +44,8 @@ Compared to `autonat v1` there are two major differences
 testing reachability for an individual address
 2. `autonat v2` provides a mechanism for nodes to verify whether the peer
 actually successfully dialled an address.
-3. `autonat v2` provides a mechanism for nodes to dial an ip address different
-from the requesting node's observed ip address without risking amplification
+3. `autonat v2` provides a mechanism for nodes to dial an IP address different
+from the requesting node's observed IP address without risking amplification
 attacks. `autonat v1` disallowed such dials to prevent amplification attacks.
 
 
@@ -67,11 +67,11 @@ of priority for verfication.
 Upon receiving this message the peer selects the first candidate from the list
 of candidates that it is capable of dialing. The peer MUST NOT dial any
 candidate other than this selected candidate. If this selected candidate address
-has an ip address different from the requesting node's observed ip address, peer
+has an IP address different from the requesting node's observed IP address, peer
 initiates the Amplification attack prevention mechanism (see [Amplification
 Attack Prevention](#amplification-attack-prevention) ). On completion, the peer
-proceeds to the next step. If the selected address has the same ip address as
-the requesting node's observed ip address, peer directly proceeds to the next
+proceeds to the next step. If the selected address has the same IP address as
+the requesting node's observed IP address, peer directly proceeds to the next
 step skipping Amplification Attack prevention steps.
 
 
@@ -122,20 +122,20 @@ Implementations MUST discard responses with status codes they do not understand
 
 ### Amplification Attack Prevention
 
-When a client asks a server to dial an address that is not the clients observed
-ip address, the server asks the client to send him some non trivial amount of
-bytes as a cost to dial a different ip address. To make amplification attacks
+When a client asks a server to dial an address that is not the client's observed
+IP address, the server asks the client to send him some non trivial amount of
+bytes as a cost to dial a different IP address. To make amplification attacks
 unattractive, the number of bytes is decided such that it's sufficiently larger
 than a new connection handshake cost.
 
 On receiving a `DialRequest`, the server selects the first address it is capable
-of dialing. If this selected address has a ip different from the clients
+of dialing. If this selected address has a IP different from the client's
 observed ip, the server sends a `DialDataRequest` message with `numBytes` set to
 a sufficiently large value on the `/libp2p/autonat/2.0.0/dial-request` stream
 
 Upon receiving a `DialDataRequest` message, the client decides whether to accept
 or reject the cost of dial. If the client rejects the cost, the client resets
-the stream and the `DialRequest` is considered complete. If the client accepts
+the stream and the `DialRequest` is considered aborted. If the client accepts
 the cost, the client starts transferring `numBytes` bytes to the server. The
 server on receiving `numBytes` bytes proceeds to dial the candidate address. 
 
