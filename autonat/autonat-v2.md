@@ -164,26 +164,20 @@ bytes, encoded as an unsigned variable length integer as defined by the
 
 All RPC messages on stream `/libp2p/autonat/2.0.0/dial` are of type
 `DialMessage`. A `DialRequest` message is sent as a `DialMessage` with the
-`dialRequest` field set and the `type` field set to `DIAL_REQUEST`.
-`DialResponse` and `DialDataRequest` are handled similarly.
-
-On stream `/libp2p/autonat/2.0.0/attempt`, there is a single message type
-`AttemptMessage`
+`dialRequest` field set to `DialRequest` message. `DialResponse` and
+`DialDataRequest` are handled similarly. On stream
+`/libp2p/autonat/2.0.0/attempt`, there is a single message type `AttemptMessage`
+where `DialAttempt` is handled similarly. 
 
 ```proto
 syntax = "proto3";
 
 message DialMessage {
-  enum Type {
-    DIAL_REQUEST      = 0;
-    DIAL_RESPONSE     = 1;
-    DIAL_DATA_REQUEST = 2;
+  oneof msg {
+    DialRequest dialRequest   = 1;
+    DialResponse dialResponse = 2;
+    DialDataRequest dialDataRequest = 3;
   }
-
-  Type type          = 1;
-  DialRequest dialRequest   = 2;
-  DialResponse dialResponse = 3;
-  DialDataRequest dialDataRequest = 4;
 }
 
 message Candidate {
@@ -214,12 +208,9 @@ message DialResponse {
 }
 
 message AttemptMessage {
-  enum Type {
-    DIAL_ATTEMPT = 0;
+  oneof msg {
+    DialAttempt dialAttempt = 1;
   }
-
-  Type type = 1;
-  DialAttempt dialAttempt = 2;
 }
 
 message DialAttempt {
