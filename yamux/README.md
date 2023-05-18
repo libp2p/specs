@@ -152,12 +152,18 @@ The Length should be set to one of the following to provide an error code:
 
 ## Implementation considerations
 
-### ACK backlog
+### ACK backlog & backpressure
 
 Yamux allows for a stream to be opened (and used) before it is acknowledged by the remote.
-The ACK backlog is defined as the number of streams that a peer has opened which have not yet been acknowledged.
-Implementations SHOULD at most allow an ACK backlog of 256 streams.
-Implementations SHOULD buffer at least 256 unacknowledged inbound streams.
-Implementations SHOULD NOT implicitly acknowledge streams but wait for the application to send the first DATA frame.
+Yamux also does not specify a backpressure mechanism for opening new streams.
 
-Whilst the specification does not forsee a backpressure mechanism for opening new streams, implementing the ACK backlog as described above provides a limited form of backpressure that is backwards-compatible.
+This presents a problem:
+A peer must read from the socket and decode the frames to make progress on existing streams.
+But any frame could also open yet another stream.
+
+The ACK backlog is defined as the number of streams that a peer has opened which have not yet been acknowledged.
+To support a basic form of backpressure, implementions:
+
+- SHOULD at most allow an ACK backlog of 256 streams.
+- SHOULD buffer at least 256 unacknowledged inbound streams.
+- SHOULD NOT implicitly acknowledge streams but wait for the application to send the first DATA frame.
