@@ -648,7 +648,7 @@ connect to the rest of the libp2p network.
 
 ### WebRTC
 
-**Status**: In progress
+**Status**: Done
 
 **What?** WebRTC is a transport protocol supported by all major browsers. Those
 browsers allow the establishment of connections to remote endpoints that don't
