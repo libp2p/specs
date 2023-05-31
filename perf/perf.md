@@ -8,7 +8,7 @@ Authors: [@marcopolo]
 
 Interest Group: [@marcopolo], [@mxinden], [@marten-seemann]
 
-[@marcopolo]: https://github.com/mxinden
+[@marcopolo]: https://github.com/marcopolo
 [@mxinden]: https://github.com/mxinden
 [@marten-seemann]: https://github.com/marten-seemann
 
@@ -73,7 +73,7 @@ for some other benchmarks (called _scenarios_ in the document).
 
 ## Single connection throughput
 
-For an upload test, the client sets the the server response size 0 bytes, writes
+For an upload test, the client sets the the server response size to 0 bytes, writes
 some amount of data and closes the stream.
 
 For a download test, the client sets the server response size to N bytes, and
