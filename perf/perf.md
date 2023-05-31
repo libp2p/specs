@@ -106,7 +106,7 @@ To run this benchmark:
 3. once a connection is established, the client closes it and establishes
    another one.
 
-handshakes per second are calculated by taking the total number of connections
+Handshakes per second are calculated by taking the total number of connections
 successfully established and divide it by the time period of the test.
 
 # Security Considerations
