@@ -35,7 +35,13 @@ is almost identical to Nick Bank's [_QUIC Performance_
 Internet-Draft](https://datatracker.ietf.org/doc/html/draft-banks-quic-performance#section-2.3)
 but adapted to libp2p.
 The protocol first performs an upload of a client-chosen amount of bytes. Once
-that upload has finished, the server sends back as many bytes as the client requested.
+that upload has finished, the server sends back as many bytes as the client
+requested.
+
+The bytes themselves should be a predetermined arbitrary set of bytes. Zero is
+fine, but so is random bytes (as long as it's not a different set of random
+bytes, because then you may be limited by how fast you can generate random
+bytes).
 
 
 The protocol is as a follows:
