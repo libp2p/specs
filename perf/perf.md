@@ -45,7 +45,8 @@ Client:
 1. Open a libp2p stream to the server.
 2. Tell the server how many bytes we want the server to send us as a single
    big-endian uint64 number. Zero is a valid number, so is the max uint64 value.
-3. Optional: Write some amount of data to the stream.
+3. Write some amount of data to the stream.
+     Zero is a valid amount.
 4. Close the write side of our stream.
 5. Read from the read side of the stream. This
    should be the same number of bytes as we told the server in step 2.
