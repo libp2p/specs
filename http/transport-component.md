@@ -76,7 +76,7 @@ The HTTP Path exists in the user protocol level. In the HTTP semantics. You can
 use these semantics on any transport including, but not limited to, the HTTP
 transport.
 
-For example, say you want to fetch a file using the [IPFS trustless
+For example, say you want to fetch a file using the [IPFS trustless HTTP
 gateway](https://docs.ipfs.tech/reference/http/gateway/). It may be tempting to
 use the following URL to reference a file:
 
