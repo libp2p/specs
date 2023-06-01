@@ -31,8 +31,7 @@ avoid confusion and conflicting interpretations.
 ## What is an HTTP transport
 
 An HTTP transport is simply a node that can speak some standardized version of
-HTTP that is at least HTTP/1.1. Currently that means HTTP/1.1, HTTP/2, and
-HTTP/3. Intuitively if you can `curl` it with HTTP, then it speaks HTTP.
+HTTP. Intuitively if you can `curl` it with HTTP, then it speaks HTTP.
 
 Most environments will have a way to create an HTTP Client and Server, and the
 specific HTTP version used will be opaque. The client will negotiate (or [learn
