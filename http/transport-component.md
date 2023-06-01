@@ -34,14 +34,11 @@ An HTTP transport is simply a node that can speak some standardized version of
 HTTP. Intuitively if you can `curl` it with HTTP, then it speaks HTTP.
 
 Most environments will have a way to create an HTTP Client and Server, and the
-specific HTTP version used will be opaque. The client will negotiate (or [learn
-about](https://www.rfc-editor.org/rfc/rfc9114.html#section-3.1.1)) the specific HTTP version to use when communicating
-with the HTTP server.
-
-For this opaque case, we use the `/http` component at the end of the multidadr.
-The end user agent decides on HTTP version to use, based on the multiaddr
-prefix, application, server negotiation, and specific use case. This follows
-what existing `http://` URL implementations do.
+specific HTTP version used will be opaque. We use the `/http` component at the
+end of the multidadr to signal that this server supports an HTTP transport. The
+end user agent decides on HTTP version to use, based on the multiaddr prefix,
+application, server negotiation, and specific use case. This follows what
+existing `http://` URL implementations do.
 
 ## Multiaddr representation
 
