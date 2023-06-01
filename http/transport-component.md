@@ -78,7 +78,7 @@ transport.
 
 For example, say you want to fetch a file using the [IPFS trustless HTTP
 gateway](https://specs.ipfs.tech/http-gateways/trustless-gateway/). It may be tempting to
-use the following URL to reference a file:
+use the following multiaddr to reference a file:
 
 ```
 /ip4/127.0.0.1/tcp/8080/http/httppath/ipfs%2fbafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi
