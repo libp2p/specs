@@ -66,46 +66,54 @@ The HTTP Path exists in the user protocol level. HTTP Semantics are transport-ag
 use these semantics on any transport including, but not limited to, the HTTP
 transports like [HTTP/1.1](https://www.rfc-editor.org/info/rfc7235), [HTTP/2](https://www.rfc-editor.org/info/rfc9113), or [HTTP/3](https://www.rfc-editor.org/info/rfc9114).
 
-For example, say you want to fetch a file using the [IPFS trustless HTTP
-gateway](https://specs.ipfs.tech/http-gateways/trustless-gateway/). It may be tempting to
-use the following multiaddr to reference a file:
+For example, say you want to signal that a node supports the [IPFS trustless
+HTTP gateway] protocol. It may be tempting to use the following multiaddr to
+signal that:
 
 ```
-/ip4/127.0.0.1/tcp/8080/http/httppath/ipfs%2fbafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi
+/ip4/127.0.0.1/tcp/8080/http/httppath/ipfs
 ```
 
 But `/http` is a transport and it doesn't accept any parameters. It would be the
 same as if we used the following multiaddr:
 
 ```
-/ip4/127.0.0.1/udp/1234/quic-v1/httppath/ipfs%2fbafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi
+/ip4/127.0.0.1/udp/1234/quic-v1/httppath/ipfs
 ```
 
-What does `httppath/` mean here? Does it mean make a `GET` request? How would
-you make a `POST` request? What about headers? Does it leave that unspecified
-and ask the user to specify that as they would with curl?
+What does `httppath/` mean here? `/quic-v1` is a transport and doesn't accept
+parameters. Who handles the input from `/httppath`?
 
-We could be more precise here and specify a `/GET` component to the multiaddr
-that accepts parameters and describes what user protocol we are trying to do
-here.
+What we're really trying to do here is to highlight that the node that can be
+found at those Multiaddrs supports the [IPFS trustless HTTP gateway] protocol.
+That can and should be done some other way such as
+[identify](https://github.com/libp2p/specs/tree/master/identify) or soon the
+[`.well-known/libp2p`](https://github.com/libp2p/specs/pull/529) HTTP endpoint
+or some other custom application logic.
+
+If having this information on the multiaddr is desired and you are willing to
+make the tradeoff of potentially multiplying the number of multiaddrs you have
+by the number of protocols you want to signal, you could use a multicodec from
+the [private use
+area](https://github.com/multiformats/multicodec#private-use-area) and append
+this to your multiaddr. The result would be something like:
 
 ```
-/ip4/127.0.0.1/udp/1234/http/GET/httppath/ipfs%2fbafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi
+myProtocol = 0x300000
 
-or
-
-/ip4/127.0.0.1/udp/1234/quic-v1/GET/httppath/ipfs%2fbafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi
+/ip4/127.0.0.1/tcp/8080/http/myProtocol
+/ip4/127.0.0.1/udp/1234/quic-v1/myProtocol
 ```
 
-This is fine since `httppath` passes the path parameter to `GET` which parses
-the rest of the multiaddr as the address of the node to connect to and make an
-HTTP GET request which can happen over an HTTP transport or any other transport
-(e.g. QUIC streams or yamux+noise+tcp).
+Note that the problem appears when we want to add another protocol here:
+```
+myProtocol = 0x300000
+anotherProtocol = 0x300001
 
-You may end up with a lot of duplicate information if you have many multiaddrs
-since each one will have the same suffix of `GET/httppath/...`. Therefore this
-isn't recommended, but may be useful if you just need one multiaddr
-with some extra protocol information.
+/ip4/127.0.0.1/tcp/8080/http/myProtocol
+/ip4/127.0.0.1/udp/1234/quic-v1/myProtocol
+/ip4/127.0.0.1/tcp/8080/http/anotherProtocol
+/ip4/127.0.0.1/udp/1234/quic-v1/anotherProtocol
+```
 
-To summarize, HTTP Paths don't make sense appended to an `/http` component, but may make sense
-appended to some other custom user protocol component.
+[IPFS trustless HTTP gateway]: (https://specs.ipfs.tech/http-gateways/trustless-gateway/)
