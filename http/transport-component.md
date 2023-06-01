@@ -72,7 +72,7 @@ information about a user protocol. However the `/http` component is not a user
 protocol, and it doesn't accept any parameters. It only signals that a node is
 capable of an HTTP transport.
 
-The HTTP Path exists in the user protocol level. In the HTTP semantics. You can
+The HTTP Path exists in the user protocol level. HTTP Semantics are transport-agnostic, and defined by [RFC 9110](https://httpwg.org/specs/rfc9110.html). You can
 use these semantics on any transport including, but not limited to, the HTTP
 transport.
 
