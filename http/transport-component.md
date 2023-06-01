@@ -40,11 +40,9 @@ about](https://www.rfc-editor.org/rfc/rfc9114.html#section-3.1.1)) the specific 
 with the HTTP server.
 
 For this opaque case, we use the `/http` component at the end of the multidadr.
-If a node wants to advertise specific HTTP versions it may advertise a
-`/http-1.1`, `/http-2`, or `/h3` instead. Although these components are not
-currently [registered](https://github.com/multiformats/multiaddr), this document
-claims their use.
-
+The end user agent decides on HTTP version to use, based on the multiaddr
+prefix, application, server negotiation, and specific use case. This follows
+what existing `http://` URL implementations do.
 
 ## Multiaddr representation
 
@@ -60,9 +58,7 @@ The following are examples of multiaddrs for HTTP transport capable nodes:
 * `/ip4/1.2.3.4/tcp/443/https`
 * `/ip4/1.2.3.4/tcp/443/tls/http`
 * `/ip6/2001:0db8:85a3:0000:0000:8a2e:0370:7334/tcp/443/tls/http`
-* `/ip4/1.2.3.4/udp/50781/tls/http` // We can infer this is an HTTP/3 address
-* `/ip4/1.2.3.4/udp/50781/quic-v1/http` // Not necessary to specify that the
-  HTTP endpoint is on top of QUIC, but it is okay if it does.
+* `/ip4/1.2.3.4/udp/50781/tls/http`
 
 
 ## HTTP Paths
