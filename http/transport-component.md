@@ -74,7 +74,7 @@ capable of an HTTP transport.
 
 The HTTP Path exists in the user protocol level. HTTP Semantics are transport-agnostic, and defined by [RFC 9110](https://httpwg.org/specs/rfc9110.html). You can
 use these semantics on any transport including, but not limited to, the HTTP
-transport.
+transports like [HTTP/1.1](https://www.rfc-editor.org/info/rfc7235), [HTTP/2](https://www.rfc-editor.org/info/rfc9113), or [HTTP/3](https://www.rfc-editor.org/info/rfc9114).
 
 For example, say you want to fetch a file using the [IPFS trustless HTTP
 gateway](https://specs.ipfs.tech/http-gateways/trustless-gateway/). It may be tempting to
