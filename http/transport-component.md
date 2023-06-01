@@ -77,7 +77,7 @@ use these semantics on any transport including, but not limited to, the HTTP
 transport.
 
 For example, say you want to fetch a file using the [IPFS trustless HTTP
-gateway](https://docs.ipfs.tech/reference/http/gateway/). It may be tempting to
+gateway](https://specs.ipfs.tech/http-gateways/trustless-gateway/). It may be tempting to
 use the following URL to reference a file:
 
 ```
