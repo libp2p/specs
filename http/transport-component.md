@@ -16,7 +16,8 @@ Interest Group: [@marcopolo], [@mxinden], [@marten-seemann]
 - [Context](#context)
 - [What is an HTTP transport](#what-is-an-http-transport)
 - [Multiaddr representation](#multiaddr-representation)
-- [HTTP Paths](#http-paths)
+- [HTTP Paths (and other HTTP Semantics)](#http-paths-and-other-http-semantics)
+  - [Recommendation on including HTTP semantics in multiaddrs](#recommendation-on-including-http-semantics-in-multiaddrs)
 
 
 ## Context
@@ -55,65 +56,40 @@ The following are examples of multiaddrs for HTTP transport capable nodes:
 * `/ip4/1.2.3.4/udp/50781/quic-v1/http`
 
 
-## HTTP Paths
+## HTTP Paths (and other HTTP Semantics)
 
 It may be tempting to add an HTTP path to end of the multiaddr to specify some
 information about a user protocol. However the `/http` component is not a user
 protocol, and it doesn't accept any parameters. It only signals that a node is
 capable of an HTTP transport.
 
-The HTTP Path exists in the user protocol level. HTTP Semantics are transport-agnostic, and defined by [RFC 9110](https://httpwg.org/specs/rfc9110.html). You can
-use these semantics on any transport including, but not limited to, the HTTP
-transports like [HTTP/1.1](https://www.rfc-editor.org/info/rfc7235), [HTTP/2](https://www.rfc-editor.org/info/rfc9113), or [HTTP/3](https://www.rfc-editor.org/info/rfc9114).
+The HTTP Path exists in the semantics level. HTTP Semantics are
+transport-agnostic, and defined by [RFC
+9110](https://httpwg.org/specs/rfc9110.html). You can use these semantics on any
+transport including, but not limited to, the HTTP transports like
+[HTTP/1.1](https://www.rfc-editor.org/info/rfc7235),
+[HTTP/2](https://www.rfc-editor.org/info/rfc9113), or
+[HTTP/3](https://www.rfc-editor.org/info/rfc9114).
 
-For example, say you want to signal that a node supports the [IPFS trustless
-HTTP gateway] protocol. It may be tempting to use the following multiaddr to
-signal that:
+### Recommendation on including HTTP semantics in multiaddrs
 
-```
-/ip4/127.0.0.1/tcp/8080/http/httppath/ipfs
-```
+In general, it's better to keep the multiaddrs as a way of addressing an
+endpoint and keep the semantics independent of any specific transport. This way
+you can use the same semantics among many specific transports.
 
-But `/http` is a transport and it doesn't accept any parameters. It would be the
-same as if we used the following multiaddr:
+However, sometimes it's helpful to share a single multiaddr that contains some
+extra application-level data (as opposed to transport data). The recommendation
+is to use a new [multicodec in the private
+range](https://github.com/multiformats/multicodec#private-use-area) for your
+application. Then apply whatever application parameters to the right of your new
+multicodec and transport information to the left. E.g.
+`<transport>/myapp/<parameters>`
+or `/ip4/127.0.0.1/tcp/8080/http/myapp/custom-prefix/foo%2fbar`. Your
+application has the flexibility to handle the parameters in any way it wants
+(e.g. set HTTP headers, an HTTP path prefix, cookies, etc).
 
-```
-/ip4/127.0.0.1/udp/1234/quic-v1/httppath/ipfs
-```
-
-What does `httppath/` mean here? `/quic-v1` is a transport and doesn't accept
-parameters. Who handles the input from `/httppath`?
-
-What we're really trying to do here is to highlight that the node that can be
-found at those Multiaddrs supports the [IPFS trustless HTTP gateway] protocol.
-That can and should be done some other way such as
-[identify](https://github.com/libp2p/specs/tree/master/identify) or soon the
-[`.well-known/libp2p`](https://github.com/libp2p/specs/pull/529) HTTP endpoint
-or some other custom application logic.
-
-If having this information on the multiaddr is desired and you are willing to
-make the tradeoff of potentially multiplying the number of multiaddrs you have
-by the number of protocols you want to signal, you could use a multicodec from
-the [private use
-area](https://github.com/multiformats/multicodec#private-use-area) and append
-this to your multiaddr. The result would be something like:
-
-```
-myProtocol = 0x300000
-
-/ip4/127.0.0.1/tcp/8080/http/myProtocol
-/ip4/127.0.0.1/udp/1234/quic-v1/myProtocol
-```
-
-Note that the problem appears when we want to add another protocol here:
-```
-myProtocol = 0x300000
-anotherProtocol = 0x300001
-
-/ip4/127.0.0.1/tcp/8080/http/myProtocol
-/ip4/127.0.0.1/udp/1234/quic-v1/myProtocol
-/ip4/127.0.0.1/tcp/8080/http/anotherProtocol
-/ip4/127.0.0.1/udp/1234/quic-v1/anotherProtocol
-```
-
-[IPFS trustless HTTP gateway]: (https://specs.ipfs.tech/http-gateways/trustless-gateway/)
+This is a bit cumbersome when you are trying to use multiple transports since
+you may end up with many multiaddrs with different transports but the same
+suffix. A potential solution here is to keep them separate. A list of multiaddrs
+for the transports being used, and another multiaddr for the application-level
+data. This is one suggestion, and many other strategies would work as well.
