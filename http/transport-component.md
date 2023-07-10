@@ -55,9 +55,9 @@ The following are examples of multiaddrs for HTTP transport capable nodes:
 * `/ip6/2001:0db8:85a3:0000:0000:8a2e:0370:7334/tcp/443/tls/http`
 * `/ip4/1.2.3.4/udp/50781/quic-v1/http`
 
-Note: When we use `/quic-v1/http` (or any other QUIC version)
-implementations MUST use the correct ALPN (e.g. `h3`) and not `libp2p` when
-using the HTTP transport.
+Note: When we use `/quic-v1/http` or `/tcp/443/tls/http` (or any other
+transport) implementations MUST use the correct HTTP ALPN (e.g. `h3` or `h2`
+respectively) and not `libp2p` when using the HTTP transport.
 
 ## HTTP Paths (and other HTTP Semantics)
 
