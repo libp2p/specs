@@ -6,7 +6,7 @@
 
 Authors: [@marten-seemann, @MarcoPolo]
 
-Interest Group: [@MarcoPolo, @marten-seemann]
+Interest Group: [todo]
 
 [@marten-seemann]: https://github.com/marten-seemann
 [@MarcoPolo]: https://github.com/MarcoPolo
@@ -19,7 +19,7 @@ This document defines how libp2p nodes can offer and use an HTTP transport along
 - HTTP only edge workers can run application protocols and respond to peers on the network.
 - `curl` from the command line can make requests to other libp2p nodes.
 
-As well as allowing application protocols to make use of HTTP middle boxes such as HTTP caching and layer 7 proxying and load balancing. This is all in addition to the existing features that libp2p provides such as:
+As well as allowing application protocols to make use of HTTP intermediaries such as HTTP caching and layer 7 proxying and load balancing. This is all in addition to the existing features that libp2p provides such as:
 
 - Connectivity – Work on top of WebRTC, WebTransport, QUIC, TCP, or an HTTP transport.
 - Hole punching – Work with peers behind NATs.
@@ -65,11 +65,11 @@ The resource contains a mapping of application protocols to their respective URL
 1. That the Kademlia protocol is available at `/kademlia` and
 2. The [IPFS Path Gateway API](https://specs.ipfs.tech/http-gateways/path-gateway/) is mounted at `/`.
 
-It is valid expose a service at `/`. It is RECOMMENDED that the server resolve more specific URLs before less specific ones. e.g. a path of `/kademlia/foo` should be routed to the Kademlia protocol rather than the IPFS HTTP API.
+It is valid to expose a service at `/`. It is RECOMMENDED that the server resolve more specific URLs before less specific ones. e.g. a path of `/kademlia/foo` should be routed to the Kademlia protocol rather than the IPFS HTTP API.
 
 ## Peer ID Authentication
 
-When using the HTTP Transport, peer id authentication is optional. You only pay for it if you need it. This is benefits use cases that don’t need peer authentication (e.g. fetching content addressed data) or authenticate some other way (not tied to libp2p peer ids).
+When using the HTTP Transport, peer id authentication is optional. You only pay for it if you need it. This benefits use cases that don’t need peer authentication (e.g. fetching content addressed data) or authenticate some other way (not tied to libp2p peer ids).
 
 Peer ID authentication in the HTTP Transport follows a similar to pattern to how libp2p adds Peer ID authentication in WebTransport and WebRTC. We run the standard libp2p Noise handshake, but using `IX` for client and server authentication or `NX` for just server authentication.
 
