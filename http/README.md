@@ -71,7 +71,14 @@ It is valid to expose a service at `/`. It is RECOMMENDED that the server resolv
 
 When using the HTTP Transport, peer id authentication is optional. You only pay for it if you need it. This benefits use cases that don’t need peer authentication (e.g. fetching content addressed data) or authenticate some other way (not tied to libp2p peer ids).
 
-Peer ID authentication in the HTTP Transport follows a similar to pattern to how libp2p adds Peer ID authentication in WebTransport and WebRTC. We run the standard libp2p Noise handshake, but using `IX` for client and server authentication or `NX` for just server authentication.
+Peer ID authentication in the HTTP Transport follows a similar to pattern to how
+libp2p adds Peer ID authentication in WebTransport and WebRTC. We run the
+standard libp2p Noise handshake, but using `IX` for client and server
+authentication or `NX` for just server authentication.
+
+Note: This is just one form of Peer ID authentication. Other forms may be added
+in the future (with a different `www-authenticate` value) or be added to the
+application protocols themselves.
 
 ### Authentication flow
 
