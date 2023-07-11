@@ -62,96 +62,96 @@ attacks. `autonat v1` disallowed such dials to prevent amplification attacks.
 
 ![Autonat V2 Interaction](autonat-v2.svg)
 
-A node wishing to determine reachability of its adddresses sends a `DialRequest`
-message to a peer on a stream with protocol ID `/libp2p/autonat/2/dial`. Each
-`DialRequest` is sent on a new stream.
+A client node wishing to determine reachability of its adddresses sends a
+`DialRequest` message to a server on a stream with protocol ID
+`/libp2p/autonat/2/dial`. Each `DialRequest` is sent on a new stream.
 
 This `DialRequest` message has a list of addresses and a fixed64 `nonce`. The
 list is ordered in descending order of priority for verification. 
 
-Upon receiving this request, the peer selects the first address from the list of
-addresses that it is capable of dialing. The peer MUST NOT dial any address
+Upon receiving this request, the server selects the first address from the list
+of addresses that it is capable of dialing. The server MUST NOT dial any address
 other than this one. If this selected address has an IP address different from
-the requesting node's observed IP address, peer initiates the Amplification
+the requesting node's observed IP address, server initiates the Amplification
 attack prevention mechanism (see [Amplification Attack
-Prevention](#amplification-attack-prevention) ). On completion, the peer
+Prevention](#amplification-attack-prevention) ). On completion, the server
 proceeds to the next step. If the selected address has the same IP address as
-the requesting node's observed IP address, peer proceeds to the next step
-skipping Amplification Attack prevention steps.
+the client's observed IP address, server proceeds to the next step skipping
+Amplification Attack Prevention steps.
 
-The peer dials the selected address, opens a stream with Protocol ID
+The server dials the selected address, opens a stream with Protocol ID
 `/libp2p/autonat/2/attempt` and sends a `DialAttempt` message with the nonce
-received in the request. The peer MUST close this stream after sending the
+received in the request. The server MUST close this stream after sending the
 `DialAttempt` message.
 
-Upon completion of the dial attempt, the peer sends a `DialResponse` message to
-the initiator node on the `/libp2p/autonat/2/dial` stream. This response
-contains a list of `DialStatus`es with a status for each address in the list up
-to and including the address that the peer attempted to dial. The `DialStatus`
-for an address is set according to [Requirements for
+Upon completion of the dial attempt, the server sends a `DialResponse` message
+to the client node on the `/libp2p/autonat/2/dial` stream. The response contains
+a list of `DialStatus`es with a status for each address in the list up to and
+including the address that the server attempted to dial. The `DialStatus` for an
+address is set according to [Requirements for
 DialStatus](#requirements-for-dialstatus). The response also contains an
 appropriate `ResponseStatus` set according to [Requirements For
 ResponseStatus](#requirements-for-responsestatus).
 
-The initiator MUST check that the nonce received in the `DialAttempt` is the
-same as the nonce the it sent in the `DialRequest`. If the nonce is different,
-it MUST discard this response.
+The client MUST check that the nonce received in the `DialAttempt` is the same
+as the nonce the it sent in the `DialRequest`. If the nonce is different, it
+MUST discard this response.
 
-The peer MUST close the stream after sending the response. The initiator MUST
+The server MUST close the stream after sending the response. The client MUST
 close the stream after receiving the response.
 
 
 ### Requirements for DialStatus
 
-On receiving a `DialRequest` the peer goes through the list of addresses in the
-request to select the first address that it is capable of dialing. For every
-address that the peer checks, it assigns a `DialStatus` according to the
+On receiving a `DialRequest` the server goes through the list of addresses in
+the request to select the first address that it is capable of dialing. For every
+address that the server checks, it assigns a `DialStatus` according to the
 following requirements. 
 
-For addresses that the peer decides to not dial:
+For addresses that the server decides to not dial:
 
-`E_ADDRESS_UNKNOWN`: The peer didn't understand the address. 
+`E_ADDRESS_UNKNOWN`: The server didn't understand the address. 
 
-`E_TRANSPORT_NOT_SUPPORTED`: The peer understood the address, but has no
+`E_TRANSPORT_NOT_SUPPORTED`: The server understood the address, but has no
 transport capable of dialing the requested address. 
 
-`E_DIAL_REFUSED`: The peer didn't dial the address because of address
-based restrictions like address based rate limit, the address being a private IP
+`E_DIAL_REFUSED`: The server didn't dial the address because of address based
+restrictions like address based rate limit, the address being a private IP
 address, or a relay address.
 
-For the address that the peer decided to dial:
+For the address that the server decided to dial:
 
-`E_DIAL_ERROR`: The peer was unable to connect to the address
+`E_DIAL_ERROR`: The server was unable to connect to the address
 
-`E_CONN_UPGRADE_FAILED`: The peer was able to connect to the other address, but
-failed to complete the connection upgrade step. 
+`E_CONN_UPGRADE_FAILED`: The server was able to connect to the address, but
+failed to complete the connection upgrade step.
 
-`E_ATTEMPT_ERROR`: The peer was able to establish an upgraded connection but
+`E_ATTEMPT_ERROR`: The server was able to establish an upgraded connection but
 some error occured when sending the nonce on the `/libp2p/autonat/2/attempt`
 stream.
 
-`OK`: The peer successfully dialed the selected address.
+`OK`: The server successfully dialed the selected address.
 
-The peer MUST NOT send dial statuses for addresses after the one it selected to
-dial.
+The server MUST NOT send dial statuses for addresses after the one it selected
+to dial.
 
 
 ### Requirements for ResponseStatus
 
-The `ResponseStatus` sent by the peer in the `DialResponse` message MUST be set
-according to the following requirements
+The `ResponseStatus` sent by the server in the `DialResponse` message MUST be
+set according to the following requirements
 
-`OK`: the peer completed the request successfully. A request is considered
-completed successfully when the peer either completes a dial(successfully or
+`OK`: the server completed the request successfully. A request is considered
+completed successfully when the server either completes a dial(successfully or
 unsuccessfully) or rejects all addresses in the request as undialable. 
 
-`E_BAD_REQUEST`: the peer was unable to decode the request.
+`E_BAD_REQUEST`: the server was unable to decode the request.
 
-`E_REQUEST_REFUSED`: the peer didn't attempt to serve the request because of
+`E_REQUEST_REFUSED`: the server didn't attempt to serve the request because of
 rate limiting, resource limit reached or blacklisting.
 
 `E_INTERNAL_ERROR`: error not classified within the above error codes occured on
-peer that prevented it from completing the request.
+server that prevented it from completing the request.
 
 Implementations MUST discard responses with status codes they do not understand. 
 
@@ -180,13 +180,13 @@ server on receiving `numBytes` bytes proceeds to dial the candidate address.
 
 ## Implementation Suggestions
 
-For any given address, implementations SHOULD do the following
+For any given address, client implementations SHOULD do the following
 - periodically recheck reachability status
-- query multiple peers to determine reachability
+- query multiple servers to determine reachability
 
 The suggested heuristic for implementations is to consider an address reachable
-if more than 3 peers report a successful dial and to consider an address
-unreachable if more than 3 peers report unsuccessful dials. 
+if more than 3 servers report a successful dial and to consider an address
+unreachable if more than 3 servers report unsuccessful dials. 
 
 Implementations are free to use different heuristics than this one
 
