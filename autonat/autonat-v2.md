@@ -57,7 +57,6 @@ from the requesting node's observed IP address without risking amplification
 attacks. `autonat v1` disallowed such dials to prevent amplification attacks.
 
 
-
 ## AutoNAT V2 Protocol
 
 ![Autonat V2 Interaction](autonat-v2.svg)
@@ -67,7 +66,10 @@ A client node wishing to determine reachability of its adddresses sends a
 `/libp2p/autonat/2/dial`. Each `DialRequest` is sent on a new stream.
 
 This `DialRequest` message has a list of addresses and a fixed64 `nonce`. The
-list is ordered in descending order of priority for verification. 
+list is ordered in descending order of priority for verification. AutoNAT V2 is
+only for testing reachability on Public Internet. Client MUST NOT send any
+private address as defined in [RFC
+1918](https://datatracker.ietf.org/doc/html/rfc1918#section-3) in the list. 
 
 Upon receiving this request, the server selects the first address from the list
 of addresses that it is capable of dialing. The server MUST NOT dial any address
@@ -94,7 +96,7 @@ appropriate `ResponseStatus` set according to [Requirements For
 ResponseStatus](#requirements-for-responsestatus).
 
 The client MUST check that the nonce received in the `DialAttempt` is the same
-as the nonce the it sent in the `DialRequest`. If the nonce is different, it
+as the nonce it sent in the `DialRequest`. If the nonce is different, it
 MUST discard this response.
 
 The server MUST close the stream after sending the response. The client MUST
