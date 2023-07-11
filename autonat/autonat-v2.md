@@ -181,8 +181,17 @@ server on receiving `numBytes` bytes proceeds to dial the candidate address.
 ## Implementation Suggestions
 
 For any given address, client implementations SHOULD do the following
-- periodically recheck reachability status
-- query multiple servers to determine reachability
+- Periodically recheck reachability status.
+- Query multiple servers to determine reachability.
+- Clients SHOULD NOT reuse their listening port when making a `DialRequest`. If
+the client reuses its listening port while making the request and the server
+reuses its listening port while making the dial attempt, the server will end up
+trying to establish a connection on the same 4 tuple that the client is already
+connected on. Moreover, if the client is behind an Address-Dependent NAT as
+defined in [RFC
+4787](https://datatracker.ietf.org/doc/html/rfc4787#section-4.1), reusing the
+listening port for making the request will create a NAT mapping that's reachable
+only from the server. 
 
 The suggested heuristic for implementations is to consider an address reachable
 if more than 3 servers report a successful dial and to consider an address
