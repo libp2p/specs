@@ -96,8 +96,8 @@ appropriate `ResponseStatus` set according to [Requirements For
 ResponseStatus](#requirements-for-responsestatus).
 
 The client MUST check that the nonce received in the `DialAttempt` is the same
-as the nonce it sent in the `DialRequest`. If the nonce is different, it
-MUST discard this response.
+as the nonce it sent in the `DialRequest`. If the nonce is different, it MUST
+discard this response.
 
 The server MUST close the stream after sending the response. The client MUST
 close the stream after receiving the response.
@@ -161,7 +161,6 @@ Implementations MUST discard responses with status codes they do not understand.
 
 ![Interaction](autonat-v2-amplification-attack-prevention.svg)
 
-
 When a client asks a server to dial an address that is not the client's observed
 IP address, the server asks the client to send him some non trivial amount of
 bytes as a cost to dial a different IP address. To make amplification attacks
@@ -179,6 +178,16 @@ or reject the cost of dial. If the client rejects the cost, the client resets
 the stream and the `DialRequest` is considered aborted. If the client accepts
 the cost, the client starts transferring `numBytes` bytes to the server. The
 server on receiving `numBytes` bytes proceeds to dial the candidate address. 
+
+If an attacker asks a server to dial a victim node, the only benefit that the
+attacker gets is forcing the server and the victim to do a cryptographic
+handshake which costs some bandwidth and compute. The attacker by itself can do
+a lot of handshakes with the victim without spending any compute by using the
+same key repeatedly. The only benefit of going via the server to do this attack
+is not spending bandwidth required for a handshake. So the prevention mechanism
+only focuses on bandwidth costs. There is a minor benefit of bypassing IP
+blocklists, but that's made unattractive by the fact that servers may ask 5x
+more data than the bandwidth cost of a handshake.
 
 ## Implementation Suggestions
 
