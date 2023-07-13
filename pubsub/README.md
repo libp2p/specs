@@ -198,12 +198,6 @@ on the [signature policy](#signature-policy) configured for the topic.**
 Whichever the choice, it is crucial that **all peers** participating in a topic
 implement identical message ID calculation logic, or the topic will malfunction.
 
-> **[[ Implementation note ]]:** Today,
-> go-libp2p-pubsub (reference implementation of this spec) allows
-> configuring a [single top-level](https://pkg.go.dev/github.com/libp2p/go-libp2p-pubsub#WithMessageIdFn) `message_id_fn`
-> as well as [topic-specific](https://pkg.go.dev/github.com/libp2p/go-libp2p-pubsub#WithTopicMessageIdFn) `message_id_fn` functions. Other
-> implementations are encouraged to do the same.
-
 ## Message Signing
 
 Signature behavior is configured in two axes: signature creation, and signature
