@@ -6,10 +6,11 @@
 
 Authors: [@marten-seemann, @MarcoPolo]
 
-Interest Group: [todo]
+Interest Group: [@lidel]
 
 [@marten-seemann]: https://github.com/marten-seemann
 [@MarcoPolo]: https://github.com/MarcoPolo
+[@lidel]: https://github.com/lidel
 
 ## Introduction
 
