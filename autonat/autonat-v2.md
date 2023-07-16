@@ -162,10 +162,11 @@ Implementations MUST discard responses with status codes they do not understand.
 ![Interaction](autonat-v2-amplification-attack-prevention.svg)
 
 When a client asks a server to dial an address that is not the client's observed
-IP address, the server asks the client to send him some non trivial amount of
-bytes as a cost to dial a different IP address. To make amplification attacks
-unattractive, the number of bytes is decided such that it's sufficiently larger
-than a new connection handshake cost.
+IP address, the server asks the client to send some non trivial amount of bytes
+as a cost to dial a different IP address. To make amplification attacks
+unattractive, servers SHOULD ask for 30k to 100k bytes. Since most handshakes
+cost less than 10k bytes in bandwidth, 30kB is sufficient to make attacks
+unattractive.
 
 On receiving a `DialRequest`, the server selects the first address it is capable
 of dialing. If this selected address has a IP different from the client's
@@ -177,7 +178,7 @@ Upon receiving a `DialDataRequest` message, the client decides whether to accept
 or reject the cost of dial. If the client rejects the cost, the client resets
 the stream and the `DialRequest` is considered aborted. If the client accepts
 the cost, the client starts transferring `numBytes` bytes to the server. The
-server on receiving `numBytes` bytes proceeds to dial the candidate address. 
+server on receiving `numBytes` bytes proceeds to dial the candidate address.
 
 If an attacker asks a server to dial a victim node, the only benefit that the
 attacker gets is forcing the server and the victim to do a cryptographic
@@ -246,7 +247,7 @@ message DialDataRequest {
 message DialResponse {
     enum ResponseStatus {
         OK                        = 0;
-        E_BAD_REQUEST             = 100 
+        E_BAD_REQUEST             = 100;
         E_REQUEST_REFUSED         = 101;
         E_INTERNAL_ERROR          = 300;
     }
