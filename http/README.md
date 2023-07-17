@@ -28,16 +28,46 @@ As well as allowing application protocols to make use of HTTP intermediaries suc
 - Peer ID Authentication – Authenticate your peer by their libp2p peer id.
 - Peer discovery – Learn about a peer given their peer id.
 
-## HTTP Semantics vs HTTP Transport
+## HTTP Semantics vs Encodings vs Transport
 
 HTTP is a bit of an overloaded term. This section aims to clarify what we’re talking about when we say “HTTP”.
+
+
+```mermaid
+graph TB
+    subgraph "HTTP Semantics"
+        HTTP
+    end
+    subgraph "Encoding"
+        HTTP1.1[HTTP/1.1]
+        HTTP2[HTTP/2]
+        HTTP3[HTTP/3]
+    end
+    subgraph "Transports"
+        Libp2p[libp2p streams]
+        HTTPTransport[HTTP transport]
+    end
+    HTTP --- HTTP1.1
+    HTTP --- HTTP1.1
+    HTTP1.1 --- Libp2p
+    HTTP --- HTTP2
+    HTTP --- HTTP3
+    HTTP1.1 --- HTTPTransport
+    HTTP2 --- HTTPTransport
+    HTTP3 --- HTTPTransport
+```
 
 - *HTTP semantics* ([RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html)) is
   the stateless application-level protocol that you work with when writing HTTP
   apis (for example).
 
-- *HTTP transport* is the thing that takes your high level request/response
-  defined in terms of HTTP semantics and encodes it and sends it over the wire.
+- *HTTP encoding* is the thing that takes your high level request/response
+  defined in terms of HTTP semantics and encodes it into a form that can be sent
+  over the wire.
+
+- *HTTP transport* is the thing that takes your encoded reqeust/response and
+  sends it over the wire. For HTTP/1.1 and HTTP/2, this is a TCP+TLS connection.
+  For HTTP/3, this is a QUIC connection.
 
 When this document says *HTTP* it is generally referring to *HTTP semantics*.
 
