@@ -77,9 +77,11 @@ A goal of this spec is to allow libp2p to be able to interoperate with existing 
 
 ## HTTP Transport
 
-Nodes MUST use HTTPS (i.e. they MUST NOT use plaintext HTTP). It is RECOMMENDED to use HTTP/2 and HTTP/3.
+Nodes MUST use HTTPS (i.e., they MUST NOT use plaintext HTTP). It is RECOMMENDED to use HTTP/2 and HTTP/3.
 
-Nodes signal support for their HTTP transport using the `/http` component in their multiaddr. e.g. `/dns4/example.com/tls/http` . See the [HTTP multiaddr component spec](https://github.com/libp2p/specs/pull/550) for more details.
+Nodes signal support for their HTTP transport using the `/http` component in
+their multiaddr. E.g., `/dns4/example.com/tls/http`. See the [HTTP multiaddr
+component spec](https://github.com/libp2p/specs/pull/550) for more details.
 
 ## Namespace
 
@@ -100,11 +102,11 @@ The resource contains a mapping of application protocols to their respective URL
 1. That the Kademlia protocol is available at `/kademlia` and
 2. The [IPFS Path Gateway API](https://specs.ipfs.tech/http-gateways/path-gateway/) is mounted at `/`.
 
-It is valid to expose a service at `/`. It is RECOMMENDED that the server resolve more specific URLs before less specific ones. e.g. a path of `/kademlia/foo` should be routed to the Kademlia protocol rather than the IPFS HTTP API.
+It is valid to expose a service at `/`. It is RECOMMENDED that the server resolve more specific URLs before less specific ones. e.g., a path of `/kademlia/foo` should be routed to the Kademlia protocol rather than the IPFS HTTP API.
 
 ## Peer ID Authentication
 
-When using the HTTP Transport, peer id authentication is optional. You only pay for it if you need it. This benefits use cases that don’t need peer authentication (e.g. fetching content addressed data) or authenticate some other way (not tied to libp2p peer ids).
+When using the HTTP Transport, peer id authentication is optional. You only pay for it if you need it. This benefits use cases that don’t need peer authentication (e.g., fetching content addressed data) or authenticate some other way (not tied to libp2p peer ids).
 
 Peer ID authentication in the HTTP Transport follows a similar to pattern to how
 libp2p adds Peer ID authentication in WebTransport and WebRTC. We run the
