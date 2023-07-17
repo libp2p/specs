@@ -58,9 +58,9 @@ libp2p does not squat the global namespace. libp2p application protocols can be 
 ```json
 
 {
-    "services": {
-        "/kad/1.0.0": "/kademlia/",
-        "/ipfs-http/1.0.0": "/",
+    "protocols": {
+        "/kad/1.0.0": {"path": "/kademlia/"},
+        "/ipfs-http/1.0.0": {"path": "/"},
     }
 }
 ```
