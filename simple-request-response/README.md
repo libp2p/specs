@@ -55,7 +55,7 @@ close the stream. After sending the response the server SHOULD close the stream.
 ## How to run on top of an HTTP transport
 
 The client's request is placed in the body of an HTTP POST request. The server
-places it's response in the body of the HTTP response. Headers are unused by the
+places its response in the body of the HTTP response. Headers are unused by the
 application protocol (but may be used by the libp2p implementation to provide
 authentication). The HTTP path used is defined by the server's
 `.well-known/libp2p` HTTP resource (see the [HTTP](../http/README.md) spec for
