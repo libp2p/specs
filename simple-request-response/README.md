@@ -7,7 +7,7 @@
 Authors: [@MarcoPolo]
 
 todo: others welcome to join
-Interest Group: [@mxinden @marten-seemann]
+Interest Group: [@mxinden] [@marten-seemann]
 
 [@marten-seemann]: https://github.com/marten-seemann
 [@MarcoPolo]: https://github.com/MarcoPolo
