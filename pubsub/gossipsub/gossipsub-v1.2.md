@@ -4,11 +4,13 @@
 |-----------------|---------------------------|--------|-----------------|
 | 1A              | Working Draft             | Active | r1, 2023-07-14  |
 
-Authors:
+Authors: [@Nashatyrev], [@Menduist]
 
-Interest Group: [@vyzo]
+Interest Group: [@vyzo], [@Nashatyrev], [@Menduist]
 
 [@vyzo]: https://github.com/vyzo
+[@Nashatyrev]: https://github.com/Nashatyrev
+[@Menduist]: https://github.com/Menduist
 
 See the [lifecycle document][lifecycle-spec] for context about maturity level and spec status.
 
