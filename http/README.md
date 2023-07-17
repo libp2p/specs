@@ -21,7 +21,7 @@ This document defines how libp2p nodes can offer and use an HTTP transport along
 - HTTP only edge workers can run application protocols and respond to peers on the network.
 - `curl` from the command line can make requests to other libp2p nodes.
 
-As well as allowing application protocols to make use of HTTP intermediaries such as HTTP caching and layer 7 proxying and load balancing. This is all in addition to the existing features that libp2p provides such as:
+The HTTP transport will also allow application protocols to make use of HTTP intermediaries such as HTTP caching, and layer 7 proxying and load balancing. This is all in addition to the existing features that libp2p provides such as:
 
 - Connectivity – Work on top of WebRTC, WebTransport, QUIC, TCP, or an HTTP transport.
 - Hole punching – Work with peers behind NATs.
