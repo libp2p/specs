@@ -27,13 +27,16 @@ As well as allowing application protocols to make use of HTTP intermediaries suc
 - Peer ID Authentication – Authenticate your peer by their libp2p peer id.
 - Peer discovery – Learn about a peer given their peer id.
 
-## HTTP Transport vs HTTP Semantics
+## HTTP Semantics vs HTTP Transport
 
 HTTP is a bit of an overloaded term. This section aims to clarify what we’re talking about when we say “HTTP”.
 
-*HTTP semantics* ([RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html)) is the stateless application-level protocol that you work with when writing HTTP apis (for example).
+- *HTTP semantics* ([RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html)) is
+  the stateless application-level protocol that you work with when writing HTTP
+  apis (for example).
 
-*HTTP transport* is the thing that takes your high level request/response defined in terms of HTTP semantics and encodes it and sends it over the wire.
+- *HTTP transport* is the thing that takes your high level request/response
+  defined in terms of HTTP semantics and encodes it and sends it over the wire.
 
 When this document says *HTTP* it is generally referring to *HTTP semantics*.
 
