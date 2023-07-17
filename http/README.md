@@ -100,9 +100,9 @@ libp2p does not squat the global namespace. libp2p application protocols can be 
 The resource contains a mapping of application protocols to their respective URL. For example, this configuration file would tell a client
 
 1. That the Kademlia protocol is available at `/kademlia` and
-2. The [IPFS Path Gateway API](https://specs.ipfs.tech/http-gateways/path-gateway/) is mounted at `/`.
+2. The [IPFS Trustless Gateway API](https://specs.ipfs.tech/http-gateways/trustless-gateway/) is mounted at `/`.
 
-It is valid to expose a service at `/`. It is RECOMMENDED that the server resolve more specific URLs before less specific ones. e.g., a path of `/kademlia/foo` should be routed to the Kademlia protocol rather than the IPFS HTTP API.
+It is valid to expose a service at `/`. It is RECOMMENDED that implementations facilitate the coexistence of different service endpoints by ensuring that more specific URLs are resolved before less specific ones. For example, when registering handlers, more specific paths like `/kademlia/foo` should take precedence over less specific handler, such as `/`.
 
 ## Peer ID Authentication
 
