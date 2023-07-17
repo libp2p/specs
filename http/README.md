@@ -4,7 +4,7 @@
 | --------------- | ------------- | ------ | --------------- |
 | 1A              | Working Draft | Active | r0, 2023-01-23  |
 
-Authors: [@marten-seemann, @MarcoPolo]
+Authors: [@marten-seemann], [@MarcoPolo]
 
 Interest Group: [@lidel]
 
