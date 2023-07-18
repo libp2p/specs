@@ -50,7 +50,8 @@ to the application protocol to decide.
 Each request and response should happen in a single stream. There MUST NOT be
 pipelining. After sending a request, the client SHOULD close its write side
 (signalling EOF to the peer). After handling the response, the client SHOULD
-close the stream. After sending the response the server SHOULD close its write side (signalling EOF to the peer).
+close the stream. After sending the response the server SHOULD close the stream
+side (signalling EOF to the peer as well as signalling no future writes will be accepted.).
 
 ## How to run on top of an HTTP transport
 
