@@ -62,6 +62,14 @@ authentication). The HTTP path used is defined by the server's
 `.well-known/libp2p` HTTP resource (see the [HTTP](../http/README.md) spec for
 more details).
 
+## Considerations for applications
+
+- Applications should define a reasonable maximum amount of expected data, and
+  limit the amount of data they receive at any time. For example, Kademlia may
+  limit the maximum size of a request to
+  [16KiB](https://github.com/libp2p/rust-libp2p/blob/master/protocols/kad/src/protocol.rs#L48)
+  or
+  [4MiB](https://github.com/libp2p/go-libp2p/blob/master/core/network/network.go#L23).
 
 ## Prior Art
 
