@@ -119,11 +119,17 @@ application protocols themselves.
 
 ### Authentication flow
 
-1. The client initiates a request that it knows must be authenticated OR the client responds to a `401` with the header `WWW-Authenticate: Libp2p-Noise` (The server MAY also include `Libp2p-Token` as an authentication scheme).
-2. The client sets the `Authorization` [header](https://www.rfc-editor.org/rfc/rfc9110.html#section-11.6.2) to `Libp2p-Noise <multibase-encoded-noise-protobuf>` . This initiates the `IX` or `NX` handshake.
+1. The client initiates a request that it knows must be authenticated OR the client responds to a `401` with the header `WWW-Authenticate: Libp2p-Noise-IX` (The server MAY also include `Libp2p-Token` as an authentication scheme).
+2. The client sets the `Authorization`
+   [header](https://www.rfc-editor.org/rfc/rfc9110.html#section-11.6.2) to
+   `Libp2p-Noise-IX <multibase-encoded-noise-protobuf>`  (or `Libp2p-Noise-NX`
+   if not doing client authentication). This initiates the
+   `IX` or `NX` handshake.
     1. The protobuf is multibase encoded, but clients MUST only use encodings that are HTTP header safe (refer to to the [token68 definition](https://www.rfc-editor.org/rfc/rfc9110.html#section-11.2)). To set the minimum bar for interoperability, clients and servers MUST support base32 encoding (”b” in the multibase table).
     2. When the server receives this request and `IX` was used, it can authenticate the client.
-3. The server responds with `Authentication-Info` field set to `Libp2p-Noise <multibase-encoding-noise-protobuf-response>`.
+3. The server responds with `Authentication-Info` field set to
+   `Libp2p-Noise-<PATTERN> <multibase-encoding-noise-protobuf-response>`. Where
+   `<PATTERN>` is either `IX` or `NX`.
     1. The server MUST include the SNI used for the connection in the [Noise extensions](https://github.com/libp2p/specs/blob/master/noise/README.md#noise-extensions).
     2. The server MAY include a token in the Noise extensions that the client
     can use to avoid doing another Noise handshake in the future. The client
