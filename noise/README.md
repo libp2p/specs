@@ -221,6 +221,8 @@ syntax = "proto2";
 message NoiseExtensions {
     repeated bytes webtransport_certhashes = 1;
     repeated string stream_muxers = 2;
+    optional string SNI = 3;
+    optional string HTTP_libp2p_token = 4;
 }
 
 message NoiseHandshakePayload {
