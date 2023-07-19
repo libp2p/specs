@@ -70,7 +70,7 @@ implement, and use.
 
 ## How to map to a libp2p stream
 
-Each request and response should happen in a single stream. There MUST NOT be
+Each request and response should happen in a single stream. There SHOULD NOT be
 pipelining. After sending a request, the client SHOULD close its write side
 (signalling EOF to the peer). After handling the response, the client SHOULD
 close the stream. After sending the response the server SHOULD close the stream
