@@ -112,45 +112,13 @@ It is valid to expose a service at `/`. It is RECOMMENDED that implementations f
 
 ## Peer ID Authentication
 
-When using the HTTP Transport, peer id authentication is optional. You only pay for it if you need it. This benefits use cases that don’t need peer authentication (e.g., fetching content addressed data) or authenticate some other way (not tied to libp2p peer ids).
+When using the HTTP Transport, peer id authentication is optional. You only pay
+for it if you need it. This benefits use cases that don’t need peer
+authentication (e.g., fetching content addressed data) or authenticate some
+other way (not tied to libp2p peer ids).
 
-Peer ID authentication in the HTTP Transport follows a similar to pattern to how
-libp2p adds Peer ID authentication in WebTransport and WebRTC. We run the
-standard libp2p Noise handshake, but using `IX` for client and server
-authentication or `NX` for just server authentication.
-
-Note: This is just one form of Peer ID authentication. Other forms may be added
-in the future (with a different `WWW-Authenticate` value) or be added to the
-application protocols themselves.
-
-### Authentication flow
-
-1. The client initiates a request that it knows must be authenticated OR the client responds to a `401` with the header `WWW-Authenticate: Libp2p-Noise-IX` (The server MAY also include `Libp2p-Token` as an authentication scheme).
-2. The client sets the `Authorization`
-   [header](https://www.rfc-editor.org/rfc/rfc9110.html#section-11.6.2) to
-   `Libp2p-Noise-IX <multibase-encoded-noise-protobuf>`  (or `Libp2p-Noise-NX`
-   if not doing client authentication). This initiates the
-   `IX` or `NX` handshake.
-    1. The protobuf is multibase encoded, but clients MUST only use encodings that are HTTP header safe (refer to to the [token68 definition](https://www.rfc-editor.org/rfc/rfc9110.html#section-11.2)). To set the minimum bar for interoperability, clients and servers MUST support base32 encoding (”b” in the multibase table).
-    2. When the server receives this request and `IX` was used, it can authenticate the client.
-3. The server responds with `Authentication-Info` field set to
-   `Libp2p-Noise-<PATTERN> <multibase-encoding-noise-protobuf-response>`. Where
-   `<PATTERN>` is either `IX` or `NX`.
-    1. The server MUST include the SNI used for the connection in the [Noise extensions](https://github.com/libp2p/specs/blob/master/noise/README.md#noise-extensions).
-    2. The server MAY include a token in the Noise extensions that the client
-    can use to avoid doing another Noise handshake in the future. The client
-    would use this token by setting the `Authorization` header to `Libp2p-Token
-    <token>`.
-    3. When the client receives this response, it can authenticate the server’s peer ID.
-4. The client verifies the SNI in the Noise extension matches the one used to initiate the connection. The client MUST close the connection if they differ.
-    1. The client SHOULD remember this connection is authenticated.
-    2. The client SHOULD use the `Libp2p-Token` if provided for future authorized requests.
-
-This costs one round trip, but can piggy back on an appropriate request.
-
-### Authentication Endpoint
-
-Because the client needs to make a request to authenticate the server, and the client may not want to make the real request before authenticating the server, the server MAY provide an authentication endpoint. This authentication endpoint is like any other application protocol, and it shows up in `.well-known/libp2p`, but it only does the authentication flow. It doesn’t send any other data besides what is defined in the above Authentication flow. The protocol id for the authentication endpoint is `/http-noise-auth/1.0.0`.
+Specific authentications schemes for authenticating Peer IDs will be defined in
+a future spec.
 
 ## Using HTTP semantics over stream transports
 
