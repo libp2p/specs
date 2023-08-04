@@ -6,6 +6,8 @@
 
 Authors: [@MarcoPolo]
 
+[@MarcoPolo]: https://github.com/MarcoPolo
+
 Interest Group: Same as [HTTP](README.md)
 
 ## Introduction
@@ -34,14 +36,39 @@ challenge-response scheme.
      <varint-length> + "client-challenge=" + base64-encoded-client-chosen-client-challenge + 
      <varint-length> + "challenge=" + base64-encoded-challenge
    ```
-   * The client chosen client-challenge MUST be randomly generated.
-   * The client chosen client-challenge SHOULD be at least 32 bytes.
+   * Strings are UTF-8 encoded.
+   * The client-chosen client-challenge MUST be randomly generated.
+   * The client-chosen client-challenge SHOULD be at least 32 bytes.
    * The client MUST use the same server-name as what is used for the TLS
      session.
-1. The server MUST verify the signature using the server name used in the TLS
+   * Example: 
+    ```
+    origin=example.com
+    client-challenge=qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqo=
+    challenge=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+    ```
+
+    Message To Sign in hex with comments
+    ```
+    12 // (18 bytes)
+    6f726967696e3d6578616d706c652e636f6d // (origin=example.com)
+
+    3d // (61 bytes)
+    636c69656e742d6368616c6c656e67653d7171717171717171717171717171717171717171717171717171717171717171717171717171717171716f3d // (client-challenge=qq...o=)
+
+    36 // (54 bytes)
+    6368616c6c656e67653d414141414141414141414141414141414141414141414141414141414141414141414141414141414141413d // (challenge=AA...A=)
+    ```
+
+    All together:
+    ```
+    Message To Sign in hex:
+    126f726967696e3d6578616d706c652e636f6d3d636c69656e742d6368616c6c656e67653d7171717171717171717171717171717171717171717171717171717171717171717171717171717171716f3d366368616c6c656e67653d414141414141414141414141414141414141414141414141414141414141414141414141414141414141413d
+    ```
+2. The server MUST verify the signature using the server name used in the TLS
    session. The server MUST return 401 Unauthorized if the server fails to
    validate the signature.
-1. If the signature is valid, the server has authenticated the client's peer id
+3. If the signature is valid, the server has authenticated the client's peer id
    and MAY fulfill the request according to application logic. If the request is
    fulfilled, the server sets the `Authentication-Info` response header to the
    following:
@@ -54,7 +81,17 @@ challenge-response scheme.
         <varint-length> + "client-challenge=" + base64-encoded-client-chosen-client-challenge + 
         <varint-length> + "client=" + <encoded-client-peer-id-bytes>
         ```
-1. The client can then authenticate the server with the the signature from
+    * Strings are UTF-8 encoded.
+    * Optionally, the server MAY include a [Bearer
+      token](https://datatracker.ietf.org/doc/html/rfc6750) in the
+      `Authentication-Info` response header. This allows clients to avoid a
+      future iteration of this authentication protocol. If clients see a bearer
+      token, they SHOULD store it for future use. For example,  an
+      `Authentication-Info` header with a bearer token would look like:
+      ```
+      Libp2p-Challenge peer-id="<encoded-peer-id-bytes>",sig="<base64-signature-bytes>",bearer-token="<token>".
+      ```
+4. The client can then authenticate the server with the the signature from
    `Authentication-info`.
 
 ## Server Authentication
@@ -76,6 +113,7 @@ The protocol to do so is as follows:
         <varint-length> + "origin=" + server-name + 
         <varint-length> + "client-challenge=" + base64-encoded-client-chosen-client-challenge
         ```
+        * The same notes from mutual authentication apply here as well.
 1. The client can now authenticate the server.
 
 ## Authentication Endpoint
@@ -84,13 +122,14 @@ Because the client needs to make a request to authenticate the server, and the
 client may not want to make the real request before authenticating the server,
 the server MAY provide an authentication endpoint. This authentication endpoint
 is like any other application protocol, and it shows up in `.well-known/libp2p`,
-but it only does the authentication flow. It doesn’t send any other data besides
-what is defined in the above authentication flows. The protocol id for the
-authentication endpoint is `/http-peer-id-auth/1.0.0`.
+but it only does the authentication flow. The client and server SHOULD NOT send
+any data besides what is defined in the above authentication flows. The protocol
+id for the authentication endpoint is `/http-peer-id-auth/1.0.0`.
 
 
 ## Considerations for Implementations
 
+* Implementations MUST only authenticate over a secured connection (i.e. TLS).
 * Implementations SHOULD limit the maximum length of any variable length field.
 
 ## Note on web PKI
