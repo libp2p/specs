@@ -13,35 +13,47 @@ Interest Group: Same as [HTTP](README.md)
 ## Introduction
 
 This spec defines one way of authenticating Peer IDs over HTTP using a
-challenge-response scheme.
+challenge-response scheme. The authentication scheme is called `Libp2p-PeerID``
 
 ## Mutual Client and Server Peer ID Authentication
 
 1. The server initiates the authentication by responding to a request that must
-   be authenticated with the response header `WWW-Authenticate: Libp2p-Challenge
-   challenge="<base64-encoded-challenge>, Libp2p-Challenge-Server-Only"`. The
-   challenge MUST be randomly generated from server for sole purpose of
-   authenticating the client. The server SHOULD store the challenge temporarily
-   until the authentication is done. The challenge SHOULD be at least 32 bytes.
+   be authenticated with the response header `WWW-Authenticate: Libp2p-PeerID
+   challenge-client="<base64-encoded-challenge>`. The challenge MUST be randomly
+   generated from server for sole purpose of authenticating the client. The
+   server SHOULD store the challenge temporarily until the authentication is
+   done. The challenge SHOULD be at least 32 bytes.
+
 1. The client sends a request and sets the `Authorization`
    [header](https://www.rfc-editor.org/rfc/rfc9110.html#section-11.6.2) header
    to the following:
    ```
-   Libp2p-Challenge peer-id="<encoded-peer-id-bytes>",client-challenge="<base64-encoded-client-challenge>",sig="<base64-signature-bytes>"
+   Libp2p-PeerID peer-id="<encoded-peer-id-bytes>",[challenge-server="<base64-encoded-challenge-server>",]sig="<base64-signature-bytes>"]
    ```
+
+   * The `challenge-server` parameter is optional. The client should set it if
+     the client wants to authenticate the server.
    * The peer-id is encoded per the [peer-ids spec](../peer-ids/peer-ids.md).
    * The signature is over the concatenated result of:
    ```
      <varint-length> + "origin=" + server-name + 
-     <varint-length> + "client-challenge=" + base64-encoded-client-chosen-client-challenge + 
-     <varint-length> + "challenge=" + base64-encoded-challenge
+     [<varint-length> + "challenge-server=" + base64-encoded-client-chosen-challenge-server + ]
+     <varint-length> + "challenge-client=" + base64-encoded-challenge
    ```
    * Strings are UTF-8 encoded.
-   * The client-chosen client-challenge MUST be randomly generated.
-   * The client-chosen client-challenge SHOULD be at least 32 bytes.
+   * If the challenge server was omitted in the `Authorization` header it MUST
+     be omitted in the signature.
+   * If provided, the client-chosen `challenge-server`` MUST be randomly generated.
+   * The client-chosen `challenge-server` SHOULD be at least 32 bytes.
    * The client MUST use the same server-name as what is used for the TLS
      session.
-   * Example: 
+   * If the client _only_ wants to authenticate the server and the server does
+     not need to authenticate the client, the client can omit the
+     `challenge-client` from the parameters and signature on its initial request
+     (since it did not receive a `challenge-client`). If a resource requires
+     client authentication, the server MUST return `401 Unauthorized` if a
+     client attempts to authenticate without a `challenge-client`.
+   * Example on building the message to sign:
     ```
     origin=example.com
     client-challenge=qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqo=
@@ -73,12 +85,12 @@ challenge-response scheme.
    fulfilled, the server sets the `Authentication-Info` response header to the
    following:
     ```
-    Libp2p-Challenge peer-id="<encoded-peer-id-bytes>",sig="<base64-signature-bytes>"
+    Libp2p-PeerID peer-id="<encoded-peer-id-bytes>",sig="<base64-signature-bytes>"
     ```
    * The signature is over the concatenated result of:
         ```
         <varint-length> + "origin=" + server-name + 
-        <varint-length> + "client-challenge=" + base64-encoded-client-chosen-client-challenge + 
+        [<varint-length> + "challenge-server=" + base64-encoded-client-chosen-challenge-server + ]
         <varint-length> + "client=" + <encoded-client-peer-id-bytes>
         ```
     * Strings are UTF-8 encoded.
@@ -89,32 +101,10 @@ challenge-response scheme.
       token, they SHOULD store it for future use. For example,  an
       `Authentication-Info` header with a bearer token would look like:
       ```
-      Libp2p-Challenge peer-id="<encoded-peer-id-bytes>",sig="<base64-signature-bytes>",bearer-token="<token>".
+      Libp2p-PeerID peer-id="<encoded-peer-id-bytes>",sig="<base64-signature-bytes>",bearer-token="<token>".
       ```
 4. The client can then authenticate the server with the the signature from
    `Authentication-info`.
-
-## Server Authentication
-
-Clients may wish to only authenticate the server's peer ID, but not themselves.
-For example, a short lived client may want to get a block from a specific peer.
-
-The protocol to do so is as follows:
-
-1. The client should set the request header `Authorization` to
-   `Libp2p-Challenge-Server-Only <base64-encoded-client-chosen-client-challenge>`.
-1. The server should response to the request and set `Authentication-Info`
-   response header to the following:
-    ```
-    Libp2p-Challenge-Server-Only peer-id="<encoded-peer-id-bytes>",sig="<base64-signature-bytes>"
-    ```
-   * The signature is over the concatenated result of:
-        ```
-        <varint-length> + "origin=" + server-name + 
-        <varint-length> + "client-challenge=" + base64-encoded-client-chosen-client-challenge
-        ```
-        * The same notes from mutual authentication apply here as well.
-1. The client can now authenticate the server.
 
 ## Authentication Endpoint
 
