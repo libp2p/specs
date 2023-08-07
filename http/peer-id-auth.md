@@ -19,8 +19,9 @@ challenge-response scheme. The authentication scheme is called `Libp2p-PeerID``
 
 1. The server initiates the authentication by responding to a request that must
    be authenticated with the response header `WWW-Authenticate: Libp2p-PeerID
-   challenge-client="<base64-encoded-challenge>`. The challenge MUST be randomly
-   generated from server for sole purpose of authenticating the client. The
+   challenge-client="<base64-encoded-challenge>`. The challenge MUST be
+   indistinguishable from random data. The Server MAY randomly generate this
+   data, or MAY use an server-encrypted value. If using random data the
    server SHOULD store the challenge temporarily until the authentication is
    done. The challenge SHOULD be at least 32 bytes.
 
