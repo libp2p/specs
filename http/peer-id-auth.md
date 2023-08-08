@@ -35,7 +35,7 @@ scheme is called `Libp2p-PeerID`.
 
    * The `challenge-server` parameter is optional. The client should set it if
      the client wants to authenticate the server.
-   * The peer-id is encoded per the [peer-ids spec](../peer-ids/peer-ids.md).
+   * The peer-id is encoded per the string encoding described in the [peer-ids spec](../peer-ids/peer-ids.md).
    * The signature is over the concatenated result of:
    ```
      <varint-length> + "origin=" + server-name + 
