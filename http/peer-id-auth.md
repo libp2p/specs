@@ -12,8 +12,9 @@ Interest Group: Same as [HTTP](README.md)
 
 ## Introduction
 
-This spec defines one way of authenticating Peer IDs over HTTP using a
-challenge-response scheme. The authentication scheme is called `Libp2p-PeerID``
+This spec defines an authentication scheme of libp2p Peer IDs in accordance with
+[RFC 9110](https://datatracker.ietf.org/doc/html/rfc9110). The authentication
+scheme is called `Libp2p-PeerID`.
 
 ## Mutual Client and Server Peer ID Authentication
 
@@ -44,7 +45,7 @@ challenge-response scheme. The authentication scheme is called `Libp2p-PeerID``
    * Strings are UTF-8 encoded.
    * If the challenge server was omitted in the `Authorization` header it MUST
      be omitted in the signature.
-   * If provided, the client-chosen `challenge-server`` MUST be randomly generated.
+   * If provided, the client-chosen `challenge-server` MUST be randomly generated.
    * The client-chosen `challenge-server` SHOULD be at least 32 bytes.
    * The client MUST use the same server-name as what is used for the TLS
      session.
@@ -129,3 +130,8 @@ Protection against man-in-the-middle (mitm) type attacks is through web PKI. If
 the client is in an environment where web PKI can not be fully trusted (e.g. an
 enterprise network with a custom enterprise root CA installed on the client),
 then this authentication scheme can not protect the client from a mitm attack.
+
+## Test Vectors
+
+TODO (marco): include a couple examples of what is signed, exchanged, and
+resulting signature.
