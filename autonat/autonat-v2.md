@@ -231,6 +231,7 @@ message Message {
         DialRequest dialRequest   = 1;
         DialResponse dialResponse = 2;
         DialDataRequest dialDataRequest = 3;
+        DialDataResponse dialDataResponse = 4;
     }
 }
 
@@ -239,37 +240,46 @@ message DialRequest {
     fixed64 nonce = 2;
 }
 
+
 message DialDataRequest {
     uint32 addrIdx = 1;
     uint64 numBytes = 2;
 }
 
+
+enum DialStatus {
+    OK                        = 0;
+    E_DIAL_ERROR              = 100;
+    E_CONN_UPGRADE_FAILED     = 101;
+    E_ATTEMPT_ERROR           = 102;
+    E_DIAL_REFUSED            = 200;
+    E_TRANSPORT_NOT_SUPPORTED = 300;
+    E_ADDRESS_UNKNOWN         = 301;
+    SKIPPED                   = 400;
+}
+
+
 message DialResponse {
     enum ResponseStatus {
-        OK                        = 0;
+        ResponseStatus_OK         = 0;
         E_BAD_REQUEST             = 100;
         E_REQUEST_REFUSED         = 101;
         E_INTERNAL_ERROR          = 300;
-    }
-
-    enum DialStatus {
-        OK                        = 0;
-        E_DIAL_ERROR              = 100;
-        E_CONN_UPGRADE_FAILED     = 101;
-        E_ATTEMPT_ERROR           = 102;
-        E_DIAL_REFUSED            = 200;
-        E_TRANSPORT_NOT_SUPPORTED = 300;
-        E_ADDRESS_UNKNOWN         = 301;
     }
 
     ResponseStatus status = 1;
     repeated DialStatus dialStatuses = 2;
 }
 
+
+message DialDataResponse {
+    bytes data = 1;
+}
+
+
 message DialAttempt {
     fixed64 nonce = 1;
 }
-
 ```
 
 [uvarint-spec]: https://github.com/multiformats/unsigned-varint
