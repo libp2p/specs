@@ -178,7 +178,13 @@ Upon receiving a `DialDataRequest` message, the client decides whether to accept
 or reject the cost of dial. If the client rejects the cost, the client resets
 the stream and the `DialRequest` is considered aborted. If the client accepts
 the cost, the client starts transferring `numBytes` bytes to the server. The
-server on receiving `numBytes` bytes proceeds to dial the candidate address.
+client transfers these bytes wrapped in `DialDataResponse` protobufs where the
+`data` field in each individual protobuf is limited to 4096 bytes in length.
+This allows implementations to use a small buffer for reading and sending the
+data as well as cleaner interoperability with rest of the messages exchanged on
+the stream. The server only calculates the size of the `data` field of
+`DialDataResponse` protobufs as the bytes transferred and not the total size of
+the protobuf. The server on receiving numBytes bytes proceeds to dial the selected address.
 
 If an attacker asks a server to dial a victim node, the only benefit that the
 attacker gets is forcing the server and the victim to do a cryptographic
@@ -195,21 +201,16 @@ more data than the bandwidth cost of a handshake.
 For any given address, client implementations SHOULD do the following
 - Periodically recheck reachability status.
 - Query multiple servers to determine reachability.
-- Clients SHOULD NOT reuse their listening port when making a `DialRequest`. If
-the client reuses its listening port while making the request and the server
-reuses its listening port while making the dial attempt, the server will end up
-trying to establish a connection on the same 4 tuple that the client is already
-connected on. Moreover, if the client is behind an Address-Dependent NAT as
-defined in [RFC
-4787](https://datatracker.ietf.org/doc/html/rfc4787#section-4.1), reusing the
-listening port for making the request will create a NAT mapping that's reachable
-only from the server. 
 
 The suggested heuristic for implementations is to consider an address reachable
 if more than 3 servers report a successful dial and to consider an address
-unreachable if more than 3 servers report unsuccessful dials. 
+unreachable if more than 3 servers report unsuccessful dials. Implementations
+are free to use different heuristics than this one
 
-Implementations are free to use different heuristics than this one
+Servers SHOULD NOT reuse their listening port when making a dial attempt. In
+case the client has reused their listen port when dialing out to the server, not
+reusing the listen port for attempts prevents accidental hole punches. 
+
 
 ## RPC Messages
 
