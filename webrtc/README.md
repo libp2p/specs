@@ -132,8 +132,10 @@ real-world experiments.
 
 `RTCDataChannel`s are negotiated in-band by the WebRTC user agent (e.g. Firefox,
 Pion, ...). In other words libp2p WebRTC implementations MUST NOT change the
-default value `negotiated: false` when creating a `RTCDataChannel` via
-`RTCPeerConnection.createDataChannel`.
+default value `negotiated: false` when creating a standard libp2p stream 
+of type `RTCDataChannel` via `RTCPeerConnection.createDataChannel`. 
+Setting `negotiated: true` is reserved only for creating Noise handshake channels
+under certain protocol conditions.
 
 The WebRTC user agent (i.e. not the application) decides on the `RTCDataChannel`
 ID based on the local node's connection role. For the interested reader see
