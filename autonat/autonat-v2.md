@@ -43,7 +43,7 @@ Initially, such a transport will not be widely supported in the network.
 Requests for verifying such addresses can be reused to get information about
 other addresses
 
-The client can verify that the server did successfully dial an address of the
+The client can verify the server did successfully dial an address of the
 same transport as it reported in the response by checking the local address of
 the connection on which the nonce was received on.  
 
@@ -61,25 +61,25 @@ attacks. `autonat v1` disallowed such dials to prevent amplification attacks.
 
 ![Autonat V2 Interaction](autonat-v2.svg)
 
-A client node wishing to determine reachability of its adddresses sends a
+A client node wishing to determine reachability of its addresses sends a
 `DialRequest` message to a server on a stream with protocol ID
 `/libp2p/autonat/2/dial`. Each `DialRequest` is sent on a new stream.
 
 This `DialRequest` message has a list of addresses and a fixed64 `nonce`. The
 list is ordered in descending order of priority for verification. AutoNAT V2 is
-only for testing reachability on Public Internet. Client MUST NOT send any
+only for testing reachability on Public Internet. Client SHOULD NOT send any
 private address as defined in [RFC
 1918](https://datatracker.ietf.org/doc/html/rfc1918#section-3) in the list. 
 
-Upon receiving this request, the server selects the first address from the list
-of addresses that it is capable of dialing. The server MUST NOT dial any address
-other than this one. If this selected address has an IP address different from
-the requesting node's observed IP address, server initiates the Amplification
-attack prevention mechanism (see [Amplification Attack
-Prevention](#amplification-attack-prevention) ). On completion, the server
-proceeds to the next step. If the selected address has the same IP address as
-the client's observed IP address, server proceeds to the next step skipping
-Amplification Attack Prevention steps.
+Upon receiving this request, the server selects an address from the list to
+dial. The server SHOULD use the first address it is willing to dial. The
+server MUST NOT dial any address other than this one. If this selected address
+has an IP address different from the requesting node's observed IP address,
+server initiates the Amplification attack prevention mechanism (see
+[Amplification Attack Prevention](#amplification-attack-prevention) ). On
+completion, the server proceeds to the next step. If the selected address has
+the same IP address as the client's observed IP address, server proceeds to the
+next step skipping Amplification Attack Prevention steps.
 
 The server dials the selected address, opens a stream with Protocol ID
 `/libp2p/autonat/2/attempt` and sends a `DialAttempt` message with the nonce
@@ -88,9 +88,9 @@ received in the request. The server MUST close this stream after sending the
 
 Upon completion of the dial attempt, the server sends a `DialResponse` message
 to the client node on the `/libp2p/autonat/2/dial` stream. The response contains
-a list of `DialStatus`es with a status for each address in the list up to and
-including the address that the server attempted to dial. The `DialStatus` for an
-address is set according to [Requirements for
+`addrIdx`, the index of the address the server selected to dial and
+`DialStatus`, a dial status indicating the outcome of the dial attempt. The
+`DialStatus` for an address is set according to [Requirements for
 DialStatus](#requirements-for-dialstatus). The response also contains an
 appropriate `ResponseStatus` set according to [Requirements For
 ResponseStatus](#requirements-for-responsestatus).
@@ -105,55 +105,43 @@ close the stream after receiving the response.
 
 ### Requirements for DialStatus
 
-On receiving a `DialRequest` the server goes through the list of addresses in
-the request to select the first address that it is capable of dialing. For every
-address that the server checks, it assigns a `DialStatus` according to the
-following requirements. 
+On receiving a `DialRequest`, the server first selects an address that it will dial. 
 
-For addresses that the server decides to not dial:
+If server chooses to not dial any of the requested addresses, `DialStatus` is
+set to `E_DIAL_REFUSED`. In this case no dial attempt was made and
+the `addrIdx` sent with the response is meaningless.
 
-`E_ADDRESS_UNKNOWN`: The server didn't understand the address. 
+If the server selects an address for dialing, `addrIdx` is set to the
+index(zero-based) of the address on the list and the `DialStatus` is
+set according to the following consideration:
 
-`E_TRANSPORT_NOT_SUPPORTED`: The server understood the address, but has no
-transport capable of dialing the requested address. 
+If the server was unable to connect to the client on the selected address,
+`DialStatus` is set to `E_DIAL_ERROR`, indicating the selected address is
+not publicly reachable. 
 
-`E_DIAL_REFUSED`: The server didn't dial the address because of address based
-restrictions like address based rate limit, the address being a private IP
-address, or a relay address.
+If the server was able to connect to the client on the selected address, but an
+error occured while sending an nonce on the `/libp2p/autonat/2/attempt` stream,
+`DialStatus` is set to `E_DIAL_ATTEMPT_ERROR`. This might happen in case of
+resource limited situations on client or server, or when either the client or
+the server is misconfigured. 
 
-For the address that the server decided to dial:
-
-`E_DIAL_ERROR`: The server was unable to connect to the address
-
-`E_CONN_UPGRADE_FAILED`: The server was able to connect to the address, but
-failed to complete the connection upgrade step.
-
-`E_ATTEMPT_ERROR`: The server was able to establish an upgraded connection but
-some error occured when sending the nonce on the `/libp2p/autonat/2/attempt`
-stream.
-
-`OK`: The server successfully dialed the selected address.
-
-The server MUST NOT send dial statuses for addresses after the one it selected
-to dial.
-
+If the server was able to connect to the client and successfully send a nonce on
+the `/libp2p/autonat/2/attempt` stream, `DialStatus` is set to `OK`. 
 
 ### Requirements for ResponseStatus
 
 The `ResponseStatus` sent by the server in the `DialResponse` message MUST be
 set according to the following requirements
 
-`OK`: the server completed the request successfully. A request is considered
-completed successfully when the server either completes a dial(successfully or
-unsuccessfully) or rejects all addresses in the request as undialable. 
-
-`E_BAD_REQUEST`: the server was unable to decode the request.
-
-`E_REQUEST_REFUSED`: the server didn't attempt to serve the request because of
+`E_REQUEST_REJECTED`: the server didn't attempt to serve the request because of
 rate limiting, resource limit reached or blacklisting.
 
 `E_INTERNAL_ERROR`: error not classified within the above error codes occured on
-server that prevented it from completing the request.
+server preventing it from completing the request.
+
+`OK`: the server completed the request successfully. A request is considered
+completed successfully when the server either completes a dial(successfully or
+unsuccessfully) or rejects all addresses in the request as undialable.
 
 Implementations MUST discard responses with status codes they do not understand. 
 
@@ -171,8 +159,8 @@ unattractive.
 On receiving a `DialRequest`, the server selects the first address it is capable
 of dialing. If this selected address has a IP different from the client's
 observed IP, the server sends a `DialDataRequest` message with the selected
-address's index(0 based) and `numBytes` set to a sufficiently large value on the
-`/libp2p/autonat/2/dial` stream
+address's index(zero-based) and `numBytes` set to a sufficiently large value on
+the `/libp2p/autonat/2/dial` stream
 
 Upon receiving a `DialDataRequest` message, the client decides whether to accept
 or reject the cost of dial. If the client rejects the cost, the client resets
@@ -181,12 +169,11 @@ the cost, the client starts transferring `numBytes` bytes to the server. The
 client transfers these bytes wrapped in `DialDataResponse` protobufs where the
 `data` field in each individual protobuf is limited to 4096 bytes in length.
 This allows implementations to use a small buffer for reading and sending the
-data as well as cleaner interoperability with rest of the messages exchanged on
-the stream. The server only calculates the size of the `data` field of
-`DialDataResponse` protobufs as the bytes transferred and not the total size of
-the protobuf. The server on receiving numBytes bytes proceeds to dial the selected address.
+data. Only the size of the `data` field of `DialDataResponse` protobufs is
+counted towards the bytes transferred. Once the server has received numBytes
+bytes, it proceeds to dial the selected address.
 
-If an attacker asks a server to dial a victim node, the only benefit that the
+If an attacker asks a server to dial a victim node, the only benefit the
 attacker gets is forcing the server and the victim to do a cryptographic
 handshake which costs some bandwidth and compute. The attacker by itself can do
 a lot of handshakes with the victim without spending any compute by using the
@@ -224,8 +211,7 @@ All RPC messages on stream `/libp2p/autonat/2/dial` are of type `Message`. A
 
 On stream `/libp2p/autonat/2/attempt`, a `DialAttempt` message is sent directly
 
-```proto
-syntax = "proto3";
+```proto3
 
 message Message {
     oneof msg {
@@ -249,27 +235,23 @@ message DialDataRequest {
 
 
 enum DialStatus {
-    OK                        = 0;
-    E_DIAL_ERROR              = 100;
-    E_CONN_UPGRADE_FAILED     = 101;
-    E_ATTEMPT_ERROR           = 102;
-    E_DIAL_REFUSED            = 200;
-    E_TRANSPORT_NOT_SUPPORTED = 300;
-    E_ADDRESS_UNKNOWN         = 301;
-    SKIPPED                   = 400;
+    E_DIAL_REFUSED  = 0;
+    E_DIAL_ERROR    = 100;
+    E_ATTEMPT_ERROR = 101;
+    OK              = 200;
 }
 
 
 message DialResponse {
     enum ResponseStatus {
-        ResponseStatus_OK         = 0;
-        E_BAD_REQUEST             = 100;
-        E_REQUEST_REFUSED         = 101;
-        E_INTERNAL_ERROR          = 300;
+        E_INTERNAL_ERROR   = 0;
+        E_REQUEST_REJECTED = 100; 
+        ResponseStatus_OK  = 200; 
     }
 
     ResponseStatus status = 1;
-    repeated DialStatus dialStatuses = 2;
+    uint32 addrIdx        = 2; 
+    DialStatus dialStatus = 3;
 }
 
 
