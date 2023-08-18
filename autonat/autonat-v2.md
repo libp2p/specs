@@ -196,7 +196,9 @@ are free to use different heuristics than this one
 
 Servers SHOULD NOT reuse their listening port when making a dial attempt. In
 case the client has reused their listen port when dialing out to the server, not
-reusing the listen port for attempts prevents accidental hole punches. 
+reusing the listen port for attempts prevents accidental hole punches. Clients
+SHOULD only rely on the nonce and not on the peerID for tallying the dial
+attempt as the server is free to use a separate peerID for the dial attempts.
 
 
 ## RPC Messages
@@ -222,6 +224,7 @@ message Message {
     }
 }
 
+
 message DialRequest {
     repeated bytes addrs = 1;
     fixed64 nonce = 2;
@@ -235,10 +238,12 @@ message DialDataRequest {
 
 
 enum DialStatus {
-    E_DIAL_REFUSED  = 0;
-    E_DIAL_ERROR    = 100;
-    E_ATTEMPT_ERROR = 101;
-    OK              = 200;
+    // Default value to force servers to explicitly set the status
+    E_INTERNAL_ERROR = 0;
+    E_DIAL_REFUSED   = 100;
+    E_DIAL_ERROR     = 101;
+    E_ATTEMPT_ERROR  = 102;
+    OK               = 200;
 }
 
 
