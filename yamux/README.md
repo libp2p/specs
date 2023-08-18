@@ -165,5 +165,5 @@ The ACK backlog is defined as the number of streams that a peer has opened which
 To support a basic form of backpressure, implementions:
 
 - SHOULD at most allow an ACK backlog of 256 streams.
-- SHOULD buffer at least 256 unacknowledged inbound streams.
+- MAY buffer unacknowledged inbound streams instead of resetting them when the application currently cannot handle any more streams.
 - SHOULD NOT implicitly acknowledge streams but wait for the application to send the first DATA frame.
