@@ -258,7 +258,7 @@ message DialResponse {
         E_INTERNAL_ERROR   = 0;
         E_REQUEST_REJECTED = 100; 
         E_DIAL_REFUSED     = 101;
-        ResponseStatus_OK  = 200; 
+        OK  = 200; 
     }
 
     ResponseStatus status = 1;
