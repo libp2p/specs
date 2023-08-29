@@ -167,4 +167,4 @@ To support a basic form of backpressure, implementions:
 - SHOULD at most allow an ACK backlog of 256 streams.
 - MAY buffer unacknowledged inbound streams instead of resetting them when the application currently cannot handle any more streams.
   Such a buffer MUST be bounded in size to mitigate DoS attacks.
-- SHOULD NOT implicitly acknowledge streams but wait for the application to send the first DATA frame.
+- MAY delay acknowledging new streams until the application has received or is about to send the first DATA frame.
