@@ -2,9 +2,9 @@
 
 > Local peer discovery with zero configuration using multicast DNS.
 
-| Lifecycle Stage | Maturity      | Status | Latest Revision |
-| --------------- | ------------- | ------ | --------------- |
-| 1A              | Working Draft | Active | r2, 2021-10-12  |
+| Lifecycle Stage | Maturity       | Status | Latest Revision |
+|-----------------|----------------|--------|-----------------|
+| 1A              | Working Draft  | Active | r2, 2021-10-12  |
 
 Authors: [@richardschneider]
 
@@ -120,7 +120,7 @@ Many existing tools ignore the Additional Records, and always send individual qu
 
 ## Issues
 
-mDNS requires link-local addresses. Loopback and "NAT busting" addresses should be not sent and must be ignored on receipt.
+mDNS requires link-local addresses. Loopback and "NAT busting" addresses should not be sent and must be ignored on receipt.
 
 ## References
 
