@@ -120,7 +120,7 @@ Many existing tools ignore the Additional Records, and always send individual qu
 
 ## Issues
 
-[ ] mDNS requires link-local addresses. Loopback and "NAT busting" addresses should not sent and must be ignored on receipt?
+mDNS requires link-local addresses. Loopback and "NAT busting" addresses should not sent and must be ignored on receipt.
 
 ## References
 
