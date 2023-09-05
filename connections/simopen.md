@@ -1,8 +1,11 @@
 # Connection bootstrapping: Handling simultaneous open in multistream-select
 
-| Lifecycle Stage | Maturity      | Status | Latest Revision |
-|-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r0, 2021-05-07  |
+> This multistream extension is deprecated.
+> See https://github.com/libp2p/specs/issues/573 for details.
+
+| Lifecycle Stage | Maturity      | Status     | Latest Revision |
+|-----------------|---------------|------------|-----------------|
+| 1A              | Working Draft | Deprecated | r1, 2023-09-05  |
 
 Authors: [@vyzo]
 
