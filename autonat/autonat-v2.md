@@ -206,6 +206,9 @@ reusing the listen port for attempts prevents accidental hole punches. Clients
 SHOULD only rely on the nonce and not on the peerID for verifying the dial back
 as the server is free to use a separate peerID for the dial backs.
 
+Servers SHOULD determine whether they have IPv6 and IPv4 connectivity. IPv4 only servers SHOULD refuse requests for dialing IPv6 addresses and IPv6 only
+servers SHOULD refuse requests for dialing IPv4 addresses.
+
 
 ## RPC Messages
 
