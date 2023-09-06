@@ -5,7 +5,7 @@
 
 | Lifecycle Stage | Maturity      | Status     | Latest Revision |
 |-----------------|---------------|------------|-----------------|
-| 1A              | Working Draft | Deprecated | r1, 2023-09-05  |
+| 1T              | Terminated    | Deprecated | r1, 2023-09-05  |
 
 Authors: [@vyzo]
 
