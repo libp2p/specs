@@ -78,9 +78,9 @@ To prevent DoS the number of `IDONTWANT` control messages is limited to `max_ido
 
 ### Cancelling `IWANT`
 
-If a node requested a message via `IWANT` and then occasionally receives the message from other peer it may 
+If a node requested a message via `IWANT` and then occasionally receives the message from other peer it MAY 
 try to cancel its `IWANT` requests with the corresponding `IDONTWANT` message. It may work in cases when a
-peer delays/queues `IWANT` requests and the `IWANT` request would be removed from the queue if not processed yet
+peer delays/queues `IWANT` requests and the `IWANT` request SHOULD be removed from the queue if not processed yet
 
 ## Protobuf Extension
 
