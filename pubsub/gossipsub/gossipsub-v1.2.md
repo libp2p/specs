@@ -76,18 +76,6 @@ on per message basis when the size is exceeded or just use `IDONTWANT` for all m
 
 To prevent DoS the number of `IDONTWANT` control messages is limited to `max_idontwant_messages` per heartbeat  
 
-### Relying on `IHAVE`s
-
-Another potential additional strategy could be as follows. If a node receives `IHAVE` (from one or more peers)
-before the message is appeared in the mesh the node may request the message with `IWANT` and notify all mesh 
-peers that it don't want that message from them. 
-
-### Sending `IHAVE` to mesh peers who choked that particular message
-
-Reasonable addition to the later scenario would be to _immediately_ send `IHAVE` instead of a full message
-to those mesh peers who reported `IDONTWANT`. That would notify mesh peers that the node has this message 
-and they could request it from you in case their `IWANT` requests fail in the previous scenario 
-
 ### Cancelling `IWANT`
 
 If a node requested a message via `IWANT` and then occasionally receives the message from other peer it may 
