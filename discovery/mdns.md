@@ -85,8 +85,6 @@ The **additional records** of the response contain the peer's discovery details:
 
 The TXT record contains the multiaddresses that the peer is listening on. Each multiaddress is a TXT attribute with the form `dnsaddr=/.../p2p/QmId`. Multiple `dnsaddr` attributes and/or TXT records are allowed.
 
-Note that `mDNS` requires link-local addresses. Loopback and "NAT busting" addresses should not be sent and must be ignored on receipt.
-
 ## DNS Service Discovery
 
 DNS-SD support is not needed for peers to discover each other. However, it is extremely useful for network administrators to discover what is running on the network.
@@ -119,7 +117,6 @@ Many existing tools ignore the Additional Records, and always send individual qu
 - `<peer-name>.<service-name> TXT`
 - `<host-name> A`
 - `<host-name> AAAA`
-
 
 ## References
 
