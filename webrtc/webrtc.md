@@ -43,7 +43,7 @@ On a historical note, this specification replaces the existing [libp2p WebRTC st
 7. _A_ and _B_ send their local ICE candidates via the existing signaling protocol stream to enable trickle ICE.
    Both nodes continuously read from the stream, adding incoming remote candidates via `RTCPeerConnection.addIceCandidate()`.
 
-8. On successful establishment of the direct connection, _B_ and _A_ close the signaling protocol stream.
+8. On successful establishment of the direct connection, _B_ and _A_ leave the signaling protocol stream open to renegotiate ICE candidates if there is a change to the communication environment.
    On failure _B_ and _A_ reset the signaling protocol stream.
 
    Behavior for transferring data on a relayed connection, in the case where the direct connection failed, is out of scope for this specification and dependent on the application.
