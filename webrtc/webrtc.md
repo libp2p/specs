@@ -27,6 +27,7 @@ On a historical note, this specification replaces the existing [libp2p WebRTC st
    Note that further steps depend on the relayed connection to be authenticated, i.e. that data sent on the relayed connection can be trusted.
 
 4. _A_ (outbound side of relayed connection) creates an `RTCPeerConnection` provided by a W3C compliant WebRTC implementation (e.g. a browser).
+   _A_ creates a datachannel via `RTCPeerConnection.createDataChannel` with the label `init`. This channel is required to ensure that ICE information is shared in the SDP offer.
    See [STUN](#stun) section on what STUN servers to configure at creation time.
    _A_ creates an SDP offer via `RTCPeerConnection.createOffer()`.
    _A_ initiates the signaling protocol to _B_ via the relayed connection from (1), see [Signaling Protocol](#signaling-protocol) and sends the offer to _B_.
@@ -43,7 +44,7 @@ On a historical note, this specification replaces the existing [libp2p WebRTC st
 7. _A_ and _B_ send their local ICE candidates via the existing signaling protocol stream to enable trickle ICE.
    Both nodes continuously read from the stream, adding incoming remote candidates via `RTCPeerConnection.addIceCandidate()`.
 
-8. On successful establishment of the direct connection, _B_ and _A_ leave the signaling protocol stream open to renegotiate ICE candidates if there is a change to the communication environment.
+8. On successful establishment of the direct connection, _A_ closes the `init` data channel created in step _4_ but leave the signaling protocol stream open to renegotiate ICE candidates if there is a change to the communication environment.
    On failure _B_ and _A_ reset the signaling protocol stream.
 
    Behavior for transferring data on a relayed connection, in the case where the direct connection failed, is out of scope for this specification and dependent on the application.
