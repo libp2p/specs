@@ -67,6 +67,10 @@ message Message {
     // The sender abruptly terminates the sending part of the stream. The
     // receiver MAY discard any data that it already received on that stream.
     RESET_STREAM = 2;
+    // The receiver has previously sent a message with a FIN flag. On receiving
+    // this flag they may now close the stream as they know the remote has received
+    // all data that was sent.
+    FIN_ACK = 3;
   }
 
   optional Flag flag=1;
@@ -132,8 +136,8 @@ real-world experiments.
 
 `RTCDataChannel`s are negotiated in-band by the WebRTC user agent (e.g. Firefox,
 Pion, ...). In other words libp2p WebRTC implementations MUST NOT change the
-default value `negotiated: false` when creating a standard libp2p stream 
-of type `RTCDataChannel` via `RTCPeerConnection.createDataChannel`. 
+default value `negotiated: false` when creating a standard libp2p stream
+of type `RTCDataChannel` via `RTCPeerConnection.createDataChannel`.
 Setting `negotiated: true` is reserved only for creating Noise handshake channels
 under certain protocol conditions.
 
@@ -160,6 +164,50 @@ MUST pass an empty string. When receiving an `RTCDataChannel` via
 `RTCPeerConnection.ondatachannel` implementations MUST NOT require `label` to be
 an empty string. This allows future versions of this specification to make use
 of the `RTCDataChannel` `label` property.
+
+## Closing an `RTCDataChannel`
+
+Some WebRTC implementations do not guarantee that any queued messages will be
+sent after a datachannel is closed.  Other implementatations maintain separate
+outgoing message and transport queues, the status of which may not be visible
+to the user. Consequently we must add an additional layer of signaling to ensure
+reliable data delivery.
+
+When a node wishes to close a stream for writing, it should send a message with
+the `FIN` flag set, then proceed to wait for a `FIN_ACK` message from the remote
+node.
+
+If a `FIN` flag is received and the node has finished writing data, it should
+respond with a `FIN_ACK` immediately.
+
+If a `FIN` flag is recieved but the node has not finished writing data, it should
+delay sending a `FIN_ACK` response until it has finished writing data, sent a
+`FIN` flag, and finally received a `FIN_ACK` in response.
+
+When a `FIN_ACK` has been sent and received, a node may close the datachannel.
+
+The node may close the datachannel without receiving a `FIN_ACK`, for example in
+the case of a timeout, but there will be no guarantee that all previously sent
+messages have been received.
+
+If a node has previously sent a `STOP_SENDING` flag to the remote node, it must
+continue to act on any flags present in received messages in order to
+successfully process an incoming `FIN_ACK`.
+
+### Example of closing an `RTCDataChannel`
+
+NodeA closes for writing, NodeB delays allowing the channel to close until it also
+finishes writing.
+
+```mermaid
+sequenceDiagram
+    NodeA->>NodeB: DATA
+    NodeA->>NodeB: FIN
+    NodeB->>NodeA: DATA
+    NodeB->>NodeA: FIN
+    NodeA->>NodeB: FIN_ACK
+    NodeB->>NodeA: FIN_ACK
+```
 
 ## Previous, ongoing and related work
 
