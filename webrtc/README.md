@@ -67,9 +67,9 @@ message Message {
     // The sender abruptly terminates the sending part of the stream. The
     // receiver MAY discard any data that it already received on that stream.
     RESET_STREAM = 2;
-    // The receiver has previously sent a message with a FIN flag. On receiving
-    // the FIN_ACK flag they may now close the stream as they know the remote has received
-    // all data that was sent before the FIN.
+    // Sending the FIN_ACK flag acknowledges the previous receipt of a message
+    // with the FIN flag set. Receiving a FIN_ACK flag gives the recipient
+    // confidence that the remote has received all sent messages.
     FIN_ACK = 3;
   }
 
@@ -168,7 +168,7 @@ of the `RTCDataChannel` `label` property.
 ## Closing an `RTCDataChannel`
 
 Some WebRTC implementations do not guarantee that any queued messages will be
-sent after a datachannel is closed.  Other implementatations maintain separate
+sent after a datachannel is closed.  Other implementations maintain separate
 outgoing message and transport queues, the status of which may not be visible
 to the user. Consequently we must add an additional layer of signaling to ensure
 reliable data delivery.
@@ -177,14 +177,9 @@ When a node wishes to close a stream for writing, it SHOULD send a message with
 the `FIN` flag set, then proceed to wait for a `FIN_ACK` message from the remote
 node.
 
-If a `FIN` flag is received and the node has finished writing data, it SHOULD
-respond with a `FIN_ACK` immediately.
+If a `FIN` flag is received the node SHOULD respond with a `FIN_ACK`.
 
-If a `FIN` flag is received but the node has not finished writing data, it SHOULD
-delay sending a `FIN_ACK` response until it has finished writing data, sent a
-`FIN` flag, and finally received a `FIN_ACK` in response.
-
-When a `FIN_ACK` has been sent and received, a node may close the datachannel.
+When a `FIN_ACK` and a `FIN` have been received, a node may close the datachannel.
 
 The node MAY close the datachannel without receiving a `FIN_ACK`, for example in
 the case of a timeout, but there will be no guarantee that all previously sent
@@ -203,11 +198,17 @@ finishes writing.
 sequenceDiagram
     NodeA->>NodeB: DATA
     NodeA->>NodeB: FIN
+    NodeB->>NodeA: FIN_ACK
     NodeB->>NodeA: DATA
     NodeB->>NodeA: FIN
     NodeA->>NodeB: FIN_ACK
-    NodeB->>NodeA: FIN_ACK
 ```
+
+After NodeA has received the `FIN` it is free to close the datachannel since it
+has previously received a `FIN_ACK`. If NodeB receives the `FIN_ACK` before this
+it may close the channel since it previously received a `FIN`.
+
+This way the channel can be closed from either end without data loss.
 
 ## Previous, ongoing and related work
 
