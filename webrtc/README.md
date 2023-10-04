@@ -174,9 +174,11 @@ to the user. Consequently we must add an additional layer of signaling to ensure
 reliable data delivery.
 
 When a node wishes to close a stream for writing, it SHOULD send a message with
-the `FIN` flag set. A node SHOULD only consider its write-half closed once it received a `FIN_ACK`.
+the `FIN` flag set.
 
 If a `FIN` flag is received the node SHOULD respond with a `FIN_ACK`.
+
+A node SHOULD only consider its write-half closed once it received a `FIN_ACK`.
 
 When a `FIN_ACK` and a `FIN` have been received, a node may close the datachannel.
 
