@@ -173,14 +173,14 @@ outgoing message and transport queues, the status of which may not be visible
 to the user. Consequently we must add an additional layer of signaling to ensure
 reliable data delivery.
 
-When a node wishes to close a stream for writing, it SHOULD send a message with
+When a node wishes to close a stream for writing, it MUST send a message with
 the `FIN` flag set.
 
 If a `FIN` flag is received the node SHOULD respond with a `FIN_ACK`.
 
-A node SHOULD only consider its write-half closed once it received a `FIN_ACK`.
+A node SHOULD only consider its write-half closed once it has received a `FIN_ACK`.
 
-When a `FIN_ACK` and a `FIN` have been received, a node may close the datachannel.
+When a `FIN_ACK` and a `FIN` have been received, the node may close the datachannel.
 
 The node MAY close the datachannel without receiving a `FIN_ACK`, for example in
 the case of a timeout, but there will be no guarantee that all previously sent
