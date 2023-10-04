@@ -174,8 +174,7 @@ to the user. Consequently we must add an additional layer of signaling to ensure
 reliable data delivery.
 
 When a node wishes to close a stream for writing, it SHOULD send a message with
-the `FIN` flag set, then proceed to wait for a `FIN_ACK` message from the remote
-node.
+the `FIN` flag set. A node SHOULD only consider its write-half closed once it received a `FIN_ACK`.
 
 If a `FIN` flag is received the node SHOULD respond with a `FIN_ACK`.
 
@@ -183,7 +182,7 @@ When a `FIN_ACK` and a `FIN` have been received, a node may close the datachanne
 
 The node MAY close the datachannel without receiving a `FIN_ACK`, for example in
 the case of a timeout, but there will be no guarantee that all previously sent
-messages have been received.
+messages have been received by the remote.
 
 If a node has previously sent a `STOP_SENDING` flag to the remote node, it MUST
 continue to act on any flags present in received messages in order to
@@ -196,16 +195,16 @@ finishes writing.
 
 ```mermaid
 sequenceDiagram
-    NodeA->>NodeB: DATA
-    NodeA->>NodeB: FIN
-    NodeB->>NodeA: FIN_ACK
-    NodeB->>NodeA: DATA
-    NodeB->>NodeA: FIN
-    NodeA->>NodeB: FIN_ACK
+    A->>B: DATA
+    A->>B: FIN
+    B->>A: FIN_ACK
+    B->>A: DATA
+    B->>A: FIN
+    A->>B: FIN_ACK
 ```
 
-After NodeA has received the `FIN` it is free to close the datachannel since it
-has previously received a `FIN_ACK`. If NodeB receives the `FIN_ACK` before this
+After _A_ has received the `FIN` it is free to close the datachannel since it
+has previously received a `FIN_ACK`. If _B_ receives the `FIN_ACK` before this
 it may close the channel since it previously received a `FIN`.
 
 This way the channel can be closed from either end without data loss.
