@@ -96,7 +96,7 @@ a certain resource is meant to be interpreted.
 {
     "protocols": {
         "/kad/1.0.0": {"path": "/kademlia/"},
-        "/ipfs-http/1.0.0": {"path": "/"},
+        "/ipfs/gateway": {"path": "/"},
     }
 }
 ```
