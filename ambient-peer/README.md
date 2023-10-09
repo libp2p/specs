@@ -21,8 +21,7 @@ See the [lifecycle document][lifecycle-spec] for context about the maturity leve
 ## Overview
 
 The ambient peer discovery protocol allows peers to share some of their ambient peers with each other.
-Ambient in this case simply means "known peers".
-There is no definition of distance like in kademlia and neither do peers have to be connected to consider another peer as ambient.
+Ambient in this case means "peers I used to be connected to".
 
 ## Usecase
 
@@ -35,26 +34,31 @@ Ambient peer discovery allows the web app to inquire for further nodes from the 
 ## Protocol
 
 1. Node _A_ opens a new stream to node _B_ with the protocol name `/libp2p/ambient-peers`.
-2. Node _B_ chooses a subset of at most 5 known peer records received from other peers.
-   The chosen peer records SHOULD at least have one address that share the same transport technology as the the connection between node _A_ and node _B_.
-   For example, if node _A_ and node _B_ are connected via WebRTC, node _B_ SHOULD select 5 peer records where each one of them has at least one WebRTC address.
-3. Node _B_ writes these peer records onto the stream in their [protobuf encoding](https://github.com/libp2p/specs/blob/master/RFC/0003-routing-records.md#address-record-format), each record being length-prefixed using an unsigned varint and closes the stream after the last one.
-4. Node _A_ reads peer records from the stream until EOF or 5 have been received, whichever comes earlier.
+1. Node _B_ chooses a subset of at most 5 known peer records received from other peers.
+   1. The chosen peer records SHOULD at least have one address that share the same transport technology as the the connection between node _A_ and node _B_.
+      For example, if node _A_ and node _B_ are connected via WebRTC, node _B_ SHOULD select 5 peer records where each one of them has at least one WebRTC address.
+   1. Node _B_ MUST NOT be currently connected to any of these nodes.
+1. Node _B_ writes these peer records onto the stream in their [protobuf encoding](https://github.com/libp2p/specs/blob/master/RFC/0003-routing-records.md#address-record-format), each record being length-prefixed using an unsigned varint and closes the stream after the last one.
+1. Node _A_ reads peer records from the stream until EOF or 5 have been received, whichever comes earlier.
 
 ## Security considerations
 
 Revealing even just some of your peers has serious privacy and security implications for a network.
-Care has been taken to mitigate some of these at the design level of the ambient peer discovery protocol.
-However, users should still be aware that usage of this protocol does reveal _some_ of your either current or past connections.
+As a result, this specification forbids nodes to return peer records of nodes they are connected to.
 
 <!-- @vyzo to add more text here -->
 
-### Pre-sample peer records
+## Implementation considerations
 
-Creating new nodes is cheap, meaning we have to assume that repeated requests for e.g. TCP nodes may all come from the same actor trying to map the network.
-Implementations therefore MUST pre-sample which peer records they will return for a particular transport protocol and return the same set, regardless of which peer is asking.
+### Bound local peer storage
 
-Implementations MAY group transports as follows to further reduce how many peers they reveal:
+This protocol requires nodes to store records of peers they used to be connected to.
+This is useful independently of this protocol to e.g. reconnect to a peer you've once been connected to.
+Implementations should take care that the resulting memory or disk usage is bounded and only store a number of peers appropriate for their deployment target (mobile, server, etc). 
+
+### Group transport technologies
+
+Implementations MAY group transports as follows:
 
 1. **Anything on top of TCP:** We support several encryption protocols on top of TCP like noise or TLS.
    Some nodes may choose to embed this in their multiaddress using `/tls` or `/noise`.
