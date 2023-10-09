@@ -68,3 +68,32 @@ Implementations MAY group transports as follows:
 3. **Anything Web:** If a peer connects over `/webrtc`, `/webrtc-direct`, `/webtransport` or `/ws`, chances are they are a browser node.
    As such, nodes MAY assume that any peer record with one of these is useful.
 4. **IPv4 & IPv6**: Nodes MAY assume that the requesting peer is capable of dialing either version of IP, regardless of which one was used to make the connection.
+
+## Prior art
+
+Exchanging peers one knows is a common thing in the peer-to-peer space:
+
+1. [PEX](https://en.wikipedia.org/wiki/Peer_exchange) augments the BitTorrent protocol.
+2. Bitcoin nodes can send [`addr`](https://en.bitcoin.it/wiki/Protocol_documentation#addr) messages to exchange peers with one another.
+3. WAKU has an [ambient-peer discovery](https://github.com/vacp2p/rfc/blob/master/content/docs/rfcs/34/README.md) protocol built on top of libp2p.
+
+There have been several discussions in the libp2p space about adding such a protocol:
+
+- https://github.com/libp2p/specs/issues/222
+- https://github.com/libp2p/notes/issues/3
+- https://github.com/libp2p/notes/issues/7
+
+## FAQ
+
+### Why not use the rendezvous?
+
+The rendezvous protocol could be repurposed as a kind of peer exchange protocol.
+We would have to agree on an identifier that all peers use to register themselves within a certain topic.
+Other peers can then go and query a node for all peers registered under this topic.
+
+We consider this impractical for the given problem because:
+
+- It requires three parties to support the protocol instead of just two and thus would take a lot longer to be rolled out.
+- It creates a lot of traffic.
+  Nodes have to actively register themselves without knowing whether their peer record will ever be distributed / requested.
+  To be effective, every node would have to register themselves with every other node.
