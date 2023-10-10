@@ -75,6 +75,7 @@ Implementations MAY group transports as follows:
 Libp2p is used across a range of networks and many of them may not actually have a useful overlap in compatible protocols.
 To avoid sharing addresses of peers that don't support useful protocols, implementations SHOULD allow configuration of the protocol identifier.
 For example, instead of `/libp2p/ambient-peers` a node may use `/my-cool-p2p-network/ambient-peers`.
+It is RECOMMENDED that implementations retain the `/ambient-peers` suffix to communicate the semantics of this protocol.
 
 ## Prior art
 
