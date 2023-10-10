@@ -37,14 +37,15 @@ Ambient peer discovery allows the web app to inquire for further nodes from the 
 1. Node _B_ chooses a subset of at most 5 known peer records received from other peers.
    1. The chosen peer records SHOULD at least have one address that share the same transport technology as the the connection between node _A_ and node _B_.
       For example, if node _A_ and node _B_ are connected via WebRTC, node _B_ SHOULD select 5 peer records where each one of them has at least one WebRTC address.
-   1. Node _B_ MUST NOT be currently connected to any of these nodes.
+   1. Node _B_ SHOULD NOT be currently connected to any of these nodes.
 1. Node _B_ writes these peer records onto the stream in their [protobuf encoding](https://github.com/libp2p/specs/blob/master/RFC/0003-routing-records.md#address-record-format), each record being length-prefixed using an unsigned varint and closes the stream after the last one.
 1. Node _A_ reads peer records from the stream until EOF or 5 have been received, whichever comes earlier.
 
 ## Security considerations
 
 Revealing even just some of your peers has serious privacy and security implications for a network.
-As a result, this specification forbids nodes to return peer records of nodes they are connected to.
+By default, implementations MUST NOT share records of peers they are currently connected to.
+Implementations MAY add a configuration flag that allows users to override this.
 
 <!-- @vyzo to add more text here -->
 
@@ -68,6 +69,12 @@ Implementations MAY group transports as follows:
 3. **Anything Web:** If a peer connects over `/webrtc`, `/webrtc-direct`, `/webtransport` or `/ws`, chances are they are a browser node.
    As such, nodes MAY assume that any peer record with one of these is useful.
 4. **IPv4 & IPv6**: Nodes MAY assume that the requesting peer is capable of dialing either version of IP, regardless of which one was used to make the connection.
+
+### Separating networks
+
+Libp2p is used across a range of networks and many of them may not actually have a useful overlap in compatible protocols.
+To avoid sharing addresses of peers that don't support useful protocols, implementations SHOULD allow configuration of the protocol identifier.
+For example, instead of `/libp2p/ambient-peers` a node may use `/my-cool-p2p-network/ambient-peers`.
 
 ## Prior art
 
