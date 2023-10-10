@@ -6,7 +6,7 @@
 
 Authors: [@thomaseizinger]
 
-Interest Group: 
+Interest Group: <!-- Please add yourself here. -->
 
 [@thomaseizinger]: https://github.com/thomaseizinger
 
