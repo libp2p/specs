@@ -21,7 +21,6 @@ See the [lifecycle document][lifecycle-spec] for context about the maturity leve
 ## Overview
 
 The ambient peer discovery protocol allows peers to share some of their ambient peers with each other.
-Ambient in this case means "peers I used to be connected to".
 
 ## Usecase
 
