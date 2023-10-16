@@ -67,7 +67,7 @@ Implementations MAY group transports as follows:
    Some nodes may choose to embed this in their multiaddress using `/tls` or `/noise`.
    Nodes MAY consider these to be the equivalent and return a peer record containing a `/tcp/noise` address on a connection that is using `/tcp/tls`.
 2. **All versions of QUIC:** QUIC is in itself a versioned protocol and we have for the moment two multiaddress protocols: `/quic` and `/quicv1`.
-   For the purpose of ambient peer discovery, nodes MAY assume all current and future versions of QUIC are equal.
+   For the purpose of ambient peer discovery, nodes MAY assume all current and future versions of QUIC are supported by the remote node.
 3. **Anything Web:** If a peer connects over `/webrtc`, `/webrtc-direct`, `/webtransport` or `/ws`, chances are they are a browser node.
    As such, nodes MAY assume that any peer record with one of these is useful.
 4. **IPv4 & IPv6**: Nodes MAY assume that the requesting peer is capable of dialing either version of IP, regardless of which one was used to make the connection.
