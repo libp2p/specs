@@ -30,6 +30,9 @@ For example, a user may start a libp2p web app and enter another browser's relay
 The connection will succeed but because both nodes are browsers, further discovery of nodes via e.g. kademlia is not possible.
 Ambient peer discovery allows the web app to inquire for further nodes from the new connection.
 
+The protocol is designed to compliment other discovery mechanism like kademlia.
+It features a very small resource footprint and can thus also be used by lite-clients within browser or mobile environments.
+
 ## Protocol
 
 1. Node _A_ opens a new stream to node _B_ with the protocol name `/libp2p/ambient-peers`.
