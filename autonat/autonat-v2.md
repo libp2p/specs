@@ -64,7 +64,7 @@ attacks. `autonat v1` disallowed such dials to prevent amplification attacks.
 
 A client node wishing to determine reachability of its addresses sends a
 `DialRequest` message to a server on a stream with protocol ID
-`/libp2p/autonat/2/dial`. Each `DialRequest` is sent on a new stream.
+`/libp2p/autonat/2/dial-request`. Each `DialRequest` is sent on a new stream.
 
 This `DialRequest` message has a list of addresses and a fixed64 `nonce`. The
 list is ordered in descending order of priority for verification. AutoNAT V2 is
@@ -166,7 +166,7 @@ On receiving a `DialRequest`, the server selects the first address it is capable
 of dialing. If this selected address has a IP different from the client's
 observed IP, the server sends a `DialDataRequest` message with the selected
 address's index(zero-based) and `numBytes` set to a sufficiently large value on
-the `/libp2p/autonat/2/dial` stream
+the `/libp2p/autonat/2/dial-request` stream
 
 Upon receiving a `DialDataRequest` message, the client decides whether to accept
 or reject the cost of dial. If the client rejects the cost, the client resets
