@@ -74,7 +74,7 @@ as the protocol string.
 
 ### Explicit Peering Agreements
 
-The protocol now supports explict peering agreements between node operators. With explicit peering,
+The protocol now supports explicit peering agreements between node operators. With explicit peering,
 the application can specify a list of peers to remain connected to and unconditionally forward
 messages to each other outside of the vagaries of the peer scoring system and other defensive
 measures.
@@ -85,7 +85,7 @@ and reconnect if the connectivity is lost. The recommended period for connectivi
 
 Peering agreements are established out of band and reciprocal.
 explicit peers exist outside the mesh: every new valid incoming message is forwarded to the direct
-peers, and incoming RPCs are always accepted from them. It is an error to GRAFT on a explicit peer,
+peers, and incoming RPCs are always accepted from them. It is an error to GRAFT on an explicit peer,
 and such an attempt should be logged and rejected with a PRUNE.
 
 ### PRUNE Backoff and Peer Exchange
@@ -155,7 +155,7 @@ mesh is used when propagating messages from other peers, but a peer's own messag
 published to all known peers in the topic.
 
 This behaviour is prescribed to counter eclipse attacks and ensure that a newly published message
-from a honest node will reach all connected honest nodes and get out to the network at large.
+from an honest node will reach all connected honest nodes and get out to the network at large.
 When flood publishing is in use there is no point in utilizing a fanout map or emitting gossip when
 the peer is a pure publisher not subscribed in the topic.
 
@@ -165,7 +165,7 @@ in the network.
 ### Adaptive Gossip Dissemination
 
 In gossipsub v1.0 gossip is emitted to a fixed number of peers, as specified by the `D_lazy`
-parameter. In gossipsub v1.1 the disemmination of gossip is adaptive; instead of emitting gossip
+parameter. In gossipsub v1.1 the dissemination of gossip is adaptive; instead of emitting gossip
 to a fixed number of peers, we emit gossip to a percentage of our peers with a minimum of `D_lazy`
 peers.
 
@@ -175,18 +175,18 @@ threshold (see [Peer Scoring](#peer-scoring) below). From these peers, it random
 factor peers with a minimum of `D_lazy`, and emits gossip to the selected peers.
 
 The recommended value for the gossip factor is `0.25`, which with the default of 3 rounds of gossip
-per message ensures that each peer has at least 50% chance of receiving gossip about a message.
+per message ensures that each peer has at least a 50% chance of receiving gossip about a message.
 More specifically, for 3 rounds of gossip, the probability of a peer _not_ receiving gossip about
 a fresh message is `(3/4)³=27/64=0.421875`. So each peer receives gossip about a fresh message with
 a `0.578125` probability.
 
-This behaviour is prescribed to counter sybil attacks and ensures that a message from a honest
+This behaviour is prescribed to counter sybil attacks and ensures that a message from an honest
 node propagates in the network with high probability.
 
 ### Outbound Mesh Quotas
 
 In gossipsub v1.0 mesh peers are randomly selected, without any weight given to the direction
-of the connection. In contrast, gossipsub v1.1 implements oubout connection quotas, so that
+of the connection. In contrast, gossipsub v1.1 implements outbound connection quotas, so that
 a peer tries to always maintain a number of outbound connections in the mesh.
 
 Specifically, we define a new overlay parameter `D_out`, which must be set below `D_lo` and
@@ -195,18 +195,18 @@ at most `D/2`, such that:
   that at least `D_out` peers are outbound connections;  see also [Peer Scoring](#peer-scoring) below.
 - When the peer receives a GRAFT while oversubscribed (with mesh degree at `D_hi` or higher), it only
   accepts the new peer in the mesh if it is an outbound connection.
-- During heartbeat maintainance, if the peer already has at least `D_lo` peers in the mesh but not
+- During heartbeat maintainence, if the peer already has at least `D_lo` peers in the mesh but not
   enough outbound connections, then it selects as many needed peers to fill the quota and grafts them
   in the mesh.
 
-This behaviour is presrcibed to counter sybil attacks and ensures that a coordinated inbound attack can
+This behaviour is prescribed to counter sybil attacks and ensures that a coordinated inbound attack can
 never fully take over the mesh of a target peer.
 
 ### Peer Scoring
 
 In gossipsub v1.1 we introduce a peer scoring component: each individual peer maintains a score
 for other peers. The score is locally computed by each individual peer based on observed behaviour
-and is not shared. The score is a real value, computed as weighted mix of parameters,
+and is not shared. The score is a real value, computed as a weighted mix of parameters,
 with pluggable application-specific scoring. The score is computed across all (configured) topics
 with a weighted mix, such that faulty behaviour in one topic percolates to other topics.
 Furthermore, the score is retained for some period of time when a peer disconnects, so that malicious
@@ -219,7 +219,7 @@ with a negative score.
 #### Score Thresholds
 
 The score is plugged into various gossipsub algorithms such that peers with negative scores are
-removed from the mesh. Peers with heavily negative score are further penalized or even ignored
+removed from the mesh. Peers with a heavily negative score are further penalized or even ignored
 if the score drops too low.
 
 More specifically, the following thresholds apply:
@@ -230,7 +230,7 @@ More specifically, the following thresholds apply:
 - `GossipThreshold`: when a peer's score drops below this threshold, no gossip is emitted towards
   that peer and gossip from that peer is ignored. This threshold should be negative, such that
   some information can be propagated to/from mildly negatively scoring peers.
-- `PublishThreshold`: when a peer's score drops below this threshold, self published messages are
+- `PublishThreshold`: when a peer's score drops below this threshold, self-published messages are
   not propagated towards this peer when (flood) publishing. This threshold should be negative, and
   less than or equal to the gossip threshold.
 - `GraylistThreshold`: when a peer's score drops below this threshold, the peer is graylisted and
@@ -240,21 +240,21 @@ More specifically, the following thresholds apply:
   be non-negative and for increased security a large positive score attainable only by bootstrappers
   and other trusted well-connected peers.
 - `OpportunisticGraftThreshold`: when the median peer score in the mesh drops below this value, the
-  router may select more peers with score above the median to opportunistically graft on the mesh
+  router may select more peers with a score above the median to opportunistically graft on the mesh
   (see Opportunistic Grafting below). This threshold should be positive, with a relatively small value
   compared to scores achievable through topic contributions.
 
 #### Heartbeat Maintenance
 
 The score is checked explicitly during heartbeat maintenance such that:
-- Peers with negative score are pruned from all meshes.
+- Peers with a negative score are pruned from all meshes.
 - When pruning because of oversubscription, the peer keeps the best `D_score` scoring peers and
   selects the remaining peers to keep at random. This protects the mesh from takeover attacks
   and ensures that the best scoring peers are kept in the mesh. At the same time, we do keep some
   peers as random so that the protocol is responsive to new peers joining the mesh.
   The selection is done under the constraint that `D_out` peers are outbound connections; if the
   scoring plus random selection does not result in enough outbound connections, then we replace
-  the random and lower scoring peers in the selection with outboud connection peers.
+  the random and lower scoring peers in the selection with outbound connection peers.
 - When selecting peers to graft because of undersubscription, peers with a negative score are ignored.
 
 #### Opportunistic Grafting
@@ -519,7 +519,7 @@ if invalidMessageDeliveries < DecayToZero {
 
 #### Guidelines for Tuning the Scoring Function
 
-`TBD`: We are currently developing multiple types of simulations that will inform us on how to best recommend tunning the Scoring function. We will update this section once that work is complete
+`TBD`: We are currently developing multiple types of simulations that will inform us on how to best recommend tuning the Scoring function. We will update this section once that work is complete
 
 #### Extended Validators
 
@@ -552,7 +552,7 @@ The following parameters apply globally:
 | `D_out`              | Integer          | Number of outbound connections to keep in the mesh. Must be less than `D_lo` and at most `D/2`  | 2 for a `D` of 6        |
 
 The remaining parameters apply to [Peer Scoring](#peer-scoring). Because many parameters are
-inter-related and may be application-specific, reasonable defaults are not shown here. See
+interrelated and may be application-specific, reasonable defaults are not shown here. See
 [Guidelines for Tuning the Scoring Function](#guidelines-for-tuning-the-scoring-function) to
 understand how tune the parameters to the needs of an application.
 
@@ -648,7 +648,7 @@ In order counter spam that elicits responses and consumes resources, some measur
 An important issue to consider when deploying gossipsub is the peer discovery mechanism,
 which must provide a secure way of discovering new peers.
 Prior to gossipsub v1.1, operators were required to utilize an external peer discovery
-mechanism to locate peers paritcipating in particular topics; with gossipsub v1.1 this is now entirely optional and the network can bootstrap
+mechanism to locate peers participating in particular topics; with gossipsub v1.1 this is now entirely optional and the network can bootstrap
 purely through a small set of network entry points (bootstrappers) by utilizing Peer Exchange. In other words, gossipsub 1.1 is now self-sufficient in this regard, as long as the node manages to find at least one peer participating in the topic of interest.
 
 In order to successfully bootstrap the network without a discovery service, network operators
