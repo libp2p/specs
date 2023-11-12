@@ -195,7 +195,7 @@ at most `D/2`, such that:
   that at least `D_out` peers are outbound connections;  see also [Peer Scoring](#peer-scoring) below.
 - When the peer receives a GRAFT while oversubscribed (with mesh degree at `D_hi` or higher), it only
   accepts the new peer in the mesh if it is an outbound connection.
-- During heartbeat maintainence, if the peer already has at least `D_lo` peers in the mesh but not
+- During heartbeat maintenance, if the peer already has at least `D_lo` peers in the mesh but not
   enough outbound connections, then it selects as many needed peers to fill the quota and grafts them
   in the mesh.
 
