@@ -186,7 +186,7 @@ node propagates in the network with high probability.
 ### Outbound Mesh Quotas
 
 In gossipsub v1.0 mesh peers are randomly selected, without any weight given to the direction
-of the conneciton. In contrast, gossipsub v1.1 implements oubout connection quotas, so that
+of the connection. In contrast, gossipsub v1.1 implements oubout connection quotas, so that
 a peer tries to always maintain a number of outbound connections in the mesh.
 
 Specifically, we define a new overlay parameter `D_out`, which must be set below `D_lo` and
