@@ -109,7 +109,9 @@ in [peer-ids](../peer-ids).
 
 ### listenAddrs
 
-These are the addresses on which the peer is listening as multi-addresses.
+The addresses on which the peer is deemed to be reachable by other peers.
+These are also sometimes referred to as _external_ addresses.
+For backwards-compatibility reasons, implementations MAY also include addresses of local interfaces.
 
 ### observedAddr
 
