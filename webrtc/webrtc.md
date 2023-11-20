@@ -21,7 +21,7 @@ On a historical note, this specification replaces the existing [libp2p WebRTC st
 
 1. _B_ advertises support for the WebRTC browser-to-browser protocol by appending `/webrtc` to its relayed multiaddr, meaning it takes the form of `<relayed-multiaddr>/webrtc/p2p/<b-peer-id>`.
 
-2. Upon discovery of _B_'s multiaddress, _A_ learns that _B_ supports the WebRTC transport and knows how to establish a relayed connection to _B_ to run the `/webrtc-signaling` protocol on top.
+2. Upon discovery of _B_'s multiaddress, _A_ learns that _B_ supports the WebRTC transport and knows how to establish a relayed connection to _B_ to run the `/webrtc-signaling/0.0.1` protocol on top.
 
 3. _A_ establishes a relayed connection to _B_.
    Note that further steps depend on the relayed connection to be authenticated, i.e. that data sent on the relayed connection can be trusted.
@@ -68,7 +68,7 @@ It is not necessary for _A_ and _B_ to use the same STUN server when establishin
 
 ## Signaling Protocol
 
-The protocol id is `/webrtc-signaling`.
+The protocol id is `/webrtc-signaling/0.0.1`.
 Messages are sent prefixed with the message length in bytes, encoded as an unsigned variable length integer as defined by the [multiformats unsigned-varint spec][uvarint-spec].
 
 ``` protobuf
