@@ -90,7 +90,7 @@ XX:
 -> s, se, [ "/yamux/1.0.0", "/mplex/6.7.0" ] 
 ```
 
-The result of this negotiation is `"/mplex/6.7.0"`.
+The result of this negotiation is `"/yamux/1.0.0"`.
 
 If there is no overlap between the multiplexers support by client and server,
 the handshake MUST fail.
