@@ -59,7 +59,7 @@ This could be performed prior to the message validation to further increase the 
 
 On the other side a node maintains per-peer `dont_send_message_ids` set. Upon receiving `IDONTWANT` from 
 a peer the `messageId` is added to the `dont_send_message_ids` set. 
-When later relaying the `messageId` message to the mesh the peers found in `dont_send_message_ids` SHOULD be skipped. 
+When later relaying the `messageId` message to the mesh the peers found in `dont_send_message_ids` MUST be skipped. 
 
 Old entries from `dont_send_message_ids` SHOULD be pruned during heartbeat processing. 
 The prune strategy is outside of the spec scope and can be decided by implementations.
