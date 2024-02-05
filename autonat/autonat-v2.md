@@ -84,8 +84,11 @@ skipping Amplification Attack Prevention steps.
 
 The server dials the selected address, opens a stream with Protocol ID
 `/libp2p/autonat/2/dial-back` and sends a `DialBack` message with the nonce
-received in the request. The client MUST close this stream after receiving the
-`DialBack` message. 
+received in the request. The client on receiving this message replies with
+a `DialBackResponse` message with the status set to `OK`. The client MUST 
+close this stream after sending the response. The dial back  response provides
+the server assurance that the message was delivered so that it can close the 
+connection.
 
 Upon completion of the dial back, the server sends a `DialResponse` message to
 the client node on the `/libp2p/autonat/2/dial-request` stream. The response
@@ -277,6 +280,14 @@ message DialDataResponse {
 
 message DialBack {
     fixed64 nonce = 1;
+}
+
+message DialBackResponse {
+    enum DialBackStatus {
+        OK = 0;
+    }
+
+    DialBackStatus status = 1;
 }
 ```
 
