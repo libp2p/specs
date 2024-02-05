@@ -1,6 +1,3 @@
-# NAT Discovery  <!-- omit in toc -->
-> How we detect if we're behind a NAT.
-
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
 | 3A              | Recommendation | Active | r1, 2023-02-16  |
