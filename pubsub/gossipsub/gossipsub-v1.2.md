@@ -99,7 +99,7 @@ message ControlMessage {
 }
 
 message ControlIDontWant {
-    required bytes messageID = 1;
+    repeated bytes messageIDs = 1;
 }
 
 ```
