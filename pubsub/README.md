@@ -288,7 +288,7 @@ On the consuming side:
 _Not required for backwards-compatibility. Considered insecure, nevertheless
 defined for completeness._
 
-Always sign, and verify incoming signatures, and but accept unsigned messages.
+Always sign, and verify incoming signatures, but accept unsigned messages.
 
 On the producing side:
   - Build messages with the `signature`, `key` (`from` may be enough), `from`
