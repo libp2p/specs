@@ -122,7 +122,7 @@ a future spec.
 
 ## Using HTTP semantics over stream transports
 
-Application protocols using HTTP semantics can run over any libp2p stream transport. Clients open a new stream using `/http/1.1` as the protocol identifer. Clients encode their HTTP request as an HTTP/1.1 message and send it over the stream. Clients parse the response as an HTTP/1.1 message and then close the stream. Clients MUST NOT pipeline requests over a single stream. Servers SHOULD set the [`Connection: close` header](https://datatracker.ietf.org/doc/html/rfc2616#section-14.10) to signal to clients that this is not a persistent connection.
+Application protocols using HTTP semantics can run over any libp2p stream transport. Clients open a new stream using `/http/1.1` as the protocol identifer. Clients encode their HTTP request as an HTTP/1.1 message and send it over the stream. Clients parse the response as an HTTP/1.1 message and then close the stream. Clients SHOULD NOT pipeline requests over a single stream. Servers SHOULD set the [`Connection: close` header](https://datatracker.ietf.org/doc/html/rfc2616#section-14.10) to signal to clients that this is not a persistent connection.
 
 HTTP/1.1 is chosen as the minimum bar for interoperability, but other encodings of HTTP semantics are possible as well and may be specified in a future update.
 
