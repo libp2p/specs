@@ -95,7 +95,7 @@ message RPC {
 
 message ControlMessage {
     // messages from v1.0
-    repeated ControlIDontWant iDontWant = 5;
+    repeated ControlIDontWant idontwant = 5;
 }
 
 message ControlIDontWant {
