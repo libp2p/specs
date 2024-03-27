@@ -2,11 +2,11 @@
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r2, 2022-12-09  |
+| 3A              | Recommendation | Active | r3, 2024-03-27  |
 
 Authors: [@raulk], [@jhiesey], [@mxinden]
 
-Interest Group:
+Interest Group: [@guillaumemichel]
 
 [@raulk]: https://github.com/raulk
 [@jhiesey]: https://github.com/jhiesey
@@ -163,7 +163,8 @@ Then we loop:
 3. Upon a response:
 	1. If successful the response will contain the `k` closest nodes the peer
        knows to the key `Key`. Add them to the candidate list `Pn`, except for
-       those that have already been queried.
+       those that have already been queried. The response should never include 
+       the responder's own peer record nor the peer record of the requester.
 	2. If an error or timeout occurs, discard it.
 4. Go to 1.
 
