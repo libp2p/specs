@@ -130,4 +130,6 @@ HTTP/1.1 is chosen as the minimum bar for interoperability, but other encodings 
 
 This document has focused on using HTTP semantics, but HTTP may not be the common divisor amongst all transports (current and future). It may be desirable to use some other request-response semantics for your application-level protocol, perhaps something like rust-libp2p’s [request-response](https://docs.rs/libp2p/0.52.1/libp2p/request_response/index.html) abstraction. Nothing specified in this document prohibits mapping other semantics onto HTTP semantics to keep the benefits of using an HTTP transport.
 
-To support the simple request-response semantics, for example, the request MUST be encoded within a `POST` request to the proper URL (as defined in the Namespace section). The response is read from the body of the HTTP response. The client MUST authenticate the server and itself **before** making the request.
+As a simple example, to support the simple request-response semantics, the request MUST be encoded within a `POST` request to the proper URL (as defined in the Namespace section). The response is read from the body of the HTTP response. The client MUST authenticate the server and itself **before** making the request. The reason to chose `POST` is because this mapping makes no assumptions on whether the request is cacheable. If HTTP caching is desired users should either build on HTTP semantics or chose another mapping with different assumptions.
+
+Other mappings may also be valid and as long as nodes agree.
