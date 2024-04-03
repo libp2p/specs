@@ -87,7 +87,7 @@ component spec](https://github.com/libp2p/specs/pull/550) for more details.
 
 libp2p does not squat the global namespace. libp2p application protocols can be
 discovered by the [well-known resource](https://www.rfc-editor.org/rfc/rfc8615)
-`.well-known/libp2p`. This allows server operators to dynamically change the
+`.well-known/libp2p/protocols`. This allows server operators to dynamically change the
 URLs of the application protocols offered, and not hard-code any assumptions how
 a certain resource is meant to be interpreted.
 
