@@ -65,7 +65,7 @@ graph TB
   defined in terms of HTTP semantics and encodes it into a form that can be sent
   over the wire.
 
-- *HTTP transport* is the thing that takes your encoded reqeust/response and
+- *HTTP transport* is the thing that takes your encoded request/response and
   sends it over the wire. For HTTP/1.1 and HTTP/2, this is a TCP+TLS connection.
   For HTTP/3, this is a QUIC connection.
 
@@ -81,7 +81,7 @@ Nodes MUST use HTTPS (i.e., they MUST NOT use plaintext HTTP). It is RECOMMENDE
 
 Nodes signal support for their HTTP transport using the `/http` component in
 their multiaddr. E.g., `/dns4/example.com/tls/http`. See the [HTTP multiaddr
-component spec](https://github.com/libp2p/specs/pull/550) for more details.
+component spec](https://github.com/libp2p/specs/blob/master/http/transport-component.md) for more details.
 
 ## Namespace
 
@@ -130,6 +130,6 @@ HTTP/1.1 is chosen as the minimum bar for interoperability, but other encodings 
 
 This document has focused on using HTTP semantics, but HTTP may not be the common divisor amongst all transports (current and future). It may be desirable to use some other request-response semantics for your application-level protocol, perhaps something like rust-libp2p’s [request-response](https://docs.rs/libp2p/0.52.1/libp2p/request_response/index.html) abstraction. Nothing specified in this document prohibits mapping other semantics onto HTTP semantics to keep the benefits of using an HTTP transport.
 
-As a simple example, to support the simple request-response semantics, the request MUST be encoded within a `POST` request to the proper URL (as defined in the Namespace section). The response is read from the body of the HTTP response. The client MUST authenticate the server and itself **before** making the request. The reason to chose `POST` is because this mapping makes no assumptions on whether the request is cacheable. If HTTP caching is desired users should either build on HTTP semantics or chose another mapping with different assumptions.
+As a simple example, to support the simple request-response semantics, the request MUST be encoded within a `POST` request to the proper URL (as defined in the [Namespace](#namespace) section). The response is read from the body of the HTTP response. The client MUST authenticate the server and itself **before** making the request. The reason to chose `POST` is because this mapping makes no assumptions on whether the request is cacheable. If HTTP caching is desired users should either build on HTTP semantics or chose another mapping with different assumptions.
 
 Other mappings may also be valid and as long as nodes agree.
