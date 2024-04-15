@@ -104,7 +104,7 @@ a certain resource is meant to be interpreted.
 The resource contains a mapping of application protocols to a URL namespace. For
 example, this configuration file would tell a client
 
-1. That the Kademlia application protocol is available with prefix `/kademlia`
+1. The Kademlia application protocol is available with prefix `/kademlia`
 and,
 2. The [IPFS Trustless Gateway API](https://specs.ipfs.tech/http-gateways/trustless-gateway/) is mounted at `/`.
 
@@ -112,17 +112,17 @@ It is valid to expose a service at `/`. It is RECOMMENDED that implementations f
 
 ## Peer ID Authentication
 
-When using the HTTP Transport, peer id authentication is optional. You only pay
+When using the HTTP Transport, Peer ID authentication is optional. You only pay
 for it if you need it. This benefits use cases that don’t need peer
 authentication (e.g., fetching content addressed data) or authenticate some
 other way (not tied to libp2p peer ids).
 
-Specific authentications schemes for authenticating Peer IDs will be defined in
+Specific authentication schemes for authenticating Peer IDs will be defined in
 a future spec.
 
 ## Using HTTP semantics over stream transports
 
-Application protocols using HTTP semantics can run over any libp2p stream transport. Clients open a new stream using `/http/1.1` as the protocol identifer. Clients encode their HTTP request as an HTTP/1.1 message and send it over the stream. Clients parse the response as an HTTP/1.1 message and then close the stream. Clients SHOULD NOT pipeline requests over a single stream. Servers SHOULD set the [`Connection: close` header](https://datatracker.ietf.org/doc/html/rfc9112#section-9.6) to signal to clients that this is not a persistent connection.
+Application protocols using HTTP semantics can run over any libp2p stream transport. Clients open a new stream using `/http/1.1` as the protocol identifer. Clients encode their HTTP request as an HTTP/1.1 message and send it over the stream. Clients parse the response as an HTTP/1.1 message and then close the stream. Clients SHOULD NOT pipeline requests over a single stream. Clients and Servers SHOULD set the [`Connection: close` header](https://datatracker.ietf.org/doc/html/rfc9112#section-9.6) to signal to clients that this is not a persistent connection.
 
 HTTP/1.1 is chosen as the minimum bar for interoperability, but other encodings of HTTP semantics are possible as well and may be specified in a future update.
 
