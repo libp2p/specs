@@ -6,11 +6,12 @@
 
 Authors: [@raulk], [@jhiesey], [@mxinden]
 
-Interest Group:
+Interest Group: [@guillaumemichel]
 
 [@raulk]: https://github.com/raulk
 [@jhiesey]: https://github.com/jhiesey
 [@mxinden]: https://github.com/mxinden
+[@guillaumemichel]: https://github.com/guillaumemichel
 
 See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
