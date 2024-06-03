@@ -136,10 +136,10 @@ string encoded representation of the multiaddr. E.g. the multiaddr
 `/ip4/1.2.3.4/udp/54321/quic-v1` would be represented as
 `multiaddr:/ip4/1.2.3.4/udp/54321/quic-v1`.
 
-This URI can be extended to include HTTP paths with the `/httppath` component.
+This URI can be extended to include HTTP paths with the `/http-path` component.
 This allows a user to make an HTTP request to a specific HTTP resource using a
 multiaddr. For example, a user could make a GET request to
-`multiaddr:/ip4/1.2.3.4/udp/54321/quic-v1/p2p/12D.../httppath/.well-known%2Flibp2p`. This also allows
+`multiaddr:/ip4/1.2.3.4/udp/54321/quic-v1/p2p/12D.../http-path/.well-known%2Flibp2p`. This also allows
 an HTTP redirect to another host and another HTTP resource.
 
 ## Using other request-response semantics (not HTTP)
