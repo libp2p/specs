@@ -51,6 +51,30 @@ On a historical note, this specification replaces the existing [libp2p WebRTC st
 
 9. Messages on `RTCDataChannel`s on the established `RTCPeerConnection` are framed using the message framing mechanism described in [multiplexing].
 
+### Diagram
+
+```mermaid
+sequenceDiagram
+    participant a as Browser A
+    participant cr as CircuitRelayV2Peer
+    participant b as Browser B
+    participant stun as STUN Server
+    b->>cr: Establish Relayed Connection (WebTransport, WebRTC)
+    b-->>a: Shares its own relayed webrtc multiaddress (out of band)
+    a->>b: Establishes a relayed connection to Browser 2
+    a-->>a: Creates RTCPeerConnection with STUN server config, init DataChannel and SDP offer
+    a->>b: Initiates libp2p /webrtc-signaling/0.0.1 protocol stream over relayed conection and sends SDP
+    b-->>b: Creates RTCPeerConnection with STUN server config, sets Browser1's SDP offer, and creates SDP answer
+    b->>a: Sends SDP answer over signaling stream
+    a-->>a: Set SDP answer with RTCPeerConnection.setRemoteDescription
+    a->>+stun: What's my public IP and port
+    stun->>-a: Browser A observed ip and port: 8.8.8.1:63333
+    b->>+stun: What's my public IP and port
+    stun->>-b: Browser B observed ip and port: 6.6.6.1:52222
+    b->a: exchange ICE candidates over signalling stream pass to RTCPeerConnection.addIceCandidate()
+    b->a: Establish direct connection
+```
+
 ## STUN
 
 A node needs to discover its public IP and port, which is forwarded to the remote node in order to connect to the local node.
