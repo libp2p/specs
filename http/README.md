@@ -126,6 +126,22 @@ Application protocols using HTTP semantics can run over any libp2p stream transp
 
 HTTP/1.1 is chosen as the minimum bar for interoperability, but other encodings of HTTP semantics are possible as well and may be specified in a future update.
 
+## Multiaddr URI scheme
+
+In places where a URI is expected, implementations SHOULD accept a multiaddr URI
+in addition to a standard http or https URI. A multiaddr URI is a
+[URI](https://datatracker.ietf.org/doc/html/rfc3986) with the `multiaddr`
+scheme. It is constructed by taking the "multiaddr:" string and appending the
+string encoded representation of the multiaddr. E.g. the multiaddr
+`/ip4/1.2.3.4/udp/54321/quic-v1` would be represented as
+`multiaddr:/ip4/1.2.3.4/udp/54321/quic-v1`.
+
+This URI can be extended to include HTTP paths with the `/http-path` component.
+This allows a user to make an HTTP request to a specific HTTP resource using a
+multiaddr. For example, a user could make a GET request to
+`multiaddr:/ip4/1.2.3.4/udp/54321/quic-v1/p2p/12D.../http-path/.well-known%2Flibp2p`. This also allows
+an HTTP redirect to another host and another HTTP resource.
+
 ## Using other request-response semantics (not HTTP)
 
 This document has focused on using HTTP semantics, but HTTP may not be the common divisor amongst all transports (current and future). It may be desirable to use some other request-response semantics for your application-level protocol, perhaps something like rust-libp2p’s [request-response](https://docs.rs/libp2p/0.52.1/libp2p/request_response/index.html) abstraction. Nothing specified in this document prohibits mapping other semantics onto HTTP semantics to keep the benefits of using an HTTP transport.
