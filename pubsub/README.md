@@ -311,7 +311,7 @@ On the producing side:
 
 On the consuming side:
   - Accept and propagate messages with above fields.
-  - Verify `signature`, iff the `signature` is present, then reject if
+  - Verify `signature`, if the `signature` is present, then reject if
     `signature` is invalid.
 
 > **[[ Margin note: ]]** For content-addressed messaging, `StrictNoSign` is the
