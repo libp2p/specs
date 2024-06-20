@@ -1,0 +1,17 @@
+@startuml
+participant Cli
+participant Srv
+
+skinparam sequenceMessageAlign center
+skinparam defaultFontName monospaced
+
+
+== Amplification Attack Prevention ==
+
+Cli -> Srv: [dial] DialRequest:{nonce: 0xabcd, addrs: (addr1, addr2, addr3)}
+Srv -> Cli: [dial] DialDataRequest:{addrIdx: 1, numBytes: 120k}
+Cli -> Srv: [dial] {120k bytes}
+Srv -> Cli: [attempt]addr2 DialAttempt:{nonce: 0xabcd}
+Srv -> Cli: [dial] DialResponse:{status: OK, dialStatuses:(E_TRANSPORT_NOT_SUPPORTED, OK)} 
+
+@enduml
