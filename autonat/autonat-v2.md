@@ -179,8 +179,12 @@ client transfers these bytes wrapped in `DialDataResponse` protobufs where the
 `data` field in each individual protobuf is limited to 4096 bytes in length.
 This allows implementations to use a small buffer for reading and sending the
 data. Only the size of the `data` field of `DialDataResponse` protobufs is
-counted towards the bytes transferred. Once the server has received numBytes
-bytes, it proceeds to dial the selected address.
+counted towards the bytes transferred. Once the server has received at least
+numBytes bytes, it proceeds to dial the selected address. Servers SHOULD allow
+the last `DialDataResponse` message received from the client to be larger than
+the minimum required amount. This allows clients to serialize their
+`DialDataResponse` message once and reuse it for all Requests.
+
 
 If an attacker asks a server to dial a victim node, the only benefit the
 attacker gets is forcing the server and the victim to do a cryptographic
