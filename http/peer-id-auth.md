@@ -86,7 +86,7 @@ prefer not to import a multibase dependency.
 
 (todo reword this)
 
-1. The server initiates the authentication by responding to a request that must
+<!-- 1. The server initiates the authentication by responding to a request that must
    be authenticated with the response header `WWW-Authenticate: libp2p-PeerID
    challenge-client="<base64-encoded-challenge>`. The challenge MUST be
    indistinguishable from random data. The Server MAY randomly generate this
@@ -174,7 +174,7 @@ prefer not to import a multibase dependency.
       libp2p-PeerID peer-id="<encoded-peer-id-bytes>",sig="<base64-signature-bytes>",bearer-token="<token>".
       ```
 4. The client can then authenticate the server with the the signature from
-   `Authentication-info`.
+   `Authentication-info`. -->
 
 ## Authentication Endpoint
 
