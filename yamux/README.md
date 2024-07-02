@@ -57,7 +57,7 @@ The following message types are supported:
 * 0x0 Data - Used to transmit data. May transmit zero length payloads depending on the flags.
 
 * 0x1 Window Update - Used to updated the senders receive window size.
-  This is used to implement per-session flow control.
+  This is used to implement per-stream flow control.
 
 * 0x2 Ping - Used to measure RTT.
   It can also be used to heart-beat and do keep-alives over TCP.
@@ -132,7 +132,7 @@ Alternatively, if an error occurs, the RST flag can be used to hard close a stre
 
 #### Flow Control
 
-When Yamux is initially starts each stream with a 256KB window size.
+When Yamux is initially starts each stream with a 256KiB window size.
 There is no window size for the session.
 
 To prevent the streams from stalling, window update frames should be sent regularly.
