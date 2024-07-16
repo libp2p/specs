@@ -128,7 +128,7 @@ This does a half-close indicating the sender will send no further data.
 
 Once both sides have closed the connection, the stream is closed.
 
-Alternatively, if an error occurs, the RST flag can be used to hard close a stream immediately.
+Alternatively, if an error occurs, the RST flag can be used to hard close a stream immediately. To provide an error on stream resets, the first four bytes of the data following the header can contain a bigendian 32bit unsigned integer error code. Implementations should discard any data following the 4 bytes of error code. 
 
 #### Flow Control
 
