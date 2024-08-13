@@ -50,9 +50,27 @@ WebSockets have no built in authentication mechanism. Server-side processes list
 
 ## Encryption
 
-At the time of writing, the negotiated authentication mechanism should also be used to encrypt all traffic sent over the WebSocket even if TLS certificates are also used at the transport layer.
+Server-side processes listening on WebSocket addresses should use TLS certificates to secure transmitted data at the transport level.
 
-A mechanism to avoid this but also maintain backwards compatibility with existing server-side processes will be specified in a future revision to this spec.
+This does not provide any assurance that the remote peer possesses the private key that corresponds to their public key, so an additional handshake is necessary.
+
+During connection establishment over WebSockets, before the connection is made available to the rest of the application, if all of the following criteria are met:
+
+1. `noise` is negotiated as the connection encryption protocol
+2. An initial handshake is performed with the `handshake_only` boolean extension set to true
+3. The transport layer is secured by TLS
+
+Then all subsequent data is sent without encrypting it at the libp2p level, instead relying on TLS encryption at the transport layer.
+
+If any of the above is not true, all data is encrypted with the negotiated connection encryption method before sending.
+
+This prevents double-encryption but only when both ends opt-in to ensure backwards compatibility with existing deployments.
+
+### MITM mitigation
+
+The TLS certificate used should be signed by a trusted certificate authority, and the host name should correspond to the common name contained within the certificate.
+
+This requires trusting the certificate authority to issue correct certificates, but is necessary due to limitations of certain user agents, namely web browsers which do not allow use of self-signed certificates that could be otherwise be verified via preshared certificate fingerprints.
 
 ## Addressing
 
