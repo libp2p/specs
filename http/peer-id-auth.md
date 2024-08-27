@@ -60,8 +60,7 @@ can not or prefer not to import a multibase dependency.
 ## Public Key Encoding
 
 The authentication below exchanges the peer's public key instead of its PeerID,
-as the public key can be used to verify signatures and derive the PeerID, while
-the PeerID may not contain the public key in all cases. The Public Key is
+as the PeerID alone may not be enough to validate a signature. The Public Key is
 encoded per the [Peer ID spec] under the section "Keys" section.
 
 ## Mutual Client and Server Peer ID Authentication
@@ -78,7 +77,9 @@ protocol operates as follows:
    The opaque parameter is opaque to client. The client MUST return the opaque
    parameter back to the server. The server MAY use the opaque parameter to
    encode state.
-3. The client makes another HTTP request to the same authenticated resource and sets the header:
+3. The client makes another HTTP request to the same authenticated resource and
+   sets the header:
+
    ```
    Authorization: libp2p-PeerID public-key="<base64-encoded-public-key-bytes>", opaque="<opaque-from-server>", challenge-server="<challenge-string>", sig="<base64-signature-bytes>"
    ```
@@ -89,7 +90,9 @@ protocol operates as follows:
 4. The server MUST verify the signature using the server name used in the TLS
    session. The server MUST return 401 Unauthorized if the server fails to
    validate the signature. If the signature is valid, the server has
-   authenticated the client's public key, and thus its PeerID. The server SHOULD proceed to serve the HTTP request. The server MUST set the following response headers:
+   authenticated the client's public key, and thus its PeerID. The server SHOULD
+   proceed to serve the HTTP request. The server MUST set the following response
+   headers:
    ```
    Authentication-Info: libp2p-PeerID public-key="<base64-encoded-public-key-bytes>", sig="<base64-signature-bytes>" bearer="<base64-encoded-opaque-blob>"
    ```
@@ -148,7 +151,9 @@ the client is in an environment where Web PKI can not be fully trusted (e.g. an
 enterprise network with a custom enterprise root CA installed on the client),
 then this authentication scheme can not protect the client from a mitm attack.
 
-This authentication scheme is also not secure in cases where you do not own your domain name or the certificate. If someone else can get a valid certificate for your domain, you may be vulnerable to a mitm attack.
+This authentication scheme is also not secure in cases where you do not own your
+domain name or the certificate. If someone else can get a valid certificate for
+your domain, you may be vulnerable to a mitm attack.
 
 ## Test Vectors
 
@@ -156,14 +161,15 @@ This authentication scheme is also not secure in cases where you do not own your
 
 - zero key: An ED25519 key initialized with zero bytes.
 - zero Peer ID: A Peer ID derived from the zero key.
-- client key: An ED25519 key with the following marshalled key (refer to the [Peer ID spec] for how to unmarshal): `080112407e0830617c4a7de83925dfb2694556b12936c477a0e1feb2e148ec9da60fee7d1ed1e8fae2c4a144b8be8fd4b47bf3d3b34b871c3cacf6010f0e42d474fce27e`
+- client key: An ED25519 key with the following marshalled key (refer to the
+  [Peer ID spec] for how to unmarshal):
+  `080112407e0830617c4a7de83925dfb2694556b12936c477a0e1feb2e148ec9da60fee7d1ed1e8fae2c4a144b8be8fd4b47bf3d3b34b871c3cacf6010f0e42d474fce27e`
 - client Peer ID: A Peer ID derived from the client key.
 
 ### Walkthrough
 
-Included is a concrete example of running the protocol. The client uses the Peer ID defined above, and the server uses the zero key.
-
-
+Included is a concrete example of running the protocol. The client uses the Peer
+ID defined above, and the server uses the zero key.
 
 1. The clients sends the initial request.
 2. The server responds with the header:
@@ -178,7 +184,6 @@ Included is a concrete example of running the protocol. The client uses the Peer
    ```
    Authentication-Info: libp2p-PeerID peer-id="12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN", sig="btLFqW200aDTQqpkKetJJje7V-iDknXygFqPsfiegNsboXeYDiQ6Rqcpezz1wfr8j9h83QkN9z78cAWzKzV_AQ==", bearer="<base64-encoded-bearer-token>"
    ```
-
 
 The following table lists out all parameters and intermediate values used in the walkthrough above.
 
