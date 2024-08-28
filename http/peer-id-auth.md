@@ -33,21 +33,25 @@ Params are encoded per [RFC 9110 auth-param's ABNF](https://datatracker.ietf.org
 
 Signatures sign some set of parameters prefixed by the string `libp2p-PeerID`. The parameters are sorted
 alphabetically, prepended with a varint length prefix, and concatenated together
-to form the data to be signed. The signing algorithm is defined by the key type
-used. Refer to the [Peer ID
-spec] for
-specifics on the signing algorithm. The set of parameters is prefixed with the auth scheme "libp2p-PeerID"
+to form the data to be signed. The parameter name and value is split with a `=`.
+If the parameter value is appended directly after the `=`. Strings MUST be UTF-8
+encoded. Byte Arrays MUST be appended as-is. The signing algorithm is defined by
+the key type used. Refer to the [Peer ID spec] for specifics on the signing
+algorithm. The set of parameters is prefixed with the auth scheme
+"libp2p-PeerID"
 
-As an example, if we wanted to sign the parameters `hostname = example.com`,
-`challenge-client = <challenge-string>`, and `client-public-key = 0xbadcofee` we would first structure the parameters as a byte
-slice containing:
-```
-libp2p-PeerID<varint-len-prefix>challenge-client=<challenge-string><varint-len-prefix>hostname=example.com<varint-len-prefix>client-public-key=<raw-bytes>
-```
+### Signing Example
+| Parameter                                                                                   | Value                                                                                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| hostname                                                                                    | example.com                                                                                                                                                                                                                                                                                                    |
+| Server Private Key (pb encoded as hex)                                                      | 0801124001010101010101010101010101010101010101010101010101010101010101018a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c                                                                                                                                                                       |
+| challenge-server                                                                            | ERERERERERERERERERERERERERERERERERERERERERE=                                                                                                                                                                                                                                                                   |
+| Client Public Key (pb encoded as hex)                                                       | 080112208139770ea87d175f56a35466c34c7ecccb8d8a91b4ee37a25df60f5b8fc9b394                                                                                                                                                                                                                                       |
+| data to sign ([percent encoded](https://datatracker.ietf.org/doc/html/rfc3986#section-2.1)) | libp2p-PeerID=challenge-server=ERERERERERERERERERERERERERERERERERERERERERE=6client-public-key=%08%01%12%20%819w%0E%A8%7D%17_V%A3Tf%C3L~%CC%CB%8D%8A%91%B4%EE7%A2%5D%F6%0F%5B%8F%C9%B3%94%14hostname=example.com                                                                                                |
+| data to sign (hex encoded)                                                                  | 6c69627032702d5065657249443d6368616c6c656e67652d7365727665723d455245524552455245524552455245524552455245524552455245524552455245524552455245524552453d36636c69656e742d7075626c69632d6b65793d080112208139770ea87d175f56a35466c34c7ecccb8d8a91b4ee37a25df60f5b8fc9b39414686f73746e616d653d6578616d706c652e636f6d |
+| signature (base64 encoded)                                                                  | UA88qZbLUzmAxrD9KECbDCgSKAUBAvBHrOCF2X0uPLR1uUCF7qGfLPc7dw3Olo-LaFCDpk5sXN7TkLWPVvuXAA==                                                                                                                                                                                                                       |
 
-Then sign the resulting byte slice. See the test vectors below for a
-examples.
-
+Note that the `=` after the libp2p-PeerID scheme is actually the varint length of the challenge-server parameter.
 
 ## Base64 Encoding
 
@@ -155,53 +159,32 @@ This authentication scheme is also not secure in cases where you do not own your
 domain name or the certificate. If someone else can get a valid certificate for
 your domain, you may be vulnerable to a mitm attack.
 
-## Test Vectors
+## Complete Example Handshake
 
-### Definitions used
+### Parameters
+| Parameter                              | Value                                                                                                                                    |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| hostname                               | example.com                                                                                                                              |
+| Server Private Key (pb encoded as hex) | 0801124001010101010101010101010101010101010101010101010101010101010101018a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c |
+| Server HMAC Key (hex)                  | 0000000000000000000000000000000000000000000000000000000000000000                                                                         |
+| Challenge Client                       | ERERERERERERERERERERERERERERERERERERERERERE=                                                                                             |
+| Client Private Key (pb encoded as hex) | 0801124002020202020202020202020202020202020202020202020202020202020202028139770ea87d175f56a35466c34c7ecccb8d8a91b4ee37a25df60f5b8fc9b394 |
+| Challenge Server                       | MzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMz                                                                                                         |
+| "Now" time                             | 1969-12-31 16:00:00 -0800 PST                                                                                                            |
 
-- zero key: An ED25519 key initialized with zero bytes.
-- zero Peer ID: A Peer ID derived from the zero key.
-- client key: An ED25519 key with the following marshalled key (refer to the
-  [Peer ID spec] for how to unmarshal):
-  `080112407e0830617c4a7de83925dfb2694556b12936c477a0e1feb2e148ec9da60fee7d1ed1e8fae2c4a144b8be8fd4b47bf3d3b34b871c3cacf6010f0e42d474fce27e`
-- client Peer ID: A Peer ID derived from the client key.
+### Handshake Diagram
+```mermaid
+sequenceDiagram
+Client->>Server: Initial request
+Server->>Client: WWW-Authenticate=libp2p-PeerID challenge-client="ERERERERERERERERERERERERERERERERERERERERERE=", opaque="0H1Y9sq1zrfTJZCCTcTymI2tV_TF9-PzdMip2dFkiqZ7ImNoYWxsZW5nZS1jbGllbnQiOiJFUkVSRVJFUkVSRVJFUkVSRVJFUkVSRVJFUkVSRVJFUkVSRVJFUkVSRVJFPSIsImhvc3RuYW1lIjoiZXhhbXBsZS5jb20iLCJjcmVhdGVkLXRpbWUiOiIxOTY5LTEyLTMxVDE2OjAwOjAwLTA4OjAwIn0="
+Client->>Server: Authorization=libp2p-PeerID public-key="CAESIIE5dw6ofRdfVqNUZsNMfszLjYqRtO43ol32D1uPybOU", challenge-server="MzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMz", sig="5RT0BbFdn-hMgE4pQ_GH9tnlKpptGUQZvkh8kVLbwy81Rzli_vfiNOsuGTcMk8lyUfkmTFmk79b5XUZCR3-RBw==", opaque="0H1Y9sq1zrfTJZCCTcTymI2tV_TF9-PzdMip2dFkiqZ7ImNoYWxsZW5nZS1jbGllbnQiOiJFUkVSRVJFUkVSRVJFUkVSRVJFUkVSRVJFUkVSRVJFUkVSRVJFUkVSRVJFPSIsImhvc3RuYW1lIjoiZXhhbXBsZS5jb20iLCJjcmVhdGVkLXRpbWUiOiIxOTY5LTEyLTMxVDE2OjAwOjAwLTA4OjAwIn0="
+Note left of Server: Server has authenticated Client
+Server->>Client: Authentication-Info=libp2p-PeerID sig="HQ7BJRaSpRhNCORNiALNJENdwXUyq0eM2cxNoxe-XnQw6oEAMaeYnjMYaHHjgq0XNxZmy4W2ngKUcI1CgprLCQ==", bearer="YhlYjHWTMOkTleROtjMiChL7Mx15_GDYfi971mdJCqB7ImlzLXRva2VuIjp0cnVlLCJwZWVyLWlkIjoiMTJEM0tvb1dKV29hcVpoRGFvRUZzaEY3UmgxYnBZOW9oaWhGaHpjVzZkNjlMcjJOQVN1cSIsImhvc3RuYW1lIjoiZXhhbXBsZS5jb20iLCJjcmVhdGVkLXRpbWUiOiIxOTY5LTEyLTMxVDE2OjAwOjAwLTA4OjAwIn0=", public-key="CAESIIqI4910CfGV_VLbLTy6XXLKZwm_HZQSG_N0iAG0D29c"
+Note right of Client: Client has authenticated Server
 
-### Walkthrough
-
-Included is a concrete example of running the protocol. The client uses the Peer
-ID defined above, and the server uses the zero key.
-
-1. The clients sends the initial request.
-2. The server responds with the header:
-   ```
-   WWW-Authenticate: libp2p-PeerID challenge-client="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=", opaque="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
-   ```
-3. The client sends another request with the header:
-   ```
-   Authorization: libp2p-PeerID peer-id=12D3KooWBtg3aaRMjxwedh83aGiUkwSxDwUZkzuJcfaqUmo7R3pq, opaque="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=", challenge-server="BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=", sig="F5OBYbbMXoIVJNWrW0UANi7rrbj4GCB6kcEceQjajLTMvC-_jpBF9MFlxiaNYXOEiPQqeo_S56YUSNinwl0ZCQ=="
-   ```
-4. The server responds with the header:
-   ```
-   Authentication-Info: libp2p-PeerID peer-id="12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN", sig="btLFqW200aDTQqpkKetJJje7V-iDknXygFqPsfiegNsboXeYDiQ6Rqcpezz1wfr8j9h83QkN9z78cAWzKzV_AQ==", bearer="<base64-encoded-bearer-token>"
-   ```
-
-The following table lists out all parameters and intermediate values used in the walkthrough above.
-
-| Parameter                                   | value                                                                                        |
-| ------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| hostname                                    | example.com                                                                                  |
-| challenge-client                            | `"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="`                                             |
-| challenge-server                            | `"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB="`                                             |
-| client Peer ID                              | `12D3KooWBtg3aaRMjxwedh83aGiUkwSxDwUZkzuJcfaqUmo7R3pq`                                       |
-| server's Peer ID                            | The zero key `12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN`                          |
-| The server's opaque blob                    | Could be anything. In this example we'll use `CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC=`. |
-| What the client will sign (percent encoded) | `todo`                                                                                       |
-| The client's signature                      | `todo`                                                                                       |
-| The client's Authorization header           | `todo`                                                                                       |
-| What the server will sign (percent encoded) | `todo`                                                                                       |
-| The server's signature                      | `todo`                                                                                       |
-| The server's Authentication-Info header     | `todo`                                                                                       |
-
+Note over Client: Future requests use the bearer token
+Client->>Server: Authorization=libp2p-PeerID bearer="YhlYjHWTMOkTleROtjMiChL7Mx15_GDYfi971mdJCqB7ImlzLXRva2VuIjp0cnVlLCJwZWVyLWlkIjoiMTJEM0tvb1dKV29hcVpoRGFvRUZzaEY3UmgxYnBZOW9oaWhGaHpjVzZkNjlMcjJOQVN1cSIsImhvc3RuYW1lIjoiZXhhbXBsZS5jb20iLCJjcmVhdGVkLXRpbWUiOiIxOTY5LTEyLTMxVDE2OjAwOjAwLTA4OjAwIn0="
+```
 
 [Peer ID spec]: https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md
 
