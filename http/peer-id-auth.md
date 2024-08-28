@@ -85,8 +85,8 @@ protocol operates as follows:
    ```
 
    The `sig` param represents a signature over the parameters:
-    - `hostname`
     - `challenge-client`
+    - `hostname`
 4. The server MUST verify the signature using the server name used in the TLS
    session. The server MUST return 401 Unauthorized if the server fails to
    validate the signature. If the signature is valid, the server has
@@ -98,9 +98,9 @@ protocol operates as follows:
    ```
 
    The `sig` param represents a signature over the parameters:
-    - `hostname`
     - `challenge-server`
     - `client-public-key` the bytes of the client's public-key encoded per the [Peer ID spec].
+    - `hostname`
 
    The `bearer` token allows the client to make future Peer ID authenticated
    requests. The value is opaque to the client, and the server may use it to
