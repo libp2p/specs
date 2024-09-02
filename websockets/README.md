@@ -68,7 +68,7 @@ If any of the above is not true, all data is encrypted with the negotiated conne
 
 This prevents double-encryption but only when both ends opt-in to ensure backwards compatibility with existing deployments.
 
-Note that by opting-in to single encryption, the dialer is also opting-in to trusting the [CA](https://en.wikipedia.org/wiki/Certificate_authority) system.
+Note that by opting-in to single encryption, peers are also opting-in to trusting the [CA](https://en.wikipedia.org/wiki/Certificate_authority) system.
 
 ### MITM mitigation
 
