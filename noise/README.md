@@ -222,6 +222,7 @@ message NoiseExtensions {
     repeated bytes webtransport_certhashes = 1;
     repeated string stream_muxers = 2;
     optional bool handshake_only = 3;
+    optional string tls_common_name = 4;
 }
 
 message NoiseHandshakePayload {
