@@ -82,6 +82,8 @@ Protection against man-in-the-middle (MITM) type attacks is through Web [PKI](ht
 
 This authentication scheme is also not secure in cases where you do not own your domain name or the certificate. If someone else can get a valid certificate for your domain, you may be vulnerable to a MITM attack.
 
+Another solution would be to use Keying Material Exporters [RFC 5705](https://www.rfc-editor.org/info/rfc5705) which would remove the need to add data to the noise handshake, however whether this would be exposed as part of browser APIs is unclear at this point.
+
 ## Addressing
 
 A WebSocket address contains `/ws`, `/tls/ws` or `/wss` and runs over TCP. If a TCP port is omitted, a secure WebSocket (e.g. `/tls/ws` or `/wss` is assumed to run on TCP port 443), an insecure WebSocket is assumed to run on TCP port 80 similar to HTTP addresses.
