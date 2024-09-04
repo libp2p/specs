@@ -64,6 +64,8 @@ During connection establishment over WebSockets, before the connection is made a
 
 Then all subsequent data is sent without encrypting it at the libp2p level, instead relying on TLS encryption at the transport layer.
 
+If this is the case, the server MUST complete the handshake before reading or sending any application data, and MUST abort the connection if the handshake fails.
+
 If any of the above is not true, all data is encrypted with the negotiated connection encryption method before sending.
 
 This prevents double-encryption but only when both ends opt-in to ensure backwards compatibility with existing deployments.
