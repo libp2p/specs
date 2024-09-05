@@ -126,14 +126,22 @@ The following protocol allows both the client and server to authenticate each
 other's Peer ID by having them each sign a challenge issued by the other. The
 protocol operates as follows:
 
+### Server Initiated Handshake
+
 1. The client makes an HTTP request to an authenticated resource.
+
 2. The server responds with status code 401 (Unauthorized) and set the header:
    ```
-   WWW-Authenticate: libp2p-PeerID challenge-client="<challenge-string>", opaque="<opaque-value>"
+   WWW-Authenticate: libp2p-PeerID challenge-client="<challenge-string>", public-key="<base64-encoded-public-key-bytes>", opaque="<opaque-value>"
    ```
+
+   The public-key parameter is the server's public key. It is the same public
+   key used to derive the server's peer id.
+
    The opaque parameter is opaque to client. The client MUST return the opaque
    parameter back to the server. The server MAY use the opaque parameter to
    encode state.
+
 3. The client makes another HTTP request to the same authenticated resource and
    sets the header:
 
@@ -141,17 +149,22 @@ protocol operates as follows:
    Authorization: libp2p-PeerID public-key="<base64-encoded-public-key-bytes>", opaque="<opaque-from-server>", challenge-server="<challenge-string>", sig="<base64-signature-bytes>"
    ```
 
+   The public-key parameter is the client's public key. It is the same public
+   key used to derive the client's peer id.
+
    The `sig` param represents a signature over the parameters:
     - `challenge-client`
+    - `server-public-key` the bytes of the server's public-key encoded per the [Peer ID spec].
     - `hostname`
-4. The server MUST verify the signature using the server name used in the TLS
+
+4. The server SHOULD verify the signature using the server name used in the TLS
    session. The server MUST return 401 Unauthorized if the server fails to
    validate the signature. If the signature is valid, the server has
    authenticated the client's public key, and thus its PeerID. The server SHOULD
    proceed to serve the HTTP request. The server MUST set the following response
    headers:
    ```
-   Authentication-Info: libp2p-PeerID public-key="<base64-encoded-public-key-bytes>", sig="<base64-signature-bytes>" bearer="<base64-encoded-opaque-blob>"
+   Authentication-Info: libp2p-PeerID, sig="<base64-signature-bytes>" bearer="<base64-encoded-opaque-blob>"
    ```
 
    The `sig` param represents a signature over the parameters:
@@ -165,9 +178,71 @@ protocol operates as follows:
      - The client's Peer ID.
      - The `hostname` parameter.
      - The token creation date (to allow tokens to expire).
+
 5. The client MUST verify the signature. After verification the client has
    authenticated the server's Peer ID. The client SHOULD send the `bearer`
    token for Peer ID authenticated requests.
+
+### Client Initiated Handshake
+
+The client initiated version of this handshake follows the same structure,
+except that the client sends initially sends a `challenge-server` and the order
+of who is authenticated first is reversed. The protocol is as follows
+
+1. The client makes an HTTP request to a known authenticated resource and sets
+   the header:
+
+   ```
+   Authorization: libp2p-PeerID challenge-server="<challenge-string>", public-key="<base64-encoded-public-key-bytes>"
+   ```
+
+2. The server responds with status code 401 (Unauthorized) and set the header:
+   ```
+   WWW-Authenticate: libp2p-PeerID challenge-client="<challenge-string>", opaque="<opaque-value>", public-key="<base64-encoded-public-key-bytes>", sig="<base64-signature-bytes>"
+   ```
+
+   The `sig` param represents a signature over the parameters:
+    - `challenge-server`
+    - `client-public-key` the bytes of the client's public-key encoded per the [Peer ID spec].
+    - `hostname`
+
+3. The client MUST verify the signature. After verification the client has
+   authenticated the server's Peer ID.
+
+   The client makes another HTTP request to the same authenticated resource and
+   sets the header:
+
+   ```
+   Authorization: libp2p-PeerID opaque="<opaque-from-server>", sig="<base64-signature-bytes>"
+   ```
+
+   The client MAY send application data in this request.
+
+   The `sig` param represents a signature over the parameters:
+    - `challenge-client`
+    - `server-public-key` the bytes of the server's public-key encoded per the [Peer ID spec].
+    - `hostname`
+
+4. The server MUST verify the signature. The server SHOULD verify the signature
+   using the server name used in the TLS session. The server MUST return 401
+   Unauthorized if the server fails to validate the signature. If the signature
+   is valid, the server has authenticated the client's public key, and thus its
+   PeerID. The server SHOULD proceed to serve the HTTP request. The server MUST
+   set the following response headers:
+   ```
+   Authentication-Info: libp2p-PeerID bearer="<base64-encoded-opaque-blob>"
+   ```
+
+   The `bearer` token allows the client to make future Peer ID authenticated
+   requests. The value is opaque to the client, and the server MAY use it to
+   store authentication state such as:
+     - The client's Peer ID.
+     - The `hostname` parameter.
+     - The token creation date (to allow tokens to expire).
+
+5. The client SHOULD send the `bearer` token for future Peer ID authenticated
+   requests.
+
 
 ## libp2p bearer token
 
@@ -215,7 +290,7 @@ your domain, you may be vulnerable to a mitm attack.
 ## Complete Example Handshake
 
 The following is a complete and reproducible handshake. Generated by the current
-implementation of this spec in go-libp2p.
+implementation of this spec in go-libp2p. This is a server-initiated handshake.
 
 Understanding the opaque value is not necessary in order to understand this
 spec. Servers are free to do whatever they want with the opaque field. The
