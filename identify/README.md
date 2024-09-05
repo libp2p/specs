@@ -37,7 +37,7 @@ and spec status.
         - [listenAddrs](#listenaddrs)
         - [observedAddr](#observedaddr)
         - [protocols](#protocols)
-
+        - [signedPeerRecord](#signedpeerrecord)
 
 ## Overview
 
@@ -81,6 +81,7 @@ message Identify {
   repeated bytes listenAddrs = 2;
   optional bytes observedAddr = 4;
   repeated string protocols = 3;
+  optional bytes signedPeerRecord = 8;
 }
 ```
 
@@ -133,3 +134,10 @@ clients only support initiating requests while some servers (only) support
 responding to requests. To prevent clients from initiating requests to other
 clients, which given them being clients they fail to respond, clients should not
 advertise `foo` in their `protocols` list.
+
+### signedPeerRecord
+
+This is a serialized [SignedEnvelope](https://github.com/libp2p/go-libp2p/blob/master/core/record/pb/envelope.proto) containing a [PeerRecord](https://github.com/libp2p/go-libp2p/blob/master/core/peer/pb/peer_record.proto),
+signed by the sending node. It contains the same addresses as the `listenAddrs` field, but in a form that lets us share authenticated addrs with other peers.
+
+This field was introduced in a backwards compatible manner (meaning that it is sent along with the `listenAddrs` field), therefore, it is optional and may be omitted by older implementations.
