@@ -275,6 +275,8 @@ id for the authentication endpoint is `/http-peer-id-auth/1.0.0`.
 
 * Implementations MUST only authenticate over a secured connection (i.e. TLS).
 * Implementations SHOULD limit the maximum length of any variable length field.
+   * The suggested Maximum length of the Authentication related header should is
+     2048 bytes.
 
 ## Security Considerations
 
