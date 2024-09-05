@@ -10,11 +10,64 @@ Interest Group: [@sukunrt], [@achingbrain]
 
 ## Introduction
 
-This spec defines an authentication scheme of libp2p Peer IDs in accordance with
-[RFC 9110](https://datatracker.ietf.org/doc/html/rfc9110). The authentication
-scheme is called `libp2p-PeerID`.
+This spec defines an HTTP authentication scheme of libp2p Peer IDs in accordance
+with [RFC 9110](https://datatracker.ietf.org/doc/html/rfc9110). The
+authentication scheme is called `libp2p-PeerID`.
 
 ## Protocol Overview
+
+At a high level, challenges are exchanged and signed by each peer to
+authenticate themselves to each other. The protocol works whether the Client
+provides the first challenge, or the Server provides the first challenge.
+
+Example Diagram of Server initiated handshake
+```
+┌─────────┐                   ┌────────┐
+│ Client  │                   │ Server │
+└─────────┘                   └────────┘
+     │   initial request           │
+     ├────────────────────────────>│
+     │                             │
+     │   401; challenge-client     │
+     │<────────────────────────────┤
+     │                             │
+     │   client-sig +              │
+     │   challenge-server          │
+     │   [client authenticated]    │
+     ├────────────────────────────>│
+     │                             │
+     │   server-sig                │
+     │   [server authenticated]    │
+     │<────────────────────────────┤
+     │                             │
+     │   application data          │
+     ├────────────────────────────>│
+     │                             │
+     │   resp                      │
+     │<────────────────────────────┤
+```
+
+Example Diagram of Client initiated handshake
+```
+┌────────┐                    ┌────────┐
+│ Client │                    │ Server │
+└────────┘                    └────────┘
+     │   challenge-server          │
+     ├────────────────────────────>│
+     │                             │
+     │   challenge-client +        │
+     │   server-sig                │
+     │   [server authenticated]    │
+     │<────────────────────────────┤
+     │                             │
+     │   client-sig +              │
+     │   application data          │
+     │   [client authenticated]    │
+     ├────────────────────────────>│
+     │                             │
+     │   resp                      │
+     │<────────────────────────────┤
+```
 
 ## Parameters
 
