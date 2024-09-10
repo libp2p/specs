@@ -187,7 +187,10 @@ protocol operates as follows:
 
 The client initiated version of this handshake follows the same structure,
 except that the client sends initially sends a `challenge-server` and the order
-of who is authenticated first is reversed. The protocol is as follows
+of who is authenticated first is reversed. The server MAY ignore the initial
+request, and respond by starting the Server initiated handshake.
+
+The client initiated handshake is as follows
 
 1. The client makes an HTTP request to a known authenticated resource and sets
    the header:
@@ -198,7 +201,7 @@ of who is authenticated first is reversed. The protocol is as follows
 
 2. The server responds with status code 401 (Unauthorized) and set the header:
    ```
-   WWW-Authenticate: libp2p-PeerID challenge-client="<challenge-string>", opaque="<opaque-value>", public-key="<base64-encoded-public-key-bytes>", sig="<base64-signature-bytes>"
+   WWW-Authenticate: libp2p-PeerID challenge-client="<challenge-string>", public-key="<base64-encoded-public-key-bytes>", sig="<base64-signature-bytes>", opaque="<opaque-value>"
    ```
 
    The `sig` param represents a signature over the parameters:
