@@ -140,7 +140,9 @@ advertise `foo` in their `protocols` list.
 This is a serialized [SignedEnvelope][envelope-rfc] containing a [PeerRecord][peer-record-rfc],
 signed by the sending node. It contains the same addresses as the `listenAddrs` field, but in a form that lets us share authenticated addrs with other peers.
 
-This field was introduced in a backwards compatible manner (meaning that it is sent along with the `listenAddrs` field), therefore, it is optional and may be omitted by older implementations. If the `signedPeerRecord` is present and the implementation supports SignedEnvelope, it MUST use the data contained within it and ignore duplicated fields present in the main identify message
+This field was introduced in a backwards compatible manner (meaning that it is sent along with the `listenAddrs` field), therefore it is optional.
+
+If the `signedPeerRecord` is present the implementation MUST use the data contained within it and ignore duplicated fields present in the main identify message
 
 
 [envelope-rfc]: ../RFC/0002-signed-envelopes.md#wire-format
