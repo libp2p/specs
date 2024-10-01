@@ -13,12 +13,12 @@ Interest Group: [@marcopolo], [@mxinden], [@marten-seemann]
 [@marten-seemann]: https://github.com/marten-seemann
 
 ## Table of Contents <!-- omit in toc -->
+
 - [Context](#context)
 - [What is an HTTP transport](#what-is-an-http-transport)
 - [Multiaddr representation](#multiaddr-representation)
 - [HTTP Paths (and other HTTP Semantics)](#http-paths-and-other-http-semantics)
   - [Recommendation on including HTTP semantics in multiaddrs](#recommendation-on-including-http-semantics-in-multiaddrs)
-
 
 ## Context
 
@@ -46,14 +46,14 @@ existing `http://` URL implementations do.
 The multiaddr of a node with an HTTP transport ends with `/http` and is prefixed
 by information that would let an HTTP client know how to reach the server
 (remember that multiaddrs are [interpreted right to
-left](https://github.com/multiformats/multiaddr#interpreting-multiaddrs)). 
+left](https://github.com/multiformats/multiaddr#interpreting-multiaddrs)).
 
 The following are examples of multiaddrs for HTTP transport capable nodes:
 
-* `/dns/example.com/tls/http`
-* `/ip4/1.2.3.4/tcp/443/tls/http`
-* `/ip6/2001:0db8:85a3:0000:0000:8a2e:0370:7334/tcp/443/tls/http`
-* `/ip4/1.2.3.4/udp/50781/quic-v1/http`
+- `/dns/example.com/tls/http`
+- `/ip4/1.2.3.4/tcp/443/tls/http`
+- `/ip6/2001:0db8:85a3:0000:0000:8a2e:0370:7334/tcp/443/tls/http`
+- `/ip4/1.2.3.4/udp/50781/quic-v1/http`
 
 Note: When we use `/quic-v1/http` or `/tcp/443/tls/http` (or any other
 transport) implementations MUST use the correct HTTP ALPN (e.g. `h3` or `h2`
