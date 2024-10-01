@@ -59,28 +59,13 @@ Note: When we use `/quic-v1/http` or `/tcp/443/tls/http` (or any other
 transport) implementations MUST use the correct HTTP ALPN (e.g. `h3` or `h2`
 respectively) and not `libp2p` when using the HTTP transport.
 
-## HTTP Paths (and other HTTP Semantics)
+### Recommendation on including HTTP Request semantics in Multiaddrs
 
-It may be tempting to add an HTTP path to end of the multiaddr to specify some
-information about a user protocol. However the `/http` component is not a user
-protocol, and it doesn't accept any parameters. It only signals that a node is
-capable of an HTTP transport.
-
-The HTTP Path exists in the semantics level. HTTP Semantics are
-transport-agnostic, and defined by [RFC
-9110](https://httpwg.org/specs/rfc9110.html). You can use these semantics on any
-transport including, but not limited to, the HTTP transports like
-[HTTP/1.1](https://www.rfc-editor.org/info/rfc7235),
-[HTTP/2](https://www.rfc-editor.org/info/rfc9113), or
-[HTTP/3](https://www.rfc-editor.org/info/rfc9114).
-
-### Recommendation on including HTTP semantics in multiaddrs
-
-In general, it's better to keep the multiaddrs as a way of addressing an
+In general, it's better to keep the Multiaddrs as a way of addressing an
 endpoint and keep the semantics independent of any specific transport. This way
 you can use the same semantics among many specific transports.
 
-However, sometimes it's helpful to share a single multiaddr that contains some
+However, sometimes it's helpful to share a single Multiaddr that contains some
 extra application-level data (as opposed to transport data). The recommendation
 is to use a new [multicodec in the private
 range](https://github.com/multiformats/multicodec#private-use-area) for your
@@ -92,7 +77,7 @@ application has the flexibility to handle the parameters in any way it wants
 (e.g. set HTTP headers, an HTTP path prefix, cookies, etc).
 
 This is a bit cumbersome when you are trying to use multiple transports since
-you may end up with many multiaddrs with different transports but the same
-suffix. A potential solution here is to keep them separate. A list of multiaddrs
-for the transports being used, and another multiaddr for the application-level
+you may end up with many Multiaddrs with different transports but the same
+suffix. A potential solution here is to keep them separate. A list of Multiaddrs
+for the transports being used, and another Multiaddr for the application-level
 data. This is one suggestion, and many other strategies would work as well.
