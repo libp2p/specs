@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity                 | Status | Latest Revision |
 |-----------------|--------------------------|--------|-----------------|
-| 3A              | Recommendation | Active | r0, 2024-09-10  |
+| 3A              | Recommendation           | Active | r0, 2024-10-23  |
 
 Authors: [@achingbrain]
 
