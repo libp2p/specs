@@ -68,9 +68,9 @@ A client node wishing to determine reachability of its addresses sends a
 
 This `DialRequest` message has a list of addresses and a fixed64 `nonce`. The
 list is ordered in descending order of priority for verification. AutoNAT V2 is
-only for testing reachability on Public Internet. Client SHOULD NOT send any
+primarily for testing reachability on Public Internet. Client SHOULD NOT send any
 private address as defined in [RFC
-1918](https://datatracker.ietf.org/doc/html/rfc1918#section-3) in the list. 
+1918](https://datatracker.ietf.org/doc/html/rfc1918#section-3) in the list. The Server SHOULD NOT dial any private address.
 
 Upon receiving this request, the server selects an address from the list to
 dial. The server SHOULD use the first address it is willing to dial. The server
