@@ -62,6 +62,7 @@ Examples:
 
 * `/ip4/192.0.2.0/tcp/1234/ws` (an insecure address with a TCP port)
 * `/ip4/192.0.2.0/tcp/1234/tls/ws` (a secure address with a TCP port)
+* `/ip4/192.0.2.0/tcp/1234/tls/sni/foo.example.com/ws` (a secure address with resolved DNS address with explicit SNI value for TLS)
 * `/ip4/192.0.2.0/ws` (an insecure address that defaults to TCP port 80)
 * `/ip4/192.0.2.0/tls/ws` (a secure address that defaults to TCP port 443)
 * `/ip4/192.0.2.0/wss` (`/tls` may be omitted when using `/wss`)
