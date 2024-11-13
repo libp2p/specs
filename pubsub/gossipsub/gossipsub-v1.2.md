@@ -56,6 +56,7 @@ This section lists the configuration parameters that needs to agreed on across c
 When the peer receives the first message instance it immediately broadcasts 
 (not queue for later piggybacking) `IDONTWANT` with the `messageId` to all its mesh peers. 
 This could be performed prior to the message validation to further increase the effectiveness of the approach.    
+Additionally, on networks where multiple messages share the same messageId, a user may choose to broadcast IDONTWANT when publishing.
 
 On the other side a node maintains per-peer `dont_send_message_ids` set. Upon receiving `IDONTWANT` from 
 a peer the `messageId` is added to the `dont_send_message_ids` set. 
