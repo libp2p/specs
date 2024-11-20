@@ -92,5 +92,14 @@ as the latest WebTransport draft,
 allows for a 4-byte error code to be sent on stream resets, we will introduce
 error codes over WebTransport later.
 
+### HTTP
+Protocols that work over http MUST use the response header `Libp2p-Error-Code` to send the error code. The grammar for the field is similar to `Content-Length`
+```
+Libp2p-Error-Code: 1*DIGIT
+```
+
 ### Multistream Select
 Multistream-Select is used to negotiate Security protocol for TCP connections before a stream muxer has been selected. There's only one error code defined for such cases, `PROTOCOL_NEGOTIATION_FAILED`. To encode this error, send the string `101` prefixed with the length and close the TCP connection.  
+
+
+
