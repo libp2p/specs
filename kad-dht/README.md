@@ -492,7 +492,7 @@ These are the requirements for each `MessageType`:
   node to be found. In the response `closerPeers` is set to the `k` closest
   `Peer`s.  Each closer peer will be a DHT server, unless `key` is an exact match
   for a peer known to the node, in which case the closer peers will include the
-  matching, non-server peer.
+  matching peer, even if it is not a DHT server.
 
 * `GET_VALUE`: In the request `key` is an unstructured array of bytes. `record`
   is set to the value for the given key (if found in the datastore) and
