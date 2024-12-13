@@ -148,7 +148,7 @@ In the go implementation, the `seen` cache is provided by the pubsub framework a
 
 ## Topic Membership
 
-In addition to the `SUBSCRIBE` / `UNSUBSCRIBE` events sent by the pubsub framework, gossipsub must do additional work to maintain the mesh for the topic it is joining or leaving. We will refer to the two topic membership operations below as `JOIN(topic)` and `LEAVE(topic)`.
+In addition to the `SUBSCRIBE` / `UNSUBSCRIBE` events sent by the pubsub framework, announcesub must do additional work to maintain the mesh for the topic it is joining or leaving. We will refer to the two topic membership operations below as `JOIN(topic)` and `LEAVE(topic)`.
 
 When the application invokes `JOIN(topic)`, the router will form a topic mesh by selecting up to `D` peers from its [local peering state](#peering-state) first examining the `fanout` map. If there are peers in `fanout[topic]`, the router will move those peers from the `fanout` map to `mesh[topic]`. If the topic is not in the `fanout` map, or if `fanout[topic]` contains fewer than `D` peers, the router will attempt to fill `mesh[topic]` with peers from `peers.announcesub[topic]` which is the set of all announcesub-capable peers it is aware of that are members of the topic.
 
@@ -158,9 +158,9 @@ The application can invoke `LEAVE(topic)` to unsubscribe from a topic. The route
 
 ## Control Messages
 
-Control messages are exchanged to maintain topic meshes and emit gossip. This section lists the control messages in the core gossipsub protocol.
+Control messages are exchanged to maintain topic meshes and emit gossip. This section lists the control messages in the core announcesub protocol.
 
-For details on how gossipsub routers respond to control messages, see [Message Processing](#message-processing).
+For details on how announcesub routers respond to control messages, see [Message Processing](#message-processing).
 
 The [protobuf](https://developers.google.com/protocol-buffers) schema for control messages is detailed in the [Protobuf](#protobuf) section.
 
@@ -353,4 +353,4 @@ message ControlINeed {
 - Add a scoring function with a bunch of rules to detect misbehaving peers just like the one in [gossipsub v1.1][gossipsub-v1.1-spec]
 - Let publishers just send the full content of messages to mesh peers, rather than `IANNOUNCE`, because no one has really seen the message before. This saves one RTT, but it will kill anonymity so we are not sure yet to do it.
 
-[gossipsub-v1.1-spec]: ../gossipsub/gossipsub-v1.1.0.md
+[gossipsub-v1.1-spec]: ../gossipsub/gossipsub-v1.1.md
