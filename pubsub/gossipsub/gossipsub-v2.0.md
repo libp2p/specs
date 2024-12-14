@@ -33,6 +33,7 @@ This document specifies extensions to [gossipsub v1.2](gossipsub-v1.2.md) intend
     - [IANNOUNCE](#iannounce)
     - [INEED](#ineed)
   - [Message Processing](#message-processing)
+  - [Message Publishing](#message-publishing)
   - [Protobuf](#protobuf)
 - [Future Improvements](#future-improvements)
 
