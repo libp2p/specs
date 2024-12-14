@@ -82,15 +82,11 @@ The extensions that make up gossipsub v2.0 introduce several new application con
 
 The following parameters apply globally:
 
-| Parameter      | Purpose                          | Reasonable Default |
-|----------------|----------------------------------|--------------------|
-| `timeout`      | Timeout for `INEED` messages     | 400 milliseconds   |
+| Parameter    | Purpose                                                                                    | Reasonable Default |
+|--------------|--------------------------------------------------------------------------------------------|--------------------|
+| `timeout`    | Timeout for `INEED` messages                                                               | 400 milliseconds   |
+| `D_announce` | Desired number of times a message is sent lazily to the mesh. Must be at most equal to `D` | 4                  |
 
-The following parameters apply per topic:
-
-| Parameter      | Purpose                                   | Reasonable Default |
-|----------------|-------------------------------------------|--------------------|
-| `P_lazy`       | Probabilty to send the message lazily     | 0.5                |
 
 ### Router State
 
@@ -116,9 +112,9 @@ Upon receiving a message, the router will first process and validate the message
 
 If the message is valid and has not been previously seen, firstly it clears `acache[msgid]` to prevent sending any more `IANNOUNCE`.
 
-Secondly, for each mesh peer to which the router wants to forward the message, it will toss a coin to decide whether to forward the message eargerly or lazily. The probability of forwarding lazily is determined by `P_lazy`.
+Secondly, for each mesh peer to which the router wants to forward the message, it will toss a coin to decide whether to forward the message eagerly or lazily. The probability of forwarding lazily is determined by `D_announce/D`.
 
-- If the router decides to forward the message eargerly, it will just forward the full message to that mesh peer.
+- If the router decides to forward the message eagerly, it will just forward the full message to that mesh peer.
 - If the router decides to forward the message lazily, it will send `IANNOUNCE` with the message id attached instead to tell them that it just receives a new message. If they want the full content of the message, they should send `INEED` back.
 
 After processing the message payload, the router will process the new control messages as follows:
@@ -133,9 +129,15 @@ After processing the message payload, the router will process the new control me
 
 - Upon receiving `INEED` after sending `IANNOUNCE`, the router must send the full content back without an option to decline. Otherwise it will be deemed misbehaving.
 
-Apart from forwarding received messages, the router can of course publish messages on its own behalf. This is very similar to forwarding received messages. It also has to toss a coin to decide whether to send the message eargerly or lazily.
+Apart from forwarding received messages, the router can of course publish messages on its own behalf. This is very similar to forwarding received messages. It also has to toss a coin to decide whether to send the message eagerly or lazily.
 
 [seen-cache]: ../gossipsub/gossipsub-v1.0.md#message-cache
+
+### Message Publishing
+
+For message publishing, as long as `D_announce` is less than `D`, full messages are published to our mesh peers. There is no advantage to lazy mesh
+propagation as none of the peers have seen the message before. In the event `D_announce` is equivalent to `D` we disable publishing the full message as 
+the message originator is trivially identifiable if message propagation is completely announcement based. 
 
 ### Protobuf
 
