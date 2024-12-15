@@ -128,10 +128,13 @@ After processing the message payload, the router will process the new control me
 
   In gossipsub v2.1, we plan to penalize peers that don't send the message in time.
 
+  Since handling `IANNOUNCE` can delay receiving messages, the router must handle only `IANNOUNCE` sent from trustworthy peers, i.e. mesh peers and [explicit peers][explicit-peering].
+
 - Upon receiving `INEED` after sending `IANNOUNCE`, the router must send the full content back without an option to decline. Otherwise it will be deemed misbehaving.
 
 Apart from forwarding received messages, the router can of course publish messages on its own behalf. This is very similar to forwarding received messages. It also has to toss a coin to decide whether to send the message eagerly or lazily.
 
+[explicit-peering]: ../gossipsub/gossipsub-v1.1.md#explicit-peering-agreements
 [seen-cache]: ../gossipsub/gossipsub-v1.0.md#message-cache
 
 ### Message Publishing
@@ -139,6 +142,8 @@ Apart from forwarding received messages, the router can of course publish messag
 For message publishing, as long as `D_announce` is less than `D`, full messages are published to our mesh peers. There is no advantage to lazy mesh
 propagation as none of the peers have seen the message before. In the event `D_announce` is equivalent to `D` we disable publishing the full message as 
 the message originator is trivially identifiable if message propagation is completely announcement based. 
+
+In case of flood publishing, it's possible that the publisher is gonna send the message to peers other than mesh peers and [explicit peers][explicit-peering]. In which case, the publisher must send the message eagerly without tossing a coin.
 
 ### Protobuf
 
