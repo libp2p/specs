@@ -111,6 +111,7 @@ The `INEED` message requests the full content of a single message whose id was a
 
 Upon receiving a message, the router will first process and validate the message payload as usual.
 
+If the received message has a different message id to the one announced this would be a malicious action by the peer. In future versions of gossipsub v2.x, the peer is penalized and pruned from the mesh or banned completely.
 If the message is valid and has not been previously seen, firstly it clears `acache[msgid]` to prevent sending any more `IANNOUNCE`.
 
 Secondly, for each mesh peer to which the router wants to forward the message, it will toss a coin to decide whether to forward the message eagerly or lazily. The probability of forwarding lazily is determined by `D_announce/D`.
