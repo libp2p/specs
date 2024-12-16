@@ -145,6 +145,8 @@ the message originator is trivially identifiable if message propagation is compl
 
 In case of flood publishing, it's possible that the publisher is gonna send the message to peers other than mesh peers and [explicit peers][explicit-peering]. In which case, the publisher must send the message eagerly without tossing a coin.
 
+In case of publishing using fanout peers, just send the message eagerly.
+
 ### Protobuf
 
 The protobuf messages are identical to those specified in the [gossipsub v1.2.0 specification](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.2.md) with the following control message modifications:
