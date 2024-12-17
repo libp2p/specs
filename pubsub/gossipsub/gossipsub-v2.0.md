@@ -112,7 +112,8 @@ The `INEED` message requests the full content of a single message whose id was a
 Upon receiving a message, the router will first process and validate the message payload as usual.
 
 If the received message has a different message id to the one announced this would be a malicious action by the peer. In future versions of gossipsub v2.x, the peer is penalized and pruned from the mesh or banned completely.
-If the message is valid and has not been previously seen, firstly it clears `acache[msgid]` to prevent sending any more `IANNOUNCE`.
+
+If the message is valid and has not been previously seen, firstly it clears `acache[msgid]` to prevent sending any more `INEED`.
 
 Secondly, for each mesh peer to which the router wants to forward the message, it will toss a coin to decide whether to forward the message eagerly or lazily. The probability of forwarding lazily is determined by `D_announce/D`.
 
@@ -123,7 +124,7 @@ After processing the message payload, the router will process the new control me
 
 - Upon receiving `IANNOUNCE`, the router checks the [`seen` cache][seen-cache] to see if it has been seen or not. If not, it adds the sending peer to `acache[msgid]`, where `msgid` is the one attached to `IANNOUNCE`. If `acache[msgid]` was previously empty, the router pops `acache[msgid]` and sends `INEED` to that peer immediately.
 
-  After the router sends `INEED`, it will time out if it doesn't receive the message back in time, as indicated by `timeout`. If the timeout happens, the router will pop `acache[msgid]` send `INEED` to the next peer. If it still times out, keep going with next peers until the cache runs out of peers.
+  After the router sends `INEED`, it will time out if it doesn't receive the message back in time, as indicated by `timeout`. If the timeout happens, the router will pop `acache[msgid]` and send `INEED` to the next peer. If it still times out, keep going with next peers until the cache runs out of peers.
 
   Notice that timeouts can delay receiving the message. It's worth noting that timeouts are rare, since the peer just sent the router `IANNOUNCE` so it means the network condition is already good and the peer should be able to send the actual message without problems.
 
