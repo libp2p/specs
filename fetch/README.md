@@ -4,7 +4,7 @@
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 1A              | Working Draft  | Active | r1, 2019-08-13  |
+| 1A              | Working Draft  | Active | r1, 2025-01-09  |
 
 Authors: [@aschmahmann]
 
@@ -74,7 +74,7 @@ Should support: `Fetch(key) (value, statusCode)`
 However, the level of specificity in the types of the above variables has wiggle room if people are interested.
 The `go-libp2p-pubsub-router` implementation requires:
 
- `key`: At least as generic as a UTF-8 string
+ `key`: At least as generic as a byte array that may be interpreted as a UTF-8 string
 
  `value`: At least as generic as a byte array
 
@@ -91,7 +91,7 @@ The messages in the Fetch protocol use on of the following protobufs (proto3 syn
 syntax = "proto2";
 
 message FetchRequest {
-	string identifier = 1;
+	bytes identifier = 1;
 }
 
 message FetchResponse {
