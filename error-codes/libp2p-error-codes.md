@@ -13,6 +13,7 @@
 | GARBAGE_COLLECTED | 106 | Connection was garbage collected |
 | SHUTDOWN | 107 | The node is shutting down |
 | GATED | 108 | The connection was gated. Most likely the IP / node is blacklisted. |
+| CODE_OUT_OF_RANGE | 109 | The error code received from the peer was greater than 4294967295(Max uint32).
 
 
 ## Stream Error Codes
@@ -28,3 +29,4 @@
 | GARBAGE_COLLECTED | 106 | Idle Stream was garbage collected |
 | SHUTDOWN | 107 | The node is shutting down |
 | GATED | 108 | The stream was gated. Most likely the IP / node is blacklisted. |
+| CODE_OUT_OF_RANGE | 109 | The error code received from the peer was greater than 4294967295(Max uint32).

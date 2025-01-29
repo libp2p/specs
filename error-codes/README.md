@@ -42,7 +42,7 @@ Error code 0 signals that no error code was provided. Implementations MUST handl
 
 Error codes from 1 to 100 are reserved for transport errors. These are used by the transports to terminate connections on transport errors. 
 
-Error codes from 100 - 10000 are reserved for libp2p. This includes multistream error codes, as it is necessary for libp2p connection establishment over TCP, but not kad-dht or gossip-sub error codes. 
+Error codes from 100 - 10000 are reserved for libp2p. This includes multistream error codes, as it is necessary for libp2p connection establishment over TCP, but not kad-dht or gossip-sub error codes. Some transports, like QUIC, support sending an error code greater than a 32 bit int. On receiving such a value, implementations MUST use `CODE_OUT_OF_RANGE` as the libp2p error code. 
 
 see [Libp2p error codes](./libp2p-error-codes.md) for the libp2p reserved error
 codes.
