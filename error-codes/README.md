@@ -71,12 +71,10 @@ For Stream Resets, the error code is sent in the `Window Update` frame, with the
 32-bit Length field interpreted as the error code. See [yamux spec
 extension](https://github.com/libp2p/specs/pull/622).
 
-Connection Close error code delivery to the other end depends on the OS TCP implementation and the TCP options used for the socket. In particular, when `SO_LINGER` TCP option is set to 0 and the implementation closes the connection immediately after writing the error code containing frame, the error code may not be delivered.
+TCP connections with Yamux may not deliver the error code to the peer depending on the TCP socket options used. In particular, setting the `SO_LINGER` socket option with timeout 0, the OS discards all the data in the send buffer and sends a TCP RST to immediately close the connection, preventing error code delivery.
 
 ### WebRTC
-There is no way to provide any information on closing a peer connection in
-WebRTC. Providing error codes on Connection Close will be taken up in the
-future. 
+A libp2p WebRTC connection is closed by closing the underlying WebRTC Peer Connection. As there's no way to provide any information to the peer on closing a WebRTC Peer Connection, it's not possible to signal error codes on Connection Close.
 
 For Stream Resets, the error code can be sent in the `errorCode` field of the
 WebRTC message with `flag` set to `RESET_STREAM`.
