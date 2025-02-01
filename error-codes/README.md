@@ -34,7 +34,12 @@ Libp2p streams are reset unilaterally, calling `Reset` on a stream resets both t
 ## Error Codes Registry
 Libp2p connections are shared by multiple applications. The same connection used in the dht may be used for gossip sub, or for any other application. Any of these applications can close the underlying connection on an error, resetting streams used by the other applications. To correctly distinguish which application closed the connection, Connection Close error codes are allocated to applications from a central registry. 
 
-For simplicity, we manage both Connection Close and Stream Reset error codes from a central registry. The libp2p error codes registry is at: https://github.com/libp2p/error-codes/
+For simplicity, we manage both Connection Close and Stream Reset error codes from a central registry. The libp2p error codes registry is maintained here with all the allocations so far listen in (error-codes.csv)[./error-codes.csv].
+
+Error codes are allocated to applications in 8 bit chunks. To request an
+allocation, raise a PR allocating 256 codes right after the last allocation. If
+the last allocated range is 0x1900 - 0x19ff, add 0x1a00 - 0x1aff for your
+application.
 
 ### Libp2p Reserved Error Codes
 Error code 0 signals that no error code was provided. Implementations MUST handle closing a connection with error code 0 as they handle closing a connection with no error code, and resetting a stream with error code 0 as they handle resetting a stream without any error code. 
