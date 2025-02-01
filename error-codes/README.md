@@ -95,9 +95,3 @@ Protocols that work over http MUST use the response header `Libp2p-Error-Code` t
 ```
 Libp2p-Error-Code: 1*DIGIT
 ```
-
-### Multistream Select
-Multistream-Select is used to negotiate Security protocol for TCP connections before a stream muxer has been selected. There's only one error code defined for such cases, `PROTOCOL_NEGOTIATION_FAILED`. To encode this error, send the string `101` prefixed with the length and close the TCP connection.  
-
-
-

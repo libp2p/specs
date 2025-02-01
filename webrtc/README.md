@@ -77,7 +77,7 @@ message Message {
 
   optional bytes message = 2;
 
-  // errorCode is the reason for resetting the stream. This field is only meaningful when flag is set to RESET_STREAM 
+  // errorCode is the reason for resetting the stream. This field is only meaningful when flag is set to RESET_STREAM or STOP_SENDING
   optional uint32 errorCode = 3;
 }
 ```
