@@ -12,7 +12,6 @@ Interest Group: [@marcopolo], [@achingbrain]
 [@achingbrain]: https://github.com/achingbrain
 
 ## Introduction
-
 When closing a connection or resetting a stream, it's useful to provide the peer
 with a code that explains the reason for the closure. This enables the peer to
 better respond to the abrupt closures. For instance, it can implement a backoff
@@ -20,9 +19,9 @@ strategy to retry _only_ when it receives a `RATE_LIMITED` error code. An error
 code doesn't always indicate an error condition. For example, a node can terminate an idle connection, or close a connection because a connection to the same peer over a better transport is available. In both these cases, it can signal an appropriate error code to the other end. 
 
 ## Semantics
-Error codes are unsigned 32-bit integers. The range 0 to 10000 is reserved for
-libp2p errors. Application specific errors can be defined by protocols from
-integers outside of this range. Error Codes can be signaled on Closing a connection or on resetting a Stream.   
+Error Codes can be signaled on Closing a connection or on resetting a Stream.  Error Codes are unsigned 32-bit integers. The range 0 to 0xffff is reserved for
+libp2p errors. Application specific errors can be defined for protocols from
+integers outside of this range. 
 
 From an application perspective, error codes provide a best effort guarantee. On resetting a libp2p stream or closing a connection with an error code, the error code may or may not be delivered to the application on the remote end. The specifics depend on the transport used. For example, WebTransport doesn't support error codes at all, while WebRTC doesn't support Connection Close error codes, but supports Stream Reset error codes. 
 
@@ -38,17 +37,17 @@ Libp2p connections are shared by multiple applications. The same connection used
 For simplicity, we manage both Connection Close and Stream Reset error codes from a central registry. The libp2p error codes registry is at: https://github.com/libp2p/error-codes/
 
 ### Libp2p Reserved Error Codes
-Error code 0 signals that no error code was provided. Implementations MUST handle closing a connection with error code 0 as they handle closing a connection with no error code, and resetting a stream with error code 0 as they handle resetting a stream with no error. 
+Error code 0 signals that no error code was provided. Implementations MUST handle closing a connection with error code 0 as they handle closing a connection with no error code, and resetting a stream with error code 0 as they handle resetting a stream without any error code. 
 
-Error codes from 1 to 100 are reserved for transport errors. These are used by the transports to terminate connections on transport errors. 
+Error codes from 1 to 0x3ff are reserved for transport errors. These are used by the transports to terminate connections or streams on transport errors. 
 
-Error codes from 100 - 10000 are reserved for libp2p. This includes multistream error codes, as it is necessary for libp2p connection establishment over TCP, but not kad-dht or gossip-sub error codes. Some transports, like QUIC, support sending an error code greater than a 32 bit int. On receiving such a value, implementations MUST use `CODE_OUT_OF_RANGE` as the libp2p error code. 
+Error codes from 0x400 to 0xffff are reserved for libp2p. This includes multistream error codes, as it is necessary for libp2p connection establishment over TCP, but not kad-dht or gossip-sub error codes. See [Libp2p error codes](./libp2p-error-codes.md) for the libp2p reserved error codes.
 
-see [Libp2p error codes](./libp2p-error-codes.md) for the libp2p reserved error
-codes.
+Some transports, like QUIC, support sending an error code greater than a 32 bit int. On receiving such a value, implementations MUST use `CODE_OUT_OF_RANGE` as the libp2p error code. 
+
 
 ## Transport Specification and Wire Encoding
-Different transports will encode the 32-bit error code differently on the wire. They also provide different semantics: Webtransport doesn't define error codes, WebRTC doesn't support Connection Close error codes, Yamux error codes on Connection Close cannot be reliably sent over the wire.  
+Different transports will encode the 32-bit error code differently on the wire. For instance, Yamux will use Big Endian and QUIC uses varint. They also provide different semantics: Webtransport doesn't define error codes, WebRTC doesn't support Connection Close error codes, Yamux error codes on Connection Close cannot be reliably sent over the wire.  
 
 ### QUIC
 QUIC provides the ability to send an error on closing the read end of the
