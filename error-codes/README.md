@@ -44,9 +44,9 @@ application.
 ### Libp2p Reserved Error Codes
 Error code 0 signals that no error code was provided. Implementations MUST handle closing a connection with error code 0 as they handle closing a connection with no error code, and resetting a stream with error code 0 as they handle resetting a stream without any error code. 
 
-Error codes from 1 to 0x3ff are reserved for transport errors. These are used by the transports to terminate connections or streams on transport errors. 
+Error codes from 1 to 0xfff are reserved for transport errors. These are used by the transports to terminate connections or streams on transport errors. 
 
-Error codes from 0x400 to 0xffff are reserved for libp2p. This includes multistream error codes, as it is necessary for libp2p connection establishment over TCP, but not kad-dht or gossip-sub error codes. See [Libp2p error codes](./libp2p-error-codes.md) for the libp2p reserved error codes.
+Error codes from 0x1000 to 0xffff are reserved for libp2p. This includes multistream error codes, as it is necessary for libp2p connection establishment over TCP, but not kad-dht or gossip-sub error codes. See [Libp2p error codes](./libp2p-error-codes.md) for the libp2p reserved error codes.
 
 Some transports, like QUIC, support sending an error code greater than a 32 bit int. On receiving such a value, implementations MUST use `CODE_OUT_OF_RANGE` as the libp2p error code. 
 
