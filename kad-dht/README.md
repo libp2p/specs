@@ -368,14 +368,13 @@ the wire format and keep their routing table up-to-date, especially with peers
 closest to themselves.
 
 The process runs once on startup, then periodically with a configurable
-frequency (default: 5 minutes). On every run, we generate a random peer ID and
-we look it up via the process defined in [peer routing](#peer-routing). Peers
-encountered throughout the search are inserted in the routing table, as per
-usual business.
+frequency (default: 10 minutes). On every run, we generate a random peer ID for
+every non-empty routing table's k-bucket and we look it up via the process
+defined in [peer routing](#peer-routing). Peers encountered throughout the
+search are inserted in the routing table, as per usual business.
 
-This is repeated as many times per run as configuration parameter `QueryCount`
-(default: 1). In addition, to improve awareness of nodes close to oneself,
-implementations should include a lookup for their own peer ID.
+In addition, to improve awareness of nodes close to oneself, implementations
+should include a lookup for their own peer ID.
 
 Every repetition is subject to a `QueryTimeout` (default: 10 seconds), which
 upon firing, aborts the run.
