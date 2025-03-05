@@ -128,7 +128,7 @@ How the public key is encoded into the `Data` bytes depends on the Key Type.
 
 "libp2p" is used as the application protocol for [ALPN](https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation).
 
-The handshake MUST be aborted if both peers can't agree on the application protocol.
+The server MUST abort the handshake if it doesn't support any of the application protocols offered by the client.
 
 ## Inlined Muxer Negotiation
 
