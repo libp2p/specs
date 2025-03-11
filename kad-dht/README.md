@@ -66,8 +66,8 @@ XOR-tries (see [go-libp2p-xor]).
 ### Alpha concurrency parameter (`α`)
 
 The concurrency of node and value lookups are limited by parameter `α`, with a
-default value of 3. This implies that each lookup process can perform no more
-than 3 inflight requests, at any given time.
+default value of 10. This implies that each lookup process can perform no more
+than 10 inflight requests, at any given time.
 
 ## Client and server mode
 
