@@ -137,8 +137,8 @@ message ControlMessage {
  repeated ControlIWant iwant = 2;
  repeated ControlGraft graft = 3;
  repeated ControlPrune prune = 4;
- repeated ControlChoke prune = 5;
- repeated ControlUnChoke prune = 6;
+ repeated ControlChoke choke = 5;
+ repeated ControlUnChoke unchoke = 6;
 }
 
 message ControlIHave {
