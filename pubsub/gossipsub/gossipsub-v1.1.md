@@ -315,11 +315,11 @@ The parameters are defined as follows:
 - `P₄`: **Invalid Messages** for a topic. This is the number of invalid messages delivered in the topic.
   This is intended to penalize peers who transmit invalid messages, according to application-specific
   validation rules. It is mixed with a negative weight.
-- `P₅`: **Application-Specific** score. This is the score component assigned to the peer by the application
+- `P₅`: **Application-Specific score**. This is the score component assigned to the peer by the application
   itself, using application-specific rules. The weight is positive, but the parameter itself has an
   arbitrary real value, so that the application can signal misbehaviour with a negative score or gate
   peers before an application-specific handshake is completed.
-- `P₆`: **IP Colocation Factor**. This parameter is a threshold for the number of peers using the same IP
+- `P₆`: **IP Collocation Factor**. This parameter is a threshold for the number of peers using the same IP
   address. If the number of peers in the same IP exceeds the threshold, then the value is the square
   of the surplus, otherwise it is 0. This is intended to make it difficult to carry out sybil attacks
   by using a small number of IPs. The parameter is mixed with a negative weight.
