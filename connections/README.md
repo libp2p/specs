@@ -238,7 +238,7 @@ open protocol extension][simopen].
 ### Inlining Muxer Negotiation
 
 If both peers support it, it's possible to shortcut the muxer selection by moving
-it into the security handshake. Details are specified in [inlined-muxer-negotiation].
+it into the security handshake. Details are specified in [inlined-muxer-negotiation][inlined-muxer-selection].
 
 
 ## Opening New Streams Over a Connection
