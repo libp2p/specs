@@ -169,7 +169,7 @@ protocol operates as follows:
    headers:
 
    ```
-   Authentication-Info: libp2p-PeerID, sig="<base64-signature-bytes>" bearer="<base64-encoded-opaque-blob>"
+   Authentication-Info: libp2p-PeerID sig="<base64-signature-bytes>" bearer="<base64-encoded-opaque-blob>"
    ```
 
    The `sig` param represents a signature over the parameters:
