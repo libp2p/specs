@@ -69,3 +69,39 @@ In order to verify end-to-end encryption of the connection, the peers need to es
 On receipt of the `webtransport_certhashes` extension, the client MUST verify that the certificate hash of the certificate that was used on the connection is contained in the server's list. If the client was willing to accept multiple certificate hashes, but cannot determine which certificate was actually used to establish the connection (this will commonly be the case for browser clients), it MUST verify that all certificate hashes are contained in the server's list. If verification fails, it MUST abort the handshake.
 
 For the client, the libp2p connection is fully established once it has sent the last Noise handshake message. For the server, processing of that message completes the handshake.
+
+## Message framing
+
+Upon closing a WebTransport stream, some implementations do not wait for all outstanding stream data to be sent over the wire before freeing up stream resources and making queue memory available for other uses.
+
+To allow cleanly closing streams without the loss of data using these implementations it's necessary to adopt similar semantics to the WebRTC transport when [closing datachannels](../webrtc/README.md#closing-an-rtcdatachannel).
+
+During the [security handshake](#security-handshake), a `webtransport_message_framing` boolean value may be supplied as part of the Noise extension block.
+
+If present, all messages sent over this connection will framed within a protobuf wrapper with the following structure:
+
+```proto
+syntax = "proto3";
+
+message Message {
+  enum Flag {
+    // The sender will no longer send messages on the stream.
+    FIN = 0;
+    // The sender acknowledges receipt of a FIN
+    FIN_ACK = 1;
+  }
+
+  optional Flag flag = 1;
+  optional bytes message = 2;
+}
+```
+
+If a node sends the `webtransport_message_framing` flag but does not receive one from the remote, it MUST fall back to sending unframed messages.
+
+If both nodes send the `webtransport_message_framing` flag, when either node wishes to close a stream for writing, it MUST send a message with the `FIN` flag set.
+
+If a `FIN` flag is received the node SHOULD respond with a `FIN_ACK`.
+
+A node SHOULD only close it's writable end of the stream once it has received a `FIN_ACK`.
+
+The node MAY close the writable end of the stream without receiving a `FIN_ACK`, for example in the case of a timeout, but there will be no guarantee that all previously sent messages have been received by the remote.
