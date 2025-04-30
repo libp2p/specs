@@ -172,6 +172,17 @@ protocol operates as follows:
    Authentication-Info: libp2p-PeerID sig="<base64-signature-bytes>" bearer="<base64-encoded-opaque-blob>"
    ```
 
+   The server MAY include an `expires` field which contains the expiry time of
+   the bearer token in [ISO-8601](https://www.iso.org/iso-8601-date-and-time-format.html)
+   format:
+
+   ```
+   Authentication-Info: libp2p-PeerID sig="<base64-signature-bytes>" bearer="<base64-encoded-opaque-blob>" expires="<ISO-8601-formatted-date-string>"
+   ```
+
+   Note that the `expires` field is only advisory, the server may expire the
+   token at any time.
+
    The `sig` param represents a signature over the parameters:
 
    - `challenge-server`
@@ -186,7 +197,7 @@ protocol operates as follows:
    - The `hostname` parameter.
    - The token creation date (to allow tokens to expire).
 
-5. The client MUST verify the signature. After verification the client has
+6. The client MUST verify the signature. After verification the client has
    authenticated the server's Peer ID. The client SHOULD send the `bearer`
    token for Peer ID authenticated requests.
 
@@ -254,8 +265,19 @@ The client initiated handshake is as follows
    - The client's Peer ID.
    - The `hostname` parameter.
    - The token creation date (to allow tokens to expire).
+  
+   The server MAY include an `expires` field which contains the expiry time of
+   the bearer token in [ISO-8601](https://www.iso.org/iso-8601-date-and-time-format.html)
+   format:
 
-5. The client SHOULD send the `bearer` token for future Peer ID authenticated
+   ```
+   Authentication-Info: libp2p-PeerID bearer="<base64-encoded-opaque-blob>" expires="<ISO-8601-formatted-date-string>"
+   ```
+
+   Note that the `expires` field is only advisory, the server may expire the
+   token at any time.
+
+6. The client SHOULD send the `bearer` token for future Peer ID authenticated
    requests.
 
 ## libp2p bearer token
