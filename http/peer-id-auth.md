@@ -197,7 +197,7 @@ protocol operates as follows:
    - The `hostname` parameter.
    - The token creation date (to allow tokens to expire).
 
-6. The client MUST verify the signature. After verification the client has
+5. The client MUST verify the signature. After verification the client has
    authenticated the server's Peer ID. The client SHOULD send the `bearer`
    token for Peer ID authenticated requests.
 
@@ -277,7 +277,7 @@ The client initiated handshake is as follows
    Note that the `expires` field is only advisory, the server may expire the
    token at any time.
 
-6. The client SHOULD send the `bearer` token for future Peer ID authenticated
+5. The client SHOULD send the `bearer` token for future Peer ID authenticated
    requests.
 
 ## libp2p bearer token
