@@ -173,8 +173,7 @@ protocol operates as follows:
    ```
 
    The server MAY include an `expires` field which contains the expiry time of
-   the bearer token in [ISO-8601](https://www.iso.org/iso-8601-date-and-time-format.html)
-   format:
+   the bearer token in [RFC3339](https://www.rfc-editor.org/rfc/rfc3339) format:
 
    ```
    Authentication-Info: libp2p-PeerID sig="<base64-signature-bytes>" bearer="<base64-encoded-opaque-blob>" expires="<ISO-8601-formatted-date-string>"
@@ -267,8 +266,7 @@ The client initiated handshake is as follows
    - The token creation date (to allow tokens to expire).
   
    The server MAY include an `expires` field which contains the expiry time of
-   the bearer token in [ISO-8601](https://www.iso.org/iso-8601-date-and-time-format.html)
-   format:
+   the bearer token in [RFC3339](https://www.rfc-editor.org/rfc/rfc3339) format:
 
    ```
    Authentication-Info: libp2p-PeerID bearer="<base64-encoded-opaque-blob>" expires="<ISO-8601-formatted-date-string>"
