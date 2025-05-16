@@ -27,6 +27,8 @@ and spec status.
 - [Handshake Protocol](#handshake-protocol)
 - [Peer Authentication](#peer-authentication)
   - [libp2p Public Key Extension](#libp2p-public-key-extension)
+- [ALPN](#alpn)
+- [Inlined Muxer Negotiation](#inlined-muxer-negotiation)
 - [Test vectors](#test-vectors)
   - [1. Valid certificate authenticating an ED25519 Peer ID](#1-valid-certificate-authenticating-an-ed25519-peer-id)
   - [2. Valid certificate authenticating an ECDSA Peer ID](#2-valid-certificate-authenticating-an-ecdsa-peer-id)
@@ -121,6 +123,16 @@ How the public key is encoded into the `Data` bytes depends on the Key Type.
 - `Ed25519`: Only the 32 bytes of the public key
 - `Secp256k1`: Only the compressed form of the public key. 33 bytes.
 - The rest of the keys are encoded as a [SubjectPublicKeyInfo structure](https://www.rfc-editor.org/rfc/rfc5280.html#section-4.1) in PKIX, ASN.1 DER form.
+
+## ALPN
+
+"libp2p" is used as the application protocol for [ALPN](https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation).
+
+The server MUST abort the handshake if it doesn't support any of the application protocols offered by the client.
+
+## Inlined Muxer Negotiation
+
+See [Multiplexer Negotiation over TLS](../connections/inlined-muxer-negotiation.md#multiplexer-negotiation-over-tls).
 
 ## Test vectors
 
