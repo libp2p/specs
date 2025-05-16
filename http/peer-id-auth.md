@@ -177,7 +177,7 @@ protocol operates as follows:
    format:
 
    ```
-   Authentication-Info: libp2p-PeerID sig="<base64-signature-bytes>" bearer="<base64-encoded-opaque-blob>" expires="<ISO-8601-formatted-date-string>"
+   Authentication-Info: libp2p-PeerID sig="<base64-signature-bytes>" bearer="<base64-encoded-opaque-blob>" expires="<RFC-3339-formatted-date-string>"
    ```
 
    Note that the `expires` field is only advisory, the server may expire the
@@ -271,7 +271,7 @@ The client initiated handshake is as follows
    format:
 
    ```
-   Authentication-Info: libp2p-PeerID bearer="<base64-encoded-opaque-blob>" expires="<ISO-8601-formatted-date-string>"
+   Authentication-Info: libp2p-PeerID bearer="<base64-encoded-opaque-blob>" expires="<RFC-3339-formatted-date-string>"
    ```
 
    Note that the `expires` field is only advisory, the server may expire the
