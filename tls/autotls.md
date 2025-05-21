@@ -23,8 +23,14 @@ and spec status.
 - [Introduction](#introduction)
 - [General Flow](#general-flow)
 
-## Introduction
-TODO
+## Overview
+Most modern web browsers only establish TLS connections with peers that present certificates issued by a recognized Certificate Authority (CA). Self-signed certificates are generally not accepted. To obtain a CA-issued certificate, a requester must complete an ACME (Automatic Certificate Management Environment) challenge. This typically involves provisioning a DNS TXT record on a domain the requester controls.
+
+However, most libp2p peers do not own or control domain names, making it impractical for them to complete DNS-based ACME challenges and, by extension, to obtain trusted TLS certificates. This limitation hinders direct communication between libp2p peers and standard web browsers.
+
+AutoTLS addresses this problem by introducing an AutoTLS broker — a server that controls a domain and facilitates ACME challenges on behalf of libp2p peers. A peer can request the AutoTLS broker to fulfill an ACME DNS challenge on its behalf. Once the broker sets the appropriate DNS record, the requesting peer proceeds to notify the ACME server. The ACME server validates the challenge against the broker's domain, and if successful, issues a valid certificate.
+
+This mechanism allows libp2p peers to obtain CA-issued certificates without needing to possess or manage their own domain names.
 
 ## General Flow
 1. Start libp2p client with public IPv4 (or IPv6) and support for `identify` protocol (standard for `nim-libp2p`)
