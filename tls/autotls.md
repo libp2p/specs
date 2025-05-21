@@ -33,38 +33,63 @@ AutoTLS addresses this problem by introducing an AutoTLS broker — a server tha
 This mechanism allows libp2p peers to obtain CA-issued certificates without needing to possess or manage their own domain names.
 
 ## General Flow
-1. Start libp2p client with public IPv4 (or IPv6) and support for `identify` protocol (standard for `nim-libp2p`)
-2. Get `PeerID` as a base36 of the CID of the multihash with the `libp2p-key` (`0x72`) multicodec: 
+1. Start libp2p client with public IPv4 (or IPv6) and support for `identify` protocol
+2. Get `PeerID` as a base36 of the CID of the multihash with the `libp2p-key` (`0x72`) multicodec:
 	1. Transform PeerID into a multihash `mh`
-	2. Transform `mh` into a `v1` CID with the `0x72` multicodec (`libp2p-key`)
-	3. Base36 encode the `cid.data.buffer` (not regular base36! this one needs [multibase base36](https://github.com/multiformats/multibase/blob/f378d3427fe125057facdbac936c4215cc777920/rfcs/Base36.md), which is the same as regular base36 but doesn't trims leading zeroes and starts with a `k` or `K`) to get `b36peerid`
-3. Generate an RSA key `mykey`
-4. Register an account on the ACME server ([production server for Let's Encrypt](https://acme-v02.api.letsencrypt.org) or just the [staging server](https://acme-staging-v02.api.letsencrypt.org) for testing)
+	2. Transform `mh` into a CIDv1 with the `libp2p-key` multicodec (which is the `0x72` multicodec)
+	3. Encode `cid.data.buffer` to [multibase base36](https://github.com/multiformats/multibase/blob/f378d3427fe125057facdbac936c4215cc777920/rfcs/Base36.md), which is the same as regular base36 but does not trim leading zeroes and starts either with `k` or `K`) to get `b36peerid`
+3. Generate a key as specified in [RFC7518](https://www.rfc-editor.org/rfc/rfc7518#section-6), here we'll use an RSA key `myrsakey`
+4. Register an account on the ACME server ([production server for Let's Encrypt](https://acme-v02.api.letsencrypt.org) or just the [staging server](https://acme-staging-v02.api.letsencrypt.org) for testing, but any other ACME server would work)
 	1. Send a GET request to the `directory` endpoint, and extract the `newAccount` value from the JSON response, which will be the registration URL we'll use
-	2. Signed POST request to registration URL with the following `payload`: `{"termsOfServiceAgreed": true}`. The actual POST body is signed using JWT with an `mykey` and `nonce` (gotten from `directory["newNonce"]`), so the final body of any ACME request should look like:
+	2. Send JWT-signed POST request to registration URL with the following `payload`: `{"termsOfServiceAgreed": true}` (a `contact` field containing a list of `mailto:bob@example.org` contact information strings can also be optionally specified in the payload). The POST body is signed using JWT with `myrsakey` and `nonce` (`nonce` is a number returned by GETting the ACME server at the URL specified in `directory["newNonce"]`). The JSON payload before JWT-signing should look like:
 		```json
 		{
-		  "payload": token.claims.toBase64,
-		  "protected": token.header.toBase64,
-		  "signature": base64UrlEncode(token.signature),
+		  "header": {
+            "alg": "RS256",
+            "typ": "JWT",
+            "nonce": "`nonce`",
+            "url": "`url`",
+            "jwk": {
+              "kty": "RSA",
+              "n": "`myrsakey.n`",
+              "e": "`myrsakey.e`"
+            }
+          },
+		  "claims": {
+            "payload": {
+              "termsOfServiceAgreed": true,
+              "contact": [
+                "mailto:alice@example.com",
+                "mailto:bob@example.com"
+              ]
+            }
+          }
 		}
 		```
-		Obs: the response to the account registration contains a `kid` in the `location` field that should be saved and used in following requests to ACME server
-5. Request a certificate for the `*.{b36peerid}.libp2p.direct` domain from the ACME server by issuing a POST request using the same JWT signature scheme (and another new `nonce` from `directory["newNonce"]`) but with `kid` instead of `jwk` field and the following payload:
+    The final body of any ACME request should look like:
+		```json
+		{
+		  "payload": "`token.claims.toBase64`",
+		  "protected": "`token.header.toBase64`",
+		  "signature": "`base64UrlEncode(token.signature)`"
+		}
+		```
+		Obs: the response to the account registration contains `kid` string in the `location` header that SHOULD be saved and used in following requests to ACME server
+5. Request a certificate for the `*.{b36peerid}.libp2p.direct` domain from the ACME server by issuing a POST request using the same JWT signature scheme (and a new `nonce`) but with `kid` instead of `jwk` field and the following payload:
 	```json
 	{
 		"type": "dns",
 		"value": "*.{b36peerid}.libp2p.direct"
 	}
 	```
-6. From the ACME server response, get the entry with `"type"` of `"dns-01"` and derive the `Key Authorization` for it: 
-	-  `sha256.digest((dns01Challenge["token"] + "." + thumbprint(key))` 
-		-  [JWK thumbprint](https://www.rfc-editor.org/rfc/rfc7638): `base64encode(sha256.digest({"e": key.e, "kty": "RSA", "n": key.n}))`, but you can use other key types too
-7. Send challenge to AutoTLS broker/server https://registration.libp2p.direct/, which requires a [PeerID Auth](https://github.com/libp2p/specs/blob/master/http/peer-id-auth.md) scheme:
-	1. Send GET request to the `v1/_acme-challenge` endpoint and get `www-authenticate` field from the response header, and extract the values of three strings that it contains: `challenge-client`, `public-key` and `opaque`
-	2. Generate random string with around 42 characters as a `challengeServer` of our own
-	3. Get `peer-pubkey` and `peer-privkey` keys of our libp2p `peer`, which are not necessarily the same keys we're using to talk to ACME server
-	4. `sig = ` (obs: `varint` is a protobuf [varint](https://protobuf.dev/programming-guides/encoding/#varints) field that encodes the length of the `key=value` string)
+6. From the ACME server response, get the entry with `"type"` of `"dns-01"` (called `dns01Challenge` here) and derive the `Key Authorization` for it:
+	-  `sha256.digest((dns01Challenge["token"] + "." + thumbprint(myrsakey))`
+		-  [JWK thumbprint](https://www.rfc-editor.org/rfc/rfc7638): `base64encode(sha256.digest({"e": myrsakey.e, "kty": "RSA", "n": myrsakey.n}))`
+7. Send challenge to AutoTLS broker (e.g. `registration.libp2p.direct`). This requires a [PeerID Authentication](https://github.com/libp2p/specs/blob/master/http/peer-id-auth.md):
+	1. Send GET request to the AutoTLS broker's `v1/_acme-challenge` endpoint and get `www-authenticate` header from the response. Extract the values of three substrings that `www-authenticate` contains: `challenge-client`, `public-key` and `opaque`
+	2. Generate random string with around 42 characters to be sent as a `challengeServer`
+	3. Get the private key of the requesting libp2p peer as `peer-privkey`. This is not necessarily the same key used to communicate with ACME server
+	4. `sig = ` (obs: `varint` is a protobuf [varint](https://protobuf.dev/programming-guides/encoding/#varints) field that encodes the length of each of the `key=value` string)
 	```
 		sig = base64URL(
 			peer-privkey.sign(
