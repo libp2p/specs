@@ -161,6 +161,196 @@ The following is the general flow of a successful certificate request and subseq
 
 
 ## Complete certificate issuance example
+In this example the node at `142.93.194.175` and with peer ID `12D3KooWATZi2wFwQxQ14Z3q24TDNWKap6f8W5ryLE6Da4RMfsxy`.
+
+1. Node encodes its peer ID to multicode base 36: `k51qzi5uqu5dgf513xbrfjl4smgo2eh1x8p8y6grzsf1oz0reiy56p65tds3s6`
+
+2. Node generates an RSA key and registers with ACME server by issuing a POST HTTP request to `https://acme-staging-v02.api.letsencrypt.org` with the following JSON body:
+    ```json
+    {
+      "header": {
+        "alg": "RS256",
+        "typ": "JWT",
+        "nonce": "1jOOXM0FEc7tL_RH3PbFWf5Ml4QXTrtG-d2faH_j68L9K27-768",
+        "url": "https://acme-staging-v02.api.letsencrypt.org/acme/new-acct",
+        "jwk": {
+          "kty": "RSA",
+          "n": "xImaldcbdCDn_IHSa2qeYjOhQ5PLuqIWLXEwQvvzD6eUIC8MteHvSM9Yj4tUGUzQ6Vic7j5j3npZhrmXMv3FiwIpQgsqDEiXSyriST7zYSPtQUcZr17gEqk9Rxjewl77HKkTej34IQ7JLaHzx5owJVtNsfBI36NPQiBCDaEBMht0E5zyMa83fTlNqnVnyMAqOR7CxctsxmYkoyyYeA_hV0gJfOBzUHls_ENHP67dQ2eVYGJ0gU7ldaK7lsWw10ieNCEDjbDT9E50HAdQt4UO1c_6rD8jzD0UjS2xtO6wrJpkmUnkt71WoQXWIWjoTvhl15dqLwyx_jeW-C6ISpwh1eWdrcM0z0TZpOZQEODg1IJppOEQZsBYeSZg4El5rt1IKcllp6euWlHPopreFNcEUrYZ76uQQLuRyQ2AM_caUITFi6e0ZgTea2COuy4vof2ZJTBZP8uE4aHUdXOMYrDO6TVnXYA7mYJ6jkyp-X9OjzGSst6yRY5Qm-uCmBEuVtoN",
+          "e": "AQAB"
+        }
+      },
+      "claims": {
+        "termsOfServiceAgreed": true
+      }
+    }
+    ```
+    Which, after JWT signing, becomes:
+    ```json
+    {
+      "payload": "eyJpZGVudGlmaWVycyI6W3sidHlwZSI6ImRucyIsInZhbHVlIjoiKi5rNTFxemk1dXF1NWRnZjUxM3hicmZqbDRzbWdvMmVoMXg4cDh5NmdyenNmMW96MHJlaXk1NnA2NXRkczNzNi5saWJwMnAuZGlyZWN0In1dfQ",
+      "protected": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsIm5vbmNlIjoiWW8xc2xCY2RhV3FZREoyanFPYkhIb0dUZkZkQlJubzJzM2pzRGxQN2VNdXo5T1lDNWpBIiwidXJsIjoiaHR0cHM6Ly9hY21lLXN0YWdpbmctdjAyLmFwaS5sZXRzZW5jcnlwdC5vcmcvYWNtZS9uZXctb3JkZXIiLCJraWQiOiJodHRwczovL2FjbWUtc3RhZ2luZy12MDIuYXBpLmxldHNlbmNyeXB0Lm9yZy9hY21lL2FjY3QvMjAxNDI3MzQ0In0",
+      "signature": "f2oPdLiFYwvv7_KLaiSlBgJJh3brXDA9_wPfw52UB_GTU0eL_9y9-oX8WJJcEU87juUWUuML3eEOT4zjUY1EK2ri-rR_8AO2QngpxpWbo86wUM-XwiXk35uGelpW0QvCQw_x16AWK6xr0Rm1gSbnVkxOMrMBl-2xQYyXILwLmEuTq76C2vt2ZzrLhcV-6BKUla2lkgaZKPK3dpTYL0_i0pEybb28Ree5SERHpxihxFTO1ggvLJosbdlGOtAvCc7x-aZhTcuwhjlCRNLi0rnsFRNh3PJc-_Kz5B2Uv_OoTktWg_0vrUU_OFBuf4lHl5lb82cl5NxRH9ieX673rsh9in9l9Nr-Gt3g8SdiY29LTMwOy37MmhhNcL7MjUcseI05FOhLFxyc3dUxsG92VSDwJ_1JQIQH7EGJ6vP_dDPustMlvzNX_qHV2TjN6XpAv2tECmK5enU7qfnhTXbPihvz7MY1_PAlxJSWmBq-ui_sovN85YNJWBZ-tIPOPtqPMZDT"
+    }
+    ```
+
+3. Node requests a certificate for `*.k51qzi5uqu5dgf513xbrfjl4smgo2eh1x8p8y6grzsf1oz0reiy56p65tds3s6.libp2p.direct` by issuing a POST request to `https://acme-staging-v02.api.letsencrypt.org/acme/new-order` with the following JSON body:
+    ```json
+    {
+      "header": {
+        "alg": "RS256",
+        "typ": "JWT",
+        "nonce": "Yo1slBcdaWqYDJ2jqObHHoGTfFdBRno2s3jsDlP7eMuz9OYC5jA",
+        "url": "https://acme-staging-v02.api.letsencrypt.org/acme/new-order",
+        "kid": "https://acme-staging-v02.api.letsencrypt.org/acme/acct/201427344"
+      },
+      "claims": {
+        "identifiers": [
+          {
+            "type": "dns",
+            "value": "*.k51qzi5uqu5dgf513xbrfjl4smgo2eh1x8p8y6grzsf1oz0reiy56p65tds3s6.libp2p.direct"
+          }
+        ]
+      }
+    }
+    ```
+
+4. From the ACME server's response, node saves `orderUrl`, `chalUrl` and `finalizeUrl`:
+    ```
+    orderUrl: https://acme-staging-v02.api.letsencrypt.org/acme/order/201427344/24815752984
+    chalUrl: https://acme-staging-v02.api.letsencrypt.org/acme/chall/201427344/17523856954/k8-vYA
+    finalizeUrl: https://acme-staging-v02.api.letsencrypt.org/acme/finalize/201427344/24815752984
+    ```
+
+5. Node generates `keyAuthorization` (`jP5hwrZwCbP_qeeET_qAa9pgG0YulNaR0ivruESzCrE`) from the following `dns-01` object:
+    ```json
+    {
+      "type": "dns-01",
+      "url": "https://acme-staging-v02.api.letsencrypt.org/acme/chall/201427344/17523856954/k8-vYA",
+      "status": "pending",
+      "token": "nE2YGvFXzAy6UsFjYxqYOyA6rxZ7VJeQppsQ72hHyPM"
+    }
+    ```
+
+6. Node authenticates with AutoTLS broker at `"https://registration.libp2p.direct/v1/_acme-challenge"` (refer to the [peer ID authentication spec](https://github.com/libp2p/specs/blob/master/http/peer-id-auth.md) for guidance and examples) and sends the following JSON body:
+    ```json
+    {
+      "value": "jP5hwrZwCbP_qeeET_qAa9pgG0YulNaR0ivruESzCrE",
+      "addresses": [
+        "/ip4/142.93.194.175/tcp/49309"
+      ]
+    }
+    ```
+**Note:** the node's multiaddresses are `/ip4/127.0.0.1/tcp/49309`, `/ip4/142.93.194.175/tcp/49309`, `/ip4/10.17.0.5/tcp/49309`, and `/ip4/10.108.0.2/tcp/49309`, but only `/ip4/142.93.194.175/tcp/49309` contains a public IPv4 address, so node SHOULD only send that.
+
+7. Node saves the bearer token (`bJNzn30OvOSIPsd0UtMygo4ccjUMXkwHONRHc46oyTx7ImlzLXRva2VuIjp0cnVlLCJwZWVyLWlkIjoiMTJEM0tvb1dBVFppMndGd1F4UTE0WjNxMjRURE5XS2FwNmY4VzVyeUxFNkRhNFJNZnN4eSIsImhvc3RuYW1lIjoicmVnaXN0cmF0aW9uLmxpYnAycC5kaXJlY3QiLCJjcmVhdGVkLXRpbWUiOiIyMDI1LTA1LTIyVDE0OjAxOjU4LjY1NzAyMDQ4OFoifQ==`) from the broker's `authentication-info` response header:
+    ```
+    Authentication-Info: libp2p-PeerID sig="hysWRh0SAQX6MkhNIwf0rgyjqbV9wkjMDhNobVhHybBE3CygrOAfEPTkvgrrePX5XTGt1FO-4--VBbJas8BtCQ==", bearer="bJNzn30OvOSIPsd0UtMygo4ccjUMXkwHONRHc46oyTx7ImlzLXRva2VuIjp0cnVlLCJwZWVyLWlkIjoiMTJEM0tvb1dBVFppMndGd1F4UTE0WjNxMjRURE5XS2FwNmY4VzVyeUxFNkRhNFJNZnN4eSIsImhvc3RuYW1lIjoicmVnaXN0cmF0aW9uLmxpYnAycC5kaXJlY3QiLCJjcmVhdGVkLXRpbWUiOiIyMDI1LTA1LTIyVDE0OjAxOjU4LjY1NzAyMDQ4OFoifQ=="
+    ```
+8. Node queries DNS records: `TXT _acme-challenge.k51qzi5uqu5dgf513xbrfjl4smgo2eh1x8p8y6grzsf1oz0reiy56p65tds3s6.libp2p.direct` and `A 142-93-194-175.k51qzi5uqu5dgf513xbrfjl4smgo2eh1x8p8y6grzsf1oz0reiy56p65tds3s6.libp2p.direct` until there's a non-empty response from DNS servers.
+
+9. Node notifies ACME server about challenge completion by issuing an empty POST request to `chalUrl` with `kid` JWT signing:
+    ```json
+    {
+      "header": {
+        "alg": "RS256",
+        "typ": "JWT",
+        "nonce": "Yo1slBcd5jWarMN9llbXOVII-htMZpSZBumnZAaKdyzqjyNfREg",
+        "url": "https://acme-staging-v02.api.letsencrypt.org/acme/chall/201427344/17523856954/k8-vYA",
+        "kid": "https://acme-staging-v02.api.letsencrypt.org/acme/acct/201427344"
+      },
+      "claims": {}
+    }
+    ```
+    Node extracts `checkUrl` (`https://acme-staging-v02.api.letsencrypt.org/acme/chall/201427344/17523856954/k8-vYA`) from `url` field from ACME server's response body:
+    ```json
+    {
+      "type": "dns-01",
+      "url": "https://acme-staging-v02.api.letsencrypt.org/acme/chall/201427344/17523856954/k8-vYA",
+      "status": "pending",
+      "token": "nE2YGvFXzAy6UsFjYxqYOyA6rxZ7VJeQppsQ72hHyPM"
+    }
+    ```
+
+10. Node polls the ACME server by sending a GET HTTP request to `checkUrl` until it receives a response with `status: valid`:
+    ```json
+    {
+      "type": "dns-01",
+      "url": "https://acme-staging-v02.api.letsencrypt.org/acme/chall/201427344/17523856954/k8-vYA",
+      "status": "valid",
+      "validated": "2025-05-22T14:01:59Z",
+      "token": "nE2YGvFXzAy6UsFjYxqYOyA6rxZ7VJeQppsQ72hHyPM",
+      "validationRecord": [
+        {
+          "hostname": "k51qzi5uqu5dgf513xbrfjl4smgo2eh1x8p8y6grzsf1oz0reiy56p65tds3s6.libp2p.direct"
+        }
+      ]
+    }
+    ```
+
+11. Node creates the CSR:
+    ```
+    MIIBJzCBzgIBADAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE-xJPmWkXNCxikFNfjX-YpNpVUlwVE75FqiLzQKqz0oSRGChnxEiCPXSYW6XYfy7RyYtoaMKJB8oYjpuoZau2U6BsMGoGCSqGSIb3DQEJDjFdMFswWQYDVR0RBFIwUIJOKi5rNTFxemk1dXF1NWRnZjUxM3hicmZqbDRzbWdvMmVoMXg4cDh5NmdyenNmMW96MHJlaXk1NnA2NXRkczNzNi5saWJwMnAuZGlyZWN0MAoGCCqGSM49BAMCA0gAMEUCIA_wWAa07lkYDlXVs8QBxX9XI7ATyMT8KIWirx2dBwyVAiEA9anNGq3BssBdMKW-QHKdOPqcv7lzaB64vTjpfciyfr4="
+    ```
+    And sends it to `finalizeUrl`:
+    ```json
+    {
+      "header": {
+        "alg": "RS256",
+        "typ": "JWT",
+        "nonce": "Yo1slBcdhW7xgUkJ0DzYeH1otfpMMbjbXD3xlf7TM1lneccMLHI",
+        "url": "https://acme-staging-v02.api.letsencrypt.org/acme/finalize/201427344/24815752984",
+        "kid": "https://acme-staging-v02.api.letsencrypt.org/acme/acct/201427344"
+      },
+      "claims": {
+        "csr": "MIIBJzCBzgIBADAAMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE-xJPmWkXNCxikFNfjX-YpNpVUlwVE75FqiLzQKqz0oSRGChnxEiCPXSYW6XYfy7RyYtoaMKJB8oYjpuoZau2U6BsMGoGCSqGSIb3DQEJDjFdMFswWQYDVR0RBFIwUIJOKi5rNTFxemk1dXF1NWRnZjUxM3hicmZqbDRzbWdvMmVoMXg4cDh5NmdyenNmMW96MHJlaXk1NnA2NXRkczNzNi5saWJwMnAuZGlyZWN0MAoGCCqGSM49BAMCA0gAMEUCIA_wWAa07lkYDlXVs8QBxX9XI7ATyMT8KIWirx2dBwyVAiEA9anNGq3BssBdMKW-QHKdOPqcv7lzaB64vTjpfciyfr4="
+      }
+    }
+    ```
+12. Node polls `orderUrl` until the ACME server's response contains a `status` field with value different than `processing`:
+    ```json
+    {
+      "status": "valid",
+      "expires": "2025-05-29T14:01:58Z",
+      "identifiers": [
+        {
+          "type": "dns",
+          "value": "*.k51qzi5uqu5dgf513xbrfjl4smgo2eh1x8p8y6grzsf1oz0reiy56p65tds3s6.libp2p.direct"
+        }
+      ],
+      "authorizations": [
+        "https://acme-staging-v02.api.letsencrypt.org/acme/authz/201427344/17523856954"
+      ],
+      "finalize": "https://acme-staging-v02.api.letsencrypt.org/acme/finalize/201427344/24815752984",
+      "certificate": "https://acme-staging-v02.api.letsencrypt.org/acme/cert/2cd1c21b2b77127e4d394eb16eb073f9248d"
+    }
+    ```
+
+13. Node downloads the certificate by sending a GET request to `certDownloadUrl` (`https://acme-staging-v02.api.letsencrypt.org/acme/cert/2cd1c21b2b77127e4d394eb16eb073f9248d`), which is the `certificate` field of the finalize request's response:
+    ```
+    -----BEGIN CERTIFICATE-----
+    MIID3zCCA2SgAwIBAgISLNHCGyt3En5NOU6xbrBz+SSNMAoGCCqGSM49BAMDMFMx
+    CzAJBgNVBAYTAlVTMSAwHgYDVQQKExcoU1RBR0lORykgTGV0J3MgRW5jcnlwdDEi
+    MCAGA1UEAxMZKFNUQUdJTkcpIEZhbHNlIEZlbm5lbCBFNjAeFw0yNTA1MjIxMzAz
+    MzJaFw0yNTA4MjAxMzAzMzFaMAAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAT7
+    Ek+ZaRc0LGKQU1+Nf5ik2lVSXBUTvkWqIvNAqrPShJEYKGfESII9dJhbpdh/LtHJ
+    i2howokHyhiOm6hlq7ZTo4ICaTCCAmUwDgYDVR0PAQH/BAQDAgeAMB0GA1UdJQQW
+    MBQGCCsGAQUFBwMBBggrBgEFBQcDAjAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBT/
+    wwgAeNwsd900zIITjOK2+Zjt7TAfBgNVHSMEGDAWgBShdBoGbVC3hi1KLMF+tI2I
+    SWzNFjA2BggrBgEFBQcBAQQqMCgwJgYIKwYBBQUHMAKGGmh0dHA6Ly9zdGctZTYu
+    aS5sZW5jci5vcmcvMFwGA1UdEQEB/wRSMFCCTiouazUxcXppNXVxdTVkZ2Y1MTN4
+    YnJmamw0c21nbzJlaDF4OHA4eTZncnpzZjFvejByZWl5NTZwNjV0ZHMzczYubGli
+    cDJwLmRpcmVjdDATBgNVHSAEDDAKMAgGBmeBDAECATAxBgNVHR8EKjAoMCagJKAi
+    hiBodHRwOi8vc3RnLWU2LmMubGVuY3Iub3JnLzE0LmNybDCCAQYGCisGAQQB1nkC
+    BAIEgfcEgfQA8gB3AN2ZNPyl5ySAyVZofYE0mQhJskn3tWnYx7yrP1zB825kAAAB
+    lvhNETkAAAQDAEgwRgIhAOlwytcyMH7HcggxOYMhRdZ8LIoKt2T/VqS/bsMupnmK
+    AiEA8ed29c8/BGQ2Qzoezp7zc1gm7g6F7VyrzRlj29bpYTQAdwCwzIPlpfl9a698
+    CcwoSQSHKsfoixMsY1C3xv0m4WxsdwAAAZb4TREnAAAEAwBIMEYCIQDtuHcbHonG
+    cEuwgT8r73zcRyLJQOWpRpLAqYtFy0idfwIhAM9zywGUgthnkAilzw1LQYQOmKEf
+    fquKAmPYn0UU8duIMAoGCCqGSM49BAMDA2kAMGYCMQD+CVoiLqEpSreQua2uzmHr
+    0DAoQycGtGfPcBsMdUGxSN7y+VyuYLnSG4PqgPa3nqsCMQDQY9jPJzUjLwwg11Z2
+    +ZhDTPiLY3NoLGxa4dh5/LWKaRL6Sz77brYwebRXEnNQKAo=
+    -----END CERTIFICATE-----
+    ```
 
 ## References
 - [Announcing AutoTLS: Bridging the Gap Between libp2p and the Web](https://blog.libp2p.io/autotls/)
