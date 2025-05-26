@@ -51,6 +51,7 @@ The following is the general flow of a successful certificate request and subseq
     1. Transform PeerID into a multihash `mh`.
     2. Encode `mh` using [CIDv1](https://github.com/multiformats/cid?tab=readme-ov-file#cidv1) with the `libp2p-key` [multicodec](https://github.com/multiformats/multicodec)(`0x72`).
     3. Encode the CID data using [multibase base36](https://github.com/multiformats/multibase/blob/f378d3427fe125057facdbac936c4215cc777920/rfcs/Base36.md), which is the same as regular base36 without trimming leading zeroes and including a leading `k` or `K`) to get `b36peerid`.
+
     **Note:** "CID data" are the raw bytes that compose the CID, not richer CID objects that contain more information.
 3. The node generates a key `mykey` as specified in [RFC7518](https://www.rfc-editor.org/rfc/rfc7518#section-6).
 4. The node registers an account on the ACME server (e.g. [production](https://acme-v02.api.letsencrypt.org) or [staging](https://acme-staging-v02.api.letsencrypt.org) servers for Let's Encrypt).
@@ -112,6 +113,7 @@ The following is the general flow of a successful certificate request and subseq
 1. The node sends `keyAuthorization` to the AutoTLS broker (e.g. `registration.libp2p.direct`). This requires a [peer ID authentication](https://github.com/libp2p/specs/blob/master/http/peer-id-auth.md) between node and broker:
 	1. Node sends GET request to the AutoTLS broker's `/v1/_acme-challenge` endpoint and extracts `challenge-node`, `public-key` and `opaque` from the `www-authenticate` response header.
 	2. Node generates 32-character-long random string to be sent as a `challengeServer`.
+
     **Note:** At the time of writing the PeerID Authentication specification does not contain recommendations about challenge length, but the official [`go-libp2p` implementation uses 32 characters](https://github.com/libp2p/go-libp2p/blob/master/p2p/http/auth/internal/handshake/handshake.go#L21).
 	3. Node generates `sig`, `headers` and `payload` as follows, where `peer-privkey` is the private key of the node's libp2p peer and `multiaddrs` is a list of string representations of the libp2p peer's multiaddresses:
 	```
@@ -134,7 +136,9 @@ The following is the general flow of a successful certificate request and subseq
             "addresses": multiaddrs
         }
 	```
+
     **Note:** `varint` is a protobuf [varint](https://protobuf.dev/programming-guides/encoding/#varints) field that encodes the length of each of the `key=value` string.
+
     **Note:** the AutoTLS broker MUST NOT dial multiaddresses containing private IPv4 addresses. The node SHOULD only include multiaddresses that contain public IPv4 addresses in `multiaddrs`.
 	4. Node sends a POST request to `/v1/_acme-challenge` endpoint using `payload` as HTTP body and `headers` as HTTP headers.
 	6. Node SHOULD save the `bearer` token from the `authentication-info` response header, and use it for following requests to the AutoTLS broker.
@@ -143,7 +147,9 @@ The following is the general flow of a successful certificate request and subseq
 
 ## Signalling challenge completion to ACME server
 1. Node SHOULD query DNS records (`TXT _acme-challenge.{b36peerid}.libp2p.direct` and `A dashed-public-ip-address.{b36peerid}.libp2p.direct`) until they are set by the AutoTLS broker.
+
 **Note:** here, `dashed-public-ip-address` is the public IPv4 address of the node in which the node received the confirmation dial from the broker. For example, if the node has two public IPv4 addresses `1.1.1.1` and `8.8.8.8`, and the broker dialed it through `1.1.1.1`, then the node SHOULD query the `A 1-1-1-1.{b36peerid}.libp2p.direct`.
+
 2. Node notifies the ACME server about challenge completion so that the ACME server can lookup the DNS resource records that the AutoTLS broker has set. The notification is done in the form of a POST request to `chalUrl` with an empty HTTP body (`{}`).
 	1. Node sends an empty signed JSON payload (`{}`) to the ACME server using the `kid` obtained from the initial ACME registration and gets the response from the server (`completedResponse`).
 	2. Node extracts `url` field from `completedResponse`'s JSON body ting it, again with `kid` signing. The extracted URL is named `checkUrl` in this document.
@@ -240,6 +246,7 @@ In this example the node at `142.93.194.175` and with peer ID `12D3KooWATZi2wFwQ
       ]
     }
     ```
+
 **Note:** the node's multiaddresses are `/ip4/127.0.0.1/tcp/49309`, `/ip4/142.93.194.175/tcp/49309`, `/ip4/10.17.0.5/tcp/49309`, and `/ip4/10.108.0.2/tcp/49309`, but only `/ip4/142.93.194.175/tcp/49309` contains a public IPv4 address, so node SHOULD only send that.
 
 7. Node saves the bearer token (`bJNzn30OvOSIPsd0UtMygo4ccjUMXkwHONRHc46oyTx7ImlzLXRva2VuIjp0cnVlLCJwZWVyLWlkIjoiMTJEM0tvb1dBVFppMndGd1F4UTE0WjNxMjRURE5XS2FwNmY4VzVyeUxFNkRhNFJNZnN4eSIsImhvc3RuYW1lIjoicmVnaXN0cmF0aW9uLmxpYnAycC5kaXJlY3QiLCJjcmVhdGVkLXRpbWUiOiIyMDI1LTA1LTIyVDE0OjAxOjU4LjY1NzAyMDQ4OFoifQ==`) from the broker's `authentication-info` response header:
