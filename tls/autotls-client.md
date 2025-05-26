@@ -28,7 +28,7 @@ Most modern web browsers only establish TLS connections with peers that present 
 
 However, most libp2p peers do not own or control domain names, making it impractical for them to complete DNS-based ACME challenges and, by extension, to obtain trusted TLS certificates. This limitation hinders direct communication between libp2p peers and standard web browsers.
 
-AutoTLS addresses this problem by introducing an AutoTLS broker — a server that controls a domain and facilitates ACME challenges on behalf of libp2p peers. A peer can request the AutoTLS broker to fulfil an ACME DNS challenge on its behalf. Once the broker sets the appropriate DNS record, the requesting peer proceeds to notify the ACME server. The ACME server validates the challenge against the broker's domain, and if successful, issues a valid certificate.
+[AutoTLS](https://blog.libp2p.io/autotls/) addresses this problem by introducing an AutoTLS broker — a server that controls a domain and facilitates ACME challenges on behalf of libp2p peers. A peer can request the AutoTLS broker to fulfil an ACME DNS challenge on its behalf. Once the broker sets the appropriate DNS record, the requesting peer proceeds to notify the ACME server. The ACME server validates the challenge against the broker's domain, and if successful, issues a valid certificate.
 
 This mechanism allows libp2p peers to obtain CA-issued certificates without needing to possess or manage their own domain names.
 
@@ -141,7 +141,7 @@ The following is the general flow of a successful certificate request and subseq
 
     **Note:** the AutoTLS broker MUST NOT dial multiaddresses containing private IPv4 addresses. The node SHOULD only include multiaddresses that contain public IPv4 addresses in `multiaddrs`.
 	4. Node sends a POST request to `/v1/_acme-challenge` endpoint using `payload` as HTTP body and `headers` as HTTP headers.
-	6. Node SHOULD save the `bearer` token from the `authentication-info` response header, and use it for following requests to the AutoTLS broker.
+	5. Node SHOULD save the `bearer` token from the `authentication-info` response header, and use it for following requests to the AutoTLS broker.
 
 
 
@@ -152,7 +152,7 @@ The following is the general flow of a successful certificate request and subseq
 
 2. Node notifies the ACME server about challenge completion so that the ACME server can lookup the DNS resource records that the AutoTLS broker has set. The notification is done in the form of a POST request to `chalUrl` with an empty HTTP body (`{}`).
 	1. Node sends an empty signed JSON payload (`{}`) to the ACME server using the `kid` obtained from the initial ACME registration and gets the response from the server (`completedResponse`).
-	2. Node extracts `url` field from `completedResponse`'s JSON body ting it, again with `kid` signing. The extracted URL is named `checkUrl` in this document.
+	2. Node extracts `url` field from `completedResponse`'s JSON body. The extracted URL is named `checkUrl` in this document.
 3. The node polls the ACME server by sending a GET HTTP request to `checkUrl` with an empty body, and sign using the `kid` of the registered account. The node MUST poll the ACME server until it receives a response with `status: valid` or `status: invalid` field, meaning that the challenge checking was successful or not, respectively.
 
 
