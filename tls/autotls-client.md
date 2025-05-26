@@ -45,6 +45,15 @@ The following is the general flow of a successful certificate request and subseq
 8. Node polls ACME server until certificate is ready for download.
 9. Node downloads certificate.
 
+## Paramenters
+
+| Parameter                | Description                                                      | Reasonable Default |
+|--------------------------|------------------------------------------------------------------|--------------|
+| `max_dns_retries` | The maximum number of DNS queries that the node SHOULD make before giving up | ???  |
+| `max_dns_timeout` | The maximum number of seconds a node SHOULD wait for DNS records to be set | ???  |
+| `max_acme_poll_retries` | The maximum number of GET requests that the node SHOULD issue to ACME server before giving up | ???  |
+| `max_acme_timeout` | The maximum number of seconds a node SHOULD wait for an ACME resource status to change | ???  |
+
 ## Requesting challenge from ACME server
 1. The node starts a libp2p peer with public IPv4 and support for the [`identify`](https://github.com/libp2p/specs/blob/master/identify/README.md) protocol.
 2. The node encodes its `PeerID` as [multibase base36](https://github.com/multiformats/multibase/blob/f378d3427fe125057facdbac936c4215cc777920/rfcs/Base36.md) of the CIDv1 of the multihash with the `libp2p-key` (`0x72`) multicodec:
@@ -139,7 +148,7 @@ The following is the general flow of a successful certificate request and subseq
 
     **Note:** `varint` is a protobuf [varint](https://protobuf.dev/programming-guides/encoding/#varints) field that encodes the length of each of the `key=value` string.
 
-    **Note:** the AutoTLS broker MUST NOT dial multiaddresses containing private IPv4 addresses. The node SHOULD only include multiaddresses that contain public IPv4 addresses in `multiaddrs`.
+    **Note:** The node SHOULD only include multiaddresses that contain public IPv4 addresses in `multiaddrs`.
 	4. Node sends a POST request to `/v1/_acme-challenge` endpoint using `payload` as HTTP body and `headers` as HTTP headers.
 	5. Node SHOULD save the `bearer` token from the `authentication-info` response header, and use it for following requests to the AutoTLS broker.
 
@@ -148,12 +157,16 @@ The following is the general flow of a successful certificate request and subseq
 ## Signalling challenge completion to ACME server
 1. Node SHOULD query DNS records (`TXT _acme-challenge.{b36peerid}.libp2p.direct` and `A dashed-public-ip-address.{b36peerid}.libp2p.direct`) until they are set by the AutoTLS broker.
 
-**Note:** here, `dashed-public-ip-address` is the public IPv4 address of the node in which the node received the confirmation dial from the broker. For example, if the node has two public IPv4 addresses `1.1.1.1` and `8.8.8.8`, and the broker dialed it through `1.1.1.1`, then the node SHOULD query the `A 1-1-1-1.{b36peerid}.libp2p.direct`.
+**Note:** Here, `dashed-public-ip-address` is the public IPv4 address of the node in which the node received the confirmation dial from the broker. For example, if the node has two public IPv4 addresses `1.1.1.1` and `8.8.8.8`, and the broker dialed it through `1.1.1.1`, then the node SHOULD query the `A 1-1-1-1.{b36peerid}.libp2p.direct`.
+
+**Note:** The node SHOULD NOT send more than `max_dns_retries` DNS requests. After `max_dns_timeout`, the communication is considered failed. What to do after `max_dns_timeout` has passed is left as an implementation decision.
 
 2. Node notifies the ACME server about challenge completion so that the ACME server can lookup the DNS resource records that the AutoTLS broker has set. The notification is done in the form of a POST request to `chalUrl` with an empty HTTP body (`{}`).
 	1. Node sends an empty signed JSON payload (`{}`) to the ACME server using the `kid` obtained from the initial ACME registration and gets the response from the server (`completedResponse`).
 	2. Node extracts `url` field from `completedResponse`'s JSON body. The extracted URL is named `checkUrl` in this document.
 3. The node polls the ACME server by sending a GET HTTP request to `checkUrl` with an empty body, and sign using the `kid` of the registered account. The node MUST poll the ACME server until it receives a response with `status: valid` or `status: invalid` field, meaning that the challenge checking was successful or not, respectively.
+
+**Note:** The node SHOULD NOT send more than `max_acme_poll_retries` poll requests to the ACME server. After `max_acme_timeout`, the communication has failed. What to do after `max_acme_timeout` has passed is left as an implementation decision.
 
 
 
@@ -163,6 +176,9 @@ The following is the general flow of a successful certificate request and subseq
     2. Encode the CSR with URL safe base 64 (`b64CSR`).
     3. Send a `kid` signed POST request to `finalizeUrl` with JSON HTTP body of `{"csr": b64CSR}`.
 2. Node MUST poll ACME server by sending GET requests to `orderUrl` until the ACME server's response contains a `status` field with a value different than `processing`.
+
+**Note:** The node SHOULD NOT send more than `max_acme_poll_retries` poll requests to the ACME server. After `max_acme_timeout`, the communication has failed. What to do after `max_acme_timeout` has passed is left as an implementation decision.
+
 3. Node downloads finalized certificate by sending a GET request to `certDownloadUrl`. `certDownloadUrl` is found in the `certificate` field of the JSON HTTP body of a response to a GET request to `orderUrl`.
 
 
@@ -253,7 +269,7 @@ In this example the node at `142.93.194.175` and with peer ID `12D3KooWATZi2wFwQ
     ```
     Authentication-Info: libp2p-PeerID sig="hysWRh0SAQX6MkhNIwf0rgyjqbV9wkjMDhNobVhHybBE3CygrOAfEPTkvgrrePX5XTGt1FO-4--VBbJas8BtCQ==", bearer="bJNzn30OvOSIPsd0UtMygo4ccjUMXkwHONRHc46oyTx7ImlzLXRva2VuIjp0cnVlLCJwZWVyLWlkIjoiMTJEM0tvb1dBVFppMndGd1F4UTE0WjNxMjRURE5XS2FwNmY4VzVyeUxFNkRhNFJNZnN4eSIsImhvc3RuYW1lIjoicmVnaXN0cmF0aW9uLmxpYnAycC5kaXJlY3QiLCJjcmVhdGVkLXRpbWUiOiIyMDI1LTA1LTIyVDE0OjAxOjU4LjY1NzAyMDQ4OFoifQ=="
     ```
-8. Node queries DNS records: `TXT _acme-challenge.k51qzi5uqu5dgf513xbrfjl4smgo2eh1x8p8y6grzsf1oz0reiy56p65tds3s6.libp2p.direct` and `A 142-93-194-175.k51qzi5uqu5dgf513xbrfjl4smgo2eh1x8p8y6grzsf1oz0reiy56p65tds3s6.libp2p.direct` until there's a non-empty response from DNS servers.
+8. Node queries DNS records: `TXT _acme-challenge.k51qzi5uqu5dgf513xbrfjl4smgo2eh1x8p8y6grzsf1oz0reiy56p65tds3s6.libp2p.direct` and `A 142-93-194-175.k51qzi5uqu5dgf513xbrfjl4smgo2eh1x8p8y6grzsf1oz0reiy56p65tds3s6.libp2p.direct` until it receives a non-empty response from DNS servers.
 
 9. Node notifies ACME server about challenge completion by issuing an empty POST request to `chalUrl` with `kid` JWT signing:
     ```json
@@ -278,7 +294,7 @@ In this example the node at `142.93.194.175` and with peer ID `12D3KooWATZi2wFwQ
     }
     ```
 
-10. Node polls the ACME server by sending a GET HTTP request to `checkUrl` until it receives a response with `status: valid`:
+10. Node polls the ACME server by sending GET HTTP requests to `checkUrl` until it receives a response with `status: valid`:
     ```json
     {
       "type": "dns-01",
