@@ -50,7 +50,7 @@ Each datagram flow MUST be associated with a control stream. A datagram flow is
 defined as a logical flow of datagrams related to a specific application
 protocol. A control stream is a QUIC bidirectional stream that has negotiated
 the libp2p datagram control stream protocol ID `/dg/1`. The initiator MUST send
-the related application protocol ID related to the datagram flow after
+the related application protocol ID with a [uvarint] length prefix after
 negotiating the control stream. The control stream MUST stay open for the
 duration of the datagram flow. Implementation MAY create the control stream and
 start sending datagrams at once. There is currently no other use for the control
@@ -98,3 +98,4 @@ This is currently not specified.
 
 [RFC 9221]: https://www.rfc-editor.org/rfc/rfc9221
 [QUIC varint]: https://www.rfc-editor.org/rfc/rfc9000.html#name-variable-length-integer-enc
+[uvarint]: https://github.com/multiformats/unsigned-varint
