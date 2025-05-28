@@ -47,21 +47,18 @@ send datagrams.
 ## Datagrams on QUIC
 
 Each datagram flow MUST be associated with a control stream. A datagram flow is
-defined as a logical flow of datagrams for a specific application protocol. A
-control stream is a QUIC bidirectional stream that has negotiated the application
-protocol ID. The control stream MUST stay open for the duration of the datagram
-flow. Implementation MAY create the control stream and start sending datagrams
-at once.
-
-There is currently no other use for the control stream besides negotiating the
-application protocol ID.
-
-Receipt of a QUIC DATAGRAM frame whose payload is too short to allow parsing the
-Control Stream ID field MUST be treated as a connection error of type
-PROTOCOL_VIOLATION (0x1003).
-
-libp2p datagrams MUST NOT be sent unless the control stream's send side is
-open. If a datagram is received after the corresponding stream's receive side is
+defined as a logical flow of datagrams related to a specific application
+protocol. A control stream is a QUIC bidirectional stream that has negotiated
+the libp2p datagram control stream protocol ID `/dg/1`. The initiator MUST send
+the related application protocol ID related to the datagram flow after
+negotiating the control stream. The control stream MUST stay open for the
+duration of the datagram flow. Implementation MAY create the control stream and
+start sending datagrams at once. There is currently no other use for the control
+stream besides negotiating the application protocol ID. Receipt of a QUIC
+DATAGRAM frame whose payload is too short to allow parsing the Control Stream ID
+field MUST be treated as a connection error of type PROTOCOL_VIOLATION (0x1003).
+libp2p datagrams MUST NOT be sent unless the control stream's send side is open.
+If a datagram is received after the corresponding stream's receive side is
 closed, the received datagrams MUST be silently dropped.
 
 If a libp2p datagram is received and its Control Stream ID field maps to a
