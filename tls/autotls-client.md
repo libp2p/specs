@@ -24,16 +24,25 @@ Interest Group: TBD
 
 
 ## Overview
-Most modern web browsers only establish TLS connections with peers that present certificates issued by a recognized Certificate Authority (CA). Self-signed certificates are generally not accepted. To obtain a CA-issued certificate, a requester must complete an ACME (Automatic Certificate Management Environment) challenge. This typically involves provisioning a DNS TXT record on a domain the requester controls.
+Most modern web browsers only establish TLS connections with peers that present certificates issued by a recognized Certificate Authority (CA).
+Self-signed certificates are generally not accepted.
+To obtain a CA-issued certificate, a requester must complete an ACME (Automatic Certificate Management Environment) challenge.
+This typically involves provisioning a DNS TXT record on a domain the requester controls.
 
-However, most libp2p peers do not own or control domain names, making it impractical for them to complete DNS-based ACME challenges and, by extension, to obtain trusted TLS certificates. This limitation hinders direct communication between libp2p peers and standard web browsers.
+However, most libp2p peers do not own or control domain names, making it impractical for them to complete DNS-based ACME challenges and, by extension, to obtain trusted TLS certificates.
+This limitation hinders direct communication between libp2p peers and standard web browsers.
 
-[AutoTLS](https://blog.libp2p.io/autotls/) addresses this problem by introducing an AutoTLS broker — a server that controls a domain and facilitates ACME challenges on behalf of libp2p peers. A peer can request the AutoTLS broker to fulfil an ACME DNS challenge on its behalf. Once the broker sets the appropriate DNS record, the requesting peer proceeds to notify the ACME server. The ACME server validates the challenge against the broker's domain, and if successful, issues a valid certificate.
+[AutoTLS](https://blog.libp2p.io/autotls/) addresses this problem by introducing an AutoTLS broker — a server that controls a domain and facilitates ACME challenges on behalf of libp2p peers.
+A peer can request the AutoTLS broker to fulfil an ACME DNS challenge on its behalf.
+Once the broker sets the appropriate DNS record, the requesting peer proceeds to notify the ACME server.
+The ACME server validates the challenge against the broker's domain, and if successful, issues a valid certificate.
 
 This mechanism allows libp2p peers to obtain CA-issued certificates without needing to possess or manage their own domain names.
 
 ## General Flow
-The following is the general flow of a successful certificate request and subsequent issuance using AutoTLS. Here, "node" refers to the machine running a libp2p peer and requesting the challenge, while "broker" and "AutoTLS broker", which are used interchangeably, is the server that will fulfil the ACME challenge on behalf of the node.
+The following is the general flow of a successful certificate request and subsequent issuance using AutoTLS.
+Here, "node" refers to the machine running a libp2p peer and requesting the challenge,
+while "broker" and "AutoTLS broker", which are used interchangeably, refer to the server that will fulfil the ACME challenge on behalf of the node.
 
 1. Node requests a challenge from the ACME server.
 2. Node sends the challenge to the broker.
@@ -157,16 +166,21 @@ The following is the general flow of a successful certificate request and subseq
 ## Signalling challenge completion to ACME server
 1. Node SHOULD query DNS records (`TXT _acme-challenge.{b36peerid}.libp2p.direct` and `A dashed-public-ip-address.{b36peerid}.libp2p.direct`) until they are set by the AutoTLS broker.
 
-**Note:** Here, `dashed-public-ip-address` is the public IPv4 address of the node in which the node received the confirmation dial from the broker. For example, if the node has two public IPv4 addresses `1.1.1.1` and `8.8.8.8`, and the broker dialed it through `1.1.1.1`, then the node SHOULD query the `A 1-1-1-1.{b36peerid}.libp2p.direct`.
+**Note:** Here, `dashed-public-ip-address` is the public IPv4 address of the node in which the node received the confirmation dial from the broker.
+For example, if the node has two public IPv4 addresses `1.1.1.1` and `8.8.8.8`, and the broker dialed it through `1.1.1.1`, then the node SHOULD query the `A 1-1-1-1.{b36peerid}.libp2p.direct`.
 
-**Note:** The node SHOULD NOT send more than `max_dns_retries` DNS requests. After `max_dns_timeout`, the communication is considered failed. What to do after `max_dns_timeout` has passed is left as an implementation decision.
+**Note:** The node SHOULD NOT send more than `max_dns_retries` DNS requests.
+After `max_dns_timeout`, the communication is considered failed.
+What to do after `max_dns_timeout` has passed is left as an implementation decision.
 
 2. Node notifies the ACME server about challenge completion so that the ACME server can lookup the DNS resource records that the AutoTLS broker has set. The notification is done in the form of a POST request to `chalUrl` with an empty HTTP body (`{}`).
 	1. Node sends an empty signed JSON payload (`{}`) to the ACME server using the `kid` obtained from the initial ACME registration and gets the response from the server (`completedResponse`).
 	2. Node extracts `url` field from `completedResponse`'s JSON body. The extracted URL is named `checkUrl` in this document.
 3. The node polls the ACME server by sending a GET HTTP request to `checkUrl` with an empty body, and sign using the `kid` of the registered account. The node MUST poll the ACME server until it receives a response with `status: valid` or `status: invalid` field, meaning that the challenge checking was successful or not, respectively.
 
-**Note:** The node SHOULD NOT send more than `max_acme_poll_retries` poll requests to the ACME server. After `max_acme_timeout`, the communication has failed. What to do after `max_acme_timeout` has passed is left as an implementation decision.
+**Note:** The node SHOULD NOT send more than `max_acme_poll_retries` poll requests to the ACME server.
+After `max_acme_timeout`, the communication has failed.
+What to do after `max_acme_timeout` has passed is left as an implementation decision.
 
 
 
@@ -177,9 +191,12 @@ The following is the general flow of a successful certificate request and subseq
     3. Send a `kid` signed POST request to `finalizeUrl` with JSON HTTP body of `{"csr": b64CSR}`.
 2. Node MUST poll ACME server by sending GET requests to `orderUrl` until the ACME server's response contains a `status` field with a value different than `processing`.
 
-**Note:** The node SHOULD NOT send more than `max_acme_poll_retries` poll requests to the ACME server. After `max_acme_timeout`, the communication has failed. What to do after `max_acme_timeout` has passed is left as an implementation decision.
+**Note:** The node SHOULD NOT send more than `max_acme_poll_retries` poll requests to the ACME server.
+After `max_acme_timeout`, the communication has failed.
+What to do after `max_acme_timeout` has passed is left as an implementation decision.
 
-3. Node downloads finalized certificate by sending a GET request to `certDownloadUrl`. `certDownloadUrl` is found in the `certificate` field of the JSON HTTP body of a response to a GET request to `orderUrl`.
+3. Node downloads finalized certificate by sending a GET request to `certDownloadUrl`.
+`certDownloadUrl` is found in the `certificate` field of the JSON HTTP body of a response to a GET request to `orderUrl`.
 
 
 ## Complete certificate issuance example
