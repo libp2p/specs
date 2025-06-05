@@ -29,11 +29,11 @@ Self-signed certificates are generally not accepted.
 To obtain a CA-issued certificate, a requester must complete an ACME (Automatic Certificate Management Environment) challenge.
 This typically involves provisioning a DNS TXT record on a domain the requester controls.
 
-However, most libp2p peers do not own or control domain names, making it impractical for them to complete DNS-based ACME challenges and, by extension, to obtain trusted TLS certificates.
+However, most libp2p peers do not own or control domain names, making it impractical for them to complete DNS-based ACME challenges and, by extension, obtain trusted TLS certificates.
 This limitation hinders direct communication between libp2p peers and standard web browsers.
 
 [AutoTLS](https://blog.libp2p.io/autotls/) addresses this problem by introducing an AutoTLS broker — a server that controls a domain and facilitates ACME challenges on behalf of libp2p peers.
-A peer can request the AutoTLS broker to fulfil an ACME DNS challenge on its behalf.
+A peer can request the AutoTLS broker to fulfill an ACME DNS challenge on its behalf.
 Once the broker sets the appropriate DNS record, the requesting peer proceeds to notify the ACME server.
 The ACME server validates the challenge against the broker's domain, and if successful, issues a valid certificate.
 
@@ -54,7 +54,7 @@ while "broker" and "AutoTLS broker", which are used interchangeably, refer to th
 8. Node polls ACME server until certificate is ready for download.
 9. Node downloads certificate.
 
-## Paramenters
+## Parameters
 
 | Parameter                | Description                                                      | Reasonable Default |
 |--------------------------|------------------------------------------------------------------|--------------|
@@ -107,7 +107,7 @@ while "broker" and "AutoTLS broker", which are used interchangeably, refer to th
 		  "signature": "`base64UrlEncode(signature)`"
 		}
 		```
-5. The node MUST save the `kid` present in the `location` header of the ACME server's response for in future requests to ACME server.
+5. The node MUST save the `kid` present in the `location` header of the ACME server's response for future requests to the ACME server.
 6. The node requests a certificate for the `*.{b36peerid}.libp2p.direct` domain from the ACME server by issuing a POST request using the same JWT signature scheme (and a new `nonce`) but using the `kid` field instead of the `jwk` field and containing the following JSON payload:
 	```json
 	{
@@ -157,7 +157,7 @@ while "broker" and "AutoTLS broker", which are used interchangeably, refer to th
 
     **Note:** `varint` is a protobuf [varint](https://protobuf.dev/programming-guides/encoding/#varints) field that encodes the length of each of the `key=value` string.
 
-    **Note:** The node SHOULD only include multiaddresses that contain public IPv4 addresses in `multiaddrs`.
+    **Note:** The node SHOULD include only multiaddresses containing public IPv4 addresses in `multiaddrs`.
 	4. Node sends a POST request to `/v1/_acme-challenge` endpoint using `payload` as HTTP body and `headers` as HTTP headers.
 	5. Node SHOULD save the `bearer` token from the `authentication-info` response header, and use it for following requests to the AutoTLS broker.
 
@@ -166,7 +166,7 @@ while "broker" and "AutoTLS broker", which are used interchangeably, refer to th
 ## Signalling challenge completion to ACME server
 1. Node SHOULD query DNS records (`TXT _acme-challenge.{b36peerid}.libp2p.direct` and `A dashed-public-ip-address.{b36peerid}.libp2p.direct`) until they are set by the AutoTLS broker.
 
-**Note:** Here, `dashed-public-ip-address` is the public IPv4 address of the node in which the node received the confirmation dial from the broker.
+**Note:** Here, `dashed-public-ip-address` is the public IPv4 address on in which the node received the confirmation dial from the broker.
 For example, if the node has two public IPv4 addresses `1.1.1.1` and `8.8.8.8`, and the broker dialed it through `1.1.1.1`, then the node SHOULD query the `A 1-1-1-1.{b36peerid}.libp2p.direct`.
 
 **Note:** The node SHOULD NOT send more than `max_dns_retries` DNS requests.
