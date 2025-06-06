@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 | --------------- | ------------- | ------ | --------------- |
-| 1A              | Working Draft | Active | r0, 2023-01-23  |
+| 1A              | Working Draft | Active | r1, 2025-05-28  |
 
 Authors: [@MarcoPolo]
 
@@ -172,6 +172,17 @@ protocol operates as follows:
    Authentication-Info: libp2p-PeerID sig="<base64-signature-bytes>" bearer="<base64-encoded-opaque-blob>"
    ```
 
+   The server MAY include an `expires` field which contains the expiry time of
+   the bearer token in [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339)
+   format:
+
+   ```
+   Authentication-Info: libp2p-PeerID sig="<base64-signature-bytes>" bearer="<base64-encoded-opaque-blob>" expires="<RFC-3339-formatted-date-string>"
+   ```
+
+   Note that the `expires` field is only advisory, the server may expire the
+   token at any time.
+
    The `sig` param represents a signature over the parameters:
 
    - `challenge-server`
@@ -254,6 +265,17 @@ The client initiated handshake is as follows
    - The client's Peer ID.
    - The `hostname` parameter.
    - The token creation date (to allow tokens to expire).
+
+   The server MAY include an `expires` field which contains the expiry time of
+   the bearer token in [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339)
+   format:
+
+   ```
+   Authentication-Info: libp2p-PeerID bearer="<base64-encoded-opaque-blob>" expires="<RFC-3339-formatted-date-string>"
+   ```
+
+   Note that the `expires` field is only advisory, the server may expire the
+   token at any time.
 
 5. The client SHOULD send the `bearer` token for future Peer ID authenticated
    requests.
