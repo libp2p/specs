@@ -2,9 +2,9 @@
 
 > The spec for the friendly Stream Multiplexer (that works in 3 languages!)
 
-| Lifecycle Stage | Maturity       | Status | Latest Revision |
-|-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r0, 2018-10-10  |
+| Lifecycle Stage | Maturity       | Status     | Latest Revision |
+|-----------------|----------------|------------|-----------------|
+| 3A              | Recommendation | Deprecated | r0, 2018-10-10  |
 
 Authors: [@daviddias], [@Stebalien], [@tomaka]
 
@@ -25,16 +25,17 @@ and spec status.
 ## Table of Contents
 
 - [mplex](#mplex)
-    - [Table of Contents](#table-of-contents)
-    - [Overview](#overview)
-    - [Message format](#message-format)
-        - [Flag Values](#flag-values)
-    - [Protocol](#protocol)
-        - [Opening a new stream](#opening-a-new-stream)
-        - [Writing to a stream](#writing-to-a-stream)
-        - [Closing a stream](#closing-a-stream)
-        - [Resetting a stream](#resetting-a-stream)
-    - [Implementation notes](#implementation-notes)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Deprecation Notice](#deprecation-notice)
+  - [Message format](#message-format)
+    - [Flag Values](#flag-values)
+  - [Protocol](#protocol)
+    - [Opening a new stream](#opening-a-new-stream)
+    - [Writing to a stream](#writing-to-a-stream)
+    - [Closing a stream](#closing-a-stream)
+    - [Resetting a stream](#resetting-a-stream)
+  - [Implementation notes](#implementation-notes)
 
 ## Overview
 
@@ -49,6 +50,41 @@ Implementations in:
 - [JavaScript](https://github.com/libp2p/js-libp2p-mplex)
 - [Go](https://github.com/libp2p/go-mplex)
 - [Rust](https://github.com/libp2p/rust-libp2p/tree/master/muxers/mplex)
+
+## Deprecation Notice
+
+**mplex is deprecated** for applications requiring resiliency and liveness.
+Users should **prefer QUIC or Yamux**.
+
+**Core limitation: lack of stream flow control**
+
+mplex does not support stream-level flow control, preventing receivers from
+applying backpressure. This leads issues varying from easy to exploit DoS
+vulnerabilities due to unbounded sender behavior to hard to debug application
+	  stalls caused by slow a single slow stream receiver.
+
+**Additional Shortcomings**:
+- No stream-level flow control.
+  - No way for a reader to backpressure a sender.
+  - No good solution for slow readers.
+    - Implementations generally do some combination of these mitigations:
+      - Reset the stream once we reach a certain amount of unread buffered data.
+        [source](https://github.com/libp2p/rust-libp2p/blob/1c9b3ca355aecffa0bcf83d2495cd4cc1019425b/muxers/mplex/src/config.rs#L118)
+      - Block operations until the full stream is read from.
+        [source](https://github.com/libp2p/rust-libp2p/blob/1c9b3ca355aecffa0bcf83d2495cd4cc1019425b/muxers/mplex/src/config.rs#L130)
+      - Block up to a certain amount of time, then reset the stream.
+        [source](https://github.com/libp2p/go-mplex/blob/ad9bfb922974b5875cc48c6e7492c4987c0cb94a/multiplex.go#L35-L37)
+- Head of line blocking between streams
+  - For example, No way to interleave data from streams if one stream makes a
+    big write, and another stream has a small write
+  - A single slow reader of a single stream can stall the whole application and TCP connection.
+- No way of propagating errors.
+  - Errors that could explain why a peer reset the stream.
+- No way to signal to a peer that you will not read any more data (e.g. QUIC's
+  STOP_SENDING frame).
+- Both sides can open streams with the same ID, differing only by who opened the
+  stream. which may lead to confusion.
+- stream names are relatively unused (go-libp2p does not use them. I don't think rust-libp2p or js-libp2p uses them either)
 
 ## Message format
 
