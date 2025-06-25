@@ -8,6 +8,8 @@ message ControlExtensions {
   // encoded with at least 4 bytes
 
   optional bool testExtension = 6492434;
+
+  optional bool partialMessages = 16418754;
 }
 
 message ControlMessage {
@@ -36,4 +38,6 @@ message RPC {
   // bytes
 
   optional TestExtension testExtension = 6492434;
+
+  optional PartialMessagesExtension partial = 16418754;
 }
