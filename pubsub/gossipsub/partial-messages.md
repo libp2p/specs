@@ -20,7 +20,7 @@ and spec status.
 
 Partial Messages Extensions allow users to transmit only a small part of a
 message rather than a full message. This is especially useful in cases where
-there a large messages and a peer is missing only a small part of the message.
+this a large messages and a peer is missing only a small part of the message.
 
 Much of the complexity around partial messages is contained by the Gossipsub
 implementation. Applications require little changes to benefit from this
