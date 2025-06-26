@@ -81,8 +81,13 @@ PartialIDONTWANT serves to cancel any pending PartialIWANTs
 
 ### PartialIHAVE
 
-Partial IHave allow nodes to signal HAVE information before receiving all
+PartialIHave allows nodes to signal HAVE information before receiving all
 segments, unlocking the use of partialIWANT in more contexts.
+
+In the context of partial messages, it is more useful than IHAVE as it tells the
+peer the group ID. In contrast, a IHAVE only includes a message ID that is
+unique to the message. A receiving peer has no way to link an IHAVE's message ID
+with a group ID, without having the full message.
 
 Partial IHAVE messages can be used both in the context of lazy push, notifying
 peers about reception progress, and in the context of heartbeats, sending
@@ -90,7 +95,9 @@ also Partial IHAVEs.
 
 The structure of PartialIHAVE is analogous to that of PartialIWANT.
 
-Part status (the metadata) is set and updated by the upper layer.
+The metadata, as in Partial IWants, is application defined. It is some encoding
+that represents the parts the sender has.
+
 Implementations are free to select when to send an update to their peers based
 on signaling bandwidth tradeoff considerations.
 
