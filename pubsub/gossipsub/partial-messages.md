@@ -30,7 +30,11 @@ extension.
 
 **Full Message**: A Gossipsub Message.
 
-**Partial Message**: Some part of a Full Message. Each part should be able to be validated.
+**Partial Message**: Some part of a Full Message. Each part should be able to be
+validated.
+
+**Group ID**: An identifier to some Full Message. This must not depend on
+knowing the full message, so it can not simply be a hash of the full message.
 
 ## Motivation
 
