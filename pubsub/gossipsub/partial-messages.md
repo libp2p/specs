@@ -4,11 +4,12 @@
 | --------------- | ------------- | ------ | --------------- |
 | 1A              | Working Draft | Active | r0, 2025-06-23  |
 
-Authors: [@marcopolo]
+Authors: [@marcopolo, @cskiraly]
 
 Interest Group: TODO
 
 [@marcopolo]: https://github.com/marcopolo
+[@cskiraly]: https://github.com/cskiraly
 
 See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
@@ -28,19 +29,26 @@ extension.
 ## Motivation
 
 The main motivation for this extension is optimizing Ethereum's Data
-Availability Sampling protocol. In Ethereum's upcoming fork, Fusaka, custodied
-data is laid out in a matrix, where the rows represent user data (called blobs),
-and the columns represent a slice across all blobs (each blob slice is called a
-cell). These columns are propagated with Gossipsub. It's common for a node to
-already have all the blobs from its mempool, but in cases where it doesn't
-(~38%[1]) have _all_ of the blobs it almost always has _most_ blobs (today, it
-almost always has all but one [1]).
+Availability Sampling (DAS) protocol. In Ethereum's upcoming fork, Fusaka,
+custodied data is laid out in a matrix, where the rows represent user data
+(called blobs), and the columns represent a slice across all blobs (each blob
+slice is called a cell). These columns are propagated with Gossipsub. At the
+time of writing it is common for a node to already have all the blobs from its
+mempool, but in cases where it doesn't (~38%[1]) have _all_ of the blobs it
+almost always has _most_ blobs (today, it almost always has all but one [1]).
 
-This extension would allow nodes to only request the missing blob. Reducing the
-network resource usage significantly. As an example, if there are 32 blob cells
-in a column and the node has all but one cell, this would result in a transfer
-of 2KiB rather than 64KiB per column. and since nodes custody at least 8
-columns, the total savings per slot is around 500KiB, or 4 Megabits per slot.
+This extension would allow nodes to only request the column message part
+belonging to the missing blob. Reducing the network resource usage
+significantly. As an example, if there are 32 blob cells in a column and the
+node has all but one cell, this would result in a transfer of 2KiB rather than
+64KiB per column. and since nodes custody at least 8 columns, the total savings
+per slot is around 500KiB, or 4 Megabits per slot.
+
+Later, partial messages could enable further optimizations:
+- If cells can be validated individually, as in the case of DAS, partial messages
+could also be forwarded, allowing us to reduce the store-and-forward delay [2].
+- Finally, in the FullDAS construct, where both row and column topics are
+defined, partial messages allow cross-forwarding cells between these topics [2].
 
 ## Protocol Messages
 
@@ -119,3 +127,4 @@ message PartialIDONTWANT {
 ```
 
 [1]: https://ethresear.ch/t/is-data-available-in-the-el-mempool/22329
+[2]: https://ethresear.ch/t/fulldas-towards-massive-scalability-with-32mb-blocks-and-beyond/19529#possible-extensions-13
