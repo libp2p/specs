@@ -26,6 +26,12 @@ Much of the complexity around partial messages is contained by the Gossipsub
 implementation. Applications require little changes to benefit from this
 extension.
 
+## Terms and Definitions
+
+**Full Message**: A Gossipsub Message.
+
+**Partial Message**: Some part of a Full Message. Each part should be able to be validated.
+
 ## Motivation
 
 The main motivation for this extension is optimizing Ethereum's Data
