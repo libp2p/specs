@@ -56,6 +56,19 @@ could also be forwarded, allowing us to reduce the store-and-forward delay [2].
 - Finally, in the FullDAS construct, where both row and column topics are
 defined, partial messages allow cross-forwarding cells between these topics [2].
 
+## Advantage of Partial Messages over smaller Gossipsub Messages
+
+Partial Messages within a group imply some structure and correlation. Thus,
+multiple partial messages can be referenced succinctly. For example, parts can
+be referenced by bitmaps, ranges, or a bloom filter.
+
+The structure of partial messages in a group, as well as how partial messages
+are referenced is application defined.
+
+If, in some application, a group only ever contained a single partial message,
+then partial messages would be the same as smaller messages.
+
+
 ## Protocol Messages
 
 The following section specifies the semantics of each new protocol message.
