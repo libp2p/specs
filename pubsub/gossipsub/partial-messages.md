@@ -77,7 +77,13 @@ Nodes SHOULD assume a `partialIWANT `implies a `IDONTWANT `for the full message.
 
 ### PartialIDONTWANT
 
-PartialIDONTWANT serves to cancel any pending PartialIWANTs
+PartialIDONTWANT serves to cancel any pending PartialIWANTs.
+
+A PartialIDONTWANT without metadata serves to cancel all pending PartialIWANTs,
+and signals there is no part this peer wants.
+
+Implementations SHOULD NOT send a PartialIHAVE to a peer with parts that the
+peer has previously sent a PartialIDONTWANT for.
 
 ### PartialIHAVE
 
