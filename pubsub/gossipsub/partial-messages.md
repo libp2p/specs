@@ -133,19 +133,16 @@ on signaling bandwidth tradeoff considerations.
 ## Application Interface
 
 Message contents are application defined. Thus splitting a message must be
-application defined. Here is a list of operations an application is expected to
+application defined. Here are a list of operations an application is expected to
 provide to Gossipsub to enable partial message delivery.
 
-1. Splitting a message into partial message.
-2. Given two partial messages, merge them into a more complete partial message.
-  2a. If merging results in a complete message, return the complete message.
-3. Encode and decode a partial message.
-4. Given a partial message, encode a request for the rest of the message.
-5. Given the request above and a complete message, return relevant parts of the
-   message.
-
-
-TODO, think about this more.
+1. Split a full message into a group of partial messages.
+2. Given a group of partial messages, encode a request for the missing parts. (Used by `PartialIWANT`)
+3. Given the request above and a group of partial messages, return the relevant
+   parts of the message. (Used to fulfill a `PartialIWANT`)
+4. Given a group of partial messages, encode metadata for the parts present. (Used by `PartialIHAVE`)
+5. Validate a partial message.
+6. Encode and decode a group of partial messages.
 
 ## Protobuf
 
