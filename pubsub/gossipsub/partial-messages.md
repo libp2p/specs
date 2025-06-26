@@ -36,6 +36,10 @@ validated.
 **Group ID**: An identifier to some Full Message. This must not depend on
 knowing the full message, so it can not simply be a hash of the full message.
 
+**Group of Partial Messages**: A set of partial messages all belonging to the
+same group. The group may be complete, meaning that all parts are available. Or
+it may be incomplete, meaning some parts are missing.
+
 ## Motivation
 
 The main motivation for this extension is optimizing Ethereum's Data
