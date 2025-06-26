@@ -79,6 +79,21 @@ Nodes SHOULD assume a `partialIWANT `implies a `IDONTWANT `for the full message.
 
 PartialIDONTWANT serves to cancel any pending PartialIWANTs
 
+### PartialIHAVE
+
+Partial IHave allow nodes to signal HAVE information before receiving all
+segments, unlocking the use of partialIWANT in more contexts.
+
+Partial IHAVE messages can be used both in the context of lazy push, notifying
+peers about reception progress, and in the context of heartbeats, sending
+also Partial IHAVEs.
+
+The structure of PartialIHAVE is analogous to that of PartialIWANT.
+
+Part status (the metadata) is set and updated by the upper layer.
+Implementations are free to select when to send an update to their peers based
+on signaling bandwidth tradeoff considerations.
+
 ## Application Interface
 
 Message contents are application defined. Thus splitting a message must be
@@ -105,6 +120,7 @@ message PartialMessagesExtension {
   optional PartialMessage message = 1;
   optional PartialIWANT iwant = 2;
   optional PartialIDONTWANT idontwant = 3;
+  optional PartialIHAVE ihave = 4;
 }
 
 message PartialMessage {
@@ -120,6 +136,12 @@ message PartialIWANT {
 
 message PartialIDONTWANT {
 	optional bytes topicID = 1;
+  optional bytes groupID = 2;
+  optional bytes metadata = 3;
+}
+
+message PartialIHAVE {
+  optional bytes topicID = 1;
   optional bytes groupID = 2;
   optional bytes metadata = 3;
 }
