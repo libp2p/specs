@@ -161,7 +161,7 @@ message PartialMessagesExtension {
 }
 
 message PartialMessage {
-	optional bytes topicID = 1;
+  optional bytes topicID = 1;
   optional bytes data = 2;
 }
 
@@ -172,7 +172,7 @@ message PartialIWANT {
 }
 
 message PartialIDONTWANT {
-	optional bytes topicID = 1;
+  optional bytes topicID = 1;
   optional bytes groupID = 2;
   optional bytes metadata = 3;
 }
