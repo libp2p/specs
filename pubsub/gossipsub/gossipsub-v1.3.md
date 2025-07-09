@@ -1,14 +1,18 @@
 # gossipsub v1.3: Extensions Control Message
 
-| Lifecycle Stage | Maturity      | Status | Latest Revision |
-| --------------- | ------------- | ------ | --------------- |
-| 1A              | Working Draft | Active | r0, 2025-06-23  |
+| Lifecycle Stage | Maturity                 | Status | Latest Revision |
+| --------------- | ------------------------ | ------ | --------------- |
+| 3A              | Candidate Recommendation | Active | r0, 2025-06-23  |
 
 Authors: [@marcopolo]
 
-Interest Group: TODO
+Interest Group: [@cortze], [@cskiraly], [@ppopth], [@jxs]
 
 [@marcopolo]: https://github.com/marcopolo
+[@cortze]: https://github.com/cortze
+[@cskiraly]: https://github.com/cskiraly
+[@ppopth]: https://github.com/ppopth
+[@jxs]: https://github.com/jxs
 
 See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
