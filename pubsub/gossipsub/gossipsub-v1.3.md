@@ -6,13 +6,14 @@
 
 Authors: [@marcopolo]
 
-Interest Group: [@cortze], [@cskiraly], [@ppopth], [@jxs]
+Interest Group: [@cortze], [@cskiraly], [@ppopth], [@jxs], [@raulk]
 
 [@marcopolo]: https://github.com/marcopolo
 [@cortze]: https://github.com/cortze
 [@cskiraly]: https://github.com/cskiraly
 [@ppopth]: https://github.com/ppopth
 [@jxs]: https://github.com/jxs
+[@raulk]: https://github.com/raulk
 
 See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
