@@ -20,36 +20,31 @@ and spec status.
 
 Partial Messages Extensions allow users to transmit only a small part of a
 message rather than a full message. This is especially useful in cases where
-this a large messages and a peer is missing only a small part of the message.
-
-Much of the complexity around partial messages is contained by the Gossipsub
-implementation. Applications require little changes to benefit from this
-extension.
+there is a large messages and a peer is missing only a small part of the
+message.
 
 ## Terms and Definitions
 
 **Full Message**: A Gossipsub Message.
 
-**Partial Message**: Some part of a Full Message. Each part should be able to be
-validated.
+**Message Part**: The smallest verifiable part of a message.
+
+**Partial Message**: A group of one or more message parts.
 
 **Group ID**: An identifier to some Full Message. This must not depend on
 knowing the full message, so it can not simply be a hash of the full message.
 
-**Group of Partial Messages**: A set of partial messages all belonging to the
-same group. The group may be complete, meaning that all parts are available. Or
-it may be incomplete, meaning some parts are missing.
-
 ## Motivation
 
 The main motivation for this extension is optimizing Ethereum's Data
-Availability Sampling (DAS) protocol. In Ethereum's upcoming fork, Fusaka,
-custodied data is laid out in a matrix, where the rows represent user data
-(called blobs), and the columns represent a slice across all blobs (each blob
-slice is called a cell). These columns are propagated with Gossipsub. At the
-time of writing it is common for a node to already have all the blobs from its
-mempool, but in cases where it doesn't (~38%[1]) have _all_ of the blobs it
-almost always has _most_ blobs (today, it almost always has all but one [1]).
+Availability (DA) protocol. In Ethereum's upcoming fork, Fusaka, custodied data
+is laid out in a matrix per block, where the rows represent user data (called
+blobs), and the columns represent a slice across all blobs included in the block
+(each blob slice in the column is called a cell). These columns are propagated
+with Gossipsub. At the time of writing it is common for a node to already have
+all the blobs from its mempool, but in cases where it doesn't (~38%[1]) have
+_all_ of the blobs it almost always has _most_ of the blobs (today, it almost
+always has all but one [1]).
 
 This extension would allow nodes to only request the column message part
 belonging to the missing blob. Reducing the network resource usage
@@ -59,10 +54,12 @@ node has all but one cell, this would result in a transfer of 2KiB rather than
 per slot is around 500KiB, or 4 Megabits per slot.
 
 Later, partial messages could enable further optimizations:
-- If cells can be validated individually, as in the case of DAS, partial messages
-could also be forwarded, allowing us to reduce the store-and-forward delay [2].
+- If cells can be validated individually, as in the case of DAS, partial
+  messages could also be forwarded, allowing us to reduce the store-and-forward
+  delay [2].
 - Finally, in the FullDAS construct, where both row and column topics are
-defined, partial messages allow cross-forwarding cells between these topics [2].
+  defined, partial messages allow cross-forwarding cells between these topics
+  [2].
 
 ## Advantage of Partial Messages over smaller Gossipsub Messages
 
@@ -99,32 +96,29 @@ The `metadata` field is opaque application defined metadata associated with this
 request. This can be a bitmap, a list of ranges, or a bloom filter. The
 application generates this and consumes this.
 
+Later Partial IWants serve to refine the request of prior IWants.
 
-Nodes SHOULD assume a `partialIWANT `implies a `IDONTWANT `for the full message.
+Nodes SHOULD assume a `partialIWANT` implies a `IDONTWANT `for the full message.
 
 ### PartialIDONTWANT
 
-PartialIDONTWANT serves to cancel any pending PartialIWANTs.
-
-A PartialIDONTWANT without metadata serves to cancel all pending PartialIWANTs,
-and signals there is no part this peer wants.
+PartialIDONTWANT serves to cancel any and all pending PartialIWANTs.
 
 Implementations SHOULD NOT send a PartialIHAVE to a peer with parts that the
-peer has previously sent a PartialIDONTWANT for.
+peer has previously signaled disinterest for with a PartialIDONTWANT.
 
 ### PartialIHAVE
 
 PartialIHave allows nodes to signal HAVE information before receiving all
 segments, unlocking the use of partialIWANT in more contexts.
 
-In the context of partial messages, it is more useful than IHAVE as it tells the
-peer the group ID. In contrast, a IHAVE only includes a message ID that is
-unique to the message. A receiving peer has no way to link an IHAVE's message ID
-with a group ID, without having the full message.
+In the context of partial messages, it is more useful than IHAVE as it includes
+the group ID. In contrast, an IHAVE does not. A receiving peer has no way to
+link an IHAVE's message ID with a group ID, without having the full message.
 
 Partial IHAVE messages can be used both in the context of lazy push, notifying
-peers about reception progress, and in the context of heartbeats, sending
-also Partial IHAVEs.
+peers about available parts, and in the context of heartbeats as a replacement
+to IHAVEs.
 
 The structure of PartialIHAVE is analogous to that of PartialIWANT.
 
@@ -174,7 +168,6 @@ message PartialIWANT {
 message PartialIDONTWANT {
   optional bytes topicID = 1;
   optional bytes groupID = 2;
-  optional bytes metadata = 3;
 }
 
 message PartialIHAVE {
