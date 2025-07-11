@@ -135,7 +135,10 @@ application defined. Applications should provide a Partial Message type that
 supports the following operations:
 
 1. `.GroupID() -> GroupID: bytes`
-2. `.PartialMessageBytesFromMetadata(metadata: bytes) -> Result<EncodedPartialMessage: bytes, Error>` (When responding to a `PartialIWANT` or eagerly pushing a partial message)
+2. `.PartialMessageBytesFromMetadata(metadata: bytes) -> Result<(EncodedPartialMessage: bytes, metadata: bytes), Error>` (When responding to a `PartialIWANT` or eagerly pushing a partial message)
+  a. The returned metadata represents the still missing parts. For example, if a
+     peer is only able to fulfill a part of the the request, the returned
+     metadata represents the parts it couldn't fulfill.
 3. `.ExtendFromEncodedPartialMessage(data: bytes) -> Result<(), Error>` (When receiving a `PartialMessage`)
 4. `.MissingParts() -> Result<metadata: bytes, Error>` (For `PartialIWANT`)
 5. `.AvailableParts() -> Result<metadata: bytes, Error>` (For `PartialIHAVE`)
