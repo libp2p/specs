@@ -131,16 +131,20 @@ on signaling bandwidth tradeoff considerations.
 ## Application Interface
 
 Message contents are application defined. Thus splitting a message must be
-application defined. Here are a list of operations an application is expected to
-provide to Gossipsub to enable partial message delivery.
+application defined. Applications should provide a Partial Message type that
+supports the following operations:
 
-1. Split a full message into a group of partial messages.
-2. Given a group of partial messages, encode a request for the missing parts. (Used by `PartialIWANT`)
-3. Given the request above and a group of partial messages, return the relevant
-   parts of the message. (Used to fulfill a `PartialIWANT`)
-4. Given a group of partial messages, encode metadata for the parts present. (Used by `PartialIHAVE`)
-5. Validate a partial message.
-6. Encode and decode a group of partial messages.
+1. `.GroupID() -> GroupID: bytes`
+2. `.PartialMessageBytesFromMetadata(metadata: bytes) -> Result<EncodedPartialMessage: bytes, Error>` (When responding to a `PartialIWANT` or eagerly pushing a partial message)
+3. `.ExtendFromEncodedPartialMessage(data: bytes) -> Result<(), Error>` (When receiving a `PartialMessage`)
+4. `.MissingParts() -> Result<metadata: bytes, Error>` (For `PartialIWANT`)
+5. `.AvailableParts() -> Result<metadata: bytes, Error>` (For `PartialIHAVE`)
+
+Gossipsub in turn provides a `.PublishPartial(PartialMessage)` method.
+
+Note that this specific interface is not intended to be normative to
+implementations, rather, it is high level summary of what each layer should
+provide.
 
 ## Protobuf
 
