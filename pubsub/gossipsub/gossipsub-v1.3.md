@@ -116,6 +116,8 @@ message ControlExtensions {
 
   // Experimental extensions must use field numbers larger than 0x200000 to be
   // encoded with at least 4 bytes
+
+  optional bool testExtension = 6492434;
 }
 
 message ControlMessage {
@@ -138,5 +140,6 @@ message RPC {
 	// Experimental Extensions should register their messages here. They
 	// must use field numbers larger than 0x200000 to be encoded with at least 4
 	// bytes
+	optional TestExtension testExtension = 6492434;
 }
 ```
