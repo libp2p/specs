@@ -155,32 +155,27 @@ provide.
 syntax = "proto2";
 
 message PartialMessagesExtension {
-  optional PartialMessage message = 1;
-  optional PartialIWANT iwant = 2;
-  optional PartialIDONTWANT idontwant = 3;
-  optional PartialIHAVE ihave = 4;
+  optional bytes topicID = 1;
+  optional bytes groupID = 2;
+
+  optional PartialMessage message = 3;
+  optional PartialIWANT iwant = 4;
+  optional PartialIDONTWANT idontwant = 5;
+  optional PartialIHAVE ihave = 6;
 }
 
 message PartialMessage {
-  optional bytes topicID = 1;
-  optional bytes data = 2;
+  optional bytes data = 1;
 }
 
 message PartialIWANT {
-  optional bytes topicID = 1;
-  optional bytes groupID = 2;
-  optional bytes metadata = 3;
+  optional bytes metadata = 1;
 }
 
-message PartialIDONTWANT {
-  optional bytes topicID = 1;
-  optional bytes groupID = 2;
-}
+message PartialIDONTWANT {}
 
 message PartialIHAVE {
-  optional bytes topicID = 1;
-  optional bytes groupID = 2;
-  optional bytes metadata = 3;
+  optional bytes metadata = 1;
 }
 
 ```
