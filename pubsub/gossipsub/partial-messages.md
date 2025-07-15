@@ -180,5 +180,10 @@ message PartialIHAVE {
 
 ```
 
+## Open Questions
+
+- Do we want to add a TTL to PartialIWANTs? This would allow us to cancel them after some time.
+- Should we rename the metadata bytes to iwant and ihave?
+
 [1]: https://ethresear.ch/t/is-data-available-in-the-el-mempool/22329
 [2]: https://ethresear.ch/t/fulldas-towards-massive-scalability-with-32mb-blocks-and-beyond/19529#possible-extensions-13
