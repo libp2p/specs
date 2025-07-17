@@ -15,23 +15,23 @@ Gossipsub versions and Extensions.
 
 ## Gossipsub Extensions
 
-|               | [Choke Extensions] | [Partial Messages] |
-| ------------- | ------------------ | ------------------ |
-| [Go libp2p]   | Not Implemented    | PR Soon            |
-| [Rust libp2p] | Not Implemented    | Not Implemented    |
-| [JS libp2p]   | Not Implemented    | Not Implemented    |
-| [Nim libp2p]  | Not Implemented    | Not Implemented    |
-| [Java libp2p] | Not Implemented    | Not Implemented    |
+|               | [Choke Extensions] | [Partial Messages]                                        |
+| ------------- | ------------------ | --------------------------------------------------------- |
+| [Go libp2p]   | Not Implemented    | [PR](https://github.com/libp2p/go-libp2p-pubsub/pull/631) |
+| [Rust libp2p] | Not Implemented    | Not Implemented                                           |
+| [JS libp2p]   | Not Implemented    | Not Implemented                                           |
+| [Nim libp2p]  | Not Implemented    | Not Implemented                                           |
+| [Java libp2p] | Not Implemented    | Not Implemented                                           |
 
 ## Gossipsub Implementation Improvements
 
-|               | [Batch Publishing]                                                       | [IDONTWANT on First Publish]                              | [WFR Gossip]          |
-| ------------- | ------------------------------------------------------------------------ | --------------------------------------------------------- | --------------------- |
-| [Go libp2p]   | [✅](https://pkg.go.dev/github.com/libp2p/go-libp2p-pubsub#MessageBatch) | [✅](https://github.com/libp2p/go-libp2p-pubsub/pull/612) | In Progress (PR Soon) |
-| [Rust libp2p] | Not Implemented                                                          | [✅](https://github.com/libp2p/rust-libp2p/pull/5773)     | Not Implemented       |
-| [JS libp2p]   | Not Implemented                                                          | Not Implemented                                           | Not Implemented       |
-| [Nim libp2p]  | Not Implemented                                                          | Not Implemented                                           | Not Implemented       |
-| [Java libp2p] | Not Implemented                                                          | Not Implemented                                           | Not Implemented       |
+|               | [Batch Publishing]                                                       | [IDONTWANT on First Publish]                              | [WFR Gossip]                                              |
+| ------------- | ------------------------------------------------------------------------ | --------------------------------------------------------- | --------------------------------------------------------- |
+| [Go libp2p]   | [✅](https://pkg.go.dev/github.com/libp2p/go-libp2p-pubsub#MessageBatch) | [✅](https://github.com/libp2p/go-libp2p-pubsub/pull/612) | [PR](https://github.com/libp2p/go-libp2p-pubsub/pull/632) |
+| [Rust libp2p] | Not Implemented                                                          | [✅](https://github.com/libp2p/rust-libp2p/pull/5773)     | Not Implemented                                           |
+| [JS libp2p]   | Not Implemented                                                          | Not Implemented                                           | Not Implemented                                           |
+| [Nim libp2p]  | Not Implemented                                                          | Not Implemented                                           | Not Implemented                                           |
+| [Java libp2p] | Not Implemented                                                          | Not Implemented                                           | Not Implemented                                           |
 
 [Go libp2p]: https://github.com/libp2p/go-libp2p-pubsub
 [Rust libp2p]: https://github.com/libp2p/rust-libp2p/tree/master/protocols/gossipsub
