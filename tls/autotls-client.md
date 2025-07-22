@@ -56,12 +56,12 @@ while "broker" and "AutoTLS broker", which are used interchangeably, refer to th
 
 ## Parameters
 
-| Parameter                | Description                                                      | Reasonable Default |
-|--------------------------|------------------------------------------------------------------|--------------|
-| `max_dns_retries` | The maximum number of DNS queries that the node SHOULD make before giving up | ???  |
-| `max_dns_timeout` | The maximum number of seconds a node SHOULD wait for DNS records to be set | ???  |
-| `max_acme_poll_retries` | The maximum number of GET requests that the node SHOULD issue to ACME server before giving up | ???  |
-| `max_acme_timeout` | The maximum number of seconds a node SHOULD wait for an ACME resource status to change | ???  |
+| Parameter                | Description                                                               | Reasonable Default  |
+|--------------------------|---------------------------------------------------------------------------|---------------------|
+| `dns_poll_interval`      | Time the node SHOULD wait between of DNS queries                          | 1 second            |
+| `dns_timeout`            | The maximum time a node SHOULD wait for DNS records to be set             | 3 minutes           |
+| `acme_poll_interval`     | Time the node SHOULD wait between ACME GET requests                       | 1 second            |
+| `acme_timeout`           | The maximum time a node SHOULD wait for an ACME resource status to change | 3 minutes           |
 
 ## Requesting challenge from ACME server
 1. The node starts a libp2p peer with public IPv4 and support for the [`identify`](https://github.com/libp2p/specs/blob/master/identify/README.md) protocol.
@@ -170,18 +170,19 @@ while "broker" and "AutoTLS broker", which are used interchangeably, refer to th
 For example, if the node has two public IPv4 addresses `1.1.1.1` and `8.8.8.8`, and the broker dialed it through `1.1.1.1`, then the node SHOULD query the `A 1-1-1-1.{b36peerid}.libp2p.direct`.
 For IPv6: Replace colons with dashes, handle leading/trailing colons as zeros (`2001:db8::1` → `2001-db8--1`, `2001:db8::` → `2001-db8--0`), and query `AAAA 2001-db8--1.{b36peerid}.libp2p.direct`.
 
-**Note:** The node SHOULD NOT send more than `max_dns_retries` DNS requests.
-After `max_dns_timeout`, the communication is considered failed.
-What to do after `max_dns_timeout` has passed is left as an implementation decision.
+**Note:** The node SHOULD NOT poll DNS for longer than `dns_timeout`.
+After `dns_timeout`, the communication is considered failed.
+What to do after `dns_timeout` has passed is left as an implementation decision.
 
 2. Node notifies the ACME server about challenge completion so that the ACME server can lookup the DNS resource records that the AutoTLS broker has set. The notification is done in the form of a POST request to `chalUrl` with an empty HTTP body (`{}`).
 	1. Node sends an empty signed JSON payload (`{}`) to the ACME server using the `kid` obtained from the initial ACME registration and gets the response from the server (`completedResponse`).
 	2. Node extracts `url` field from `completedResponse`'s JSON body. The extracted URL is named `checkUrl` in this document.
 3. The node polls the ACME server by sending a GET HTTP request to `checkUrl` with an empty body, and sign using the `kid` of the registered account. The node MUST poll the ACME server until it receives a response with `status: valid` or `status: invalid` field, meaning that the challenge checking was successful or not, respectively.
 
-**Note:** The node SHOULD NOT send more than `max_acme_poll_retries` poll requests to the ACME server.
-After `max_acme_timeout`, the communication has failed.
-What to do after `max_acme_timeout` has passed is left as an implementation decision.
+**Note:** The node SHOULD NOT send more than one request every `acme_interval` to the ACME server.
+The node SHOULD use exponential backoff to increase time between retries.
+After `acme_timeout`, the communication has failed.
+What to do after `acme_timeout` has passed is left as an implementation decision.
 
 
 
@@ -192,9 +193,10 @@ What to do after `max_acme_timeout` has passed is left as an implementation deci
     3. Send a `kid` signed POST request to `finalizeUrl` with JSON HTTP body of `{"csr": b64CSR}`.
 2. Node MUST poll ACME server by sending GET requests to `orderUrl` until the ACME server's response contains a `status` field with a value different than `processing`.
 
-**Note:** The node SHOULD NOT send more than `max_acme_poll_retries` poll requests to the ACME server.
-After `max_acme_timeout`, the communication has failed.
-What to do after `max_acme_timeout` has passed is left as an implementation decision.
+**Note:** The node SHOULD NOT send more than one request every `acme_interval` to the ACME server.
+The node SHOULD use exponential backoff to increase time between retries.
+After `acme_timeout`, the communication has failed.
+What to do after `acme_timeout` has passed is left as an implementation decision.
 
 3. Node downloads finalized certificate by sending a GET request to `certDownloadUrl`.
 `certDownloadUrl` is found in the `certificate` field of the JSON HTTP body of a response to a GET request to `orderUrl`.
