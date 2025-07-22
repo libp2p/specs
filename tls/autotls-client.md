@@ -157,7 +157,10 @@ while "broker" and "AutoTLS broker", which are used interchangeably, refer to th
 
     **Note:** `varint` is a protobuf [varint](https://protobuf.dev/programming-guides/encoding/#varints) field that encodes the length of each of the `key=value` string.
 
-    **Note:** The node SHOULD include only multiaddresses containing public IPv4 addresses in `multiaddrs`.
+    **Note:** The node MUST only include only publicly reachable IP addresses in `multiaddrs`.
+    IPv4 private address ranges MUST be excluded.
+    IPv6 private address ranges and NAT64 translated addresses MUST be excluded.
+    Addresses containing `/p2p-circuit` MUST be excluded.
 	4. Node sends a POST request to `/v1/_acme-challenge` endpoint using `payload` as HTTP body and `headers` as HTTP headers.
 	5. Node SHOULD save the `bearer` token from the `authentication-info` response header, and use it for following requests to the AutoTLS broker.
 
