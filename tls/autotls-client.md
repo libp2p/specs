@@ -280,6 +280,8 @@ In this example the node at `142.93.194.175` and with peer ID `12D3KooWATZi2wFwQ
     }
     ```
 
+**User-Agent Header**: Implementations SHOULD include a descriptive User-Agent header that identifies the client library name and version or the host application (e.g., "kubo/0.17.0", "helia/2.0.0"). 
+
 **Note:** the node's multiaddresses are `/ip4/127.0.0.1/tcp/49309`, `/ip4/142.93.194.175/tcp/49309`, `/ip4/10.17.0.5/tcp/49309`, and `/ip4/10.108.0.2/tcp/49309`, but only `/ip4/142.93.194.175/tcp/49309` contains a public IPv4 address, so node SHOULD only send that.
 
 7. Node saves the bearer token (`bJNzn30OvOSIPsd0UtMygo4ccjUMXkwHONRHc46oyTx7ImlzLXRva2VuIjp0cnVlLCJwZWVyLWlkIjoiMTJEM0tvb1dBVFppMndGd1F4UTE0WjNxMjRURE5XS2FwNmY4VzVyeUxFNkRhNFJNZnN4eSIsImhvc3RuYW1lIjoicmVnaXN0cmF0aW9uLmxpYnAycC5kaXJlY3QiLCJjcmVhdGVkLXRpbWUiOiIyMDI1LTA1LTIyVDE0OjAxOjU4LjY1NzAyMDQ4OFoifQ==`) from the broker's `authentication-info` response header:
