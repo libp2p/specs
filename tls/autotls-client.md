@@ -172,7 +172,8 @@ For IPv6: Replace colons with dashes, handle leading/trailing colons as zeros (`
 
 **Note:** The node SHOULD NOT poll DNS for longer than `dns_timeout`.
 After `dns_timeout`, the communication is considered failed.
-What to do after `dns_timeout` has passed is left as an implementation decision.
+If an answer is not received after `dns_timeout` has passed, the request flow SHOULD be aborted.
+The node SHOULD NOT try to ask for a certificate from the ACME server if `dns_timeout` was reached.
 
 2. Node notifies the ACME server about challenge completion so that the ACME server can lookup the DNS resource records that the AutoTLS broker has set. The notification is done in the form of a POST request to `chalUrl` with an empty HTTP body (`{}`).
 	1. Node sends an empty signed JSON payload (`{}`) to the ACME server using the `kid` obtained from the initial ACME registration and gets the response from the server (`completedResponse`).
