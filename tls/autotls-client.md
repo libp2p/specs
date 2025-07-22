@@ -168,6 +168,7 @@ while "broker" and "AutoTLS broker", which are used interchangeably, refer to th
 
 **Note:** Here, `dashed-public-ip-address` is the public IPv4 address on in which the node received the confirmation dial from the broker.
 For example, if the node has two public IPv4 addresses `1.1.1.1` and `8.8.8.8`, and the broker dialed it through `1.1.1.1`, then the node SHOULD query the `A 1-1-1-1.{b36peerid}.libp2p.direct`.
+For IPv6: Replace colons with dashes, handle leading/trailing colons as zeros (`2001:db8::1` → `2001-db8--1`, `2001:db8::` → `2001-db8--0`), and query `AAAA 2001-db8--1.{b36peerid}.libp2p.direct`.
 
 **Note:** The node SHOULD NOT send more than `max_dns_retries` DNS requests.
 After `max_dns_timeout`, the communication is considered failed.
