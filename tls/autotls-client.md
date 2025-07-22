@@ -164,7 +164,7 @@ while "broker" and "AutoTLS broker", which are used interchangeably, refer to th
 
 
 ## Signalling challenge completion to ACME server
-1. Node SHOULD query DNS records (`TXT _acme-challenge.{b36peerid}.libp2p.direct` and `A dashed-public-ip-address.{b36peerid}.libp2p.direct`) until they are set by the AutoTLS broker.
+1. Node SHOULD query DNS records (`TXT _acme-challenge.{b36peerid}.libp2p.direct`) until they are set by the AutoTLS broker using exponential backoff (double the interval after each failed attempt).
 
 **Note:** Here, `dashed-public-ip-address` is the public IPv4 address on in which the node received the confirmation dial from the broker.
 For example, if the node has two public IPv4 addresses `1.1.1.1` and `8.8.8.8`, and the broker dialed it through `1.1.1.1`, then the node SHOULD query the `A 1-1-1-1.{b36peerid}.libp2p.direct`.
