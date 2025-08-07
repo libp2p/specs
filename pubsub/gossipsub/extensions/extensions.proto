@@ -1,0 +1,39 @@
+syntax = "proto2";
+
+message ControlExtensions {
+  // Initially empty. Future canonical extensions will be added here along with
+  // a reference to their specification.
+
+  // Experimental extensions must use field numbers larger than 0x200000 to be
+  // encoded with at least 4 bytes
+
+  optional bool testExtension = 6492434;
+}
+
+message ControlMessage {
+  repeated ControlIHave ihave = 1;
+  repeated ControlIWant iwant = 2;
+  repeated ControlGraft graft = 3;
+  repeated ControlPrune prune = 4;
+  repeated ControlIDontWant idontwant = 5;
+  optional ControlExtensions extensions = 6;
+}
+
+message RPC {
+  message SubOpts {
+    optional bool subscribe = 1; // subscribe or unsubcribe
+    optional string topicid = 2;
+  }
+
+  repeated SubOpts subscriptions = 1;
+  repeated Message publish = 2;
+  optional ControlMessage control = 3;
+
+  // Canonical Extensions should register their messages here.
+
+  // Experimental Extensions should register their messages here. They
+  // must use field numbers larger than 0x200000 to be encoded with at least 4
+  // bytes
+
+  optional TestExtension testExtension = 6492434;
+}
