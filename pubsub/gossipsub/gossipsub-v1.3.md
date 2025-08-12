@@ -26,8 +26,8 @@ and spec status.
 This version specifies a way to for gossipsub peers to describe their
 characteristics to each other without requiring a new protocol ID per extension.
 
-This spec MUST be updated upon introducing a new extension, either canonical or
-experimental, to the network.
+The extensions.proto file registry MUST be updated upon introducing a new
+extension, either canonical or experimental, to the network.
 
 ## Motivation
 
