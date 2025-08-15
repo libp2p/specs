@@ -368,10 +368,17 @@ the wire format and keep their routing table up-to-date, especially with peers
 closest to themselves.
 
 The process runs once on startup, then periodically with a configurable
-frequency (default: 10 minutes). On every run, we generate a random peer ID for
-every non-empty routing table's k-bucket and we look it up via the process
-defined in [peer routing](#peer-routing). Peers encountered throughout the
-search are inserted in the routing table, as per usual business.
+frequency (default: 10 minutes): 
+
+```
+if routing table is not empty:
+  for each k-bucket in the routing table:
+    create a $PEER_ID for said k-bucket using an RNG
+    do the normal <findNode($PEER_ID)>
+```
+The idea here, is that peers encountered throughout the find-node process
+as defined in [peer routing](#peer-routing), are inserted into the routing table,
+as per usual business.
 
 In addition, to improve awareness of nodes close to oneself, implementations
 should include a lookup for their own peer ID.
@@ -497,7 +504,7 @@ These are the requirements for each `MessageType`:
 
 * `PUT_VALUE`: In the request `record` is set to the record to be stored and `key`
   on `Message` is set to equal `key` of the `Record`. The target node validates
-  `record`, and if it is [valid, it then selects](entry-validation) the value to be stored, and stores it in the datastore. As a response, the request is echoed, with the `record` updated with the selected value.
+  `record`, and if it is [valid, it then selects](#entry-validation) the value to be stored, and stores it in the datastore. As a response, the request is echoed, with the `record` updated if the selection makes a change.
 
 * `GET_PROVIDERS`: In the request `key` is set to a CID. The target node
   returns the closest known `providerPeers` (if any) and the `k` closest known
