@@ -497,8 +497,7 @@ These are the requirements for each `MessageType`:
 
 * `PUT_VALUE`: In the request `record` is set to the record to be stored and `key`
   on `Message` is set to equal `key` of the `Record`. The target node validates
-  `record`, and if it is valid, it stores it in the datastore and as a response
-  echoes the request.
+  `record`, and if it is [valid, it then selects](entry-validation) the value to be stored, and stores it in the datastore. As a response, the request is echoed, with the `record` updated with the selected value.
 
 * `GET_PROVIDERS`: In the request `key` is set to a CID. The target node
   returns the closest known `providerPeers` (if any) and the `k` closest known
