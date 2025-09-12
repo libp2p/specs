@@ -180,9 +180,7 @@ Recommended sanitization steps:
    - Combining marks and diacritics
    - Private use characters (Unicode category `Co`)
 
-5. **Trim whitespace** - Remove leading and trailing whitespace after sanitization.
-
-6. **Enforce length limits** - Limit to 128 runes (Unicode code points, not bytes)
+5. **Enforce length limits** - Limit to 128 runes (Unicode code points, not bytes)
    to prevent excessive resource consumption.
 
 Note: These sanitization steps are recommended for display purposes only. The
