@@ -20,11 +20,9 @@ third-party data ownership.
   - [🚑 Self-healing networks](#-self-healing-networks)
   - [📮 Offline message queue / postbox](#-offline-message-queue--postbox)
 - [Evolve](#evolve)
-  - [✈️ WebTransport](#️-webtransport)
   - [⏱ Full Observability](#-full-observability)
   - [🧪 Automated compatibility testing](#-automated-compatibility-testing)
   - [Stream Migration Protocol](#stream-migration-protocol)
-  - [WebRTC](#webrtc)
   - [🤖 libp2p as a Wasm library](#-libp2p-as-a-wasm-library)
   - [🤝 Low latency, efficient connection handshake](#-low-latency-efficient-connection-handshake)
   - [🛣️ Peer Routing Records](#️-peer-routing-records)
@@ -39,6 +37,7 @@ third-party data ownership.
   - [🏹 RPC and other common node communication patterns](#-rpc-and-other-common-node-communication-patterns)
 - [Done](#done)
   - [🕸 Hole punching on TCP and QUIC](#-hole-punching-on-tcp-and-quic)
+  - [WebRTC](#webrtc)
 
 ## Core Tenets
 Before we dive into what libp2p should support and enable, let's outline the core tenets that underpin the project. As maintainers, we commit to ensuring libp2p is:
@@ -217,26 +216,6 @@ roaming, etc.
 
 These are the projects pushing the existing libp2p stack forward.
 
-### ✈️ WebTransport
-
-**Status**: In progress
-
-**What?** WebTransport is a browser-API offering low-latency, bidirectional
-client-server messaging running on top of QUIC. The browser API allows the
-establishment of connections to servers that don't have a TLS certificate
-signed by a certificate authority if the hash of the certificate is known in
-advance.
-
-**Why?** This allows libp2p nodes running in the browser (using js-libp2p) to
-connect to the rest of the libp2p network.
-
-**Links:**
-
-- [IETF draft](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http3/)
-- [W3C Browser API](https://w3c.github.io/webtransport/)
-- [libp2p spec discussion](https://github.com/libp2p/specs/pull/404)
-- [webtransport-go](https://github.com/marten-seemann/webtransport-go/)
-
 ### ⏱ Full Observability
 
 **What?** libp2p should expose a wide set of metrics, making it easy to
@@ -285,27 +264,6 @@ connection to a direct connection.
 
 - Tracking issue https://github.com/libp2p/specs/issues/328
 - Specification draft https://github.com/libp2p/specs/pull/406#discussion_r852835671
-
-### WebRTC
-
-**Status**: In progress
-
-**What?** WebRTC is a transport protocol supported by all major browsers. Those
-browsers allow the establishment of connections to remote endpoints that don't
-have a TLS certificate signed by a trusted certificate authority. In addition
-WebRTC includes hole punching capabilities.
-
-**Why?** In most p2p networks the majority of nodes do not have a signed TLS
-certificate. With WebRTC browsers will thus be able to connect to these
-previously unreachable nodes. In addition, being able to hole punch allows
-browsers to connect to nodes behind firewalls and NATs e.g. other browsers. Note
-that the former, namely connecting without trusted TLS certificate, can as well
-be achieved with the [WebTransport](#✈️-webtransport) protocol.
-
-**Links:**
-
-- Tracking issue https://github.com/libp2p/specs/issues/220
-- Specification draft https://github.com/libp2p/specs/pull/412
 
 ### 🤖 libp2p as a Wasm library
 
@@ -664,3 +622,48 @@ to the rest of the system.
   vision](https://github.com/libp2p/specs/blob/master/connections/hole-punching.md).
 
 - [NAT traversal tracking issue](https://github.com/libp2p/specs/issues/312).
+
+
+### ✈️ WebTransport
+
+**Status**: Done
+
+**What?** WebTransport is a browser-API offering low-latency, bidirectional
+client-server messaging running on top of QUIC. The browser API allows the
+establishment of connections to servers that don't have a TLS certificate
+signed by a certificate authority if the hash of the certificate is known in
+advance.
+
+**Why?** This allows libp2p nodes running in the browser (using js-libp2p-webtransport) to
+connect to the rest of the libp2p network.
+
+**Links:**
+
+- [IETF draft](https://datatracker.ietf.org/doc/draft-ietf-webtrans-http3/)
+- [W3C Browser API](https://w3c.github.io/webtransport/)
+- [libp2p Specification](https://github.com/libp2p/specs/tree/master/webtransport)
+- [webtransport-go](https://github.com/marten-seemann/webtransport-go/)
+- [go-libp2p WebTransport](https://github.com/libp2p/go-libp2p/tree/master/p2p/transport/webtransport)
+- [js-libp2p WebTransport](https://github.com/libp2p/js-libp2p-webtransport/)
+
+### WebRTC
+
+**Status**: Done
+
+**What?** WebRTC is a transport protocol supported by all major browsers. Those
+browsers allow the establishment of connections to remote endpoints that don't
+have a TLS certificate signed by a trusted certificate authority. In addition
+WebRTC includes hole punching capabilities.
+
+**Why?** In most p2p networks the majority of nodes do not have a signed TLS
+certificate. With WebRTC browsers will thus be able to connect to these
+previously unreachable nodes. In addition, being able to hole punch allows
+browsers to connect to nodes behind firewalls and NATs e.g. other browsers. Note
+that the former, namely connecting without trusted TLS certificate, can as well
+be achieved with the [WebTransport](#✈️-webtransport) protocol.
+
+**Links:**
+
+- Tracking issue https://github.com/libp2p/specs/issues/220
+- [`/webrtc` specification](./webrtc/webrtc.md)
+- [`/webrtc-direct` specification](./webrtc/webrtc-direct.md)

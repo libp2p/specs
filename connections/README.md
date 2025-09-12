@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 |-----------------|---------------|--------|-----------------|
-| 1A              | Working Draft | Active | r0, 2019-06-20  |
+| 1A              | Working Draft | Active | r1, 2022-12-07  |
 
 Authors: [@yusefnapora]
 
@@ -14,7 +14,7 @@ Interest Group: [@JustMaier], [@vasco-santos] [@bigs], [@mgoelzer]
 [@bigs]: https://github.com/bigs
 [@mgoelzer]: https://github.com/mgoelzer
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
@@ -34,6 +34,7 @@ and spec status.
         - [State Management](#state-management)
             - [Peer Metadata Storage](#peer-metadata-storage)
             - [Connection Limits](#connection-limits)
+            - [Supported protocols](#supported-protocols)
         - [Connection Lifecycle Events](#connection-lifecycle-events)
     - [Hole punching](#hole-punching)
     - [Future Work](#future-work)
@@ -100,7 +101,7 @@ One of libp2p's core design goals is to be adaptable to many network
 environments, including those that don't yet exist. To provide this flexibility,
 the connection upgrade process supports multiple protocols for connection
 security and stream multiplexing and allows peers to select which to use for
-each connection. 
+each connection.
 
 The process of selecting protocols is called **protocol negotiation**. In
 addition to its role in the connection upgrade process, protocol negotiation is
@@ -114,7 +115,7 @@ Each protocol supported by a peer is identified using a unique string called a
 path-like structure containing a short name and a version number, separated by
 `/` characters. For example: `/yamux/1.0.0` identifies version 1.0.0 of the
 [`yamux` stream multiplexing protocol][yamux]. multistream-select itself has a
-protocol id of `/multistream/1.0.0`. 
+protocol id of `/multistream/1.0.0`.
 
 Including a version number in the protocol id simplifies the case where you want
 to concurrently support multiple versions of a protocol, perhaps a stable version
@@ -234,6 +235,11 @@ Note: In the case where both peers initially act as initiators, e.g. during NAT
 hole punching, tie-breaking is done via the [multistream-select simultaneous
 open protocol extension][simopen].
 
+### Inlining Muxer Negotiation
+
+If both peers support it, it's possible to shortcut the muxer selection by moving
+it into the security handshake. Details are specified in [inlined-muxer-negotiation].
+
 
 ## Opening New Streams Over a Connection
 
@@ -281,7 +287,7 @@ The recommended baseline **stream multiplexer** is [yamux][yamux], which
 provides a very simple programmatic API and is supported in most libp2p
 implementations.
 
-### State Management 
+### State Management
 
 While the connection establishment process itself does not require any
 persistent state, some state management is useful to assist bootstrapping and
@@ -319,6 +325,17 @@ when you're near the limit.
 Resource allocation, measurement and enforcement policies are all an active area
 of discussion in the libp2p community, and implementations are free to develop
 whatever prioritization system makes sense.
+
+#### Supported protocols
+
+A libp2p node SHOULD scope its set of supported protocols to the underlying
+physical connection to a peer. It MAY only support a protocol based on properties
+of a physical connection to e.g. limit the use of bandwidth-heavy protocols over
+a relayed or metered connection. A libp2p node MAY offer different sets of protocols
+to different peers. It MAY revoke or add the support for a protocol at any time,
+for example to only offer certain services after learning its NAT status on a connection.
+Therefore, libp2p nodes SHOULD NOT assume that the set of protocols on a connection
+is static.
 
 ### Connection Lifecycle Events
 
@@ -409,3 +426,4 @@ updated to incorporate the changes.
 [simopen]: ./simopen.md
 [resource-manager-issue]: https://github.com/libp2p/go-libp2p/issues/635
 [hole-punching]: ./hole-punching.md
+[inlined-muxer-selection]: ./inlined-muxer-negotiation.md

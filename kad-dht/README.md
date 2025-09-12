@@ -2,17 +2,18 @@
 
 | Lifecycle Stage | Maturity       | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r1, 2021-10-30  |
+| 3A              | Recommendation | Active | r2, 2022-12-09  |
 
 Authors: [@raulk], [@jhiesey], [@mxinden]
 
-Interest Group:
+Interest Group: [@guillaumemichel]
 
 [@raulk]: https://github.com/raulk
 [@jhiesey]: https://github.com/jhiesey
 [@mxinden]: https://github.com/mxinden
+[@guillaumemichel]: https://github.com/guillaumemichel
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
@@ -65,8 +66,8 @@ XOR-tries (see [go-libp2p-xor]).
 ### Alpha concurrency parameter (`α`)
 
 The concurrency of node and value lookups are limited by parameter `α`, with a
-default value of 3. This implies that each lookup process can perform no more
-than 3 inflight requests, at any given time.
+default value of 10. This implies that each lookup process can perform no more
+than 10 inflight requests, at any given time.
 
 ## Client and server mode
 
@@ -75,13 +76,21 @@ nodes, unrestricted nodes should operate in _server mode_ and restricted nodes,
 e.g. those with intermittent availability, high latency, low bandwidth, low
 CPU/RAM/Storage, etc., should operate in _client mode_.
 
-As an example, running the libp2p Kademlia protocol on top of the Internet,
-publicly routable nodes, e.g. servers in a datacenter, might operate in _server
+As an example, publicly routable nodes running the libp2p Kademlia protocol, 
+e.g. servers in a datacenter, should operate in _server
 mode_ and non-publicly routable nodes, e.g. laptops behind a NAT and firewall,
-might operate in _client mode_. The concrete factors used to classify nodes into
+should operate in _client mode_. The concrete factors used to classify nodes into
 _clients_ and _servers_ depend on the characteristics of the network topology
-and the properties of the Kademlia DHT . Factors to take into account are e.g.
+and the properties of the Kademlia DHT. Factors to take into account are e.g.
 network size, replication factor and republishing period.
+
+For instance, setting the replication factor to a low value would require more
+reliable peers, whereas having higher replication factor could allow for less 
+reliable peers at the cost of more overhead. Ultimately, peers that act as 
+servers should help the network (i.e., provide positive utility in terms of 
+availability, reachability, bandwidth). Any factor that slows down network
+operations (e.g., a node not being reachable, or overloaded) for the majority
+of times it is being contacted should instead be operating as a client node.
 
 Nodes, both those operating in _client_ and _server mode_, add another node to
 their routing table if and only if that node operates in _server mode_. This
@@ -228,7 +237,7 @@ Then we loop:
                becomes the new best peer (`Pb`).
 			2. If the new value loses, we add the current peer to `Po`.
 	2. If successful with or without a value, the response will contain the
-       closest nodes the peer knows to the key `Key`. Add them to the candidate
+       closest nodes the peer knows to the `Key`. Add them to the candidate
        list `Pn`, except for those that have already been queried.
 	3. If an error or timeout occurs, discard it.
 4. Go to 1.
@@ -256,7 +265,7 @@ type Validator interface {
 ```
 
 `Validate()` should be a pure function that reports the validity of a record. It
-may validate a cryptographic signature, or else. It is called on two occasions:
+may validate a cryptographic signature, or similar. It is called on two occasions:
 
 1. To validate values retrieved in a `GET_VALUE` query.
 2. To validate values received in a `PUT_VALUE` query before storing them in the
@@ -268,23 +277,76 @@ heuristic of the value to make the decision.
 
 ### Content provider advertisement and discovery
 
-Nodes must keep track of which nodes advertise that they provide a given key
-(CID). These provider advertisements should expire, by default, after 24 hours.
-These records are managed through the `ADD_PROVIDER` and `GET_PROVIDERS`
+There are two things at play with regard to provider record (and therefore content)
+liveness and reachability:
+
+Content needs to be reachable, despite peer churn;
+and nodes that store and serve provider records should not serve records for stale content,
+i.e., content that the original provider does not wish to make available anymore.
+
+The following two parameters help cover both of these cases.
+
+1. **Provider Record Republish Interval:** The content provider 
+needs to make sure that the nodes chosen to store the provider record 
+are still online when clients ask for the record. In order to 
+guarantee this, while taking into account the peer churn, content providers
+republish the records they want to provide. Choosing the particular value for the
+Republish interval is network-specific and depends on several parameters, such as
+peer reliability and churn.
+
+   - For the IPFS network it is currently set to **22 hours**.
+
+2. **Provider Record Expiration Interval:** The network needs to provide
+content that content providers are still interested in providing. In other words,
+nodes should not keep records for content that content providers have stopped 
+providing (aka stale records). In order to guarantee this, provider records 
+should _expire_ after some interval, i.e., nodes should stop serving those records, 
+unless the content provider has republished the provider record. Again, the specific
+setting depends on the characteristics of the network.
+
+   - In the IPFS DHT the Expiration Interval is set to **48 hours**.
+
+The values chosen for those parameters should be subject to continuous monitoring 
+and investigation. Ultimately, the values of those parameters should balance 
+the tradeoff between provider record liveness (due to node churn) and traffic overhead
+(to republish records).
+The latest parameters are based on the comprehensive study published
+in [provider-record-measurements].
+
+Provider records are managed through the `ADD_PROVIDER` and `GET_PROVIDERS`
 messages.
+
+It is also worth noting that the keys for provider records are multihashes. This
+is because:
+
+- Provider records are used as a rendezvous point for all the parties who have
+advertised that they store some piece of content.
+- The same multihash can be in different CIDs (e.g. CIDv0 vs CIDv1 of a SHA-256 dag-pb object,
+or the same multihash but with different codecs such as dag-pb vs raw).
+- Therefore, the rendezvous point should converge on the minimal thing everyone agrees on,
+which is the multihash, not the CID.
 
 #### Content provider advertisement
 
 When the local node wants to indicate that it provides the value for a given
-key, the DHT finds the closest peers to the key using the `FIND_NODE` RPC (see
+key, the DHT finds the (`k` = 20) closest peers to the key using the `FIND_NODE` RPC (see
 [peer routing section](#peer-routing)), and then sends an `ADD_PROVIDER` RPC with
-its own `PeerInfo` to each of these peers.
+its own `PeerInfo` to each of these peers. The study in [provider-record-measurements]
+proved that the replication factor of `k` = 20 is a good setting, although continuous
+monitoring and investigation may change this recommendation in the future.
 
 Each peer that receives the `ADD_PROVIDER` RPC should validate that the received
 `PeerInfo` matches the sender's `peerID`, and if it does, that peer should store
 the `PeerInfo` in its datastore. Implementations may choose to not store the
 addresses of the providing peer e.g. to reduce the amount of required storage or
-to prevent storing potentially outdated address information.
+to prevent storing potentially outdated address information. Implementations that choose
+to keep the network address (i.e., the `multiaddress`) of the providing peer should do it for
+a period of time that they are confident the network addresses of peers do not change after the 
+provider record has been (re-)published. As with previous constant values, this is dependent
+on the network's characteristics. A safe value here is the Routing Table Refresh Interval. 
+In the kubo IPFS implementation, this is set to 30 mins. After that period, peers provide 
+the provider's `peerID` only, in order to avoid pointing to stale network addresses 
+(i.e., the case where the peer has moved to a new network address).
 
 #### Content provider discovery
 
@@ -306,14 +368,13 @@ the wire format and keep their routing table up-to-date, especially with peers
 closest to themselves.
 
 The process runs once on startup, then periodically with a configurable
-frequency (default: 5 minutes). On every run, we generate a random peer ID and
-we look it up via the process defined in [peer routing](#peer-routing). Peers
-encountered throughout the search are inserted in the routing table, as per
-usual business.
+frequency (default: 10 minutes). On every run, we generate a random peer ID for
+every non-empty routing table's k-bucket and we look it up via the process
+defined in [peer routing](#peer-routing). Peers encountered throughout the
+search are inserted in the routing table, as per usual business.
 
-This is repeated as many times per run as configuration parameter `QueryCount`
-(default: 1). In addition, to improve awareness of nodes close to oneself,
-implementations should include a lookup for their own peer ID.
+In addition, to improve awareness of nodes close to oneself, implementations
+should include a lookup for their own peer ID.
 
 Every repetition is subject to a `QueryTimeout` (default: 10 seconds), which
 upon firing, aborts the run.
@@ -340,6 +401,8 @@ bytes, encoded as an unsigned variable length integer as defined by the
 All RPC messages conform to the following protobuf:
 
 ```protobuf
+syntax = "proto2";
+
 // Record represents a dht record that contains a value
 // for a key value pair
 message Record {
@@ -461,7 +524,7 @@ multiaddrs are stored in the node's peerbook.
 
 [1]: Baumgart, I., & Mies, S. (2014). S / Kademlia : A practicable approach towards secure key-based routing S / Kademlia : A Practicable Approach Towards Secure Key-Based Routing, (June). https://doi.org/10.1109/ICPADS.2007.4447808
 
-[2]: Freedman, M. J., & Mazières, D. (2003). Sloppy Hashing and Self-Organizing Clusters. In IPTPS. Springer Berlin / Heidelberg. Retrieved from www.coralcdn.org/docs/coral-iptps03.ps
+[2]: Freedman, M. J., & Mazières, D. (2003). Sloppy Hashing and Self-Organizing Clusters. In IPTPS. Springer Berlin / Heidelberg. Retrieved from https://www.cs.princeton.edu/~mfreed/docs/coral-iptps03.pdf
 
 [bittorrent]: http://bittorrent.org/beps/bep_0005.html
 
@@ -470,3 +533,5 @@ multiaddrs are stored in the node's peerbook.
 [ping]: https://github.com/libp2p/specs/issues/183
 
 [go-libp2p-xor]: https://github.com/libp2p/go-libp2p-xor
+
+[provider-record-measurements]: https://github.com/protocol/network-measurements/blob/master/results/rfm17-provider-record-liveness.md

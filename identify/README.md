@@ -18,7 +18,7 @@ Interest Group: [@yusefnapora], [@tomaka], [@richardschneider], [@Stebalien], [@
 [@Stebalien]: https://github.com/Stebalien
 [@bigs]: https://github.com/bigs
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
@@ -73,6 +73,7 @@ whose values have changed.
 ## The Identify Message
 
 ```protobuf
+syntax = "proto2";
 message Identify {
   optional string protocolVersion = 5;
   optional string agentVersion = 6;

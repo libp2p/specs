@@ -19,7 +19,7 @@ Interest Group: [@yusefnapora], [@raulk], [@whyrusleeping], [@Stebalien], [@jame
 [@daviddias]: https://github.com/daviddias
 [@yiannisbot]: https://github.com/yiannisbot
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
@@ -251,12 +251,12 @@ Topic membership is controlled by two operations supported by the
 router, as part of the pubsub api:
 - On `JOIN(topic)` the router joins the topic. In order to do so, if it already has
   `D` peers from the `fanout` peers of a topic, then it adds them to `mesh[topic]`,
-  and notifies them with a `GRAFT(topic)` control message. Otherwise, if there are 
-  less than `D` peers (let this number be `x`) in the fanout for a topic (or the 
-  topic is not in the fanout), then it 
+  and notifies them with a `GRAFT(topic)` control message. Otherwise, if there are
+  less than `D` peers (let this number be `x`) in the fanout for a topic (or the
+  topic is not in the fanout), then it
   still adds them as above (if there are any), and selects the remaining number
-  of peers (`D-x`) from `peers.gossipsub[topic]`, and likewise adds them to 
-  `mesh[topic]` and notifies them with a `GRAFT(topic)` control message. 
+  of peers (`D-x`) from `peers.gossipsub[topic]`, and likewise adds them to
+  `mesh[topic]` and notifies them with a `GRAFT(topic)` control message.
 - On `LEAVE(topic)` the router leaves the topic. It notifies the peers in
   `mesh[topic]` with a `PRUNE(topic)` message and forgets `mesh[topic]`.
 
@@ -375,6 +375,8 @@ control messages. The four control messages are `ControlIHave` for `IHAVE` messa
 The protobuf is as follows:
 
 ```protobuf
+syntax = "proto2";
+
 message RPC {
     // ...
 	optional ControlMessage control = 3;

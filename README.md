@@ -70,7 +70,14 @@ and are used throughout the system.
 These specs define wire protocols that are used by libp2p for connectivity,
 security, multiplexing, and other purposes.
 
-The protocols described below all use [protocol buffers](https://developers.google.com/protocol-buffers/docs/proto?hl=en) (aka protobuf) to define message schemas. Version `proto2` is used unless stated otherwise.
+The protocols described below all use [protocol
+buffers](https://developers.google.com/protocol-buffers/docs/proto?hl=en) (aka
+protobuf) to define message schemas.
+
+Existing protocols may use `proto2`, and continue to use them. `proto3` is
+recommended for new protocols. `proto3` is a simplification of `proto2` and
+removes some footguns. For context and a discussion around `proto3` vs `proto2`,
+see [#465](https://github.com/libp2p/specs/issues/465).
 
 - [ping][spec_ping] - Ping protocol
 - [autonat][spec_autonat] - NAT detection
@@ -78,6 +85,7 @@ The protocols described below all use [protocol buffers](https://developers.goog
 - [kademlia][spec_kademlia] - The Kademlia Distributed Hash Table (DHT) subsystem
 - [mdns][spec_mdns] - Local peer discovery with zero configuration using multicast DNS
 - [mplex][spec_mplex] - The friendly stream multiplexer
+- [yamux][spec_yamux] - Yet Another Multiplexer
 - [noise][spec_noise] - The libp2p Noise handshake
 - [plaintext][spec_plaintext] - An insecure transport for non-production usage
 - [pnet][spec_pnet] - Private networking in libp2p using pre-shared keys
@@ -90,7 +98,8 @@ The protocols described below all use [protocol buffers](https://developers.goog
   peer discovery
 - [secio][spec_secio] - SECIO, a transport security protocol for libp2p
 - [tls][spec_tls] - The libp2p TLS Handshake (TLS 1.3+)
-- [webrtc][spec_webrtc] - The libp2p WebRTC transport
+- [quic][spec_quic] - The libp2p QUIC Handshake
+- [webrtc][spec_webrtc] - The libp2p WebRTC transports
 - [WebTransport][spec_webtransport] - Using WebTransport in libp2p
 
 
@@ -122,6 +131,7 @@ you feel an issue isn't the appropriate place for your topic, please join our
 [spec_rendezvous]: ./rendezvous/README.md
 [spec_secio]: ./secio/README.md
 [spec_tls]: ./tls/tls.md
+[spec_quic]: ./quic/README.md
 [spec_peerids]: ./peer-ids/peer-ids.md
 [spec_connections]: ./connections/README.md
 [spec_plaintext]: ./plaintext/README.md
@@ -133,3 +143,4 @@ you feel an issue isn't the appropriate place for your topic, please join our
 [spec_webrtc]: ./webrtc/README.md
 [spec_webtransport]: ./webtransport/README.md
 [spec_ping]: ./ping/ping.md
+[spec_yamux]: ./yamux/README.md

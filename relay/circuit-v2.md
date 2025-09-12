@@ -2,9 +2,9 @@
 
 This is the version 2 of the libp2p Circuit Relay protocol.
 
-| Lifecycle Stage | Maturity        | Status | Latest Revision |
-|-----------------|-----------------|--------|-----------------|
-| 3A              | Recommendation  | Active | r1, 2021-12-17  |
+| Lifecycle Stage | Maturity       | Status | Latest Revision |
+| --------------- | -------------- | ------ | --------------- |
+| 3A              | Recommendation | Active | r3, 2023-02-28  |
 
 Authors: [@vyzo]
 
@@ -15,7 +15,7 @@ Interest Group: [@mxinden], [@stebalien], [@raulk]
 [@stebalien]: https://github.com/stebalien
 [@raulk]: https://github.com/raulk
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
@@ -166,6 +166,9 @@ The relayed connection flows in the `hop` stream between the
 connection initiator and the relay and in the `stop` stream between
 the relay and the connection termination point.
 
+_B_ and _A_ upgrade the relayed connection with a security protocol and a
+multiplexer, just like they would e.g. upgrade a TCP connection.
+
 ### Hop Protocol
 
 The Hop protocol governs interaction between clients and the relay;
@@ -221,7 +224,7 @@ Reservation {
 }
 ```
 
-- the `expire` field contains the expiration time as a UTC UNIX time. The reservation becomes invalid after this time and it's the responsibility of the client to refresh.
+- the `expire` field contains the expiration time as a UTC UNIX time in seconds. The reservation becomes invalid after this time and it's the responsibility of the client to refresh.
 - the `addrs` field contains all the public relay addrs, including the peer ID of the relay node but not the
   trailing `p2p-circuit` part; the client can use this list to construct its
   own `p2p-circuit` relay addrs for advertising by encapsulating
@@ -251,6 +254,16 @@ connection for the duration of any reservations and tag it to prevent
 accidental termination according to its connection management policy.
 If a relay server becomes overloaded however, it may still drop a
 connection with reservations in order to maintain its resource quotas.
+
+If more data than the limit specified in the `data` field is transferred
+over the relayed connection, or the relayed connection has been open for
+longer than `duration`, the relay should reset the stream to the source
+and the stream to the destination.
+
+If the reservation for the connection has expired then the relay may
+apply any connection management policy to the connection as normal otherwise
+it should retain the connection, unless doing so would prevent it from
+maintaining its resource quotas.
 
 ***Note: Implementations _should not_ accept reservations over already relayed connections.***
 
@@ -347,11 +360,14 @@ The voucher itself is a [Signed Envelope](../RFC/0002-signed-envelopes.md).
 The envelope domain is `libp2p-relay-rsvp` and uses the multicodec code `0x0302`.
 
 The payload of the envelope has the following form, in canonicalized protobuf format:
-```
+```protobuf
+syntax = "proto3";
 message Voucher {
-  required bytes relay = 1;
-  required bytes peer = 2;
-  required uint64 expiration = 3;
+  // These fields are marked optional for backwards compatibility with proto2.
+  // Users should make sure to always set these.
+  optional bytes relay = 1;
+  optional bytes peer = 2;
+  optional uint64 expiration = 3;
 }
 ```
 - the `relay` field is the peer ID of the relay.
@@ -363,7 +379,8 @@ The wire representation is canonicalized, where elements of the message are writ
 
 ## Protobuf
 
-```
+```protobuf
+syntax = "proto3";
 message HopMessage {
   enum Type {
     RESERVE = 0;
@@ -371,7 +388,9 @@ message HopMessage {
     STATUS = 2;
   }
 
-  required Type type = 1;
+  // This field is marked optional for backwards compatibility with proto2.
+  // Users should make sure to always set this.
+  optional Type type = 1;
 
   optional Peer peer = 2;
   optional Reservation reservation = 3;
@@ -386,7 +405,9 @@ message StopMessage {
     STATUS = 1;
   }
 
-  required Type type = 1;
+  // This field is marked optional for backwards compatibility with proto2.
+  // Users should make sure to always set this.
+  optional Type type = 1;
 
   optional Peer peer = 2;
   optional Limit limit = 3;
@@ -395,12 +416,16 @@ message StopMessage {
 }
 
 message Peer {
-  required bytes id = 1;
+  // This field is marked optional for backwards compatibility with proto2.
+  // Users should make sure to always set this.
+  optional bytes id = 1;
   repeated bytes addrs = 2;
 }
 
 message Reservation {
-  required uint64 expire = 1; // Unix expiration time (UTC)
+  // This field is marked optional for backwards compatibility with proto2.
+  // Users should make sure to always set this.
+  optional uint64 expire = 1; // Unix expiration time (UTC)
   repeated bytes addrs = 2;   // relay addrs for reserving peer
   optional bytes voucher = 3; // reservation voucher
 }
@@ -411,6 +436,8 @@ message Limit {
 }
 
 enum Status {
+  // zero value field required for proto3 compatibility
+  UNUSED                  = 0;
   OK                      = 100;
   RESERVATION_REFUSED     = 200;
   RESOURCE_LIMIT_EXCEEDED = 201;

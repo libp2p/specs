@@ -1,0 +1,16 @@
+@startuml
+participant Cli
+participant Srv
+
+skinparam sequenceMessageAlign center
+skinparam defaultFontName monospaced
+
+
+== Amplification Attack Prevention ==
+
+Cli -> Srv: [conn1: stream: dial] DialRequest:{nonce: 0xabcd, addrs: (addr1, addr2, addr3)}
+Srv -> Cli: [conn1: stream: dial] DialDataRequest:{addrIdx: 1, numBytes: 120k}
+Cli -> Srv: [conn1: stream: dial] DialDataResponse:{data: 4k bytes},DialDataResponse:{data: 4k bytes},...
+Srv -> Cli: [conn2: stream: dial-back]addr2 DialBack:{nonce: 0xabcd}
+Srv -> Cli: [conn1: stream: dial] DialResponse:{status: OK, addrIdx: 1, dialStatus: DIAL_STATUS_OK} 
+@enduml

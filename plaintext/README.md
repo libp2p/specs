@@ -19,7 +19,7 @@ Interest Group: [@raulk], [@Warchant], [@Stebalien], [@mhchia]
 [@Stebalien]: https://github.com/Stebalien
 [@mhchia]: https://github.com/mhchia
 
-See the [lifecycle document][lifecycle-spec] for context about maturity level
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
 
 [lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
@@ -55,7 +55,7 @@ process][conn-spec-conn-upgrade].
 ## Protocol Id and Version History
 
 The plaintext protocol described in this document has the protocol id of
-`/plaintext/2.0.0`. 
+`/plaintext/2.0.0`.
 
 An earlier version, `/plaintext/1.0.0`, was implemented in several languages,
 but it did not include any exchange of public keys or peer ids. This led to
@@ -84,6 +84,8 @@ The `PublicKey` message uses the same definition [specified in the peer id
 spec][peer-id-spec-pubkey-message]. For reference, it is defined as follows:
 
 ``` protobuf
+syntax = "proto2";
+
 enum KeyType {
 	RSA = 0;
 	Ed25519 = 1;
