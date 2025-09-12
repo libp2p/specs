@@ -158,33 +158,35 @@ sanitize untrusted input from remote peers to prevent display issues and potenti
 security vulnerabilities.
 
 The following sanitization steps use Unicode General Category values as defined in
-[Unicode Standard Annex #44](https://www.unicode.org/reports/tr44/#General_Category_Values).
+[Unicode Standard Annex #44](https://www.unicode.org/reports/tr44/#General_Category_Values)
+and follow guidance from [RFC 9839](https://www.rfc-editor.org/rfc/rfc9839.html) on
+handling Unicode strings.
 
 Recommended sanitization steps:
 
-1. **Remove control characters** (Unicode category `Cc`: Other, Control) -
+1. **Replace control characters** (Unicode category `Cc`: Other, Control) with `U+FFFD` (�) -
    These can cause terminal escape sequences, carriage returns, line feeds, and other
    display disruptions.
 
-2. **Remove format characters** (Unicode category `Cf`: Other, Format) -
+2. **Replace format characters** (Unicode category `Cf`: Other, Format) with `U+FFFD` (�) -
    These include RTL/LTR overrides, zero-width characters, and other formatting marks.
 
-3. **Remove private use characters** (Unicode category `Co`: Other, Private Use) -
-   These have unpredictable rendering across different systems.
-
-4. **Remove surrogate characters** (Unicode category `Cs`: Other, Surrogate) -
+3. **Replace surrogate characters** (Unicode category `Cs`: Other, Surrogate) with `U+FFFD` (�) -
    These are invalid in UTF-8 and can cause parsing errors.
 
-5. **Preserve legitimate Unicode** - Keep all other Unicode characters including:
+4. **Preserve legitimate Unicode** - Keep all other Unicode characters including:
    - Letters, numbers, and symbols from all languages
    - Emojis and other valid Unicode symbols
    - Combining marks and diacritics
+   - Private use characters (Unicode category `Co`)
 
-6. **Trim whitespace** - Remove leading and trailing whitespace after sanitization.
+5. **Trim whitespace** - Remove leading and trailing whitespace after sanitization.
 
-7. **Enforce length limits** - Limit to 128 runes (Unicode code points, not bytes)
+6. **Enforce length limits** - Limit to 128 runes (Unicode code points, not bytes)
    to prevent excessive resource consumption.
 
 Note: These sanitization steps are recommended for display purposes only. The
 protocol itself does not restrict the use of Unicode in these fields, allowing
 for international support while protecting against display-related security issues.
+Per RFC 9839, replacing problematic code points with `U+FFFD` is preferred over
+silently deleting them, as deletion is a known security risk.
