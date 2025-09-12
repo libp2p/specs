@@ -5,11 +5,11 @@
 
 | Lifecycle Stage | Maturity Level | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r1, 2021-08-09  |
+| 3A              | Recommendation | Active | r2, 2025-09-12  |
 
 Authors: [@vyzo]
 
-Interest Group: [@yusefnapora], [@tomaka], [@richardschneider], [@Stebalien], [@bigs]
+Interest Group: [@yusefnapora], [@tomaka], [@richardschneider], [@Stebalien], [@bigs], [@lidel]
 
 [@vyzo]: https://github.com/vyzo
 [@yusefnapora]: https://github.com/yusefnapora
@@ -17,6 +17,7 @@ Interest Group: [@yusefnapora], [@tomaka], [@richardschneider], [@Stebalien], [@
 [@richardschneider]: https://github.com/richardschneider
 [@Stebalien]: https://github.com/Stebalien
 [@bigs]: https://github.com/bigs
+[@lidel]: https://github.com/lidel
 
 See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
@@ -95,8 +96,10 @@ protocol families / networks.
 
 Example value: `/my-network/0.1.0`.
 
-Implementations should discard non-ASCII characters and trim the string
-to 64 characters.
+Implementations SHOULD limit the string to 128 runes (Unicode code points) when
+displaying or processing this field. When displaying in terminals, logs, or user
+interfaces, implementations SHOULD sanitize the string as described in the
+[Unicode Sanitization](#unicode-sanitization) section below.
 
 ### agentVersion
 
@@ -104,8 +107,10 @@ This is a free-form string, identifying the implementation of the peer.
 The usual format is `agent-name/version`, where `agent-name` is
 the name of the program or library and `version` is its semantic version.
 
-Implementations should discard non-ASCII characters and trim the string
-to 64 characters.
+Implementations SHOULD limit the string to 128 runes (Unicode code points) when
+displaying or processing this field. When displaying in terminals, logs, or user
+interfaces, implementations SHOULD sanitize the string as described in the
+[Unicode Sanitization](#unicode-sanitization) section below.
 
 ### publicKey
 
@@ -132,8 +137,10 @@ observable source address.
 
 This is a list of protocols supported by the peer.
 
-Implementations should discard non-ASCII characters and trim each string
-to 64 characters.
+Implementations SHOULD limit each string to 128 runes (Unicode code points) when
+displaying or processing these values. When displaying in terminals, logs, or user
+interfaces, implementations SHOULD sanitize the strings as described in the
+[Unicode Sanitization](#unicode-sanitization) section below.
 
 A node should only advertise a protocol if it's willing to receive inbound
 streams on that protocol. This is relevant for asymmetrical protocols. For
@@ -142,3 +149,42 @@ clients only support initiating requests while some servers (only) support
 responding to requests. To prevent clients from initiating requests to other
 clients, which given them being clients they fail to respond, clients should not
 advertise `foo` in their `protocols` list.
+
+## Unicode Sanitization
+
+When displaying identify protocol string fields (`protocolVersion`, `agentVersion`,
+and `protocols`) in terminals, logs, or user interfaces, implementations SHOULD
+sanitize untrusted input from remote peers to prevent display issues and potential
+security vulnerabilities.
+
+The following sanitization steps use Unicode General Category values as defined in
+[Unicode Standard Annex #44](https://www.unicode.org/reports/tr44/#General_Category_Values).
+
+Recommended sanitization steps:
+
+1. **Remove control characters** (Unicode category `Cc`: Other, Control) -
+   These can cause terminal escape sequences, carriage returns, line feeds, and other
+   display disruptions.
+
+2. **Remove format characters** (Unicode category `Cf`: Other, Format) -
+   These include RTL/LTR overrides, zero-width characters, and other formatting marks.
+
+3. **Remove private use characters** (Unicode category `Co`: Other, Private Use) -
+   These have unpredictable rendering across different systems.
+
+4. **Remove surrogate characters** (Unicode category `Cs`: Other, Surrogate) -
+   These are invalid in UTF-8 and can cause parsing errors.
+
+5. **Preserve legitimate Unicode** - Keep all other Unicode characters including:
+   - Letters, numbers, and symbols from all languages
+   - Emojis and other valid Unicode symbols
+   - Combining marks and diacritics
+
+6. **Trim whitespace** - Remove leading and trailing whitespace after sanitization.
+
+7. **Enforce length limits** - Limit to 128 runes (Unicode code points, not bytes)
+   to prevent excessive resource consumption.
+
+Note: These sanitization steps are recommended for display purposes only. The
+protocol itself does not restrict the use of Unicode in these fields, allowing
+for international support while protecting against display-related security issues.
