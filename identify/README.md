@@ -96,7 +96,7 @@ protocol families / networks.
 
 Example value: `/my-network/0.1.0`.
 
-Implementations SHOULD limit the string to 128 runes (Unicode code points) when
+Implementations SHOULD limit the string to 128 Unicode code points when
 displaying or processing this field. When displaying in terminals, logs, or user
 interfaces, implementations SHOULD sanitize the string as described in the
 [Unicode Sanitization](#unicode-sanitization) section below.
@@ -107,7 +107,7 @@ This is a free-form string, identifying the implementation of the peer.
 The usual format is `agent-name/version`, where `agent-name` is
 the name of the program or library and `version` is its semantic version.
 
-Implementations SHOULD limit the string to 128 runes (Unicode code points) when
+Implementations SHOULD limit the string to 128 Unicode code points when
 displaying or processing this field. When displaying in terminals, logs, or user
 interfaces, implementations SHOULD sanitize the string as described in the
 [Unicode Sanitization](#unicode-sanitization) section below.
@@ -137,7 +137,7 @@ observable source address.
 
 This is a list of protocols supported by the peer.
 
-Implementations SHOULD limit each string to 128 runes (Unicode code points) when
+Implementations SHOULD limit each string to 128 Unicode code points when
 displaying or processing these values. When displaying in terminals, logs, or user
 interfaces, implementations SHOULD sanitize the strings as described in the
 [Unicode Sanitization](#unicode-sanitization) section below.
@@ -180,7 +180,7 @@ Recommended sanitization steps:
    - Combining marks and diacritics
    - Private use characters (Unicode category `Co`)
 
-5. **Enforce length limits** - Limit to 128 runes (Unicode code points, not bytes)
+5. **Enforce length limits** - Limit to 128 Unicode code points (not bytes)
    to prevent excessive resource consumption.
 
 Note: These sanitization steps are recommended for display purposes only. The
