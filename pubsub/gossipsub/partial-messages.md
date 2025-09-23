@@ -102,13 +102,6 @@ A later `PartialIWANT` serve to refine the request of prior a prior `PartialIWAN
 
 Nodes SHOULD assume a `PartialIWANT` implies a `IDONTWANT` for the full message.
 
-### PartialIDONTWANT
-
-PartialIDONTWANT serves to cancel any and all pending `PartialIWANTs`.
-
-Implementations SHOULD NOT send a `PartialIHAVE` to a peer with parts that the
-peer has previously signaled disinterest for with a `PartialIDONTWANT`.
-
 ### PartialIHAVE
 
 A `PartialIHAVE` allows nodes to signal HAVE information before receiving all
@@ -129,6 +122,9 @@ that represents the parts the sender has.
 
 Implementations are free to select when to send an update to their peers based
 on signaling bandwidth tradeoff considerations.
+
+Receivers MUST treat a `PartialIHAVE` as a signal that the peer does not want
+the indicated part.
 
 ## Application Interface
 
@@ -162,8 +158,7 @@ message PartialMessagesExtension {
 
   optional PartialMessage message = 3;
   optional PartialIWANT iwant = 4;
-  optional PartialIDONTWANT idontwant = 5;
-  optional PartialIHAVE ihave = 6;
+  optional PartialIHAVE ihave = 5;
 }
 
 message PartialMessage {
@@ -173,8 +168,6 @@ message PartialMessage {
 message PartialIWANT {
   optional bytes metadata = 1;
 }
-
-message PartialIDONTWANT {}
 
 message PartialIHAVE {
   optional bytes metadata = 1;
