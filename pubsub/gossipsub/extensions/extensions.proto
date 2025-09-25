@@ -25,6 +25,11 @@ message RPC {
   message SubOpts {
     optional bool subscribe = 1; // subscribe or unsubcribe
     optional string topicid = 2;
+
+    // Used with Partial Messages extension.
+    // If set, the receiver of this message MUST send partial messages to the
+    // sender instead of full messages.
+    optional bool partial = 3;
   }
 
   repeated SubOpts subscriptions = 1;
@@ -40,4 +45,25 @@ message RPC {
   optional TestExtension testExtension = 6492434;
 
   optional PartialMessagesExtension partial = 16418754;
+}
+
+message PartialMessagesExtension {
+  optional bytes topicID = 1;
+  optional bytes groupID = 2;
+
+  optional PartialMessage message = 3;
+  optional PartialIWANT iwant = 4;
+  optional PartialIHAVE ihave = 5;
+}
+
+message PartialMessage {
+  optional bytes data = 1;
+}
+
+message PartialIWANT {
+  optional bytes metadata = 1;
+}
+
+message PartialIHAVE {
+  optional bytes metadata = 1;
 }

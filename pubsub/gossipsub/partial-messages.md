@@ -126,6 +126,22 @@ on signaling bandwidth tradeoff considerations.
 Receivers MUST treat a `PartialIHAVE` as a signal that the peer does not want
 the indicated part.
 
+### Changes to `SubOpts` and interaction with the existing Gossipsub mesh.
+
+Partial Messages uses the same mesh as normal Gossipsub messages. It is a
+replacement to "full" messages. A node requests a peer to use partial messages
+for a specific topic by setting the `partial` field in the `SubOpts` message.
+The `SubOpts` message is how a peer subscribes to a topic.
+
+If a node receives a subscribe request with the `partial` field set to true, it
+MUST send partial messages instead of full messages.
+
+It is an error to set the partial field true if the peer does not support
+partial extensions.
+
+The partial field value MUST be ignored when a peer sends an unsubscribe message
+`SubOpts.subscribe=false`.
+
 ## Application Interface
 
 Message contents are application defined. Thus splitting a message must be
@@ -149,31 +165,7 @@ provide.
 
 ## Protobuf
 
-```protobuf
-syntax = "proto2";
-
-message PartialMessagesExtension {
-  optional bytes topicID = 1;
-  optional bytes groupID = 2;
-
-  optional PartialMessage message = 3;
-  optional PartialIWANT iwant = 4;
-  optional PartialIHAVE ihave = 5;
-}
-
-message PartialMessage {
-  optional bytes data = 1;
-}
-
-message PartialIWANT {
-  optional bytes metadata = 1;
-}
-
-message PartialIHAVE {
-  optional bytes metadata = 1;
-}
-
-```
+Refer to the protobuf registry at `./extensions/extensions.proto`
 
 ## Open Questions
 
