@@ -80,51 +80,27 @@ then partial messages would be the same as smaller messages.
 
 The following section specifies the semantics of each new protocol message.
 
-### PartialIWANT
+### partialMessage
 
-A `PartialIWANT` signal to a receiver that the sending peer only wants a part of
-some message.
+The `partialMessage` field encodes one or more parts of the full message. The
+encoding is application defined.
 
-The message to which the peer is requesting a part of is identified by the
-`groupID` identifier. This is similar to a complete message's `MessageID`, but,
-in contrast to a content-based message id, does not require the full message to
-compute. For example, in the Ethereum use case, this could simply be the hash of
-the signed block header.
+### partsMetadata
 
-The `topicID` references the Gossipsub topic a message, and thus its parts,
-belong to.
+The `partsMetadata` field encodes the parts a peer has and wants. The encoding
+is application defined. An unset value carries no information besides that the
+peer did not send a value.
 
-The `metadata` field is opaque application defined metadata associated with this
-request. This can be a bitmap, a list of ranges, or a bloom filter. The
-application generates this and consumes this.
+Upon receiving a `partsMetadata` a node SHOULD respond with only parts the peer
+wants.
 
-A later `PartialIWANT` serve to refine the request of prior a prior `PartialIWANT`.
+A later `partsMetadata` replaces a prior one.
 
-Nodes SHOULD assume a `PartialIWANT` implies a `IDONTWANT` for the full message.
-
-### PartialIHAVE
-
-A `PartialIHAVE` allows nodes to signal HAVE information before receiving all
-segments, unlocking the use of `PartialIWANT` in more contexts.
-
-In the context of partial messages, it is more useful than IHAVE as it includes
-the group ID. In contrast, an IHAVE does not. A receiving peer has no way to
-link an IHAVE's message ID with a group ID, without having the full message.
-
-A `PartialIHAVE` message can be used both in the context of lazy push, notifying
-peers about available parts, and in the context of heartbeats as a replacement
-to IHAVEs.
-
-The structure of `PartialIHAVE` is analogous to that of `PartialIWANT`.
-
-The metadata, as in a `PartialIWANT`, is application defined. It is some encoding
-that represents the parts the sender has.
+`partsMetadata` can be used during heartbeat gossip to inform non-mesh topic
+peers about parts this node has.
 
 Implementations are free to select when to send an update to their peers based
 on signaling bandwidth tradeoff considerations.
-
-Receivers MUST treat a `PartialIHAVE` as a signal that the peer does not want
-the indicated part.
 
 ### Changes to `SubOpts` and interaction with the existing Gossipsub mesh.
 
@@ -144,24 +120,23 @@ The partial field value MUST be ignored when a peer sends an unsubscribe message
 
 ## Application Interface
 
-Message contents are application defined. Thus splitting a message must be
+This specific interface is not intended to be normative to implementations, it
+is only an example of one possible API.
+
+Message contents are application defined, thus splitting a message must be
 application defined. Applications should provide a Partial Message type that
 supports the following operations:
 
 1. `.GroupID() -> GroupID: bytes`
-2. `.PartialMessageBytesFromMetadata(metadata: bytes) -> Result<(EncodedPartialMessage: bytes, metadata: bytes), Error>` (When responding to a `PartialIWANT` or eagerly pushing a partial message)
-  a. The returned metadata represents the still missing parts. For example, if a
-     peer is only able to fulfill a part of the the request, the returned
-     metadata represents the parts it couldn't fulfill.
-3. `.ExtendFromEncodedPartialMessage(data: bytes) -> Result<(), Error>` (When receiving a `PartialMessage`)
-4. `.MissingParts() -> Result<metadata: bytes, Error>` (For `PartialIWANT`)
-5. `.AvailableParts() -> Result<metadata: bytes, Error>` (For `PartialIHAVE`)
+2. `.PartialMessageBytes(partsMetadata: bytes) -> Result<(EncodedPartialMessage: bytes, newPartsMetadata: bytes), Error>`
+  a. The method should return an encoded partial message with just the parts the
+     peer requested.
+  b. The returned `newPartsMetadata` can be used to track parts that could not
+     be fulfilled. This allows the GossipSub library to avoid sending duplicate
+     parts to the same peer.
+3. `.PartsMetadata() -> bytes`
 
 Gossipsub in turn provides a `.PublishPartial(PartialMessage)` method.
-
-Note that this specific interface is not intended to be normative to
-implementations, rather, it is high level summary of what each layer should
-provide.
 
 ## Protobuf
 

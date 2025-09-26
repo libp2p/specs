@@ -51,19 +51,9 @@ message PartialMessagesExtension {
   optional bytes topicID = 1;
   optional bytes groupID = 2;
 
-  optional PartialMessage message = 3;
-  optional PartialIWANT iwant = 4;
-  optional PartialIHAVE ihave = 5;
-}
+  // An encoded partial message
+  optional bytes partialMessage = 3;
 
-message PartialMessage {
-  optional bytes data = 1;
-}
-
-message PartialIWANT {
-  optional bytes metadata = 1;
-}
-
-message PartialIHAVE {
-  optional bytes metadata = 1;
+  // An encoded representation of the parts a peer has and wants.
+  optional bytes partsMetadata = 4;
 }
