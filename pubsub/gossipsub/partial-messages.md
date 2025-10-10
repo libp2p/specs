@@ -109,11 +109,12 @@ replacement to "full" messages. A node requests a peer to use partial messages
 for a specific topic by setting the `partial` field in the `SubOpts` message.
 The `SubOpts` message is how a peer subscribes to a topic.
 
-If a node receives a subscribe request with the `partial` field set to true, it
-MUST send partial messages instead of full messages.
+If a node receives a subscribe request with the `partial` field set to true, and
+it supports the partial message extension, it MUST send partial messages instead
+of full messages.
 
-It is an error to set the partial field true if the peer does not support
-partial extensions.
+If a node does not support the partial message extension, it MUST ignore the
+`partial` field. This is the default behavior of protobuf parsers.
 
 The partial field value MUST be ignored when a peer sends an unsubscribe message
 `SubOpts.subscribe=false`.
