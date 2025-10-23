@@ -104,20 +104,53 @@ on signaling bandwidth tradeoff considerations.
 
 ### Changes to `SubOpts` and interaction with the existing Gossipsub mesh.
 
-Partial Messages uses the same mesh as normal Gossipsub messages. It is a
-replacement to "full" messages. A node requests a peer to use partial messages
-for a specific topic by setting the `partial` field in the `SubOpts` message.
 The `SubOpts` message is how a peer subscribes to a topic.
 
-If a node receives a subscribe request with the `partial` field set to true, and
-it supports the partial message extension, it MUST send partial messages instead
-of full messages.
+Partial Messages uses the same mesh as normal Gossipsub messages. It is a
+replacement to "full" messages. A node requests a peer to send partial messages
+for a specific topic by setting the `requestsPartial` field in the `SubOpts`
+message to true. A node signals support for sending partial messages on a given
+topic by setting the `supportsSendingPartial` field in `SubOpts` to true. A node can
+support sending partial messages without wanting to receive them.
+
+If a node requests partial messages, it MUST support sending partial messages.
+
+A node uses a peer's `supportsSendingPartial` setting to know if it can send a
+partial message request to a peer. It uses its `requestsPartial` setting to know
+whether to send send the peer a full message or a partial message.
+
+If a peer supports partial messages on a topic but did not request them, a node
+MUST omit the `partialMessage` field of the `PartialMessagesExtension` message.
 
 If a node does not support the partial message extension, it MUST ignore the
-`partial` field. This is the default behavior of protobuf parsers.
+`requestPartial` and `supportsPartial` fields. This is the default behavior of
+protobuf parsers.
 
-The partial field value MUST be ignored when a peer sends an unsubscribe message
-`SubOpts.subscribe=false`.
+The `requestPartial` and `supportsPartial` fields value MUST be ignored when a
+peer sends an unsubscribe message `SubOpts.subscribe=false`.
+
+#### Behavior table
+
+The following table describes the expected behavior of receiver of a `SubOpts`
+message for a given topic.
+
+| SubOpts.requestsPartial | behavior of receiver that supports partial messages for the topic                                 |
+| ------------------------ | ------------------------------------------------------------------------------------------------- |
+| true                     | The receiver SHOULD send partial messages (data and metadata) to this peer.                       |
+| false                    | receiver MUST NOT send partial message data to this peer. The receiver SHOULD send full messages. |
+
+| SubOpts.requestsPartial | behavior of receiver that does not support partial messages for the topic |
+| ------------------------ | ------------------------------------------------------------------------- |
+| \*                       | The receiver SHOULD send full messages.                                   |
+
+| SubOpts.supportsSendingPartial | behavior of receiver that requested partial messages for the topic                                               |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| true                     | The receiver expects the peer to respond to partial message requests, and receive `partsMetadata` from the peer. |
+| false                    | The receiver expects full messages.                                                                              |
+
+| SubOpts.supportsSendingPartial | behavior of receiver that did not request partial messages for the topic |
+| ------------------------ | ------------------------------------------------------------------------ |
+| \*                       | The receiver expects full messages                                       |
 
 ## Application Interface
 

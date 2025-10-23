@@ -25,9 +25,13 @@ message RPC {
     optional string topicid = 2;
 
     // Used with Partial Messages extension.
-    // If set, the receiver of this message MUST send partial messages to the
-    // sender instead of full messages.
-    optional bool partial = 3;
+    // If set to true, signals to the receiver that the sender prefers partial
+    // messages.
+    optional bool requestsPartial = 3;
+    // If set to true, signals to the receiver that the sender supports sending
+    // partial messages on this topic. If requestsPartial is true, this is
+    // assumed to be true.
+    optional bool supportsSendingPartial = 4;
   }
 
   repeated SubOpts subscriptions = 1;
