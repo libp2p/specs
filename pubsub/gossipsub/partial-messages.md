@@ -56,6 +56,7 @@ node has all but one cell, this would result in a transfer of 2KiB rather than
 per slot is around 500KiB.
 
 Later, partial messages could enable further optimizations:
+
 - If cells can be validated individually, as in the case of DAS, partial
   messages could also be forwarded, allowing us to reduce the store-and-forward
   delay [2].
@@ -74,7 +75,6 @@ are referenced is application defined.
 
 If, in some application, a group only ever contained a single partial message,
 then partial messages would be the same as smaller messages.
-
 
 ## Protocol Messages
 
@@ -130,11 +130,11 @@ supports the following operations:
 
 1. `.GroupID() -> GroupID: bytes`
 2. `.PartialMessageBytes(partsMetadata: bytes) -> Result<(EncodedPartialMessage: bytes, newPartsMetadata: bytes), Error>`
-  a. The method should return an encoded partial message with just the parts the
-     peer requested.
-  b. The returned `newPartsMetadata` can be used to track parts that could not
-     be fulfilled. This allows the GossipSub library to avoid sending duplicate
-     parts to the same peer.
+   1. The method should return an encoded partial message with just the parts the
+      peer requested.
+   2. The returned `newPartsMetadata` can be used to track parts that could not
+      be fulfilled. This allows the GossipSub library to avoid sending duplicate
+      parts to the same peer.
 3. `.PartsMetadata() -> bytes`
 
 Gossipsub in turn provides a `.PublishPartial(PartialMessage)` method.
