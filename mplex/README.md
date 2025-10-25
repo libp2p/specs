@@ -107,9 +107,8 @@ To close a stream, send a message with a zero length body and a `CloseReceiver` 
 
 ### Resetting a stream
 
-To immediately close a stream for both reading and writing, use reset. This should generally only be used on error; during normal operation, both sides should close instead.
-
-To reset a stream, send a message with a zero length body and a `ResetReceiver` (5) or `ResetInitiator` (6) flag. Reset must immediately close both ends of the stream for both reading and writing. Writing to a stream after it has been reset is a protocol violation. Since reset is generally sent when an error happens, all future reads from a reset stream should return an error (*not* EOF).
+To reset a stream, send a message with a zero length body and a `ResetReceiver` (5) or `ResetInitiator` (6) flag.
+See [stream resets](../connections/README.md#resets) for a detailed behaviour description.
 
 ## Implementation notes
 
