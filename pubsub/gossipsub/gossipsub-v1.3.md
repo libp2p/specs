@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity                 | Status | Latest Revision |
 | --------------- | ------------------------ | ------ | --------------- |
-| 3A              | Candidate Recommendation | Active | r0, 2025-06-23  |
+| 2A              | Candidate Recommendation | Active | r0, 2025-06-23  |
 
 Authors: [@marcopolo]
 
