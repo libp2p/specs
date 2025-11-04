@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity                 | Status | Latest Revision |
 |-----------------|--------------------------|--------|-----------------|
-| 3A              | Recommendation           | Active | r0, 2024-10-23  |
+| 3A              | Recommendation           | Active | r1, 2024-10-23  |
 
 Authors: [@achingbrain]
 
@@ -50,9 +50,41 @@ WebSockets have no built in authentication mechanism. Server-side processes list
 
 ## Encryption
 
-At the time of writing, the negotiated authentication mechanism should also be used to encrypt all traffic sent over the WebSocket even if TLS certificates are also used at the transport layer.
+Server-side processes listening on WebSocket addresses should use TLS certificates to secure transmitted data at the transport level.
 
-A mechanism to avoid this but also maintain backwards compatibility with existing server-side processes will be specified in a future revision to this spec.
+This does not provide any assurance that the remote peer possesses the private key that corresponds to their public key, so an additional handshake is necessary.
+
+During connection establishment over WebSockets, before the connection is made available to the rest of the application, if all of the following criteria are met:
+
+1. `noise` is negotiated as the connection encryption protocol
+1. An initial handshake is performed with:
+    1. the `handshake_only` boolean extension set to true
+    1. a `tls_common_name` extension value that matches the domain name being connected to
+1. The transport layer is secured by TLS
+
+Then all subsequent data is sent without encrypting it at the libp2p level, instead relying on TLS encryption at the transport layer.
+
+If this is the case, the server MUST complete the handshake before reading or sending any application data, and MUST abort the connection if the handshake fails.
+
+If any of the above is not true, all data is encrypted with the negotiated connection encryption method before sending.
+
+This prevents double-encryption but only when both ends opt-in to ensure backwards compatibility with existing deployments.
+
+Note that by opting-in to single encryption, peers are also opting-in to trusting the [CA](https://en.wikipedia.org/wiki/Certificate_authority) system.
+
+### MITM mitigation
+
+The TLS certificate used should be signed by a trusted certificate authority, the host name should correspond to the common name contained within the certificate, and the domain being connected to should match the common name sent as part of the noise handshake.
+
+This requires trusting the certificate authority to issue correct certificates, but is necessary due to limitations of certain user agents, namely web browsers which do not allow use of self-signed certificates that could be otherwise be verified via preshared certificate fingerprints.
+
+### Security Considerations
+
+Protection against man-in-the-middle (MITM) type attacks is through Web [PKI](https://en.wikipedia.org/wiki/Public_key_infrastructure). If the client is in an environment where Web PKI can not be fully trusted (e.g. an enterprise network with a custom enterprise root CA installed on the client), then this authentication scheme can not protect the client from a MITM attack.
+
+This authentication scheme is also not secure in cases where you do not own your domain name or the certificate. If someone else can get a valid certificate for your domain, you may be vulnerable to a MITM attack.
+
+Another solution would be to use Keying Material Exporters [RFC 5705](https://www.rfc-editor.org/info/rfc5705) which would remove the need to add data to the noise handshake, however whether this would be exposed as part of browser APIs is unclear at this point.
 
 ## Addressing
 
