@@ -5,11 +5,11 @@
 
 | Lifecycle Stage | Maturity Level | Status | Latest Revision |
 |-----------------|----------------|--------|-----------------|
-| 3A              | Recommendation | Active | r1, 2021-08-09  |
+| 3A              | Recommendation | Active | r2, 2023-01-03  |
 
 Authors: [@vyzo]
 
-Interest Group: [@yusefnapora], [@tomaka], [@richardschneider], [@Stebalien], [@bigs]
+Interest Group: [@yusefnapora], [@tomaka], [@richardschneider], [@Stebalien], [@bigs], [@marten-seemann]
 
 [@vyzo]: https://github.com/vyzo
 [@yusefnapora]: https://github.com/yusefnapora
@@ -17,6 +17,7 @@ Interest Group: [@yusefnapora], [@tomaka], [@richardschneider], [@Stebalien], [@
 [@richardschneider]: https://github.com/richardschneider
 [@Stebalien]: https://github.com/Stebalien
 [@bigs]: https://github.com/bigs
+[@marten-seemann]: https://github.com/marten-seemann
 
 See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
@@ -31,6 +32,7 @@ and spec status.
         - [`identify`](#identify)
         - [`identify/push`](#identifypush)
     - [The Identify Message](#the-identify-message)
+        - [sequence](#sequence)
         - [protocolVersion](#protocolversion)
         - [agentVersion](#agentversion)
         - [publicKey](#publickey)
@@ -75,6 +77,7 @@ whose values have changed.
 ```protobuf
 syntax = "proto2";
 message Identify {
+  optional uint64 sequence = 7;
   optional string protocolVersion = 5;
   optional string agentVersion = 6;
   optional bytes publicKey = 1;
@@ -83,6 +86,17 @@ message Identify {
   repeated string protocols = 3;
 }
 ```
+
+### sequence
+
+A sequence number for this identify message used to deal with reordered Identify
+messages. Senders SHOULD increment the sequence number for every Identify message
+they send. After processing an Identify with a certain sequence number, receivers
+MUST ignore all Identify messages with smaller sequence numbers.
+
+To avoid persisting state across restarts, implementations MAY use unix
+epoch time as the `seq` value, however receivers MUST NOT attempt to interpret the
+sequence number value as a valid timestamp.
 
 ### protocolVersion
 
