@@ -1,13 +1,13 @@
 syntax = "proto2";
 
 message ControlExtensions {
-  // Initially empty. Future canonical extensions will be added here along with
-  // a reference to their specification.
+    optional bool partialMessages = 10;
 
   // Experimental extensions must use field numbers larger than 0x200000 to be
   // encoded with at least 4 bytes
 
   optional bool testExtension = 6492434;
+
 }
 
 message ControlMessage {
@@ -23,6 +23,15 @@ message RPC {
   message SubOpts {
     optional bool subscribe = 1; // subscribe or unsubcribe
     optional string topicid = 2;
+
+    // Used with Partial Messages extension.
+    // If set to true, signals to the receiver that the sender prefers partial
+    // messages.
+    optional bool requestsPartial = 3;
+    // If set to true, signals to the receiver that the sender supports sending
+    // partial messages on this topic. If requestsPartial is true, this is
+    // assumed to be true.
+    optional bool supportsSendingPartial = 4;
   }
 
   repeated SubOpts subscriptions = 1;
@@ -30,10 +39,23 @@ message RPC {
   optional ControlMessage control = 3;
 
   // Canonical Extensions should register their messages here.
+  optional PartialMessagesExtension partial = 10;
 
   // Experimental Extensions should register their messages here. They
   // must use field numbers larger than 0x200000 to be encoded with at least 4
   // bytes
 
   optional TestExtension testExtension = 6492434;
+
+}
+
+message PartialMessagesExtension {
+  optional bytes topicID = 1;
+  optional bytes groupID = 2;
+
+  // An encoded partial message
+  optional bytes partialMessage = 3;
+
+  // An encoded representation of the parts a peer has and wants.
+  optional bytes partsMetadata = 4;
 }
