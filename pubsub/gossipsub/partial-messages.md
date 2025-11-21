@@ -186,6 +186,39 @@ parts or forwarding the message. Both are done with `.PublishPartial`.
 Gossipsub MUST forward all messages to the application, not just messages from
 peers.
 
+## Upgrading a topic to use partial messages
+
+Rolling out partial messages on an existing topic allows for incremental
+migration with backwards compatibility. The steps are as follows:
+
+1. Deploy nodes that support partial messages, but do not request them for the
+   target topic. The goal is to seed support for partial messages before making
+   the switch. Nodes signal their support for partial messages by setting the
+   subscribe option `supportsSendingPartial` to true.
+2. Slowly deploy and monitor nodes that request (and implicitly support) partial
+   messages. These nodes should find peers that send them partial messages from
+   the previous step. Nodes request partial messages by setting the subscribe
+   option `requestPartial` to true.
+
+### Supporting both full and partial messages for a topic
+
+Partial messages use the same mesh as "full" messages. Supporting both is
+straightforward. If a peer subscribes to a topic with a "requestPartial", the
+node SHOULD send the peer partial messages. Otherwise, send the node full
+messages.
+
+On the receiving side, if the node is in a mixed network of partial and full
+messages, and it requests partial messages, the node MUST support receiving full
+messages.
+
+## Creating a topic to only use partial messages
+
+There is currently no mechanism to specify a topic should only be used for
+partial messages. A future extension may define this.
+
+With this extension nodes can choose to only graft peers that support partial
+messages, and prune those that do not.
+
 ## Protobuf
 
 Refer to the protobuf registry at `./extensions/extensions.proto`
