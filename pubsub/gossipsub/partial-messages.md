@@ -170,7 +170,21 @@ supports the following operations:
       parts to the same peer.
 3. `.PartsMetadata() -> bytes`
 
-Gossipsub in turn provides a `.PublishPartial(PartialMessage)` method.
+Gossipsub in turn provides a `.PublishPartial(PartialMessage, PartialPublishOptions)` method.
+
+The `PartialPublishOptions` contains:
+
+1. Any eager data that should be pushed to peers who haven't sent us a bitmap yet.
+2. An optional list of peers to publish to instead of the topic mesh peers.
+    1. This is useful for responding to peers who are not in the node's mesh, but
+      sent the node a PartialMessage (e.g similar to Gossipsub's `IHAVE`)
+
+When Gossipsub receives a partial message it MUST forward it to the application.
+The application decides if it should act on the message by either requesting
+parts or forwarding the message. Both are done with `.PublishPartial`.
+
+Gossipsub MUST forward all messages to the application, not just messages from
+peers.
 
 ## Protobuf
 
