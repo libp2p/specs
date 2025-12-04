@@ -1,0 +1,4 @@
+start_range,end_range,name
+0,          0,        No error code
+1,          0xfff,    Transport errors
+0x1000,     0xffff,   libp2p
