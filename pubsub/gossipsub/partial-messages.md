@@ -162,19 +162,16 @@ application defined. Applications should provide a Partial Message type that
 supports the following operations:
 
 1. `.GroupID() -> GroupID: bytes`
-2. `.PartialMessageBytes(partsMetadata: bytes) -> Result<(EncodedPartialMessage: bytes, newPartsMetadata: bytes), Error>`
+2. `.PartialMessageBytes(partsMetadata: bytes) -> Result<(EncodedPartialMessage: bytes), Error>`
    1. The method should return an encoded partial message with just the parts the
       peer requested.
-   2. The returned `newPartsMetadata` can be used to track parts that could not
-      be fulfilled. This allows the GossipSub library to avoid sending duplicate
-      parts to the same peer.
 3. `.PartsMetadata() -> bytes`
 
 Gossipsub in turn provides a `.PublishPartial(PartialMessage, PartialPublishOptions)` method.
 
 The `PartialPublishOptions` contains:
 
-1. Any eager data that should be pushed to peers who haven't sent us a bitmap yet.
+1. Optional eager data that should be pushed to peers who haven't sent us a bitmap yet.
 2. An optional list of peers to publish to instead of the topic mesh peers.
     1. This is useful for responding to peers who are not in the node's mesh, but
       sent the node a PartialMessage (e.g similar to Gossipsub's `IHAVE`)
