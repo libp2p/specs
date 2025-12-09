@@ -188,9 +188,7 @@ supports the following operations:
       receiving the encoded partial message.
 4. `.PartsMetadata() -> bytes`: The parts this partial message has.
 
-Gossipsub in turn provides a `.PublishPartial(PartialMessage, PartialPublishOptions)` method.
-
-The `PartialPublishOptions` contains:
+Gossipsub in turn provides a `.PublishPartial(PartialMessage)` method.
 
 When Gossipsub receives a partial message it MUST forward it to the application.
 The application decides if it should act on the message by either requesting
@@ -198,6 +196,15 @@ parts or forwarding the message. Both are done with `.PublishPartial`.
 
 Gossipsub MUST forward all messages to the application, not just messages from
 mesh peers.
+
+### Fanout and Gossip messages
+
+Fanout and Gossip messages by definition come from non-mesh peers. Partial
+messages, without eager data, requires an exchange of bitmaps before parts are
+transferred. In order for fanout and gossip messages to be useful, the Gossipsub
+implementation SHOULD include the peers that sent them in the list of peers to
+publish partial messages to. This allows the application to simply call
+`PublishPartial` to respond to both mesh and non mesh peers.
 
 ## Upgrading a topic to use partial messages
 
