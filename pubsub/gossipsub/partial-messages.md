@@ -181,7 +181,7 @@ The application decides if it should act on the message by either requesting
 parts or forwarding the message. Both are done with `.PublishPartial`.
 
 Gossipsub MUST forward all messages to the application, not just messages from
-peers.
+mesh peers.
 
 ## Upgrading a topic to use partial messages
 
