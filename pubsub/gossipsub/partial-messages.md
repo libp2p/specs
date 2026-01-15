@@ -182,16 +182,15 @@ supports the following operations:
 2. `.PartialMessageBytes(partsMetadata: bytes) -> Result<(EncodedPartialMessage: bytes), Error>`
    1. The method should return an encoded partial message with just the parts the
       peer requested.
-3. `.PartsMetadata() -> bytes`
+3. `.EagerPartialMessageBytes() -> Result<(EncodedPartialMessage: bytes, partsMetadata: bytes), Error>`
+   1. The method should return an encoded partial message of eager data that
+      should be sent, along with the partsMetadata a peer would have after
+      receiving the encoded partial message.
+4. `.PartsMetadata() -> bytes`: The parts this partial message has.
 
 Gossipsub in turn provides a `.PublishPartial(PartialMessage, PartialPublishOptions)` method.
 
 The `PartialPublishOptions` contains:
-
-1. Optional eager data that should be pushed to peers who haven't sent us a bitmap yet.
-2. An optional list of peers to publish to instead of the topic mesh peers.
-    1. This is useful for responding to peers who are not in the node's mesh, but
-      sent the node a PartialMessage (e.g similar to Gossipsub's `IHAVE`)
 
 When Gossipsub receives a partial message it MUST forward it to the application.
 The application decides if it should act on the message by either requesting
