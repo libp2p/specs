@@ -152,6 +152,23 @@ message for a given topic.
 | ------------------------ | ------------------------------------------------------------------------ |
 | \*                       | The receiver expects full messages                                       |
 
+
+## Partial Message Gossip
+
+Partial Messages can replace Gossipsub's IHAVE/IWANT with a message that
+provides more context (via the Group ID) and allows for partial responses.
+
+When Gossiping, a node that supports partial messages SHOULD NOT send an `IHAVE`
+to a peer that requested partial messages. The node SHOULD send a partial message
+instead.
+
+### Reacting to `IHAVE`
+
+If a node requests partial messages and is connected to partial message capable
+peers, it MAY prefer to delay reacting to a peer's `IHAVE` message in order to
+give the opportunity for a partial message request to finish and provide the
+missing message more efficiently.
+
 ## Application Interface
 
 This specific interface is not intended to be normative to implementations, it
