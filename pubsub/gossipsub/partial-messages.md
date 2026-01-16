@@ -169,10 +169,40 @@ peers, it MAY prefer to delay reacting to a peer's `IHAVE` message in order to
 give the opportunity for a partial message request to finish and provide the
 missing message more efficiently.
 
-## Application Interface
+## Implementation Recommendations
 
-This specific interface is not intended to be normative to implementations, it
-is only an example of one possible API.
+The following section is not intended to be normative, it is only meant to
+provide rough recommendations to implementations.
+
+### Sending `partsMetadata`
+
+Implementations should send their `partsMetadata` whenever it changes. The goal
+being to provide an up-to-date view of its parts to its peers. Implementations
+should not send duplicate `partsMetadata` to peers when nothing has changed.
+
+If a node has previously sent a peer its `partsMetadata`, and that peer has
+responded with parts, the node can assume the peer's view of itself is the union
+of the its previously sent `partsMetadata `and the remote peer's
+`partsMetadata`. The node does not need to send this peer its updated
+`partsMetadata` if its `partsMetadata` has not changed since the previously sent
+`partsMetadata`.
+
+On the other side, when a node responds to a peer's request for parts, it should
+update the peer's `partsMetadata` with the union of its `partsMetadata` and the
+peers `partsMetadata`.
+
+Due to the distributed nature of peers, this might result in a period of time
+where a peer's `partsMetadata` is not exactly correct, but it should become
+eventually consistent.
+
+### Merging Eager Data with a peer's `partsMetadata`.
+
+When eagerly sending data, a node should track which parts it has sent to the
+peer in order to update its view of the peer's `partsMetadata`. This allows the
+node to avoid sending duplicate data in the case that a peer concurrently sends
+a `partsMetadata` that requests data already eagerly sent.
+
+### Example Application Interface
 
 Message contents are application defined, thus splitting a message must be
 application defined. Applications should provide a Partial Message type that
@@ -188,7 +218,10 @@ supports the following operations:
       receiving the encoded partial message.
 4. `.PartsMetadata() -> bytes`: The parts this partial message has.
 
-Gossipsub in turn provides a `.PublishPartial(PartialMessage)` method.
+Gossipsub in turn provides a `.PublishPartial(PartialMessage)` method. This
+method should be idempotent. The application should be able to call it multiple
+times, and the library should make sure not to send redundant or duplicate
+messages to peers.
 
 When Gossipsub receives a partial message it MUST forward it to the application.
 The application decides if it should act on the message by either requesting
