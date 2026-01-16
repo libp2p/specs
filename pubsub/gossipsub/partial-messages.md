@@ -78,7 +78,8 @@ then partial messages would be the same as smaller messages.
 
 ## Protocol Messages
 
-The following section specifies the semantics of each new protocol message.
+The following section specifies the semantics of each field in the protocol
+message.
 
 ### partialMessage
 
@@ -117,10 +118,12 @@ If a node requests partial messages, it MUST support sending partial messages.
 
 A node uses a peer's `supportsSendingPartial` setting to know if it can send a
 partial message request to a peer. It uses its `requestsPartial` setting to know
-whether to send send the peer a full message or a partial message.
+whether to send the peer a full message or a partial message.
 
 If a peer supports partial messages on a topic but did not request them, a node
-MUST omit the `partialMessage` field of the `PartialMessagesExtension` message.
+MUST omit the `partialMessage` field of the `PartialMessagesExtension` message
+when sending a message to this peer. In other words, it MUST NOT send this peer
+encoded partialMessage data since it did not request it.
 
 If a node does not support the partial message extension, it MUST ignore the
 `requestPartial` and `supportsPartial` fields. This is the default behavior of
@@ -162,13 +165,6 @@ When Gossiping, a node that supports partial messages SHOULD NOT send an `IHAVE`
 to a peer that requested partial messages. The node SHOULD send a partial message
 instead.
 
-### Reacting to `IHAVE`
-
-If a node requests partial messages and is connected to partial message capable
-peers, it MAY prefer to delay reacting to a peer's `IHAVE` message in order to
-give the opportunity for a partial message request to finish and provide the
-missing message more efficiently.
-
 ## Implementation Recommendations
 
 The following section is not intended to be normative, it is only meant to
@@ -202,6 +198,13 @@ peer in order to update its view of the peer's `partsMetadata`. This allows the
 node to avoid sending duplicate data in the case that a peer concurrently sends
 a `partsMetadata` that requests data already eagerly sent.
 
+### Reacting to `IHAVE`
+
+If a node requests partial messages and is connected partial message capable
+peers, it MAY prefer to delay reacting to a peer's `IHAVE` message in order to
+give the opportunity for a partial message request to finish and provide the
+missing message more efficiently.
+
 ### Example Application Interface
 
 Message contents are application defined, thus splitting a message must be
@@ -233,7 +236,7 @@ mesh peers.
 ### Fanout and Gossip messages
 
 Fanout and Gossip messages by definition come from non-mesh peers. Partial
-messages, without eager data, requires an exchange of bitmaps before parts are
+messages, without eager data, require an exchange of bitmaps before parts are
 transferred. In order for fanout and gossip messages to be useful, the Gossipsub
 implementation SHOULD include the peers that sent them in the list of peers to
 publish partial messages to. This allows the application to simply call
@@ -266,8 +269,8 @@ messages.
 
 ## Creating a topic to only use partial messages
 
-There is currently no mechanism to specify a topic should only be used for
-partial messages. A future extension may define this.
+There is currently no mechanism to requre that a topic only be used for partial
+messages. A future extension may define this.
 
 With this extension nodes can choose to only graft peers that support partial
 messages, and prune those that do not.
