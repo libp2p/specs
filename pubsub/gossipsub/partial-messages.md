@@ -20,7 +20,7 @@ and spec status.
 
 Partial Messages Extensions allow users to transmit only a small part of a
 message rather than a full message. This is especially useful in cases where
-there is a large messages and a peer is missing only a small part of the
+there is a large message and a peer is missing only a small part of the
 message.
 
 ## Terms and Definitions
