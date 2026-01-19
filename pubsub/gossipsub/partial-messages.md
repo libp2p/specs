@@ -4,12 +4,16 @@
 | --------------- | ------------- | ------ | --------------- |
 | 1A              | Working Draft | Active | r0, 2025-06-23  |
 
-Authors: [@marcopolo, @cskiraly]
+Authors: [@marcopolo], [@cskiraly]
 
-Interest Group: TODO
+Interest Group: [@jxs], [@dknopik], [@sukunrt], [@raulk]
 
 [@marcopolo]: https://github.com/marcopolo
 [@cskiraly]: https://github.com/cskiraly
+[@jxs]: https://github.com/jxs
+[@raulk]: https://github.com/raulk
+[@dknopik]: https://github.com/dknopik
+[@sukunrt]: https://github.com/sukunrt
 
 See the [lifecycle document][lifecycle-spec] for context about the maturity level
 and spec status.
