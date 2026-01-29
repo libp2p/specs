@@ -209,6 +209,16 @@ peers, it MAY prefer to delay reacting to a peer's `IHAVE` message in order to
 give the opportunity for a partial message request to finish and provide the
 missing message more efficiently.
 
+### DoS Resiliency
+
+- Limit the amount of peer initiated state you track.
+
+### Eager pushing data
+
+If you have a peer's `partsMetadata` you should use that to decide what to send
+to the peer. The corollary is that you do not eager push data to a peer that has
+given you its `partsMetadata`.
+
 ### Example Application Interface
 
 Message contents are application defined, thus splitting a message must be
