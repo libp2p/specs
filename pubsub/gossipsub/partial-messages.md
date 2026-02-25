@@ -224,6 +224,12 @@ validation of the message.
 An application MAY choose to send data eagerly to a peer before it has received
 its `partsMetadata`. Implementations SHOULD support this.
 
+### Minimizing unnecessary messages
+
+Some applications may be able to infer updates to `partsMetadata` from sent and
+received messages. Applications SHOULD leverage this to reduce the number of
+messages sent to a peer.
+
 ## Upgrading a topic to use partial messages
 
 Rolling out partial messages on an existing topic allows for incremental
