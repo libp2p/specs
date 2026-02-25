@@ -175,6 +175,13 @@ When Gossiping, a node that supports partial messages SHOULD NOT send an `IHAVE`
 to a peer that requested partial messages. The node SHOULD send a partial message
 instead.
 
+## Application-Library Interface
+
+Both `partsMetadata` and `partialMessage` in the Partial Message RPC are
+application defined. Therefore, Gossipsub implementations MUST forward these
+messages to the application for it to act on them. This is true regardless if
+the sender is in our mesh or not.
+
 ## Implementation Recommendations
 
 The following section is not intended to be normative, it is only meant to
