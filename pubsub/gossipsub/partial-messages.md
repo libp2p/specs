@@ -38,6 +38,11 @@ message.
 **Group ID**: An identifier to some Full Message. This must not depend on
 knowing the full message, so it can not simply be a hash of the full message.
 
+**Parts Metadata**: Metadata used to communicate a node's state about its
+available message parts.
+
+**Eager Data**: Data pushed to a peer before receiving their `PartsMetadata`
+
 ## Motivation
 
 The main motivation for this extension is optimizing Ethereum's Data
@@ -97,12 +102,13 @@ is application defined. An unset value carries no information besides that the
 peer did not send a value.
 
 Upon receiving a `partsMetadata` a node SHOULD respond with only parts the peer
-wants.
+doesn't have.
 
 A later `partsMetadata` replaces a prior one.
 
-`partsMetadata` can be used during heartbeat gossip to inform non-mesh topic
-peers about parts this node has.
+During heartbeat gossip, `partsMetadata` can be used to inform a random subset
+of non-mesh topic peers about the parts held by this node, similar to full
+message IHAVE gossip.
 
 Implementations are free to select when to send an update to their peers based
 on signaling bandwidth tradeoff considerations.
@@ -112,7 +118,7 @@ on signaling bandwidth tradeoff considerations.
 The `SubOpts` message is how a peer subscribes to a topic.
 
 Partial Messages uses the same mesh as normal Gossipsub messages. It is a
-replacement to "full" messages. A node requests a peer to send partial messages
+replacement to full messages. A node requests a peer to send partial messages
 for a specific topic by setting the `requestsPartial` field in the `SubOpts`
 message to true. A node signals support for sending partial messages on a given
 topic by setting the `supportsSendingPartial` field in `SubOpts` to true. A node can
@@ -120,9 +126,9 @@ support sending partial messages without wanting to receive them.
 
 If a node requests partial messages, it MUST support sending partial messages.
 
-A node uses a peer's `supportsSendingPartial` setting to know if it can send a
-partial message request to a peer. It uses its `requestsPartial` setting to know
-whether to send the peer a full message or a partial message.
+A node uses a peer's `supportsSendingPartial` setting to know if it can send
+`partsMetadata` to a peer. It uses its `requestsPartial` setting to know whether
+to send the peer a full message or a partial message.
 
 If a peer supports partial messages on a topic but did not request them, a node
 MUST omit the `partialMessage` field of the `PartialMessagesExtension` message
@@ -162,7 +168,7 @@ message for a given topic.
 
 ## Partial Message Gossip
 
-Partial Messages can replace Gossipsub's IHAVE/IWANT with a message that
+Partial Messages SHOULD replace Gossipsub's IHAVE/IWANT with a message that
 provides more context (via the Group ID) and allows for partial responses.
 
 When Gossiping, a node that supports partial messages SHOULD NOT send an `IHAVE`
@@ -204,10 +210,10 @@ a `partsMetadata` that requests data already eagerly sent.
 
 ### Reacting to `IHAVE`
 
-If a node requests partial messages and is connected partial message capable
-peers, it MAY prefer to delay reacting to a peer's `IHAVE` message in order to
-give the opportunity for a partial message request to finish and provide the
-missing message more efficiently.
+If a node is reconstructing a message with partial message extension, it MAY
+prefer to delay reacting to a peer's `IHAVE` message in order to give the
+opportunity for a partial message request to finish and get the message more
+efficiently.
 
 ### DoS Resiliency
 
@@ -272,8 +278,8 @@ migration with backwards compatibility. The steps are as follows:
 
 ### Supporting both full and partial messages for a topic
 
-Partial messages use the same mesh as "full" messages. Supporting both is
-straightforward. If a peer subscribes to a topic with a "requestPartial", the
+Partial messages use the same mesh as full messages. Supporting both is
+straightforward. If a peer subscribes to a topic with a `requestPartial`, the
 node SHOULD send the peer partial messages. Otherwise, send the node full
 messages.
 
@@ -283,7 +289,7 @@ messages.
 
 ## Creating a topic to only use partial messages
 
-There is currently no mechanism to requre that a topic only be used for partial
+There is currently no mechanism to require that a topic only be used for partial
 messages. A future extension may define this.
 
 With this extension nodes can choose to only graft peers that support partial
