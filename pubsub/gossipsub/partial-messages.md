@@ -182,38 +182,28 @@ application defined. Therefore, Gossipsub implementations MUST forward these
 messages to the application for it to act on them. This is true regardless if
 the sender is in our mesh or not.
 
+At a high level libraries need to provide two things:
+
+1. A way for the application to receive incoming partial messages.
+2. A way for the application to send partial messages to mesh peers and other
+   non-mesh peers (as is the case when responding to gossip or fanout).
+
+An implementation MAY choose to provide more, but SHOULD NOT provide less.
+
+Implementations are encouraged to look at `go-libp2p-pubsub` and `rust-libp2p`
+for two different designs.
+
+## Fanout and Gossip messages
+
+Fanout and Gossip messages by definition come from non-mesh peers. Partial
+messages, without eager data, require an exchange of bitmaps before parts are
+transferred. In order for fanout and gossip messages to be useful, the
+Application MUST be able to send partial messages to these peers.
+
 ## Implementation Recommendations
 
 The following section is not intended to be normative, it is only meant to
 provide rough recommendations to implementations.
-
-### Sending `partsMetadata`
-
-Implementations should send their `partsMetadata` whenever it changes. The goal
-being to provide an up-to-date view of its parts to its peers. Implementations
-should not send duplicate `partsMetadata` to peers when nothing has changed.
-
-If a node has previously sent a peer its `partsMetadata`, and that peer has
-responded with parts, the node can assume the peer's view of itself is the union
-of the its previously sent `partsMetadata `and the remote peer's
-`partsMetadata`. The node does not need to send this peer its updated
-`partsMetadata` if its `partsMetadata` has not changed since the previously sent
-`partsMetadata`.
-
-On the other side, when a node responds to a peer's request for parts, it should
-update the peer's `partsMetadata` with the union of its `partsMetadata` and the
-peers `partsMetadata`.
-
-Due to the distributed nature of peers, this might result in a period of time
-where a peer's `partsMetadata` is not exactly correct, but it should become
-eventually consistent.
-
-### Merging Eager Data with a peer's `partsMetadata`.
-
-When eagerly sending data, a node should track which parts it has sent to the
-peer in order to update its view of the peer's `partsMetadata`. This allows the
-node to avoid sending duplicate data in the case that a peer concurrently sends
-a `partsMetadata` that requests data already eagerly sent.
 
 ### Reacting to `IHAVE`
 
@@ -224,50 +214,15 @@ efficiently.
 
 ### DoS Resiliency
 
-- Limit the amount of peer initiated state you track.
+As with everything in gossipsub it is important to limit the amount of peer
+initiated state the implementation tracks. If possible, defer the decision of
+whether to persist state to the application, as it can do application-specific
+validation of the message.
 
 ### Eager pushing data
 
-If you have a peer's `partsMetadata` you should use that to decide what to send
-to the peer. The corollary is that you do not eager push data to a peer that has
-given you its `partsMetadata`.
-
-### Example Application Interface
-
-Message contents are application defined, thus splitting a message must be
-application defined. Applications should provide a Partial Message type that
-supports the following operations:
-
-1. `.GroupID() -> GroupID: bytes`
-2. `.PartialMessageBytes(partsMetadata: bytes) -> Result<(EncodedPartialMessage: bytes), Error>`
-   1. The method should return an encoded partial message with just the parts the
-      peer requested.
-3. `.EagerPartialMessageBytes() -> Result<(EncodedPartialMessage: bytes, partsMetadata: bytes), Error>`
-   1. The method should return an encoded partial message of eager data that
-      should be sent, along with the partsMetadata a peer would have after
-      receiving the encoded partial message.
-4. `.PartsMetadata() -> bytes`: The parts this partial message has.
-
-Gossipsub in turn provides a `.PublishPartial(PartialMessage)` method. This
-method should be idempotent. The application should be able to call it multiple
-times, and the library should make sure not to send redundant or duplicate
-messages to peers.
-
-When Gossipsub receives a partial message it MUST forward it to the application.
-The application decides if it should act on the message by either requesting
-parts or forwarding the message. Both are done with `.PublishPartial`.
-
-Gossipsub MUST forward all messages to the application, not just messages from
-mesh peers.
-
-### Fanout and Gossip messages
-
-Fanout and Gossip messages by definition come from non-mesh peers. Partial
-messages, without eager data, require an exchange of bitmaps before parts are
-transferred. In order for fanout and gossip messages to be useful, the Gossipsub
-implementation SHOULD include the peers that sent them in the list of peers to
-publish partial messages to. This allows the application to simply call
-`PublishPartial` to respond to both mesh and non mesh peers.
+An application MAY choose to send data eagerly to a peer before it has received
+its `partsMetadata`. Implementations SHOULD support this.
 
 ## Upgrading a topic to use partial messages
 
