@@ -4,7 +4,7 @@
 | --------------- | ------------- | ------ | --------------- |
 | 1A              | Working Draft | Active | r0, 2025-06-23  |
 
-Authors: [@marcopolo], [@cskiraly]
+Authors: [@marcopolo], [@sukunrt], [@jxs], [@cskiraly]
 
 Interest Group: [@jxs], [@dknopik], [@sukunrt], [@raulk]
 
