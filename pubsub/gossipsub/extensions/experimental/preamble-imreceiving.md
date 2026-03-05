@@ -1,20 +1,23 @@
-# gossipsub v1.4: PREAMBLE and IMRECEIVING to limit duplicate transmissions of large messages
+# PREAMBLE and IMRECEIVING Extension
 
-| Lifecycle Stage | Maturity | Status | Latest Revision |
-| --- | --- | --- | --- |
-| 1A | Working Draft | Active | r1, 2025-05-01 |
+| Lifecycle Stage | Maturity      | Status | Latest Revision |
+| --------------- | ------------- | ------ | --------------- |
+| 1A              | Working Draft | Active | r0, 2026-03-05  |
 
 Authors: @ufarooqstatus, @kaiserd
 
 Interest Group: TBD
 
-See the [lifecycle document](https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md) for context about maturity level and spec status.
+See the [lifecycle document][lifecycle-spec] for context about the maturity level
+and spec status.
+
+[lifecycle-spec]: https://github.com/libp2p/specs/blob/master/00-framework-01-spec-lifecycle.md
 
 ## Overview
 
-This document outlines small extensions to the gossipsub v1.2 protocol to improve performance when handling large message transmissions. The extensions are optional, fully compatible with v1.2 of the protocol, and involve minor modifications to peer behavior when receiving or forwarding large messages.
+This extension introduces two control messages — PREAMBLE and IMRECEIVING — to improve performance when handling large message transmissions in GossipSub. The extension is optional, fully compatible with GossipSub v1.2+, and involves minor modifications to peer behavior when receiving or forwarding large messages.
 
-The proposed modifications address the issue that the number of IWANT requests and duplicates increases significantly with the message size. This happens because sending a large message can take considerable time, and during this time, the receiver is unaware of the IDs of the messages it is receiving.
+The proposed modifications address the issue that the number of IWANT requests and duplicates increases significantly with message size. This happens because sending a large message can take considerable time, and during this time, the receiver is unaware of the IDs of the messages it is receiving.
 
 Under the current arrangement, if IHAVE announcements are received for a message that is already being received, the receiver may generate multiple IWANT requests, triggering unnecessary retransmissions of the same message. Higher message reception time also increases the probability of simultaneously receiving the same message from many peers.
 
@@ -24,15 +27,7 @@ At the same time, receivers may inform their mesh members about ongoing message 
 
 On receiving an IMRECEIVING message, a peer should refrain from sending the message identified by the announced message ID. This can lead to a significant reduction in bandwidth utilization and message latency. The Safety Strategy below safeguards against malicious behavior.
 
-## Specification
-
-### Protocol Id
-
-Nodes that support this Gossipsub extension should additionally advertise the version number 1.4.0. Gossipsub nodes can advertise their own protocol-id prefix, by default this is `meshsub` giving the default protocol id:
-
-- `/meshsub/1.4.0`
-
-### Parameters
+## Parameters
 
 This section lists the configuration parameters that clients need to agree on to avoid peer penalizations.
 
@@ -43,9 +38,9 @@ This section lists the configuration parameters that clients need to agree on to
 | `preamble_threshold` | The minimum message size (in bytes) required to enable the use of a message PREAMBLE |
 | `fallback_mode` | Message fetching strategy (`pull` or `push`) to use when a peer fails to deliver the message after sending a PREAMBLE. Default: `push` |
 
-### Message PREAMBLE
+## Message PREAMBLE
 
-#### Basic scenario
+### Basic scenario
 
 When a peer starts relaying a message that exceeds the `preamble_threshold` size, it should transmit a preceding control message called PREAMBLE.
 
@@ -59,7 +54,7 @@ If the download takes longer than the estimated download time, the sender may be
 
 PREAMBLE is considered optional for both the sender and the receiver. This means that the sender can choose not to send the PREAMBLE, and the receiver can also opt to ignore it. Adding a PREAMBLE may increase control overhead for small messages. Therefore, it is preferable to use it only for messages that exceed the `preamble_threshold`.
 
-#### Limiting IWANT Requests
+### Limiting IWANT Requests
 
 When a peer receives an IHAVE announcement for a message ID not present in the seen cache, the peer must also check the `ongoing_receives` list before making an IWANT request.
 
@@ -69,7 +64,7 @@ If the message download completes before the `defer_interval` expires, the IWANT
 
 The total number of outstanding IWANT requests for a single message must not exceed `max_iwant_requests`. Every peer must respond to incoming IWANT requests as long as the number of responses remains within the limits defined by gossipsub v1.1. Failing to do so should result in a behavioral penalty. This will discourage peers from intentionally not replying to IWANT requests.
 
-### IMRECEIVING Message
+## IMRECEIVING Message
 
 The IMRECEIVING message serves a distinct purpose compared to the IDONTWANT message. An IDONTWANT can only be transmitted after receiving the entire message. In contrast, an IMRECEIVING should be transmitted immediately after receiving a PREAMBLE, indicating an ongoing large message reception. The IMRECEIVING message requests peers in the full message mesh to refrain from resending a large message that is already being received.
 
@@ -77,7 +72,7 @@ When a peer receives a PREAMBLE indicating a message ID that is not present in t
 
 A corresponding IDONTWANT from the peer that issued IMRECEIVING will indicate successful reception of the message. Otherwise, the peers in the full message mesh may proceed with a push-based or a pull-based operation depending upon the selected `fallback_mode`. See Safety Strategy below.
 
-### Safety Strategy
+## Safety Strategy
 
 A malicious peer can attempt to exploit this approach by sending a PREAMBLE but never completing (or deliberately delaying) the promised message transfer or by misrepresenting the message size, potentially hindering the message propagation across the network. The following describes one suggested defense mechanism. Sending and processing of PREAMBLE and IMRECEIVING messages is optional, and implementations may adopt a safety strategy that best fits their specific requirements.
 
@@ -93,29 +88,25 @@ In a pull-based strategy, the peer receiving the message uses an IWANT request t
 
 Negative scoring helps prune non-conforming peers, whereas the fallback strategy helps recover from incomplete message transfers.
 
-### Protobuf Extension
-
-The protobuf messages are identical to those specified in the [gossipsub v1.2 specification](https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.2.md) with the following control message modifications:
+## Protobuf
 
 ```protobuf
-message RPC {
- // ... see definition in the gossipsub specification
-}
+syntax = "proto2";
 
-message ControlMessage {
-    // ... see definition in the gossipsub specification
-    repeated ControlPreamble    preamble     = 6;
-    repeated ControlIMReceiving imreceiving  = 7;
+message PreambleImreceivingExtension {
+  repeated ControlPreamble preamble = 1;
+  repeated ControlIMReceiving imreceiving = 2;
 }
 
 message ControlPreamble {
-    optional bytes  messageID     = 1;
-    optional uint64 messageLength = 2;
+  optional bytes  messageID     = 1;
+  optional uint64 messageLength = 2;
 }
 
 message ControlIMReceiving {
-    optional bytes  messageID       = 1;
-    optional uint64 messageLength   = 2;
-    optional uint32 deferDurationMs = 3;
+  optional bytes  messageID       = 1;
+  optional uint64 messageLength   = 2;
+  optional uint32 deferDurationMs = 3;
 }
 ```
+
