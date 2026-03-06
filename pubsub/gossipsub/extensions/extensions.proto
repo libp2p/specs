@@ -8,6 +8,10 @@ message ControlExtensions {
 
   optional bool testExtension = 6492434;
 
+  // PREAMBLE and IMRECEIVING extension for large message handling
+  // See: ./experimental/preamble-imreceiving.md
+  optional bool preambleImreceiving = 3847291;
+
 }
 
 message ControlMessage {
@@ -46,6 +50,10 @@ message RPC {
   // bytes
 
   optional TestExtension testExtension = 6492434;
+
+  // PREAMBLE and IMRECEIVING extension for large message handling
+  // See: ./experimental/preamble-imreceiving.proto
+  // optional PreambleImreceivingExtension preambleImreceiving = 3847291;
 
 }
 
