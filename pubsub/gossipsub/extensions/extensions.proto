@@ -53,7 +53,7 @@ message RPC {
 
   // PREAMBLE and IMRECEIVING extension for large message handling
   // See: ./experimental/preamble-imreceiving.proto
-  optional PreambleImreceivingExtension preambleImreceiving = 3847291;
+  // optional PreambleImreceivingExtension preambleImreceiving = 3847291;
 
 }
 
