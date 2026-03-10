@@ -97,7 +97,11 @@ Both Ping and Go Away messages should always use the 0 StreamID.
 The meaning of the length field depends on the message type:
 
 * Data - provides the length of bytes following the header
-* Window update - provides a delta update to the window size
+* Window update:
+  * If RST flag is not set: 
+    * Provides a delta update to the window size
+  * If RST flag is set:
+    * Contains an error code
 * Ping - Contains an opaque value, echoed back
 * Go Away - Contains an error code
 
@@ -128,7 +132,7 @@ This does a half-close indicating the sender will send no further data.
 
 Once both sides have closed the connection, the stream is closed.
 
-Alternatively, if an error occurs, the RST flag can be used to hard close a stream immediately.
+Alternatively, if an error occurs, the RST flag can be used to hard close a stream immediately. To provide an error code with the reset, use a window update frame with the RST flag set and set the Length field to the error code. 
 
 #### Flow Control
 
