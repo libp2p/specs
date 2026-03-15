@@ -405,11 +405,11 @@ Dialing without a peer ID can be appropriate when:
 1. **The application protocol performs its own authentication** after the
    libp2p connection is established (e.g. an application-level challenge or
    token exchange).
-2. **Peer discovery returns peer IDs alongside addresses.** For example, a
+2. **Peer discovery may precede a normal authenticated dial.** For example, a
    `/dnsaddr` record that resolves to entries containing `/p2p/<peer-id>`
-   allows the caller to discover and authenticate peers in a single step,
-   as long as DNSSEC protects the DNS lookup and the resolved peer IDs are
-   verified during the handshake.
+   allows the caller to discover peers first and then dial with those peer IDs.
+   This is not dialing without a peer ID; once the peer ID is known, it should
+   be verified during the handshake.
 3. **The network environment provides equivalent guarantees** such as an
    encrypted overlay (WireGuard, Tailscale) where endpoints are already
    mutually authenticated.
