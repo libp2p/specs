@@ -37,6 +37,10 @@ and spec status.
             - [Supported protocols](#supported-protocols)
         - [Connection Lifecycle Events](#connection-lifecycle-events)
     - [Hole punching](#hole-punching)
+    - [Dialing Without a Peer ID](#dialing-without-a-peer-id)
+        - [Security Implications](#security-implications)
+        - [Acceptable Use Cases](#acceptable-use-cases)
+        - [Implementation Guidance](#implementation-guidance)
     - [Future Work](#future-work)
 
 ## Overview
@@ -368,6 +372,63 @@ baseline would be:
 ## Hole punching
 
 See [hole punching][hole-punching] document.
+
+## Dialing Without a Peer ID
+
+In the standard connection flow a dialer supplies the remote peer's peer ID
+so the security handshake (Noise, TLS, etc.) can authenticate the responder.
+Some use cases call for dialing a multiaddr that does not contain a `/p2p/<peer-id>`
+component. This section documents the security properties and trade-offs involved.
+
+### Security Implications
+
+Dialing without a peer ID means the dialer will **accept any peer ID** presented
+by the remote during the security handshake. In TLS/web terms this is equivalent to
+disabling certificate verification: an on-path attacker can impersonate the
+responder with its own key pair and the dialer has no way to detect the
+substitution.
+
+Specifically:
+
+- There is **no authentication at the IP layer**. A packet sent to a given IP
+  does not guarantee that the machine deployed at that IP is the one that
+  replies.
+- DNSSEC protects the integrity of DNS records but does **not** authenticate
+  the endpoint. If a `/dnsaddr` record resolves to addresses that include
+  `/p2p/<peer-id>` components, verifying those peer IDs is still required to
+  prevent man-in-the-middle attacks.
+
+### Acceptable Use Cases
+
+Dialing without a peer ID can be appropriate when:
+
+1. **The application protocol performs its own authentication** after the
+   libp2p connection is established (e.g. an application-level challenge or
+   token exchange).
+2. **Peer discovery may precede a normal authenticated dial.** For example, a
+   `/dnsaddr` record that resolves to entries containing `/p2p/<peer-id>`
+   allows the caller to discover peers first and then dial with those peer IDs.
+   This is not dialing without a peer ID; once the peer ID is known, it should
+   be verified during the handshake.
+3. **The network environment provides equivalent guarantees** such as an
+   encrypted overlay (WireGuard, Tailscale) where endpoints are already
+   mutually authenticated.
+
+### Implementation Guidance
+
+Implementations that support dialing without a peer ID SHOULD:
+
+- Expose this capability through a distinct API entry point (e.g.
+  `DialAddress(addr) -> PeerID`) so that callers cannot accidentally omit
+  the peer ID.
+- Return the authenticated peer ID to the caller so it can be recorded and
+  used for subsequent connections.
+- Log or document the reduced security guarantees clearly.
+
+Implementations SHOULD NOT treat a connection established without prior peer
+ID knowledge as authenticated for purposes such as routing table updates or
+data replication unless the application layer has separately verified the
+peer's identity.
 
 ## Future Work
 
