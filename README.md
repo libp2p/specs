@@ -117,7 +117,7 @@ you feel an issue isn't the appropriate place for your topic, please join our
 [contributor's section](https://discuss.libp2p.io/c/contributors).
 
 
-[libp2p_implementations]: https://libp2p.io/implementations
+[libp2p_implementations]: https://libp2p.io/projects/
 [spec_lifecycle]: 00-framework-01-spec-lifecycle.md
 [spec_header]: 00-framework-02-document-header.md
 [spec_identify]: ./identify/README.md
