@@ -121,6 +121,7 @@ Current language support for ML-DSA is still evolving:
 - Node.js runtime support is experimental.
 - Browser WebCrypto support is unavailable.
 - Go has an internal implementation for ML-DSA but no public API as of Go 1.26.
+  - Worth noting: `crypto/mlkem` went public in Go 1.24, so `crypto/mldsa` going public soon is likely. For now, `github.com/cloudflare/circl/sign/mldsa` is available.
 
 This RFC specifies interoperability behavior independent of implementation
 maturity.
