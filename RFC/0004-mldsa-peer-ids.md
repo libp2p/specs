@@ -51,6 +51,8 @@ This RFC supports the three standardized ML-DSA parameter sets:
 - `ML-DSA-65`
 - `ML-DSA-87`
 
+Parameter names and sizes are defined by [FIPS 204](#references).
+
 ### 3. Key serialization in protobuf `Data`
 
 For `PublicKey` and `PrivateKey` messages where `Type = MLDSA`, the `Data`
@@ -66,24 +68,27 @@ Where `variant-prefix` is one byte:
 - `0x02` = `ML-DSA-65`
 - `0x03` = `ML-DSA-87`
 
-Raw key lengths are the standard ML-DSA key sizes for each variant:
+Raw key and signature lengths are fixed per ML-DSA variant:
 
-- `ML-DSA-44`: public key `1312` bytes, expanded private key `2560` bytes
-- `ML-DSA-65`: public key `1952` bytes, expanded private key `4032` bytes
-- `ML-DSA-87`: public key `2592` bytes, expanded private key `4896` bytes
+| Variant | Public key (bytes) | Expanded private key (bytes) | Signature (bytes) |
+| --- | ---: | ---: | ---: |
+| `ML-DSA-44` | 1312 | 2560 | 2420 |
+| `ML-DSA-65` | 1952 | 4032 | 3309 |
+| `ML-DSA-87` | 2592 | 4896 | 4627 |
 
-Implementations MUST reject malformed key payloads (unknown prefix,
-missing prefix, or length mismatch).
+Implementations MUST reject malformed key payloads, including unknown
+`variant-prefix`, missing prefix, or length mismatch against the table above.
 
 ### 4. Signature semantics
 
 ML-DSA signatures are generated and verified using the standard ML-DSA
 algorithm for the corresponding parameter set.
 
-- Input to signing is the exact message bytes.
-- No additional pre-hash step is applied by libp2p at the key API boundary.
-- Verification is performed over the same message bytes with the same parameter
-  set.
+- Implementations MUST sign the exact message bytes.
+- Implementations MUST NOT apply an additional pre-hash at the libp2p key API
+  boundary.
+- Implementations MUST verify signatures over the exact same message bytes and
+  ML-DSA parameter set.
 
 ### 5. Peer ID derivation
 
@@ -121,7 +126,9 @@ Current language support for ML-DSA is still evolving:
 - Node.js runtime support is experimental.
 - Browser WebCrypto support is unavailable.
 - Go has an internal implementation for ML-DSA but no public API as of Go 1.26.
-  - Worth noting: `crypto/mlkem` went public in Go 1.24, so `crypto/mldsa` going public soon is likely. For now, `github.com/cloudflare/circl/sign/mldsa` is available.
+  - Worth noting: `crypto/mlkem` went public in Go 1.24, `crypto/mldsa` is in
+    proposal phase [golang/go#77626](https://github.com/golang/go/issues/77626).
+    For now, `github.com/cloudflare/circl/sign/mldsa` is available.
 
 This RFC specifies interoperability behavior independent of implementation
 maturity.
@@ -136,7 +143,14 @@ recommendation:
 1. Default variant selection for new key generation (`ML-DSA-44`, `-65`, or
   `-87`).
 2. Whether any libp2p subsystem should require dual-signature or hybrid
-  identity strategies.
+   identity strategies.
 3. Whether to define mandatory test vectors in the peer-id spec for ML-DSA
-  encodings.
-4. Canonical private key format: should it be FIPS 204 expanded form ([multiformats/multicodec#399](https://github.com/multiformats/multicodec/pull/399), W3C DI Quantum-Safe Cryptosuite)?
+   encodings.
+4. Canonical private key format: should it be FIPS 204 expanded form
+   [multiformats/multicodec#399](https://github.com/multiformats/multicodec/pull/399),
+   W3C DI Quantum-Safe Cryptosuite)?
+
+## References
+
+- [FIPS 204] NIST, *Module-Lattice-Based Digital Signature Standard* (ML-DSA),
+  https://csrc.nist.gov/pubs/fips/204/final
