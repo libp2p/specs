@@ -68,9 +68,9 @@ Where `variant-prefix` is one byte:
 
 Raw key lengths are the standard ML-DSA key sizes for each variant:
 
-- `ML-DSA-44`: public key `1312` bytes, private key `2560` bytes
-- `ML-DSA-65`: public key `1952` bytes, private key `4032` bytes
-- `ML-DSA-87`: public key `2592` bytes, private key `4896` bytes
+- `ML-DSA-44`: public key `1312` bytes, expanded private key `2560` bytes
+- `ML-DSA-65`: public key `1952` bytes, expanded private key `4032` bytes
+- `ML-DSA-87`: public key `2592` bytes, expanded private key `4896` bytes
 
 Implementations MUST reject malformed key payloads (unknown prefix,
 missing prefix, or length mismatch).
