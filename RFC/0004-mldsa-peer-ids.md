@@ -138,3 +138,4 @@ recommendation:
   identity strategies.
 3. Whether to define mandatory test vectors in the peer-id spec for ML-DSA
   encodings.
+4. Canonical private key format: should it be FIPS 204 expanded form ([multiformats/multicodec#399](https://github.com/multiformats/multicodec/pull/399), W3C DI Quantum-Safe Cryptosuite)?
