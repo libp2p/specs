@@ -6,10 +6,11 @@
 
 Authors: [@mxinden]
 
-Interest Group: [@marten-seemann]
+Interest Group: [@marten-seemann], [@dozyio]
 
 [@marten-seemann]: https://github.com/marten-seemann
 [@mxinden]: https://github.com/mxinden/
+[@dozyio]: https://github.com/dozyio
 
 ## Motivation
 
@@ -195,7 +196,6 @@ prefix.
 
 WebRTC can run both on UDP and TCP. libp2p WebRTC implementations MUST support
 UDP and MAY support TCP.
-
 
 ## Connection Security
 
