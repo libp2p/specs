@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity                  | Status | Latest Revision |
 |-----------------|---------------------------|--------|-----------------|
-| 2A              | Candidate Recommendation  | Active | r1, 2023-04-12  |
+| 2A              | Candidate Recommendation  | Active | r2, 2026-04-23  |
 
 Authors: [@mxinden]
 
@@ -34,6 +34,10 @@ The TLS certificate fingerprint in `/certhash` is a
 [multibase](https://github.com/multiformats/multibase) encoded
 [multihash](https://github.com/multiformats/multihash).
 
+WebRTC Direct v1 and v2 both use the same `/webrtc-direct` multiaddr protocol.
+Version selection is done via the ICE username fragment prefix, not via a new
+multiaddr protocol.
+
 For compatibility implementations MUST support hash algorithm
 [`sha-256`](https://github.com/multiformats/multihash) and base encoding
 [`base64url`](https://github.com/multiformats/multibase). Implementations MAY
@@ -42,7 +46,7 @@ connect to all other nodes.
 
 ## Connection Establishment
 
-### Browser to public Server
+### Browser to public Server (v1, SDP munging)
 
 Scenario: Browser _A_ wants to connect to server node _B_ where _B_ is publicly
 reachable but _B_ does not have a TLS certificate trusted by _A_.
@@ -70,11 +74,9 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
 
 4. _A_ constructs _B_'s SDP answer locally based on _B_'s multiaddr.
 
-   _A_ generates a random string prefixed with "libp2p+webrtc+v1/". The prefix
-   allows us to use the ufrag as an upgrade mechanism to role out a new version
-   of the libp2p WebRTC protocol on a live network. While a hack, this might be
-   very useful in the future. _A_ sets the string as the username (_ufrag_ or _username fragment_)
-   and password on the SDP of the remote's answer.
+   _A_ generates a random string prefixed with `libp2p+webrtc+v1/` and sets it
+   as both the username fragment (`ice-ufrag`) and password (`ice-pwd`) in the
+   synthetic remote answer SDP.
 
    _A_ MUST set the `a=max-message-size:16384` SDP attribute. See reasoning
    [multiplexing] for rational.
@@ -148,6 +150,48 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
 
 9. The remote is authenticated via an additional Noise handshake. See
    [Connection Security section](#connection-security).
+
+### Browser to public Server (v2, no SDP munging)
+
+This flow runs over the same `/webrtc-direct` multiaddr protocol as v1 and keeps
+the same no-signaling model. The version is selected via ICE username fragment
+prefix.
+
+1. _A_ and _B_ perform steps (1), (2), and (3) from
+   [Browser to public Server](#browser-to-public-server).
+
+2. _A_ creates a local offer via
+   [`RTCPeerConnection.createOffer()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createOffer)
+   and sets it via
+   [`RTCPeerConnection.setLocalDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setLocalDescription).
+   _A_ MUST NOT modify (`mung`) local offer `a=ice-ufrag` or `a=ice-pwd`.
+
+3. _A_ reads the local ICE password (`client_pwd`) from the local offer SDP.
+   _A_ constructs _B_'s synthetic remote answer with:
+   - `a=ice-ufrag:libp2p+webrtc+v2/<client_pwd>`
+   - `a=ice-pwd:libp2p+webrtc+v2/<client_pwd>`
+
+   _A_ MUST set `a=max-message-size:16384` and set the remote answer via
+   [`RTCPeerConnection.setRemoteDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setRemoteDescription).
+
+4. _A_ starts sending STUN connectivity checks. _B_ parses STUN `USERNAME` as
+   `server_ufrag:client_ufrag` and validates that `server_ufrag` has the prefix
+   `libp2p+webrtc+v2/`.
+
+5. _B_ infers _A_'s SDP offer as follows:
+   1. `ice-ufrag = client_ufrag`
+   2. `ice-pwd = <payload after libp2p+webrtc+v2/>`
+   3. set an arbitrary sha-256 remote fingerprint
+   4. set `c=IN <ip> <port>` from the incoming STUN packet source
+   5. set `a=max-message-size:16384`
+
+6. _B_ sets this inferred offer as remote description, generates an answer, and
+   sets it as local description.
+
+7. _A_ and _B_ continue with steps (7), (8), and (9) from
+   [Browser to public Server](#browser-to-public-server).
+
+## Transport Support
 
 WebRTC can run both on UDP and TCP. libp2p WebRTC implementations MUST support
 UDP and MAY support TCP.
@@ -253,7 +297,10 @@ prologue = "6c69627032702d7765627274632d6e6f6973653a12203e79af40d6059617a0d83b83
   adopt this optimization.
 
   Note, one can role out a new version of the libp2p WebRTC protocol through a
-  new multiaddr protocol, e.g. `/webrtc-direct-2`.
+  new multiaddr protocol, e.g. `/webrtc-direct-3`.
+
+  This specification additionally defines a v2 rollout that keeps
+  `/webrtc-direct` unchanged and versions via ICE username fragment prefix.
 
 - _Why exchange fingerprints in an additional authentication handshake on top of
   an established WebRTC connection? Why not only exchange signatures of ones TLS
