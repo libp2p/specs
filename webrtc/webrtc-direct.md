@@ -299,9 +299,6 @@ prologue = "6c69627032702d7765627274632d6e6f6973653a12203e79af40d6059617a0d83b83
   Note, one can role out a new version of the libp2p WebRTC protocol through a
   new multiaddr protocol, e.g. `/webrtc-direct-3`.
 
-  This specification additionally defines a v2 rollout that keeps
-  `/webrtc-direct` unchanged and versions via ICE username fragment prefix.
-
 - _Why exchange fingerprints in an additional authentication handshake on top of
   an established WebRTC connection? Why not only exchange signatures of ones TLS
   fingerprints signed with ones libp2p private key on the plain WebRTC
