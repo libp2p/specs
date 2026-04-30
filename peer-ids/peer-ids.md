@@ -28,6 +28,8 @@ about maturity level and spec status.
         - [Ed25519](#ed25519)
         - [Secp256k1](#secp256k1)
         - [ECDSA](#ecdsa)
+        - [PKIX Public Keys](#pkix-public-keys)
+        - [PKCS#8 Private Keys](#pkcs%238-private-keys)
 - [Peer Ids](#peer-ids)
     - [String representation](#string-representation)
         - [Encoding](#encoding)
@@ -192,24 +194,88 @@ it using [DER-encoded ASN.1.](https://wiki.openssl.org/index.php/DER)
 
 #### PKIX Public Keys
 
-The PKIX key type only encodes public keys. The Data field is the [PKIX
-encoding](https://www.rfc-editor.org/rfc/rfc5280) of the public key. The public
-key and algorithm are identified by the [Subject Public Key
-Info](https://www.rfc-editor.org/rfc/rfc5280#section-4.1.2.7) field.
+The PKIX key type only encodes public keys. The Data field MUST contain the
+DER-encoded [SubjectPublicKeyInfo](https://www.rfc-editor.org/rfc/rfc5280#section-4.1.2.7)
+structure defined in [RFC 5280](https://www.rfc-editor.org/rfc/rfc5280).
 
-Signature Verification is defined by the key algorithm used.
+Implementations MUST reject non-DER encodings, PEM text, trailing bytes, and
+encodings that do not parse to exactly one `SubjectPublicKeyInfo` value.
 
-For backwards compatibility, if a key algorithm has a prior libp2p specific encoding, implementers SHOULD prefer that.
+The public key algorithm is identified by the `AlgorithmIdentifier` field in
+`SubjectPublicKeyInfo`.
+
+Signature verification is defined by the key algorithm used.
+
+The generic PKIX `KeyType` is intended to enable algorithms that do not
+already have a canonical libp2p public key encoding, without requiring a new
+libp2p `KeyType` for each algorithm.
+
+For backwards compatibility, if a key algorithm has an existing
+libp2p-specific public key encoding, implementations MUST use that encoding
+when serializing public keys for Peer ID derivation.
+
+A PKIX profile specifies algorithm-specific requirements for using
+SubjectPublicKeyInfo (SPKI)-encoded public keys as libp2p identity keys. It
+is part of the public libp2p interoperability profile only if it is defined in
+a libp2p specification.
+Profiles not meeting this criterion are implementation-defined and are not
+part of public libp2p interoperability.
+
+For public interoperability, a PKIX-backed identity algorithm MUST be
+described by a profile that specifies:
+
+- accepted `AlgorithmIdentifier` OID(s)
+- `AlgorithmIdentifier` parameter encoding rules
+- public-key encoding and validation rules
+- signature algorithm and verification rules
+- libp2p protocol contexts where the key can authenticate a peer
+- Peer ID test vectors
+
+Implementations MUST reject unsupported algorithms carried in SPKI that they
+do not explicitly support, including algorithms whose profiles are unknown to
+the implementation.
+
+Implementations MUST NOT treat the presence of a valid `SubjectPublicKeyInfo`
+encoding as sufficient for libp2p identity support.
+
+Implementations MUST NOT accept key-agreement-only algorithms as identity keys
+unless explicitly specified by a libp2p specification.
+
+Implementations MAY support additional algorithms carried in SPKI for
+experimental, private-network, or application-specific use.
+
+Implementations MAY accept DER-encoded SPKI as an import/export format for
+public keys, but before Peer ID derivation they MUST canonicalize the key to
+the existing libp2p-specific public key encoding.
 
 #### PKCS#8 Private Keys
 
-The PKCS8 key type primarily encodes private keys, but may include the
-corresponding public key. The Data field is the [PKCS#8
-encoding](https://www.rfc-editor.org/rfc/rfc5958.html) of the private key.
+The PKCS#8 key type primarily encodes private keys, but may include the
+corresponding public key. The `Data` field MUST contain the DER encoding of
+`OneAsymmetricKey` from [RFC 5958](https://www.rfc-editor.org/rfc/rfc5958.html).
 
-Signing is defined by the key algorithm used.
+Implementations MUST reject non-DER encodings, PEM text, trailing bytes, and
+encodings that do not parse to exactly one `OneAsymmetricKey` value.
 
-For backwards compatibility, if a key algorithm has a prior libp2p specific encoding, implementers SHOULD prefer that.
+Signature generation is defined by the key algorithm used.
+
+PKCS#8 is an import/export and private-key storage format. Peer IDs are
+derived from public keys, not directly from PKCS#8 private-key encodings.
+
+When importing a PKCS#8 private key, implementations MUST derive the
+corresponding public key and serialize that public key using the canonical
+libp2p public key encoding for the algorithm before Peer ID derivation.
+
+For backwards compatibility, if a key algorithm has an existing
+libp2p-specific public key encoding, implementations MUST use that encoding
+for Peer ID derivation.
+
+Implementations MUST NOT derive alternate Peer IDs by re-encoding such public
+keys under the generic PKIX `KeyType` when a canonical libp2p-specific public
+key encoding exists.
+
+If the PKCS#8 structure includes a public key and it does not match the public
+key derived from the private key, implementations MUST reject the key.
 
 ### Test vectors
 
@@ -238,13 +304,13 @@ using the "identity" multihash codec.
 Specifically, to compute a peer ID of a key:
 
 1. Encode the public key as described in the [keys](#keys) section.
-4. If the length of the serialized bytes is less than or equal to 42, compute
+2. If the length of the serialized bytes is less than or equal to 42, compute
    the "identity" multihash of the serialized bytes. In other words, no
    hashing is performed, but the [multihash format is still
    followed][multihash] (byte plus varint plus serialized bytes). The idea
    here is that if the serialized byte array is short enough, we can fit it in
    a multihash verbatim without having to condense it using a hash function.
-5. If the length is greater than 42, then hash it using the SHA256
+3. If the length is greater than 42, then hash it using the SHA256
    multihash.
 
 ### String representation
