@@ -30,7 +30,6 @@ and spec status.
   - [Listener (Responder) Requirements](#listener-responder-requirements)
 - [Known Limitations](#known-limitations)
   - [Protocol Confusion on Negotiation Failure](#protocol-confusion-on-negotiation-failure)
-- [Security Considerations](#security-considerations)
 - [Interaction with Inlined Muxer Negotiation](#interaction-with-inlined-muxer-negotiation)
 - [Implementation References](#implementation-references)
 
@@ -40,10 +39,10 @@ Also known as "lazy multistream-select" or "lazy negotiation".
 
 In standard [multistream-select][mss] negotiation, the dialer (initiator) sends
 its protocol proposal and **waits** for the listener (responder) to echo the
-protocol ID back before sending any application data. This costs two full
-round trips before application data can flow.
+protocol ID back before sending any application data. This costs one round
+trip before application data can flow.
 
-Optimistic protocol negotiation eliminates one round trip by allowing the dialer
+Optimistic protocol negotiation eliminates this round trip by allowing the dialer
 to send the multistream-select header, the protocol proposal, **and** the initial
 application data all at once, without waiting for the listener's echo response.
 The listener's echo response arrives asynchronously while the dialer is already
@@ -51,12 +50,7 @@ sending application data.
 
 This optimization is critical for latency-sensitive use cases such as
 [Kademlia DHT][kad-dht] operations, which use a "one stream per RPC" pattern
-and would otherwise pay the full two-round-trip cost on every request.
-
-Both [go-libp2p] and [rust-libp2p] use optimistic negotiation in production,
-but it has not previously been documented in the libp2p specifications. This
-document formalizes the optimization and documents the requirements
-implementations must follow to use it correctly.
+and would otherwise pay the full round-trip cost on every request.
 
 ## Applicability
 
@@ -76,9 +70,7 @@ Optimistic protocol negotiation can be applied in two contexts:
 ## Wire Format
 
 The wire format for individual messages is unchanged from standard
-[multistream-select][mss]. Messages are UTF-8 strings, newline-terminated, and
-prefixed with their length as an [unsigned varint][uvarint]. The difference is
-purely in the **sequencing** of messages.
+[multistream-select][mss].
 
 ### Standard Multistream-Select
 
@@ -89,16 +81,16 @@ before sending application data:
 Dialer                                  Listener
   |                                        |
   |--- /multistream/1.0.0 ---------------->|
-  |<-- /multistream/1.0.0 -----------------|
+  |--- /my-protocol/1.0.0 ---------------->|
   |                                        |
-  |--- /my-protocol/1.0.0 --------------->|
+  |<-- /multistream/1.0.0 -----------------|
   |<-- /my-protocol/1.0.0 ---- (echo) ----|  <- Dialer waits for echo
   |                                        |
   |--- [application data] --------------->|  <- Only then sends data
   |                                        |
 ```
 
-**Cost**: 2 round trips before application data flows.
+**Cost**: 1 round trip before application data flows.
 
 ### Optimistic Multistream-Select
 
@@ -109,7 +101,7 @@ proposal, and application data without waiting:
 Dialer                                  Listener
   |                                        |
   |--- /multistream/1.0.0 ---------------->|
-  |--- /my-protocol/1.0.0 ---------------->|  <- No wait for header echo
+  |--- /my-protocol/1.0.0 ---------------->|
   |--- [application data] ---------------->|  <- Sent immediately
   |                                        |
   |<-- /multistream/1.0.0 -----------------|  <- Echo arrives later
@@ -117,13 +109,13 @@ Dialer                                  Listener
   |                                        |
 ```
 
-**Cost**: 1 round trip saved. Application data is delivered to the listener
+**Cost**: 0 round trips. Application data is delivered to the listener
 alongside the protocol proposal. The listener processes the negotiation and then
 delivers the application data to the protocol handler.
 
 ## Prerequisites
 
-Optimistic protocol negotiation is inherently **best-effort**. The dialer sends
+Optimistic protocol negotiation is inherently optimistic. The dialer sends
 application data before receiving confirmation that the listener supports the
 requested protocol. If the listener does not support the protocol, the
 negotiation will fail, and the application data sent optimistically will be
@@ -141,8 +133,8 @@ supported protocols can change dynamically at any time (e.g., via
 In practice, protocol support is stable enough that optimistic negotiation
 succeeds in the vast majority of cases.
 
-Implementations SHOULD NOT use optimistic negotiation on the **first** stream
-to a peer when no prior protocol knowledge is available.
+Implementations MAY skip optimistic negotiation when no prior protocol
+knowledge is available.
 
 ## Requirements
 
@@ -168,10 +160,10 @@ interpreted as described in [RFC 2119].
    is a pure write/fire-and-forget pattern), the implementation MAY skip reading
    the handshake response.
 
-3. **Prior knowledge**: Implementations SHOULD NOT use optimistic negotiation
-   without prior knowledge that the peer supports the requested protocol (e.g.,
-   via a preceding [identify][identify] exchange). Using optimistic negotiation
-   without prior knowledge risks triggering the protocol confusion issue
+3. **Prior knowledge**: Implementations MAY use optimistic negotiation without
+   prior knowledge that the peer supports the requested protocol. However,
+   using optimistic negotiation without prior knowledge (e.g., via a preceding
+   [identify][identify] exchange) risks triggering the protocol confusion issue
    described in [Known Limitations](#known-limitations).
 
 ### Listener (Responder) Requirements
@@ -185,12 +177,6 @@ interpreted as described in [RFC 2119].
 2. **Stream delivery**: Implementations MUST still deliver the stream to the
    application protocol handler even if the echo write fails. The handler can
    then `Read()` any application data the dialer already sent.
-
-3. **Data boundary**: After a protocol has been successfully matched during
-   negotiation, implementations MUST NOT interpret subsequent bytes on the
-   stream as multistream-select messages. All bytes after the negotiated
-   protocol ID are application data and MUST be forwarded to the protocol
-   handler.
 
 ## Known Limitations
 
@@ -243,40 +229,11 @@ original author:
 - Implementations SHOULD log or track negotiation failures to detect potential
   protocol confusion.
 
-## Security Considerations
-
-The protocol confusion issue described in [Known Limitations](#known-limitations)
-represents a potential security concern. If a malicious or misconfigured peer
-provides incorrect information about which protocols it supports (e.g., via
-identify responses), the dialer may optimistically propose a protocol the peer
-does not actually support, triggering the protocol confusion scenario.
-
-Implementations SHOULD:
-
-- Validate identify responses and consider them advisory, not authoritative.
-- Track and limit the rate of negotiation failures per peer. A high failure rate
-  may indicate a misconfigured peer or an attack.
-- Ensure that protocol handlers validate incoming data before processing it,
-  regardless of how the stream was negotiated.
-
-The security impact is limited by the fact that libp2p connections are
-authenticated and encrypted (via [Noise][noise] or [TLS 1.3][tls]). An attacker
-cannot inject data into an existing connection. The protocol confusion risk only
-applies within an already-authenticated peer relationship, where the remote peer
-provides incorrect identify information.
-
 ## Interaction with Inlined Muxer Negotiation
 
-For connection upgrades (as opposed to stream-level negotiation), the latency
-benefit of optimistic negotiation is reduced by [inlined muxer negotiation][inlined-muxer],
-which moves the stream multiplexer selection into the security handshake. When
-inlined muxer negotiation is in use, the connection upgrade already avoids the
-extra round trip for muxer selection, so the additional savings from optimistic
-negotiation during the connection upgrade are minimal.
-
-Optimistic negotiation during connection upgrades is therefore most useful when
-inlined muxer negotiation is **not** available (e.g., when connecting to older
-peers that do not support the optimization).
+For connection upgrades, [inlined muxer negotiation][inlined-muxer] is
+preferred as it already eliminates the extra round trip for muxer selection
+during the security handshake.
 
 ## Implementation References
 
