@@ -127,7 +127,7 @@ using optimistic negotiation. The `protocols` field of the identify message
 (see [identify spec][identify]) contains the list of protocols the remote peer
 supports.
 
-However, it is important to note that this is still *optimistic* — a peer's
+However, it is important to note that this is still *optimistic* - a peer's
 supported protocols can change dynamically at any time (e.g., via
 [identify/push][identify-push] updates, or due to configuration changes).
 In practice, protocol support is stable enough that optimistic negotiation
@@ -172,7 +172,7 @@ interpreted as described in [RFC 2119].
    errors when echoing back the protocol ID during negotiation. With optimistic
    negotiation, the dialer may have already closed its write side of the stream
    after sending application data. The echo write failing does not indicate a
-   negotiation failure — the negotiated protocol has already been identified.
+   negotiation failure - the negotiated protocol has already been identified.
 
 2. **Stream delivery**: Implementations MUST still deliver the stream to the
    application protocol handler even if the echo write fails. The handler can
@@ -183,7 +183,7 @@ interpreted as described in [RFC 2119].
 ### Protocol Confusion on Negotiation Failure
 
 There is a known soundness issue with optimistic multistream-select that arises
-when the negotiation **fails** — i.e., the listener does not support the
+when the negotiation **fails** - i.e., the listener does not support the
 proposed protocol.
 
 Consider the following scenario:
@@ -205,7 +205,7 @@ multistream-select protocol proposal:
 ```
 
 Peer B does not support `protocolA`, so it responds with `"na"` and reads the
-next message. It sees `/protocolB/1.0.0` — which it **does** support — and
+next message. It sees `/protocolB/1.0.0` - which it **does** support - and
 interprets it as a new protocol proposal. It echoes back `/protocolB/1.0.0` and
 starts interpreting `[other data]` as `protocolB` traffic.
 
