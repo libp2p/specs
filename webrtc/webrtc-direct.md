@@ -2,15 +2,16 @@
 
 | Lifecycle Stage | Maturity                  | Status | Latest Revision |
 |-----------------|---------------------------|--------|-----------------|
-| 2A              | Candidate Recommendation  | Active | r2, 2026-04-23  |
+| 2A              | Candidate Recommendation  | Active | r2, 2026-06-20  |
 
 Authors: [@mxinden]
 
-Interest Group: [@marten-seemann], [@dozyio]
+Interest Group: [@marten-seemann], [@dozyio], [@lidel]
 
 [@marten-seemann]: https://github.com/marten-seemann
 [@mxinden]: https://github.com/mxinden/
 [@dozyio]: https://github.com/dozyio
+[@lidel]: https://github.com/lidel
 
 ## Motivation
 
@@ -35,8 +36,8 @@ The TLS certificate fingerprint in `/certhash` is a
 [multibase](https://github.com/multiformats/multibase) encoded
 [multihash](https://github.com/multiformats/multihash).
 
-WebRTC Direct v1 and v2 both use the same `/webrtc-direct` multiaddr protocol.
-Version selection is done via the ICE username fragment prefix, not via a new
+WebRTC Direct v1 and v2 share the same `/webrtc-direct` multiaddr. The server
+picks the version from the ICE username fragment prefix, not from a separate
 multiaddr protocol.
 
 For compatibility implementations MUST support hash algorithm
@@ -46,6 +47,14 @@ support other hash algorithms and base encodings, but they may not be able to
 connect to all other nodes.
 
 ## Connection Establishment
+
+There are two connection establishment flows, v1 and v2. New connections SHOULD
+use v2: v1 relies on SDP munging that browsers are removing, so its
+browser-to-server path will stop working in the near future (see [Browser to
+public Server v2](#browser-to-public-server-v2-no-sdp-munging) for details). v1
+is documented here because existing peers still use it; servers SHOULD keep
+accepting it while browsers still allow v1 and the ecosystem of web clients
+migrates to v2.
 
 ### Browser to public Server v1 (SDP munging)
 
@@ -101,6 +110,12 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    Firefox, Chrome) due to use-cases in the wild. See also
    https://bugs.chromium.org/p/chromium/issues/detail?id=823036
 
+   Chromium is rolling out the [`WebRTC-NoSdpMangleUfrag`][nosdpmangle] field
+   trial, which blocks this ufrag munging and so breaks this step.
+   [Browser to public Server v2](#browser-to-public-server-v2-no-sdp-munging)
+   avoids munging altogether and is the most future-proof way to establish
+   browser-to-server connections; new deployments SHOULD prefer it.
+
 6. Once _A_ sets the SDP offer and answer, it will start sending STUN requests
    to _B_. _B_ reads the _ufrag_ from the incoming STUN request's _username_
    field. _B_ then infers _A_'s SDP offer using the IP, port, and _ufrag_ of the
@@ -112,8 +127,8 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
    2. _B_ sets an arbitrary sha-256 digest as the remote fingerprint as it does
       not verify fingerprints at this point.
 
-   3. _B_ sets the connection field (`c`) to the IP and port of the incoming
-      request `c=IN <ip> <port>`.
+   3. _B_ sets the connection field (`c`) to the IP of the incoming
+      request `c=IN <IP4|IP6> <ip>`.
 
    4. _B_ sets the `a=max-message-size:16384` SDP attribute. See reasoning
       [multiplexing] for rational.
@@ -154,40 +169,96 @@ reachable but _B_ does not have a TLS certificate trusted by _A_.
 
 ### Browser to public Server v2 (no SDP munging)
 
-This flow runs over the same `/webrtc-direct` multiaddr protocol as v1 and keeps
-the same no-signaling model. The version is selected via ICE username fragment
+v2 keeps the same no-signaling model and the same `/webrtc-direct` multiaddr as
+v1, but it never munges the local SDP offer. It exists because browsers are
+taking munging away: Chromium's [`WebRTC-NoSdpMangleUfrag`][nosdpmangle] field
+trial blocks any change to `a=ice-ufrag` (and `a=ice-pwd`) between `createOffer`
+and `setLocalDescription`, so _B_ can no longer predict _A_'s credentials the way
+v1 step (5) relies on. See the WebRTC issue [411871813][webrtc-411871813], the
+[discuss-webrtc notice][discuss-webrtc-psa], and the [`getStats` side
+channel][webrtc-stats-789] that prompted it. Instead of munging, _A_ leaves its
+local credentials alone and puts its own ICE password into the username fragment
+of the synthetic remote answer, where _B_ reads it back from the STUN `USERNAME`
+with no signaling channel.
+
+_B_ picks the version from `server_ufrag`, the part of the STUN `USERNAME` before
+the first `:` (an ICE ufrag never contains `:`). The prefix `libp2p+webrtc+v2/`
+selects this flow; `libp2p+webrtc+v1/` selects
+[v1](#browser-to-public-server-v1-sdp-munging). The `libp2p+webrtc+` namespace is
+reserved for versions: if _B_ does not recognize the version, or sees no such
+prefix, it MUST reject the connection rather than guess a version, so _B_ never
+mistakes a future version for an older one. A _B_ that supports both flows MUST
+serve them on the same UDP port and route each incoming connection by this
 prefix.
 
 1. _A_ and _B_ perform steps (1), (2), and (3) from
    [Browser to public Server v1 (SDP munging)](#browser-to-public-server-v1-sdp-munging).
+   As in v1, _B_ is ICE _controlled_: it acts as an [ICE
+   Lite](https://www.rfc-editor.org/rfc/rfc8445) agent that answers connectivity
+   checks but never starts its own.
 
 2. _A_ creates a local offer via
    [`RTCPeerConnection.createOffer()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createOffer)
    and sets it via
    [`RTCPeerConnection.setLocalDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setLocalDescription).
-   _A_ MUST NOT modify (`mung`) local offer `a=ice-ufrag` or `a=ice-pwd`.
+   _A_ MUST NOT modify ("munge") the local offer's `a=ice-ufrag` or `a=ice-pwd`;
+   they stay as the browser-generated random values. We call them `client_ufrag`
+   and `client_pwd` below.
 
-3. _A_ reads the local ICE password (`client_pwd`) from the local offer SDP.
-   _A_ constructs _B_'s synthetic remote answer with:
+3. _A_ reads its local ICE password `client_pwd` from the `a=ice-pwd` line of
+   [`RTCPeerConnection.localDescription`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/localDescription)
+   after step (2), so it sees the value the browser actually chose. An ICE
+   password is 22 to 256 `ice-char`s (`ALPHA / DIGIT / "+" / "/"`, which never
+   includes `:`); see [RFC 8839], section 5.4 for the grammar and [RFC 8445],
+   section 5.3 for the randomness requirement. Browser-generated passwords meet
+   this. If _A_ cannot read a valid password back, it MUST abort the dial rather
+   than continue with an incomplete credential.
+
+   _A_ builds _B_'s synthetic remote answer and sets both the ICE username
+   fragment and password to `libp2p+webrtc+v2/` followed by `client_pwd`:
    - `a=ice-ufrag:libp2p+webrtc+v2/<client_pwd>`
    - `a=ice-pwd:libp2p+webrtc+v2/<client_pwd>`
 
-   _A_ MUST set `a=max-message-size:16384` and set the remote answer via
+   The resulting `server_ufrag` MUST be a valid ICE username fragment (4 to 256
+   `ice-char`s, [RFC 8839], section 5.4); the 17-character prefix counts toward
+   this limit, so it caps how long `client_pwd` can be. The answer is an ICE Lite
+   answer (`a=ice-lite`) with `a=setup:passive`, which makes _A_ the DTLS client
+   and _B_ the DTLS server. _A_ MUST set `a=max-message-size:16384` and take the
+   remote fingerprint from _B_'s `/certhash`. _A_ sets the remote answer via
    [`RTCPeerConnection.setRemoteDescription()`](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/setRemoteDescription).
 
-4. _A_ starts sending STUN connectivity checks. _B_ parses STUN `USERNAME` as
-   `server_ufrag:client_ufrag` and validates that `server_ufrag` has the prefix
-   `libp2p+webrtc+v2/`.
+4. _A_ starts sending STUN connectivity checks. The browser signs each check's
+   `MESSAGE-INTEGRITY` with the ICE password it took from the synthetic answer
+   (`libp2p+webrtc+v2/<client_pwd>`) and sets its `USERNAME` attribute to
+   `server_ufrag:client_ufrag` ([RFC 8445], section 7.2.2). _B_ splits the
+   `USERNAME` on the first `:` into `server_ufrag` and `client_ufrag`, and MUST
+   check that both are well-formed ICE username fragments (the `ice-char` set and
+   length bounds of [RFC 8839], section 5.4), rejecting the connection otherwise.
+   This keeps attacker-controlled bytes such as `CR`/`LF` out of the SDP _B_
+   builds in step (5). The `libp2p+webrtc+v2/` prefix on `server_ufrag` selects
+   this flow (see version selection above).
 
-5. _B_ infers _A_'s SDP offer as follows:
-   1. `ice-ufrag = client_ufrag`
-   2. `ice-pwd = <payload after libp2p+webrtc+v2/>`
-   3. set an arbitrary sha-256 remote fingerprint
-   4. set `c=IN <ip> <port>` from the incoming STUN packet source
-   5. set `a=max-message-size:16384`
+5. _B_ recovers `client_pwd` by stripping the `libp2p+webrtc+v2/` prefix from
+   `server_ufrag`. If the result is not a valid ICE password (22 to 256
+   `ice-char`s, [RFC 8839], section 5.4), _B_ MUST reject the connection. _B_
+   then infers _A_'s SDP offer as in v1 step (6), except the username fragment
+   and password now differ:
+   1. `a=ice-ufrag` = `client_ufrag`
+   2. `a=ice-pwd` = `client_pwd` (the value recovered above)
+   3. an arbitrary sha-256 remote fingerprint (verification is disabled, see v1
+      step (7))
+   4. `c=IN <IP4|IP6> <ip>` from the incoming STUN packet source
+   5. `a=max-message-size:16384`
+   6. `a=setup:actpass` (or `active`); _B_ answers as the DTLS server
 
-6. _B_ sets this inferred offer as remote description, generates an answer, and
-   sets it as local description.
+6. Before generating its answer, _B_ MUST set its own local ICE username fragment
+   and password to `server_ufrag` (the exact value _A_ embedded,
+   `libp2p+webrtc+v2/<client_pwd>`). ICE needs this: _A_ signs its checks with
+   this value and expects _B_'s STUN responses to use it too. _B_ sets the
+   inferred offer from step (5) as the remote description, then generates its
+   answer and sets it as the local description. That answer is an ICE Lite answer
+   with `a=setup:passive` (so _B_ is the DTLS server) and carries the credentials
+   set above.
 
 7. _A_ and _B_ continue with steps (7), (8), and (9) from
    [Browser to public Server v1 (SDP munging)](#browser-to-public-server-v1-sdp-munging).
@@ -296,8 +367,12 @@ prologue = "6c69627032702d7765627274632d6e6f6973653a12203e79af40d6059617a0d83b83
   it at this point in time. Later versions of the libp2p WebRTC protocol might
   adopt this optimization.
 
-  Note, one can role out a new version of the libp2p WebRTC protocol through a
-  new multiaddr protocol, e.g. `/webrtc-direct-3`.
+  Most new versions roll out within the same `/webrtc-direct` multiaddr by adding
+  a `libp2p+webrtc+<version>/` ICE username fragment prefix, the way v2 was added
+  alongside v1 (see [Connection Establishment](#connection-establishment)). A new
+  multiaddr protocol (e.g. `/webrtc-direct-3`) is only needed for a wire change
+  the prefix cannot negotiate, for example one the dialer needs to know from the
+  multiaddr before it opens the connection.
 
 - _Why exchange fingerprints in an additional authentication handshake on top of
   an established WebRTC connection? Why not only exchange signatures of ones TLS
@@ -354,3 +429,9 @@ prologue = "6c69627032702d7765627274632d6e6f6973653a12203e79af40d6059617a0d83b83
   Given that WebRTC uses DTLS 1.2, _B_ is the one that can send data first.
 
 [multiplexing]: ./README.md#multiplexing
+[RFC 8445]: https://www.rfc-editor.org/rfc/rfc8445
+[RFC 8839]: https://www.rfc-editor.org/rfc/rfc8839
+[nosdpmangle]: https://webrtc-review.googlesource.com/c/src/+/385721
+[webrtc-411871813]: https://issues.webrtc.org/issues/411871813
+[discuss-webrtc-psa]: https://groups.google.com/g/discuss-webrtc/c/PIJZN5MTZF4
+[webrtc-stats-789]: https://github.com/w3c/webrtc-stats/issues/789
