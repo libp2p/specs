@@ -8,6 +8,7 @@ message ControlExtensions {
 
   optional bool testExtension = 6492434;
 
+  optional bool topicStreams = 6492435; // See topic-streams.md 
 }
 
 message ControlMessage {
@@ -58,4 +59,28 @@ message PartialMessagesExtension {
 
   // An encoded representation of the parts a peer has and wants.
   optional bytes partsMetadata = 4;
+}
+
+message TopicRPCHeader {
+  optional string topic = 1;
+}
+
+// TopicScopedMessage is identical to Message, except the topic field is unused
+message TopicScopedMessage {
+	optional string from = 1;
+	optional bytes data = 2;
+	optional bytes seqno = 3;
+
+  // Included for computing signatures, not used on the wire
+  optional string unset_topic_name = 4;
+
+	optional bytes signature = 5;
+	optional bytes key = 6;
+}
+
+message TopicRPC {
+  oneof payload {
+    TopicScopedMessage publish = 1;
+    PartialMessagesExtension partial = 2;
+  }
 }
