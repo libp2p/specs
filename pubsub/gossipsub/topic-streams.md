@@ -76,7 +76,7 @@ SHOULD reset the stream. One second is a reasonable timeout for most
 applications.
 
 `TopicRPC` messages MUST NOT be empty. They MUST contain either a partial or
-publish message.
+publish message. The data length of the application message MUST be non zero.
 
 If there are multiple streams for a single topic, the receiver SHOULD process
 them in the order the streams were opened by the initiator. The receiver
