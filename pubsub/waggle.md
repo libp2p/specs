@@ -93,24 +93,13 @@ At the protocol layer, implementations SHOULD provide basic protections against 
 The protocol uses Protocol Buffers (protobuf) as its wire format. Messages are encoded using the following schema:
 
 ```protobuf
-message Message {
-  oneof payload {
-    TopicSubscription subscription = 1;
-    ObjectPieces publication = 2;
-  }
-}
-
 message TopicSubscription {
   required bytes topicID = 1;
 }
 
 message ObjectPieces {
   required bytes objectID = 2;
-
-  // Encoded representation of the pieces the peer has and the pieces it needs.
   optional bytes piecesMetadata = 3;
-
-  // The raw bytes of one or more pieces of the object being published.
   optional bytes pieces = 4;
 }
 ```
