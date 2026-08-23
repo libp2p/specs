@@ -71,8 +71,12 @@ message TopicScopedMessage {
 	optional bytes data = 2;
 	optional bytes seqno = 3;
 
-  // Included for computing signatures, not used on the wire
-  optional string unset_topic_name = 4;
+  // Field 4 is `topic` on the canonical pubsub Message (see pubsub/README.md).
+  // It is reserved on the wire because the topic comes from TopicRPCHeader.
+  // Implementations MAY still populate field 4 locally when computing
+  // signatures so they can hash a protobuf object without copying the whole
+  // message. This is an implementation choice; field 4 is not sent on the wire.
+  reserved 4;
 
 	optional bytes signature = 5;
 	optional bytes key = 6;
