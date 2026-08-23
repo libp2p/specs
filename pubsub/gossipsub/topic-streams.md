@@ -37,6 +37,15 @@ not publish messages to a peer before learning of its subscriptions, there is
 no window when a publisher wishes to publish a message, but does not know if
 the peer supports Topic Streams.
 
+Because streams are multiplexed independently, a peer MAY receive an inbound
+topic stream before receiving the opening peer's `ControlExtensions` message.
+If the receiving peer supports Topic Streams, it MUST assume that the opening
+peer supports Topic Streams and accept and process the stream. If the receiving
+peer later receives a `ControlExtensions` message indicating that the opening
+peer does not support Topic Streams, it MUST treat this as a protocol violation
+and abort the connection as described in [Aborting the Connection on Protocol
+Violation](#aborting-the-connection-on-protocol-violation).
+
 ## Aborting the Connection on Protocol Violation
 
 If a receiver receives a message from a peer that violates a MUST condition,
