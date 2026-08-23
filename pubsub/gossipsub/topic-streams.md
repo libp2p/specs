@@ -117,8 +117,8 @@ message to the application.
 ### Partial Messages
 
 If the partial message extension has been negotiated with this extension, peers
-MUST send each other Partial Messages on the topic stream, not the control
-stream.
+MUST send each other Partial Messages on the topic stream.
+Peers MUST NOT send Partial Messages on the control stream.
 
 `PartialMessagesExtension` protobuf messages MUST omit the `topicID` field when
 sent over the wire. Implementations MUST set the `topicID` field after
