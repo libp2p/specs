@@ -80,10 +80,10 @@ publish message. The data length of the application message MUST be non zero.
 
 If there are multiple streams for a single topic, the receiver SHOULD process
 them in the order the streams were opened by the initiator. The receiver
-SHOULD limit the number of concurrent topic streams for the same topic to 3 and
-downscore peers that open more. Initiators SHOULD limit the number of
-concurrent topic streams to 1 per topic. The initiator MUST close the old
-stream before writing on a new stream for a given topic.
+SHOULD limit the number of concurrent topic streams for the same topic to 3 by
+resetting future streams and downscore peers that open more. Initiators SHOULD
+limit the number of concurrent topic streams to 1 per topic. The initiator MUST
+close the old stream before writing on a new stream for a given topic.
 
 If the receiver receives a topic stream for a topic it is not subscribed to and
 has not recently published partial messages to (via fanout), it SHOULD
