@@ -70,9 +70,15 @@ The protocol id for a topic stream is `/gsts/v0beta`.
 ### Control Stream
 
 When this extension is negotiated, the original gossipsub stream becomes the
-control stream. Application messages (such as the `Message` or
-`PartialMessagesExtension` messages) MUST NOT be published on the control
-stream.
+control stream. Subscriptions, `IHAVE`, `IWANT`, `GRAFT`, `PRUNE`, `IDONTWANT`,
+`ControlExtensions`, and any other non-application RPC or control traffic MUST
+remain on this stream.
+
+A stream opened with protocol id `/gsts/v0beta` and identified by a
+`TopicRPCHeader` is a topic stream. Application publish payloads (`Message`,
+represented on the wire by `TopicScopedMessage`, and
+`PartialMessagesExtension`) MUST be sent on a topic stream and MUST NOT be
+published on the control stream.
 
 ### Topic Stream Header
 
@@ -111,8 +117,16 @@ peers and use a short-lived stream when responding to `IWANTs`.
 
 ### Topic Scoped Messages
 
-When a peer wishes to publish a message, it MUST publish a `TopicScopedMessage`
-and it MUST NOT publish a message on the control stream.
+A stream opened with protocol id `/gsts/v0beta` and identified by a
+`TopicRPCHeader` is a topic stream. The original gossipsub stream is the
+[control stream](#control-stream) after negotiation.
+
+When a peer wishes to publish an application `Message`, it MUST send it as a
+`TopicScopedMessage` on the topic stream and MUST NOT publish it on the control
+stream. `PartialMessagesExtension` application payloads likewise MUST be sent
+on the topic stream and MUST NOT be published on the control stream. All
+subscriptions and other non-application RPC or control traffic MUST remain on
+the control stream.
 
 Implementations MUST NOT set the topic name when sending the message over the
 wire.
