@@ -48,7 +48,7 @@ Violation](#aborting-the-connection-on-protocol-violation).
 
 ## Aborting the Connection on Protocol Violation
 
-If a receiver receives a message from a peer that violates a MUST condition,
+If a receiver receives a message that violates a MUST condition,
 the receiver MUST reset the connection to the peer and send error code
 `0xd52505` when the transport allows it. This code signifies a Topic Streams
 Protocol Violation error, and is derived from the first 3 bytes of the sha256
@@ -57,7 +57,7 @@ hashsum of the string `gossipsub-topic-streams`. (i.e. `echo -n
 
 ## Topic Streams
 
-A peer opens a bidirectional stream for each topic that it wishes to send
+A peer MUST open a bidirectional stream for each topic that it wishes to send
 application messages for. Despite being bidirectional streams, they are treated
 as unidirectional streams. If both sides wish to publish messages for a given
 topic, both sides MUST open a bidirectional stream.
@@ -93,12 +93,12 @@ applications.
 `TopicRPC` messages MUST NOT be empty. They MUST contain either a partial or
 publish message. The data length of the application message MUST be non zero.
 
-If there are multiple streams for a single topic, the receiver SHOULD process
-them in the order the streams were opened by the initiator. The receiver
-SHOULD limit the number of concurrent topic streams for the same topic to 3 by
-resetting future streams and downscore peers that open more. Initiators SHOULD
-limit the number of concurrent topic streams to 1 per topic. The initiator MUST
-close the old stream before writing on a new stream for a given topic.
+The initiator MUST close the existing topic stream for a topic before it opens
+a new one. Because the transport can reorder packets, the receiver can get a
+new stream before the close of the old one. This is not a violation. The
+receiver MUST accept up to 3 open streams for a topic and SHOULD process them
+in the sequence opened. If there are more than 3, the receiver SHOULD reset
+the excess streams and downscore the peer.
 
 If the receiver receives a topic stream for a topic it is not subscribed to and
 has not recently published partial messages to (via fanout), it SHOULD
