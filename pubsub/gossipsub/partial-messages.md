@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 | --------------- | ------------- | ------ | --------------- |
-| 1A              | Working Draft | Active | r0, 2025-06-23  |
+| 1A              | Working Draft | Active | r1, 2026-08-31  |
 
 Authors: [@marcopolo], [@sukunrt], [@jxs], [@cskiraly]
 
@@ -64,11 +64,12 @@ node has all but one cell, this would result in a transfer of 2KiB rather than
 64KiB per column. and since nodes custody at least 8 columns, the total savings
 per slot is around 500KiB.
 
-Later, partial messages could enable further optimizations:
+Partial messages enable further optimizations:
 
 - If cells can be validated individually, as in the case of DAS, partial
-  messages could also be forwarded, allowing us to reduce the store-and-forward
-  delay [2].
+  messages can also be forwarded before the node has the full message (see
+  [Forwarding Message Parts](#forwarding-message-parts)), allowing us to
+  reduce the store-and-forward delay [2].
 - Finally, in the FullDAS construct, where both row and column topics are
   defined, partial messages allow cross-forwarding cells between these topics
   [2].
@@ -199,6 +200,31 @@ Fanout and Gossip messages by definition come from non-mesh peers. Partial
 messages, without eager data, require an exchange of bitmaps before parts are
 transferred. In order for fanout and gossip messages to be useful, the
 Application MUST be able to send partial messages to these peers.
+
+## Forwarding Message Parts
+
+Some applications can validate a message part on its own, without the full
+message. Such a part is individually verifiable. For example, a node can
+validate a DAS cell against its KZG commitment without the other cells in the
+column.
+
+A node that requested partial messages receives parts before it has the full
+message. When a received part is individually verifiable, the application
+SHOULD validate it and SHOULD then forward it to mesh peers that requested
+partial messages for the topic, without waiting for the full message. This
+removes the store-and-forward delay of full message relay [2].
+
+An application MUST NOT forward a part that failed validation.
+
+To support this, implementations MUST accept a partial message publish for a
+group before the application has the full message, and MUST accept repeated
+publishes for the same group as the application obtains more parts.
+Implementations SHOULD track per-peer state so that repeated publishes only
+send parts and metadata a peer does not already have.
+
+Parts that are not individually verifiable MUST NOT be forwarded before the
+full message validates. Applications with such parts fall back to
+store-and-forward relay of the reconstructed full message.
 
 ## Implementation Recommendations
 
