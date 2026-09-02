@@ -68,8 +68,8 @@ Partial messages enable further optimizations:
 
 - If cells can be validated individually, as in the case of DAS, partial
   messages can also be forwarded before the node has the full message (see
-  [Forwarding Message Parts](#forwarding-message-parts)), allowing us to
-  reduce the store-and-forward delay [2].
+  [Forwarding Message Parts Without Knowing Full Message](#forwarding-message-parts-without-knowing-full-message)),
+  helping to reduce the store-and-forward delay [2].
 - Finally, in the FullDAS construct, where both row and column topics are
   defined, partial messages allow cross-forwarding cells between these topics
   [2].
@@ -201,12 +201,7 @@ messages, without eager data, require an exchange of bitmaps before parts are
 transferred. In order for fanout and gossip messages to be useful, the
 Application MUST be able to send partial messages to these peers.
 
-## Forwarding Message Parts
-
-Some applications can validate a message part on its own, without the full
-message. Such a part is individually verifiable. For example, a node can
-validate a DAS cell against its KZG commitment without the other cells in the
-column.
+## Forwarding Message Parts Without Knowing Full Message
 
 A node that requested partial messages receives parts before it has the full
 message. When a received part is individually verifiable, the application
@@ -214,17 +209,26 @@ SHOULD validate it and SHOULD then forward it to mesh peers that requested
 partial messages for the topic, without waiting for the full message. This
 removes the store-and-forward delay of full message relay [2].
 
-An application MUST NOT forward a part that failed validation.
+An application MUST NOT forward a part that failed validation or that cannot be
+individually validated.
 
 To support this, implementations MUST accept a partial message publish for a
 group before the application has the full message, and MUST accept repeated
 publishes for the same group as the application obtains more parts.
-Implementations SHOULD track per-peer state so that repeated publishes only
+Implementations SHOULD track peer state so that repeated publishes only
 send parts and metadata a peer does not already have.
 
-Parts that are not individually verifiable MUST NOT be forwarded before the
-full message validates. Applications with such parts fall back to
-store-and-forward relay of the reconstructed full message.
+To track this state, an implementation keeps two records for each peer and
+Group ID: the parts it believes the peer has, and the `partsMetadata` it last
+sent to the peer. The first record starts from the last `partsMetadata`
+received from the peer and is updated with every part the implementation sends
+to the peer. The second record is the implementation's own `partsMetadata` as
+of the last send. On a repeated publish for the group, the implementation
+sends only the parts absent from the first record, and includes its
+`partsMetadata` only if it differs from the second record. If neither record
+changes, it sends nothing to that peer. Both records are per-message state and
+SHOULD be dropped after a bounded number of heartbeats (see
+[DoS Resiliency](#dos-resiliency)).
 
 ## Implementation Recommendations
 
