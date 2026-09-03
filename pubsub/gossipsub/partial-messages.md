@@ -218,17 +218,18 @@ publishes for the same group as the application obtains more parts.
 Implementations SHOULD track peer state so that repeated publishes only
 send parts and metadata a peer does not already have.
 
-To track this state, an implementation keeps two records for each peer and
-Group ID: the parts it believes the peer has, and the `partsMetadata` it last
-sent to the peer. The first record starts from the last `partsMetadata`
-received from the peer and is updated with every part the implementation sends
-to the peer. The second record is the implementation's own `partsMetadata` as
-of the last send. On a repeated publish for the group, the implementation
-sends only the parts absent from the first record, and includes its
-`partsMetadata` only if it differs from the second record. If neither record
-changes, it sends nothing to that peer. Both records are per-message state and
-SHOULD be dropped after a bounded number of heartbeats (see
-[DoS Resiliency](#dos-resiliency)).
+To avoid resending data, an implementation SHOULD track, for each `(peer, Group ID)` pair:
+
+- **Known parts**: which parts the peer already has. This starts from the
+  peer's last `partsMetadata` and grows with each part sent to the peer.
+- **Last sent metadata**: the `partsMetadata` this implementation last sent to
+  the peer.
+
+When the group is published again, the implementation SHOULD only send  parts
+the peer does not yet have, and attach its current `partsMetadata` only if
+it has changed since it was last sent. If neither condition holds, nothing is
+sent to that peer. This state is per-message and SHOULD be dropped after a
+bounded number of heartbeats (see [DoS Resiliency](#dos-resiliency)).
 
 ## Implementation Recommendations
 
