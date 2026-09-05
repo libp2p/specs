@@ -43,6 +43,8 @@ included in the first message on the stream. An Extensions control message MUST
 NOT be sent more than once. If a peer supports no extensions, it may omit
 sending the Extensions control message.
 
+The receiver SHOULD downscore a peer that violates either rule.
+
 Extensions are not negotiated; they describe characteristics of the sending peer
 that can be used by the receiving peer. However, a negotiation can be implied:
 each peer uses the Extensions control message to advertise a set of supported
@@ -56,6 +58,20 @@ to combine with other extensions that modify or replace the same functionality
 unless the behavior of the combination is explicitly defined. Such extensions
 SHOULD define their interaction with previously defined extensions modifying the
 same protocol components.
+
+## Peer Scoring on Protocol Violations
+
+If a peer sends a message that violates a MUST or MUST NOT condition of this
+document, or of an extension the peer advertises, the receiver SHOULD downscore
+the peer through the `P₇` behavioural penalty defined in [gossipsub
+v1.1][gossipsub-v1.1-scoring]. This covers only the conditions that the receiver
+can check from the messages it receives. An extension MAY define a stronger
+remedy, such as resetting the connection.
+
+A receiver MUST NOT downscore a peer for a message that the peer could have sent
+before it processed the receiver's latest subscription change.
+
+[gossipsub-v1.1-scoring]: https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.1.md#peer-scoring
 
 ## Protocol ID
 

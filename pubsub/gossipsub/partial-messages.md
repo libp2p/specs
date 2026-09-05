@@ -133,7 +133,10 @@ to send the peer a full message or a partial message.
 If a peer supports partial messages on a topic but did not request them, a node
 MUST omit the `partialMessage` field of the `PartialMessagesExtension` message
 when sending a message to this peer. In other words, it MUST NOT send this peer
-encoded partialMessage data since it did not request it.
+encoded partialMessage data since it did not request it. A node that receives a
+`partialMessage` field for a topic it did not request partial messages on SHOULD
+downscore the sending peer, unless the peer could have sent the message before it
+processed the node's latest `SubOpts` for that topic.
 
 If a node does not support the partial message extension, it MUST ignore the
 `requestPartial` and `supportsPartial` fields. This is the default behavior of
@@ -165,6 +168,13 @@ message for a given topic.
 | ------------------------ | ------------------------------------------------------------------------ |
 | \*                       | The receiver expects full messages                                       |
 
+
+## Peer Scoring on Protocol Violations
+
+A receiver scores violations of this extension as described in [Peer Scoring on
+Protocol Violations][gossipsub-v1.3-violations].
+
+[gossipsub-v1.3-violations]: https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.3.md#peer-scoring-on-protocol-violations
 
 ## Partial Message Gossip
 

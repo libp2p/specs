@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity                  | Status | Latest Revision |
 |-----------------|---------------------------|--------|-----------------|
-| 1A              | Working Draft             | Active | r1, 2023-07-14  |
+| 1A              | Working Draft             | Active | r2, 2026-08-30  |
 
 Authors: [@Nashatyrev], [@Menduist]
 
@@ -75,6 +75,10 @@ is more appropriate for it. Possible options are either choose a message size th
 on per message basis when the size is exceeded or just use `IDONTWANT` for all messages on selected topics.
 
 To prevent DoS the number of `IDONTWANT` control messages is limited to `max_idontwant_messages` per heartbeat  
+
+The receiver SHOULD ignore the `IDONTWANT` messages beyond `max_idontwant_messages` within a heartbeat, and SHOULD
+downscore the peer that sent them, but only when `max_idontwant_messages` is agreed across the network. An
+implementation that disagrees with its peers on this value downscores honest peers.
 
 ### Cancelling `IWANT`
 
