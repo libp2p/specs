@@ -2,7 +2,7 @@
 
 | Lifecycle Stage | Maturity      | Status | Latest Revision |
 | --------------- | ------------- | ------ | --------------- |
-| 1A              | Working Draft | Active | r0, 2025-06-23  |
+| 1A              | Working Draft | Active | r1, 2026-08-31  |
 
 Authors: [@marcopolo], [@sukunrt], [@jxs], [@cskiraly]
 
@@ -64,11 +64,12 @@ node has all but one cell, this would result in a transfer of 2KiB rather than
 64KiB per column. and since nodes custody at least 8 columns, the total savings
 per slot is around 500KiB.
 
-Later, partial messages could enable further optimizations:
+Partial messages enable further optimizations:
 
 - If cells can be validated individually, as in the case of DAS, partial
-  messages could also be forwarded, allowing us to reduce the store-and-forward
-  delay [2].
+  messages can also be forwarded before the node has the full message (see
+  [Forwarding Message Parts Without Knowing Full Message](#forwarding-message-parts-without-knowing-full-message)),
+  helping to reduce the store-and-forward delay [2].
 - Finally, in the FullDAS construct, where both row and column topics are
   defined, partial messages allow cross-forwarding cells between these topics
   [2].
@@ -209,6 +210,36 @@ Fanout and Gossip messages by definition come from non-mesh peers. Partial
 messages, without eager data, require an exchange of bitmaps before parts are
 transferred. In order for fanout and gossip messages to be useful, the
 Application MUST be able to send partial messages to these peers.
+
+## Forwarding Message Parts Without Knowing Full Message
+
+A node that requested partial messages may receive parts before it has the full
+message. When a received part is individually verifiable, the application
+SHOULD validate it and SHOULD then forward it to mesh peers that requested
+partial messages for the topic, without waiting for the full message. This
+removes the store-and-forward delay of full message relay [2].
+
+An application MUST NOT forward a part that failed validation or that cannot be
+individually validated.
+
+To support this, implementations MUST accept a partial message publish for a
+group before the application has the full message, and MUST accept repeated
+publishes for the same group as the application obtains more parts.
+Implementations SHOULD track peer state so that repeated publishes only
+send parts and metadata a peer does not already have.
+
+To avoid resending data, an implementation SHOULD track, for each `(peer, Group ID)` pair:
+
+- **Known parts**: which parts the peer already has. This starts from the
+  peer's last `partsMetadata` and grows with each part sent to the peer.
+- **Last sent metadata**: the `partsMetadata` this implementation last sent to
+  the peer.
+
+When the group is published again, the implementation SHOULD only send parts
+the peer does not yet have, and attach its current `partsMetadata` only if
+it has changed since it was last sent. If neither condition holds, nothing is
+sent to that peer. This state is per-message and SHOULD be dropped after a
+bounded number of heartbeats (see [DoS Resiliency](#dos-resiliency)).
 
 ## Implementation Recommendations
 
