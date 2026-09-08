@@ -203,7 +203,7 @@ Application MUST be able to send partial messages to these peers.
 
 ## Forwarding Message Parts Without Knowing Full Message
 
-A node that requested partial messages receives parts before it has the full
+A node that requested partial messages may receive parts before it has the full
 message. When a received part is individually verifiable, the application
 SHOULD validate it and SHOULD then forward it to mesh peers that requested
 partial messages for the topic, without waiting for the full message. This
