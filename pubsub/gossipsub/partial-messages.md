@@ -225,7 +225,7 @@ To avoid resending data, an implementation SHOULD track, for each `(peer, Group 
 - **Last sent metadata**: the `partsMetadata` this implementation last sent to
   the peer.
 
-When the group is published again, the implementation SHOULD only send  parts
+When the group is published again, the implementation SHOULD only send parts
 the peer does not yet have, and attach its current `partsMetadata` only if
 it has changed since it was last sent. If neither condition holds, nothing is
 sent to that peer. This state is per-message and SHOULD be dropped after a
