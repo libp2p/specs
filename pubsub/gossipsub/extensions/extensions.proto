@@ -3,6 +3,10 @@ syntax = "proto2";
 message ControlExtensions {
     optional bool partialMessages = 10;
 
+    // gossipsub v1.4: Large Message Handling extension.
+    // See gossipsub-v1.4.md for the specification.
+    optional bool largeMessageHandling = 11;
+
   // Experimental extensions must use field numbers larger than 0x200000 to be
   // encoded with at least 4 bytes
 
@@ -17,6 +21,12 @@ message ControlMessage {
   repeated ControlPrune prune = 4;
   repeated ControlIDontWant idontwant = 5;
   optional ControlExtensions extensions = 6;
+
+  // gossipsub v1.4: Large Message Handling control messages.
+  // PREAMBLE announces a large message before transmission begins.
+  repeated ControlPreamble preamble = 7;
+  // IMRECEIVING signals that a large message is currently being received.
+  repeated ControlImReceiving imreceiving = 8;
 }
 
 message RPC {
@@ -41,6 +51,10 @@ message RPC {
   // Canonical Extensions should register their messages here.
   optional PartialMessagesExtension partial = 10;
 
+  // gossipsub v1.4: Large message fragments.
+  // See gossipsub-v1.4.md for the specification.
+  repeated LargeMessageFragment largeMessageFragments = 12;
+
   // Experimental Extensions should register their messages here. They
   // must use field numbers larger than 0x200000 to be encoded with at least 4
   // bytes
@@ -58,4 +72,31 @@ message PartialMessagesExtension {
 
   // An encoded representation of the parts a peer has and wants.
   optional bytes partsMetadata = 4;
+}
+
+// ===== gossipsub v1.4: Large Message Handling =====
+// See gossipsub-v1.4.md for the full specification.
+
+// PREAMBLE is sent before transmitting a large message to announce its
+// messageID and size, allowing receivers to prepare and coordinate.
+message ControlPreamble {
+  optional bytes messageID = 1;    // ID of the message about to be transmitted
+  optional uint64 messageSize = 2; // Total size in bytes of the full message
+  optional string topicID = 3;     // Topic the message belongs to
+}
+
+// IMRECEIVING signals that the sender is currently in the process of receiving
+// a large message, allowing neighbors to suppress redundant sends.
+message ControlImReceiving {
+  optional bytes messageID = 1;    // ID of the message currently being received
+}
+
+// LargeMessageFragment carries a single fragment of a large message that has
+// been split for pipeline-parallel relay across the mesh.
+message LargeMessageFragment {
+  optional bytes messageID = 1;      // Full message ID this fragment belongs to
+  optional uint32 fragmentIndex = 2; // 0-based index of this fragment
+  optional uint32 totalFragments = 3;// Total number of fragments
+  optional bytes fragmentData = 4;   // The fragment payload
+  optional string topicID = 5;       // Topic the original message belongs to
 }

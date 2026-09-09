@@ -15,13 +15,14 @@ Gossipsub versions and Extensions.
 
 ## Gossipsub Extensions
 
-|               | [Choke Extensions] | [Partial Messages]                                        |
-| ------------- | ------------------ | --------------------------------------------------------- |
-| [Go libp2p]   | Not Implemented    | [PR](https://github.com/libp2p/go-libp2p-pubsub/pull/631) |
-| [Rust libp2p] | Not Implemented    | Not Implemented                                           |
-| [JS libp2p]   | Not Implemented    | Not Implemented                                           |
-| [Nim libp2p]  | Not Implemented    | Not Implemented                                           |
-| [Java libp2p] | Not Implemented    | Not Implemented                                           |
+|               | [Choke Extensions] | [Partial Messages]                                        | [Large Message Handling] |
+| ------------- | ------------------ | --------------------------------------------------------- | ------------------------ |
+| [Go libp2p]   | Not Implemented    | [PR](https://github.com/libp2p/go-libp2p-pubsub/pull/631) | Not Implemented          |
+| [Rust libp2p] | Not Implemented    | Not Implemented                                           | Not Implemented          |
+| [JS libp2p]   | Not Implemented    | Not Implemented                                           | Not Implemented          |
+| [Nim libp2p]  | Not Implemented    | Not Implemented                                           | Prototype                |
+| [Java libp2p] | Not Implemented    | Not Implemented                                           | Not Implemented          |
+| [Py libp2p]   | Not Implemented    | Not Implemented                                           | Prototype                |
 
 ## Gossipsub Implementation Improvements
 
@@ -42,6 +43,9 @@ Gossipsub versions and Extensions.
 [1.3-alpha]: https://github.com/libp2p/specs/issues/687
 [Choke Extensions]: https://github.com/libp2p/specs/pull/681
 [Partial Messages]: https://github.com/libp2p/specs/pull/685
+[Large Message Handling]: https://github.com/libp2p/specs/blob/master/pubsub/gossipsub/gossipsub-v1.4.md
+[Py libp2p]: https://github.com/libp2p/py-libp2p/tree/master/libp2p/pubsub
 [Batch Publishing]: https://ethresear.ch/t/improving-das-performance-with-gossipsub-batch-publishing/21713
 [IDONTWANT on first Publish]: https://github.com/libp2p/go-libp2p-pubsub/issues/610
 [WFR Gossip]: https://ethresear.ch/t/the-paths-of-least-resistance-introducing-wfr-gossip/22671/3
+
