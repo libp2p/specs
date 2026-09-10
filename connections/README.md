@@ -238,7 +238,7 @@ open protocol extension][simopen].
 ### Inlining Muxer Negotiation
 
 If both peers support it, it's possible to shortcut the muxer selection by moving
-it into the security handshake. Details are specified in [inlined-muxer-negotiation].
+it into the security handshake. Details are specified in [inlined-muxer-negotiation][inlined-muxer-selection].
 
 
 ## Opening New Streams Over a Connection
@@ -398,7 +398,7 @@ perhaps eventually replace) the current [notification system][go-net-notifee].
 
 One of the near-term goals of the event bus refactor is to more easily respond
 to changes in the protocols supported by a remote peer. Those changes are
-communicated over the wire using the [identify/push protocol][identify-push].
+communicated over the wire using the [identify/push protocol][identify/push].
 Using an event bus allows other, unrelated components of libp2p (for
 example, a DHT module) to respond to changes without tightly coupling components
 together with direct dependencies.
@@ -414,7 +414,7 @@ updated to incorporate the changes.
 [yamux]: https://github.com/hashicorp/yamux/blob/master/spec.md
 [noise-spec]: ../noise/README.md
 [connmgr-v2-spec]: https://github.com/libp2p/specs/pull/161
-[connmgr-go-interface]: https://github.com/libp2p/go-libp2p-core/blob/master/connmgr/connmgr.go
+[connmgr-go-interface]: https://github.com/libp2p/go-libp2p/tree/master/core/connmgr
 [tls-libp2p]: ../tls/tls.md
 [go-libp2p-peerstore]: https://github.com/libp2p/go-libp2p-peerstore
 [js-peer-book]: https://github.com/libp2p/js-peer-book
