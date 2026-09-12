@@ -181,7 +181,7 @@ If the peers agree on a protocol, multistream-select's job is done, and future
 traffic over the channel will adhere to the rules of the agreed-upon protocol.
 
 If a peer receives a `"na"` response to a proposed protocol id, they can either
-try again with a different protocol id or close the channel.
+try again with a different protocol id or close the channel with error code `PROTOCOL_NEGOTIATION_FAILED` as defined in [libp2p error codes](./../error-codes/README.md) spec. 
 
 
 ## Upgrading Connections
