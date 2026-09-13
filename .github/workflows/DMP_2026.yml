@@ -1,0 +1,345 @@
+name: DMP 2026 Project Template
+description: List a new project for Dedicated Mentoring Program (DMP) 2026
+title: "[DMP 2026]: "
+labels: ["DMP 2026"]
+body:
+  - type: textarea
+    id: ticket-description
+    validations:
+      required: true
+    attributes:
+      label: Ticket Contents
+      value: |
+        ## Description
+        [Provide a brief description of the feature, including why it is needed and what it will accomplish.]
+
+  - type: textarea
+    id: ticket-goals
+    validations:
+      required: true
+    attributes:
+      label: Goals & Mid-Point Milestone
+      description: List the goals of the feature. Please add the goals that must be achieved by Mid-point check-in i.e 1.5 months into the coding period.
+      value: |
+        ## Goals
+        - [ ] [Goal 1]
+        - [ ] [Goal 2]
+        - [ ] [Goal 3]
+        - [ ] [Goal 4]
+        - [ ] [Goals Achieved By Mid-point Milestone]
+
+  - type: textarea
+    id: ticket-setup
+    attributes:
+      label: Setup/Installation 
+      description: Please list or link setup or installation guide (if any)
+
+  - type: textarea
+    id: ticket-expected-outcome
+    attributes:
+      label: Expected Outcome
+      description: Describe in detail what the final product or result should look like and how it should behave.
+
+  - type: textarea
+    id: ticket-acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: List the acceptance criteria for this feature.
+
+  - type: textarea
+    id: ticket-implementation-details
+    validations:
+      required: true
+    attributes:
+      label: Implementation Details
+      description: List any technical details about the proposed implementation, including any specific technologies that will be used.
+
+  - type: textarea
+    id: ticket-mockups
+    attributes:
+      label: Mockups/Wireframes
+      description: Include links to any visual aids, mockups, wireframes, or diagrams that help illustrate what the final product should look like. This is not always necessary, but can be very helpful in many cases.
+
+  - type: input
+    id: ticket-product
+    attributes:
+      label: Product Name
+      placeholder: Enter Product Name
+    validations:
+      required: true
+
+  - type: dropdown
+    id: ticket-organisation
+    attributes:
+      label: Organisation Name
+      description: Enter Organisation Name
+      multiple: false
+      options:
+        - Agami
+        - Argusoft
+        - ARMMAN
+        - Avanti Fellows
+        - Bandhu
+        - Beckn
+        - Belongg
+        - Blockster Global (CREDBEL)
+        - Blockster Labs / AyanWorks
+        - CBoard
+        - CHAOSS
+        - CHAOSS Africa + GWU
+        - Civis
+        - ConveGenius
+        - Consul Democracy
+        - COSS
+        - CranberryFit
+        - Development Gateway
+        - DHIS2
+        - Dhiway
+        - Dhwani
+        - Digital Green
+        - Digital India
+        - Dimagi
+        - Drupal
+        - Education Initiative
+        - eGov
+        - EkShop Marketplace
+        - FIDE
+        - FinternetLabs
+        - Flywheel
+        - GovDirectory
+        - Haqdarshak
+        - Healthsites.io
+        - IDinsight
+        - If Me
+        - IIIT Delhi
+        - IIT Bombay
+        - IIT Delhi
+        - Impactyaan
+        - Indus Action
+        - Intel Health
+        - Key Education Foundation
+        - Khushi Baby
+        - Learning Economy
+        - Linux Foundation
+        - Mecha Systems
+        - Medic Mobile
+        - Medtronic Labs
+        - MetaBrainz
+        - Mifos
+        - Mojaloop
+        - MOSIP
+        - NASSCOM Foundation
+        - NHA
+        - NIUA
+        - Norwegian Meteorological Institute
+        - NSUT x SEETA x AIC
+        - ONDC
+        - ONEST
+        - Open Healthcare Network
+        - OpenCRVS
+        - OpenFn
+        - OpenIMIS
+        - OpenMRS
+        - OpenSPP
+        - Piramal Swasthya
+        - Planet Read
+        - Policy Engine
+        - Pratham Books
+        - Project Second Chance
+        - Project Tech4Dev
+        - Protean
+        - RCTS-IIITH
+        - Reap Benefit
+        - Resolve to Save Lives
+        - Rocket Learning
+        - Rumsan
+        - Sahamati
+        - SamagraX
+        - Samanvay Foundation
+        - Sampatti Card
+        - Sanketika
+        - ShikshaLokam
+        - SimPPL
+        - Sugar Labs
+        - Swasth Alliance
+        - Swecha
+        - Tarento
+        - Tattle
+        - Tech4Dev
+        - Tekdi
+        - The Apprentice Project
+        - The Mifos Initiative
+        - Thoughtworks
+        - Tibil
+        - TinkerHub
+        - Trustin
+        - Tuner Labs
+        - TYCIA
+        - UNICEF
+        - United Nations
+        - Ushahidi
+        - Win Over Cancer
+        - WRI
+        - Zendalona
+        - Zenysis
+        - Arghyam
+    validations:
+      required: true
+
+  - type: dropdown
+    id: ticket-governance-domain
+    attributes:
+      label: Domain
+      options:
+        - ⁠Healthcare 
+        - ⁠Education
+        - Financial Inclusion
+        - ⁠Livelihoods
+        - ⁠Skilling 
+        - ⁠Learning & Development
+        - ⁠Agriculture
+        - ⁠Service Delivery
+        - Open Source Library
+        - Water
+    validations:
+      required: true
+
+
+  - type: dropdown
+    id: ticket-technical-skills-required
+    attributes:
+      label: Tech Skills Needed
+      description: Select the technologies needed for this ticket (use Ctrl or Command to select multiple)
+      multiple: true
+      options:
+        - .NET
+        - Angular
+        - Artificial Intelligence
+        - ASP.NET
+        - AWS
+        - Babel
+        - Bootstrap
+        - C#
+        - Chart.js
+        - CI/CD
+        - Computer Vision
+        - CORS
+        - cURL
+        - Cypress
+        - D3.js
+        - Database
+        - Debugging
+        - Design
+        - DevOps
+        - Django
+        - Docker
+        - Electron
+        - ESLint
+        - Express.js
+        - Feature
+        - Flask
+        - Go
+        - GraphQL
+        - HTML
+        - Ionic
+        - Jest
+        - Java
+        - JavaScript
+        - Jenkins
+        - JWT
+        - Kubernetes
+        - Laravel
+        - Machine Learning
+        - Maintenance
+        - Markdown
+        - Material-UI
+        - Microservices
+        - MongoDB
+        - Mobile
+        - Mockups
+        - Mocha
+        - Natural Language Processing
+        - NestJS
+        - Node.js
+        - NUnit
+        - OAuth
+        - Performance Improvement
+        - Prettier
+        - Python
+        - Question
+        - React
+        - React Native
+        - Redux
+        - RESTful APIs
+        - Ruby
+        - Ruby on Rails
+        - Rust
+        - Scala
+        - Security
+        - Selenium
+        - SEO
+        - Serverless
+        - Solidity
+        - Spring Boot
+        - SQL
+        - Swagger
+        - Tailwind CSS
+        - Test
+        - Testing Library
+        - Three.js
+        - TypeScript
+        - UI/UX/Design
+        - Virtual Reality
+        - Vue.js
+        - WebSockets
+        - Webpack
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: ticket-mentors
+    attributes:
+      label: Mentor(s)
+      description: Please tag relevant mentors for the ticket
+    validations:
+      required: true
+
+  - type: dropdown
+    id: ticket-category
+    attributes: 
+      label: Category
+      description: Choose the categories that best describe your ticket
+      multiple: true
+      options:
+        - API
+        - Analytics
+        - Accessibility
+        - Backend
+        - Breaking Change
+        - Beginner Friendly
+        - Configuration
+        - CI/CD
+        - Database
+        - Data Science
+        - Deprecation
+        - Documentation
+        - Delpoyment
+        - Frontend
+        - Internationalization
+        - Localization
+        - Machine Learning
+        - Maintenance
+        - Mobile
+        - Performance Improvement
+        - Question
+        - Refactoring
+        - Research
+        - Needs Reproduction
+        - SEO
+        - Security
+        - Testing
+        - AI
+        - Other
+    validations:
+      required: true
