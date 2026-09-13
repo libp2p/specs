@@ -1,0 +1,20 @@
+syntax = "proto2";
+
+// PREAMBLE and IMRECEIVING extension for improved large message handling
+// See: ./preamble-imreceiving.md
+
+message PreambleImreceivingExtension {
+  repeated ControlPreamble preamble = 1;
+  repeated ControlIMReceiving imreceiving = 2;
+}
+
+message ControlPreamble {
+  optional bytes  messageID     = 1;
+  optional uint64 messageLength = 2;
+}
+
+message ControlIMReceiving {
+  optional bytes  messageID       = 1;
+  optional uint64 messageLength   = 2;
+  optional uint32 deferDurationMs = 3;
+}
