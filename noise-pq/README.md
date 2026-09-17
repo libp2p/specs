@@ -365,9 +365,9 @@ Four implementations have been developed and tested against each other:
 
 | Language | Repository | Status |
 |----------|-----------|--------|
-| TypeScript | [ChainSafe/js-libp2p-noise PR #665](https://github.com/ChainSafe/js-libp2p-noise/pull/665) | Open PR; 99 tests, 5 deterministic test vectors |
-| Python | [libp2p/py-libp2p PR #1310](https://github.com/libp2p/py-libp2p/pull/1310) | Open PR; 56 tests |
-| Rust | [libp2p/rust-libp2p PR #6481](https://github.com/libp2p/rust-libp2p/pull/6481), by @royzah; interop harness in [royzah/rust-libp2p PR #1](https://github.com/royzah/rust-libp2p/pull/1) | Open PR; uses `ml-kem` crate (RustCrypto) |
+| TypeScript | [ChainSafe/js-libp2p-noise PR #665](https://github.com/ChainSafe/js-libp2p-noise/pull/665) | Draft PR; 99 tests, 5 deterministic test vectors |
+| Python | [libp2p/py-libp2p PR #1310](https://github.com/libp2p/py-libp2p/pull/1310) | Draft PR; 56 tests |
+| Rust | [libp2p/rust-libp2p PR #6481](https://github.com/libp2p/rust-libp2p/pull/6481), by @royzah; interop harness in [royzah/rust-libp2p PR #1](https://github.com/royzah/rust-libp2p/pull/1) | Draft PR; uses `ml-kem` crate (RustCrypto) |
 | Nim | [vacp2p/nim-libp2p PR #2811](https://github.com/vacp2p/nim-libp2p/pull/2811) | Draft PR; ML-KEM-768 via BoringSSL |
 
 ### Interoperability Matrix (2026-09-17)
