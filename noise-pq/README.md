@@ -288,7 +288,7 @@ Each test vector has the following form. The example is vector 1 of the referenc
   "vectors": [
     {
       "vector_index": 1,
-      "description": "Noise_XXhfs vector 1 — all keys seeded from base byte 0x10",
+      "description": "Noise_XXhfs vector 1: all keys seeded from base byte 0x10",
       "static_i_public": "7b4e909bbe7ffe44c465a220037d608ee35897d31ef972f07f74892cb0f73f13",
       "static_i_private": "1111111111111111111111111111111111111111111111111111111111111111",
       "static_r_public": "052a50773ac8d91773f2dc9662e12f0defe915e415b8a1c8e20a5a3d6ab2b843",
@@ -350,7 +350,7 @@ host = await new_node(
 A conforming implementation MUST:
 
 1. Use the exact protocol name string: `Noise_XXhfs_25519+MLKEM768_ChaChaPoly_SHA256`
-2. Use raw ML-KEM-768 (FIPS 203) as the KEM primitive — not X-Wing or any other composite wrapper
+2. Use raw ML-KEM-768 (FIPS 203) as the KEM primitive, not X-Wing or any other composite wrapper
 3. Apply `encryptAndHash(cipherText)` BEFORE `mixKey(sharedSecret)` in the `ekem1` token
 4. Transmit `e1.publicKey` as exactly 1,184 bytes in Message A (no AEAD tag at this stage)
 5. Transmit `ekem1` as exactly 1,104 bytes in Message B (1,088-byte ciphertext + 16-byte AEAD tag)
