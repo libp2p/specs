@@ -54,6 +54,39 @@ specified by Noise HFS; this spec adds nothing to them.
 The libp2p identity payload (signature over the static key) is carried and
 verified as in [`/noise`][noise], unchanged.
 
+## Security considerations
+
+### Downgrade to classical `/noise`
+
+The connection encrypter is chosen by multistream-select, which runs in
+plaintext and is not authenticated. An on-path attacker can remove this
+protocol from the exchange and leave both peers on `/noise`: altering the
+proposal makes the responder answer `na`, and the initiator falls back. Both
+peers then complete a valid, mutually authenticated classical session.
+
+Neither peer can detect this afterwards. `connection.encryption` is recorded
+locally and never transmitted, identify carries no field for the connection
+encrypter, the peer store records neither the encrypter nor the Noise static
+key, and the two encrypters use independent static keys that nothing compares.
+A runnable demonstration against two libp2p nodes is in [downgrade-demo].
+
+It cannot be mitigated inside this handshake. A successful downgrade runs
+`/noise` and never reaches the code specified here, so binding the negotiation
+into this suite's prologue or handshake hash has no effect on it.
+
+Implementations SHOULD therefore provide a mode in which `/noise` is neither
+offered nor accepted, so that an operator who requires the post-quantum
+property can choose connection failure over silent downgrade. This is the only
+mitigation available to a deployment today. Implementations differ: the mode is
+reachable by configuration in the TypeScript, Python and Nim implementations,
+while `protocol_info()` in rust-libp2p returns `/noise` alongside this protocol
+unconditionally.
+
+A general fix belongs to [`/noise`][noise] rather than to this suite. An
+identity signature covering the handshake hash and the set of security
+protocols a peer offered lets both peers detect a tampered negotiation on the
+classical path too, and is out of scope here.
+
 ## Open issues
 
 1. The protocol ID string.
@@ -69,6 +102,7 @@ verified as in [`/noise`][noise], unchanged.
   release, the implementation pins `snow` via `[patch]`; KATs land with it.
 
 [noise]: https://github.com/libp2p/specs/blob/master/noise/README.md
+[downgrade-demo]: https://github.com/paschal533/pq-noise-artifacts/tree/main/experiments/downgrade-demo
 [hfs]: https://github.com/noiseprotocol/noise_wiki/wiki/Hybrid-Forward-Secrecy
 [pr]: https://github.com/libp2p/rust-libp2p/pull/6481
 [old]: https://github.com/libp2p/rust-libp2p/pull/2168
