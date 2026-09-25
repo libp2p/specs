@@ -77,10 +77,9 @@ into this suite's prologue or handshake hash has no effect on it.
 Implementations SHOULD therefore provide a mode in which `/noise` is neither
 offered nor accepted, so that an operator who requires the post-quantum
 property can choose connection failure over silent downgrade. This is the only
-mitigation available to a deployment today. Implementations differ: the mode is
-reachable by configuration in the TypeScript, Python and Nim implementations,
-while `protocol_info()` in rust-libp2p returns `/noise` alongside this protocol
-unconditionally.
+mitigation available to a deployment today. Every current implementation offers
+it: by configuration in the TypeScript, Python and Nim implementations, and as
+`Config::with_classical_fallback` in [the Rust implementation][pr].
 
 A general fix belongs to [`/noise`][noise] rather than to this suite. An
 identity signature covering the handshake hash and the set of security
