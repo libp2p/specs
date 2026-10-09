@@ -34,6 +34,7 @@ and spec status.
   - [WebSockets](#websockets)
   - [QUIC](#quic)
   - [`p2p-circuit` Relay Addresses](#p2p-circuit-relay-addresses)
+- [Related specs](#related-specs)
 
 ## Overview
 
@@ -324,8 +325,15 @@ Here, the destination peer has the peer id
 relay node with peer id `QmdPU7PfRyKehdrP5A3WqmjyD6bhVpU1mLGKppa2FjGDjZ` running
 on TCP port 5002 of the IPv4 loopback interface.
 
+## Related specs
+
+- [Address Manager][address-manager-spec]: how a node discovers its own
+  addresses, confirms that remote peers can dial them, and decides which of
+  them it announces.
+
 [peer-id-spec]: ../peer-ids/peer-ids.md
 [identify-spec]: ../identify/README.md
 [multiaddr-repo]: https://github.com/multiformats/multiaddr
 [multiaddr-proto-table]: https://github.com/multiformats/multiaddr/blob/master/protocols.csv
 [relay-spec]: ../relay/README.md
+[address-manager-spec]: ./address-manager.md
