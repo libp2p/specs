@@ -8,6 +8,10 @@ message ControlExtensions {
 
   optional bool testExtension = 6492434;
 
+  // SPREAD: anonymity-preserving, topology-aware dissemination.
+  // See ../spread/README.md
+  optional bool spread = 6492435;
+
 }
 
 message ControlMessage {
@@ -47,6 +51,8 @@ message RPC {
 
   optional TestExtension testExtension = 6492434;
 
+  optional SpreadExtension spread = 6492435;
+
 }
 
 message PartialMessagesExtension {
@@ -58,4 +64,11 @@ message PartialMessagesExtension {
 
   // An encoded representation of the parts a peer has and wants.
   optional bytes partsMetadata = 4;
+}
+
+message SpreadExtension {
+  // Zero-based indices into RPC.publish identifying the messages in this RPC
+  // that are being disseminated via SPREAD. Absent or empty means no message
+  // in this RPC is a SPREAD message.
+  repeated uint32 publishIndices = 1;
 }
