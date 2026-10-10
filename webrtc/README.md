@@ -88,9 +88,9 @@ QUIC. The libp2p WebRTC message framing is not concerned with flow-control and
 thus does not need the `RESET_STREAM` frame to be send in reply to a
 `STOP_SENDING` frame.
 
-Encoded messages including their length prefix MUST NOT exceed 16kiB to support
-all major browsers. See ["Understanding message size
-limits"](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Using_data_channels#understanding_message_size_limits).
+Encoded messages including their length prefix MUST NOT exceed 256kiB to support
+all major browsers. See ["Large Data Channel Messages"](https://blog.mozilla.org/webrtc/large-data-channel-messages/)
+and [WebRTC#40644524](https://issues.webrtc.org/issues/40644524).
 Implementations MAY choose to send smaller messages, e.g. to reduce delays
 sending _flagged_ messages.
 
