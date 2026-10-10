@@ -126,7 +126,9 @@ In this case, the pruned peer will have to rely on the ambient peer discovery se
 
 #### Protobuf
 
-The `ControlPrune` message is extended with a `peers` field as follows.
+The `ControlPrune` message is extended with a `peers` field as follows. The `peers` list must not contain 
+more than `MaxExchangePeers`
+
 
 ```protobuf
 syntax = "proto2";
@@ -545,6 +547,7 @@ The following parameters apply globally:
 | Parameter            | Type             | Description                                                            | Reasonable Default |
 |----------------------|------------------|------------------------------------------------------------------------|--------------------|
 | `PruneBackoff`       | Duration         | Time after pruning a mesh peer before we consider grafting them again. | `1 minute`         |
+| `MaxExchangePeers`   | Integer          | Maximum number of entries in `ControlPrune.peers` list                 | 16                 |
 | `UnsubscribeBackoff` | Duration         | Backoff to use when unsuscribing from a topic. Should not resubscribe to this topic before it expired. | `10 seconds`         |
 | `FloodPublish`       | Boolean          | Whether to enable flood publishing                                     | `true`             |
 | `GossipFactor`       | Float [0.0, 1.0] | % of peers to send gossip to, if we have more than `D_lazy` available  | `0.25`             |
