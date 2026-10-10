@@ -96,7 +96,6 @@ see [#465](https://github.com/libp2p/specs/issues/465).
   - [dcutr][spec_dcutr] - Direct Connection Upgrade through Relay protocol
 - [rendezvous][spec_rendezvous] - Rendezvous Protocol for generalized
   peer discovery
-- [secio][spec_secio] - SECIO, a transport security protocol for libp2p
 - [tls][spec_tls] - The libp2p TLS Handshake (TLS 1.3+)
 - [quic][spec_quic] - The libp2p QUIC Handshake
 - [webrtc][spec_webrtc] - The libp2p WebRTC transports
