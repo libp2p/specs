@@ -61,7 +61,7 @@ that
 Without a verifier, the address manager announces every candidate that it
 discovers, thus a node that disables AutoNAT retains the current behavior.
 
-This document defines no message and no wire format, thus a node that adopts it
+This document defines no message or wire format, thus a node that adopts it
 stays compatible with a node that does not. go-libp2p made the same split: it
 moved its observed address manager into an [address pipeline][go-addrs-manager]
 that also tracks [reachability][go-reachability].
@@ -90,8 +90,8 @@ interpreted as described in [RFC 2119].
   new list of addresses (the existing `AddressMapper` concept).
 - **Address policy**: the allow list, the deny list and the announce filters
   that the host operator configures. The address manager holds this policy.
-- **Feeder**: a component that adds, updates or removes a candidate directly.
-  It does not use the mapper chain.
+- **Feeder**: a component that adds or removes a candidate directly. It does
+  not use the mapper chain.
 - **Verifier**: a component that asks the network if one candidate is
   reachable.
 - **Announce set**: the addresses that the node publishes in Identify, in
@@ -103,7 +103,7 @@ interpreted as described in [RFC 2119].
   the derivation (see [Identify observations](#identify-observations)).
 
 The names of the operations below (`add`, `verify`, `candidates` and the
-others) show the behaviour, and they are not normative.
+others) show the behavior, and they are not normative.
 
 ## Candidate model
 
@@ -158,7 +158,7 @@ observed IP MUST NOT relax them.
 | ------------- | -------------------------------------------------------------------------- |
 | `Unverified`  | No verifier gives a verdict on this address. This is the default.          |
 | `Confirmed`   | A verifier proves that a remote peer can dial this address.                |
-| `Unreachable` | A verifier proves that a remote peer cannot dial this address.             |
+| `Unreachable` | A remote peer reports to a verifier that it cannot dial this address.      |
 
 A candidate enters the table as `Unverified`. Only a verdict from a verifier
 changes the state. A new source on a candidate MUST NOT change its state.
@@ -167,8 +167,8 @@ The state holds the latest verdict, and not a history of verdicts. Two verdicts
 on one address disagree when the network changes or when a prover lies, and the
 most recent one wins. Two rules limit the damage: a `Confirmed` verdict needs
 proof that the dial-back arrived (see [AutoNAT v2
-verifier](#autonat-v2-verifier)), and an `Unreachable` verdict on an announced
-public address needs two peers (see [Verdict handling](#verdict-handling)).
+verifier](#autonat-v2-verifier)), and an `Unreachable` verdict on an address
+in the announce set needs two peers (see [Verdict handling](#verdict-handling)).
 
 ## Address discovery
 
@@ -186,7 +186,8 @@ Each run follows this order:
 3. The address manager withdraws each `(address, source)` pair that the chain
    no longer produces.
 4. The address manager adds the addresses that the host operator announces,
-   with the source `Announced`.
+   with the source `Announced`. It withdraws the source `Announced` from each
+   address that the host operator no longer configures.
 
 Two inputs stay outside this order. A feeder acts at any time. Identify puts an
 observation in the ring at any time, and the address manager derives candidates
@@ -235,14 +236,13 @@ the source of a feeder that added it directly.
 A component that does not fit the mapper shape uses the direct entry points:
 
 ```
-add(address, source)   -> bool   // true when the candidate is new
-update(address, state) -> bool   // true when the candidate exists
-remove(address)        -> bool   // true when the candidate existed
+add(address, source)    -> bool   // true when the candidate is new
+remove(address, source) -> bool   // true when the candidate had the source
 ```
 
-`add` on a candidate that exists only adds the source. `remove` deletes the
-candidate, whatever the number of its sources. A feeder that shares an address
-with a mapper SHOULD let the mapper withdraw it.
+`add` on a candidate that exists only adds the source. `remove` withdraws only
+the given source, and the address manager deletes the candidate when no source
+is left. A feeder cannot set a state: only a verifier does that.
 
 ### Identify observations
 
@@ -254,29 +254,36 @@ addObservation(observed, reporter) -> bool
 ```
 
 The address manager MUST reject an observation that no remote peer can see for
-the local node: an address that does not contain both an IP address and a  transport, a relayed address,
-and a wildcard or multicast IP. It accepts a loopback address and a private
-address, because a peer on the same host or on the same LAN did reach the node
-there.
+the local node: an address that does not contain both an IP address and a
+transport, a relayed address, and a wildcard or multicast IP. It accepts a
+loopback address and a private address, because a peer on the same host or on
+the same LAN did reach the node there.
 
 Each accepted observation enters a ring of `maxSize` entries (RECOMMENDED
 default 10) that evicts the oldest. The ring MUST hold one entry at most per
 peer that reports, thus a new observation replaces the entry of its own peer.
 
-From the ring the address manager derives the *most observed* address per IP
-family: the IP (or the IP with its transport and port) that at least `minCount`
-distinct peers report (RECOMMENDED default 3). Below the threshold a family has
-no most observed address. This gives two queries:
+From the ring the address manager derives the *most observed* value per IP
+family: the value that the most distinct peers report, if at least `minCount`
+of them report it (RECOMMENDED default 3). A tie goes to the value that a peer
+reported most recently. Below the threshold a family has no most observed
+value. This gives two queries, and each one counts a different value:
 
-- `mostObservedAddrs()`: the most observed `ip4/.../port` address and the most
-  observed `ip6/.../port` address.
-- `externalAddrFor(listenAddr)`: `listenAddr` that carries the most observed IP
-  of its family, or `listenAddr` as it is.
+- `mostObservedAddrs()`: counts the IP with its transport and port
+  (`/ip4/<ip>/tcp/<port>`, `/ip6/<ip>/udp/<port>`), and drops the protocols
+  after the port. It returns the most observed address of each family.
+- `externalAddrFor(listenAddr)`: counts the IP alone. It returns `listenAddr`
+  with the most observed IP of its family, or `listenAddr` as it is. A NAT that
+  maps each connection to a different port still gives one IP, thus this query
+  finds the IP where the first query finds nothing.
 
-To make candidates from observations is OPTIONAL, and it is off by default.
-When it is on, each verification run adds each `externalAddrFor(listenAddr)`
-that differs from its listen address, and each address from
-`mostObservedAddrs()`, with the source `Identify`.
+Implementations MAY derive candidates from observations. This derivation is
+off by default. When it is on, each verification run adds each
+`externalAddrFor(listenAddr)` that differs from its listen address, and each
+address from `mostObservedAddrs()`, with the source `Identify`. The run
+withdraws the source `Identify` from each address that it no longer derives,
+thus a candidate does not stay after the ring changes or after its count falls
+below `minCount`.
 
 A verifier that finds a remote-only candidate `Unreachable` removes it (see
 [Verdict handling](#verdict-handling)) and quarantines the address, thus the
@@ -288,7 +295,7 @@ default 10), and it MUST evict the oldest entry when the quarantine is full.
 ### Explicitly announced addresses
 
 An address that the host operator configures (`announcedAddrs`) enters the
-table with source `Announced`, and the address manager verifies it like each
+table with source `Announced`, and the address manager verifies it like every
 other candidate. A verdict on such an address changes the confirmed addresses
 and the reachability summary, and never the announce set.
 
@@ -313,7 +320,7 @@ The address manager asks a verifier about one address at a time. The verifier
 returns one of three verdicts:
 
 - `Confirmed` when a remote peer proves that it dialed the address,
-- `Unreachable` when a remote peer proves that it could not dial the address,
+- `Unreachable` when a remote peer reports that it could not dial the address,
 - `Undecided` when it concludes nothing: there is no suitable peer, a timeout
   occurs, the answer is ambiguous, the peer does not support the transport, or
   the node reaches a resource limit.
@@ -327,9 +334,10 @@ manager MUST cancel each verification that is in flight before it installs the
 next verifier, and it MUST drop a verdict that the replaced verifier returns
 after that point.
 
-When the host removes the verifier, verification stops. The address manager
-keeps the states that it already assigned, until the chain withdraws the
-candidate or the address manager stops.
+When the host removes the verifier, verification stops, and the address
+manager sets the state of each candidate to `Unverified`. Without a verifier no
+run refreshes a state, thus a kept state becomes stale. The node then announces
+like a node that never had a verifier.
 
 ### Verification runs
 
@@ -340,8 +348,10 @@ The address manager runs verification on a heartbeat with the period
 2. It derives the `Identify` candidates from the observation ring, when this is
    on.
 3. It selects the candidates to verify. A candidate qualifies when the address
-   policy accepts it and when it is **not** relayed, because no AutoNAT server
-   dials back a circuit address.
+   policy accepts it, when it is **not** relayed, because no AutoNAT server
+   dials back a circuit address, and when it is public. A remote peer proves
+   nothing about a private address, and AutoNAT v2 tells clients not to send
+   one. A private candidate thus stays `Unverified`.
 4. It verifies them one at a time, and it takes the candidate whose last
    verification is the oldest first. A candidate that no verifier saw counts as
    the oldest. It stops when all are done, or when it spends `verifyTimeout`,
@@ -372,6 +382,8 @@ MUST NOT send a second request for an address that already has one in flight.
 
 - If the candidate no longer exists, because the chain withdrew it during the
   run, the address manager drops the verdict.
+- If the verdict is `Unreachable` and the candidate is in the announce set,
+  the address manager applies the rule of two peers below.
 - If the candidate is remote-only and the verdict is `Unreachable`, the address
   manager removes the candidate and quarantines the address (see above).
 - In the other cases, the address manager updates the state. Confirmation
@@ -380,11 +392,13 @@ MUST NOT send a second request for an address that already has one in flight.
 A `Confirmed` verdict proves itself, because the verifier saw the dial-back
 arrive. An `Unreachable` verdict is only the word of the peer that the verifier
 asked, and it removes an address from the announce set, thus one hostile prover
-can hide an address that works. Before the address manager marks a locally
-trusted public candidate `Unreachable`, it SHOULD get that verdict from two
-different peers. After a single refutation the state stays as it is, and the
-next run asks another peer. A remote-only candidate needs no second peer,
-because the address manager never announced it.
+can hide an address that works. Before the address manager applies an
+`Unreachable` verdict to a candidate in the announce set, it MUST get that
+verdict from two different peers. This applies whatever the sources are, thus
+it also covers a remote-only candidate that is `Confirmed`. After a single
+refutation the state stays as it is, and the next run asks another peer. A
+remote-only candidate that is not `Confirmed` needs no second peer, because the
+address manager never announced it.
 
 Later runs heal a wrong verdict of either type.
 
@@ -399,20 +413,26 @@ The reference verifier uses [AutoNAT v2][autonat-v2]:
    outbound connection. That peer MUST hold no inbound connection to the local
    node, because a peer that already reached the node proves nothing about a
    new dial. If there is no such peer, the verifier returns `Undecided`.
-3. It sends one `DialRequest` that carries exactly the one candidate. AutoNAT
-   v2 gives the client no way to learn the timeout of the server, thus the
-   client MUST apply a timeout of its own (RECOMMENDED default 30 seconds).
+3. It sends one `DialRequest` with the address under test first. It MAY add
+   candidates of lower priority after it, because AutoNAT v2 permits it. It
+   MUST apply the verdict only to the address that the server reports as
+   dialed (`addrIdx`). AutoNAT v2 gives the client no way to learn the timeout
+   of the server, thus the client MUST apply a timeout of its own (RECOMMENDED
+   default 30 seconds).
 4. It maps the response. `OK` becomes `Confirmed`, but only if the dial-back
-   nonce of that request arrived on the address under test. An `OK` without the
-   matching nonce MUST give `Undecided`, because a server that lies can answer
-   `OK` for an address that it never dialed. A dial error (`E_DIAL_ERROR`,
-   `E_DIAL_BACK_ERROR`) becomes `Unreachable`. A refusal, a timeout, a
-   transport that the peer does not support, and each protocol error give
-   `Undecided`.
+   nonce of that request arrived on a new inbound connection over the transport
+   of the reported address. An `OK` without the matching nonce MUST give
+   `Undecided`, because a server that lies can answer `OK` for an address that
+   it never dialed. A dial error (`E_DIAL_ERROR`, `E_DIAL_BACK_ERROR`) becomes
+   `Unreachable`. A refusal, a timeout, a transport that the peer does not
+   support, and each protocol error give `Undecided`.
 
-An implementation MAY put guesses of lower priority in the same request as the
-address under test, because AutoNAT v2 permits it. It MUST then attribute the
-verdict to the address that the server reports as dialed.
+The nonce proves that a dial from the server reached the node. It does not
+prove which external IP and port the server dialed: behind a NAT the local
+socket shows only the internal address. The exact address thus comes from the
+word of the server (`addrIdx`). A server that lies can confirm a wrong address
+of the node only if that server can also reach the node on a different address
+with the same transport.
 
 [autonat-v2]: https://github.com/libp2p/specs/blob/master/autonat/autonat-v2.md
 
@@ -422,8 +442,8 @@ The address manager installs itself as the first `AddressMapper` of the
 `PeerInfo` of the host, and it resolves the announce set in one pass:
 
 1. It runs [address discovery](#address-discovery).
-2. If the host operator configures announced addresses, it returns them and it
-   stops.
+2. If the host operator configures announced addresses, it applies the address
+   policy to the configured addresses and returns the result.
 3. If not, it takes each candidate from the chain and then each candidate from
    a feeder, and it removes the duplicates. It keeps an address when:
    - the state is `Confirmed`; or
@@ -446,7 +466,7 @@ announce that address.
 
 The host MUST notify the address observers (identify-push, the refresh of the
 signed peer record) when the announce set changes. The host SHOULD group the
-notifications of a short window (RECOMMENDED default 1 second) into one.
+notifications within a short window (RECOMMENDED default 1 second) into one.
 
 Queries:
 
@@ -466,14 +486,18 @@ set.
 For a consumer that needs one flag, the address manager computes a read-only
 summary from the states of the addresses. It never stores the summary as truth:
 
-| Condition                                                                | Summary        |
-| ------------------------------------------------------------------------ | -------------- |
-| any candidate is `Confirmed`                                             | `Reachable`    |
-| else any candidate is `Unreachable`, or a remote-only guess is quarantined | `NotReachable` |
-| else                                                                     | `Unknown`      |
+| Condition                                                                   | Summary        |
+| --------------------------------------------------------------------------- | -------------- |
+| any candidate is `Confirmed`                                                | `Reachable`    |
+| else any candidate that a run selects is still `Unverified`                 | `Unknown`      |
+| else any candidate is `Unreachable`, or a remote-only guess is quarantined  | `NotReachable` |
+| else                                                                        | `Unknown`      |
 
-A quarantined guess is evidence: it is no longer a candidate, but it did record
-a dial-back that failed.
+The second row keeps the summary `Unknown` while a verification is still
+missing, thus one refuted address does not make the node `NotReachable` before
+the verifier tests the others. A private candidate does not count, because no
+run selects it. A quarantined guess is evidence: it is no longer a candidate,
+but it did record a dial-back that failed.
 
 The address manager notifies its reachability observers from the verification
 heartbeat, each time that the summary differs from the last value that it
@@ -497,14 +521,15 @@ Identify, and it passes the address manager to Identify by reference.
   clears the observations, the candidates, the records of the chain, the
   mappers, the reachability observers and the quarantine, and removes its
   mapper from `PeerInfo`. A call to stop MUST be safe before start, and it MUST
-  be safe more than one time. A mapper that an owner registers before stop is
-  gone after stop, and the owner registers it again on its next start.
+  be safe to call more than once. A mapper that an owner registers before stop
+  is gone after stop, and the owner registers it again on its next start.
 - `addObservation` on an address manager that stopped returns false, and it
   records nothing.
 
 The thresholds (`maxSize`, `maxQuarantine`, `minCount`) and the times of the
-verification (`verifyInterval`, `verifyTimeout`) are configuration of the host.
-A value below 1 MUST become 1.
+verification (`verifyInterval`, `verifyTimeout`) are host configuration
+parameters. A threshold below 1 MUST become 1. A time that is zero or negative
+MUST become its default.
 
 ## Security considerations
 
@@ -527,9 +552,9 @@ A value below 1 MUST become 1.
   address per family.
 - **Amplification of the verification.** The address manager asks for a
   dial-back only to an address that it believes is its own. It sends one
-  address per request, one request at a time, inside the budget of the run, and
-  it refuses when it has no free slot for an incoming connection. The defences
-  on the AutoNAT v2 server stay in force.
+  request at a time, inside the budget of the run, and it refuses when it has
+  no free slot for an incoming connection. The defences on the AutoNAT v2
+  server stay in force.
 - **Choice of the prover.** A peer that already holds an inbound connection
   gives a positive answer that proves nothing, thus the reference verifier
   excludes it. Each other peer is arbitrary, thus the verifier accepts
@@ -537,10 +562,10 @@ A value below 1 MUST become 1.
   `Unreachable` on an announced address.
 - **A working address that an attacker hides.** An `Unreachable` verdict
   removes a public address from the announce set, thus a hostile prover that
-  answers `E_DIAL_ERROR` can hide the node. Two peers must agree, and the
-  address manager verifies again at each `verifyInterval`. This limits the
-  attack to an attacker that controls a large part of the peers that the node
-  dials.
+  answers `E_DIAL_ERROR` can hide the node. Two peers must agree for each
+  address in the announce set, and the address manager verifies again at each
+  `verifyInterval`. This limits the attack to an attacker that controls a large
+  part of the peers that the node dials.
 - **Announcement of an unreachable address.** The node keeps a private address
   with the state `Unreachable` in the announce set. This is the design: the
   peer that the verifier asked was never a valid prover for that address.
@@ -564,13 +589,13 @@ A value below 1 MUST become 1.
 
 nim-libp2p ([roadmap item][roadmap]):
 
-- [vacp2p/nim-libp2p#2924](https://github.com/vacp2p/nim-libp2p/pull/2924): the
+- [iftech/nim-libp2p#2924](https://github.com/iftech/nim-libp2p/pull/2924): the
   switch owns the observed address manager
-- [vacp2p/nim-libp2p#2928](https://github.com/vacp2p/nim-libp2p/pull/2928): the
+- [iftech/nim-libp2p#2928](https://github.com/iftech/nim-libp2p/pull/2928): the
   address manager owns every announced address
-- [vacp2p/nim-libp2p#2934](https://github.com/vacp2p/nim-libp2p/pull/2934): a
+- [iftech/nim-libp2p#2934](https://github.com/iftech/nim-libp2p/pull/2934): a
   verifier confirms candidates on a heartbeat
-- [vacp2p/nim-libp2p#2953](https://github.com/vacp2p/nim-libp2p/pull/2953): the
+- [iftech/nim-libp2p#2953](https://github.com/iftech/nim-libp2p/pull/2953): the
   address manager registers the verifier, and the consumers move to it
 
 [roadmap]: https://roadmap.vac.dev/p2p/ift/2026q3-nimlibp2p-addr-manager
