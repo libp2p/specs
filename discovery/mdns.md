@@ -27,142 +27,145 @@ and spec status.
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [Definitions](#definitions)
-  - [Peer Discovery](#peer-discovery)
+  - [Find All Peers](#find-all-peers)
     - [Request](#request)
-    - [Response](#response)
-  - [DNS Service Discovery](#dns-service-discovery)
-    - [Meta Query](#meta-query)
-    - [Find All Response](#find-all-response)
-    - [Gotchas](#gotchas)
-  - [Issues](#issues)
+    - [Answer](#answer)
+    - [Examples](#examples)
+  - [Direct Queries](#direct-queries)
+    - [Example](#example)
+  - [Find All Services](#find-all-services)
+    - [Request](#request-1)
+    - [Answer](#answer-1)
   - [References](#references)
-    - [Meta Query](#meta-query-1)
-      - [Question](#question)
-      - [Answer](#answer)
-    - [Find All Peers](#find-all-peers)
-      - [Question](#question-1)
-      - [Answer](#answer-1)
-      - [Additional Records](#additional-records)
 
 ## Overview
 
-The goal is to allow peers to discover each other when on the same local network with zero configuration. mDNS uses a multicast system of DNS records; this allows all peers on the local network to see all query responses.
+mDNS allows peers to discover each other when on the same local network with zero configuration. mDNS uses a multicast system of DNS records; this allows all peers on the local network to see all query answers.
 
-Conceptually, it is very simple. When a peer starts (or detects a network change), it sends a query for all peers. As responses come in, the peer adds the other peers' information into its local database of peers.
+When a peer starts or detects a network change, it SHOULD send a query for all peers. As answers come in, the peer adds the other peers' information into its local peer database.
+
+The key words "MUST", "MUST NOT", "SHOULD", "SHOULD NOT" and "MAY" in this document are to be interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
 
 ## Definitions
 
-- `service-name` is the DNS Service Discovery (DNS-SD) service name for all peers. It is defined as `_p2p._udp.local`.
-- `host-name` is the fully qualified name of the peer. It is derived from the peer's name and `p2p.local`.
-- `peer-name` is the case-insensitive unique identifier of the peer, and is less than 64 characters.
+- `service-name` is the DNS Service Discovery (DNS-SD) service name for all peers. On the public network, it MUST be `_p2p._udp.local`.
+- `peer-name` is the unique identifier of the peer. It MUST be a valid DNS label of at most 63 bytes, and peers MUST compare it case-insensitively. It does not carry meaning; it only needs to be unique. Peers SHOULD generate a random, lower-case alphanumeric string of at least 32 characters in length when booting up their node. Peers SHOULD NOT use their Peer ID here because a future Peer ID could exceed the DNS label limit of 63 characters.
+- `host-name` is the fully qualified name of the peer. It SHOULD be `<peer-name>.local`.
 
-   As the this field doesn't carry any meaning, it is sufficient to ensure the uniqueness of this identifier. Peers SHOULD generate a random, lower-case alphanumeric string of least 32 characters in length when booting up their node. Peers SHOULD NOT use their Peer ID here because a future Peer ID could exceed the DNS label limit of 63 characters.
-
-If a [private network](https://github.com/libp2p/specs/blob/master/pnet/Private-Networks-PSK-V1.md) is in use, then the `service-name` contains the base-16 encoding of the network's fingerprint  as in `_p2p-X._udp.local`.
+In [private networks](https://github.com/libp2p/specs/blob/master/pnet/Private-Networks-PSK-V1.md) the `service-name` MUST contain the base-16 encoding of the network's fingerprint (`<hex>`) in the format `_p2p-<hex>._udp.local`.
 This prevents public and private networks from discovering each other's peers.
 
-## Peer Discovery
+The fingerprint is derived from the network's 32-byte pre-shared key (PSK):
+
+    fingerprint = SHA-256("libp2p-mdns-pnet-fingerprint" || PSK)[0:5]
+
+where `PSK` is the raw decoded key (not the contents of the key file), `||` is concatenation, and `[0:5]` is the first 5 bytes of the digest. `<hex>` is the lower-case base-16 encoding of the fingerprint, 10 characters long. This keeps the service label within the 15-character limit for DNS-SD service names ([RFC 6763, section 7.2](https://tools.ietf.org/html/rfc6763#section-7.2)).
+
+For example, the PSK `000102…1e1f` (bytes `0x00` to `0x1f`) has the fingerprint `587912df03`, so its `service-name` is `_p2p-587912df03._udp.local`.
+
+The fingerprint only partitions discovery; it is not a security mechanism. Two networks with colliding fingerprints would discover each other's peers but still fail to connect, since connections are protected by the PSK itself.
+
+## Find All Peers
 
 ### Request
 
-To find all peers, a DNS message is sent with the question `_p2p._udp.local PTR`. Peers will then start responding with their details.
+    <service-name> PTR
 
-Note that a peer must respond to its own query. This allows other peers to passively discover it.
+For example, `_p2p._udp.local PTR` on the public network.
 
-### Response
+**Note:** a peer MUST respond to its own query. This allows other peers to passively discover it.
 
-On receipt of a `find all peers` query, a peer sends a DNS response message (QR = 1) that contains the **answer**
+### Answer
 
-```
-<service-name> PTR <peer-name>.<service-name>
-```
+On receipt of a `find all peers` query, a peer MUST respond with
 
-The **additional records** of the response contain the peer's discovery details:
+    <service-name> PTR <peer-name>.<service-name>
 
-```
-<peer-name>.<service-name> TXT "dnsaddr=..."
-```
+The **additional records** of the response contain the peer's discovery details. The peer MUST include
 
-The TXT record contains the multiaddresses that the peer is listening on. Each multiaddress is a TXT attribute with the form `dnsaddr=/.../p2p/QmId`. Multiple `dnsaddr` attributes and/or TXT records are allowed.
+    <peer-name>.<service-name> TXT "dnsaddr=..."
 
-## DNS Service Discovery
+The TXT record MUST contain at least one multiaddress that the peer is listening on. Each multiaddress MUST be a TXT attribute with the form `dnsaddr=/.../p2p/<peer-id>`. A peer MAY include multiple `dnsaddr` attributes or TXT records; receivers MUST accept both.
 
-DNS-SD support is not needed for peers to discover each other. However, it is extremely useful for network administrators to discover what is running on the network.
+Peers SHOULD NOT advertise circuit relay addresses or addresses for browser-only transports (WebSocket, WebTransport, WebRTC), since these are not useful for direct connections on the local network. Peers SHOULD only advertise addresses that are reachable on the local network, and SHOULD NOT advertise loopback addresses.
 
-### Meta Query
+The peer SHOULD also include the following additional records, which allow generic DNS-SD tools to resolve it:
 
-This allows discovery of all services. The question is `_services._dns-sd._udp.local PTR`.
-
-A peer responds with the answer
-
-```
-    _services._dns-sd._udp.local PTR <service-name>
-```
-
-### Find All Response
-
-On receipt of a `find all peers` query, the following **additional records** should be included
-
-```
     <peer-name>.<service-name> SRV ... <host-name>
-    <host-name>              A <ipv4 address>
-    <host-name>              AAAA <ipv6 address>
-```
+    <host-name>                A <ipv4 address>
+    <host-name>                AAAA <ipv6 address>
 
-### Gotchas
+On receipt of an answer:
 
-Many existing tools ignore the Additional Records, and always send individual queries for the peer's discovery details. To accomodate this, a peer should respond to the following queries:
+- Receivers MUST ignore answers that carry their own Peer ID.
+- Receivers MUST ignore TXT attributes that are not `dnsaddr=` or that fail to parse, and MUST NOT discard the rest of the response because of them.
+- Receivers MUST use only the `dnsaddr` attributes to learn a peer's Peer ID and multiaddresses. They MUST NOT rely on SRV, A or AAAA records, whose contents (in particular the SRV port) are not meaningful to libp2p.
+
+### Examples
+
+1. Peer `abc123` sends a `find all peers` query and receives two answers: one from itself and one from another peer (`xyz789`) on the network. Additional records are omitted here.
+
+    ```
+    Q:  _p2p._udp.local.  PTR  ?                          # query from abc123
+    A:  _p2p._udp.local.  PTR  abc123._p2p._udp.local.    # answer from abc123 (itself)
+    A:  _p2p._udp.local.  PTR  xyz789._p2p._udp.local.    # answer from xyz789
+    ```
+
+2. The full response from peer `xyz789` in the example above, including its additional records:
+
+    ```
+    ;; ANSWER
+    _p2p._udp.local.         120  IN  PTR   xyz789._p2p._udp.local.
+    ;; ADDITIONAL
+    xyz789._p2p._udp.local.  120  IN  TXT   "dnsaddr=/ip4/192.168.1.10/tcp/4001/p2p/12D3KooW…"
+                                            "dnsaddr=/ip6/fe80::1/udp/4001/quic-v1/p2p/12D3KooW…"
+    xyz789._p2p._udp.local.  120  IN  SRV   0 0 4001 xyz789.local.
+    xyz789.local.            120  IN  A     192.168.1.10
+    xyz789.local.            120  IN  AAAA  fe80::1
+    ```
+
+## Direct Queries
+
+Many existing tools ignore the additional records and send individual queries for the peer's discovery details instead. To accommodate this, a peer SHOULD respond to the following queries:
 
 - `<peer-name>.<service-name> SRV`
 - `<peer-name>.<service-name> TXT`
 - `<host-name> A`
 - `<host-name> AAAA`
 
-## Issues
+### Example
 
-[ ] mDNS requires link-local addresses. Loopback and "NAT busting" addresses should not sent and must be ignored on receipt?
+A peer asks `abc123` directly for its TXT record:
+
+```
+Q:  abc123._p2p._udp.local.  TXT  ?
+A:  abc123._p2p._udp.local.  TXT  "dnsaddr=…" "dnsaddr=…"
+```
+
+## Find All Services
+
+Service type enumeration is not needed for peers to discover each other. However, it is useful for network administrators to discover what is running on the network, and it lets generic DNS-SD tools find libp2p peers.
+
+### Request
+
+The following query enumerates all service types advertised on the local network:
+
+    _services._dns-sd._udp.local PTR
+
+### Answer
+
+A peer MAY respond with its `service-name`:
+
+    _services._dns-sd._udp.local PTR <service-name>
+
+For example, on the public network:
+
+    _services._dns-sd._udp.local PTR _p2p._udp.local
 
 ## References
 
 - [RFC 1035 - Domain Names (DNS)](https://tools.ietf.org/html/rfc1035)
+- [RFC 2119 - Key words for use in RFCs to Indicate Requirement Levels](https://tools.ietf.org/html/rfc2119)
 - [RFC 6762 - Multicast DNS](https://tools.ietf.org/html/rfc6762)
 - [RFC 6763 - DNS-Based Service Discovery](https://tools.ietf.org/html/rfc6763)
 - [Multiaddr](https://github.com/multiformats/multiaddr)
-
-
-### Meta Query
-
-Goal: find all services on the local network.
-
-#### Question
-
-```
-_services._dns-sd._udp.local PTR
-```
-
-#### Answer
-
-```
-_services._dns-sd._udp.local IN PTR _p2p._udp.local
-```
-
-### Find All Peers
-
-Goal: find all peers on the local network.
-
-#### Question
-
-```
-_p2p._udp.local PTR
-```
-
-#### Answer
-
-```
-_p2p._udp.local IN PTR `<peer-name>`._p2p._udp.local
-```
-
-#### Additional Records
-
-- `<peer-name>`._p2p._udp.local IN TXT dnsaddr=/ip6/2001:DB8::7573:b0a8:46b0:bfea/tcp/4001/p2p/`id`
-- `<peer-name>`._p2p._udp.local IN TXT dnsaddr=/ip4/192.0.2.0/tcp/4001/p2p/`id`
