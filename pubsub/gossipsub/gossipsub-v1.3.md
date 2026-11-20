@@ -106,7 +106,7 @@ evaluated and iterated upon. Adding an experimental extension to the
 misinterpretations of messages on the wire. A patch to this `extensions.proto`
 is not needed if experimenting with an extension in a controlled environment. A
 patch to `extensions.proto` is also not needed if you are not using the
-`/meshsub/v1.3.0` protocol ID.
+`/meshsub/1.3.0` protocol ID.
 
 If the extension is being tested on a live network, a PR MUST be created that
 adds the extension to the `ControlExtensions` protobuf with a link to the
