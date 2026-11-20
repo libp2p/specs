@@ -139,11 +139,11 @@ downscore the sending peer, unless the peer could have sent the message before i
 processed the node's latest `SubOpts` for that topic.
 
 If a node does not support the partial message extension, it MUST ignore the
-`requestPartial` and `supportsPartial` fields. This is the default behavior of
-protobuf parsers.
+`requestsPartial` and `supportsSendingPartial` fields. This is the default
+behavior of protobuf parsers.
 
-The `requestPartial` and `supportsPartial` fields value MUST be ignored when a
-peer sends an unsubscribe message `SubOpts.subscribe=false`.
+The `requestsPartial` and `supportsSendingPartial` fields value MUST be ignored
+when a peer sends an unsubscribe message `SubOpts.subscribe=false`.
 
 #### Behavior table
 
@@ -252,12 +252,12 @@ migration with backwards compatibility. The steps are as follows:
 2. Slowly deploy and monitor nodes that request (and implicitly support) partial
    messages. These nodes should find peers that send them partial messages from
    the previous step. Nodes request partial messages by setting the subscribe
-   option `requestPartial` to true.
+   option `requestsPartial` to true.
 
 ### Supporting both full and partial messages for a topic
 
 Partial messages use the same mesh as full messages. Supporting both is
-straightforward. If a peer subscribes to a topic with a `requestPartial`, the
+straightforward. If a peer subscribes to a topic with a `requestsPartial`, the
 node SHOULD send the peer partial messages. Otherwise, send the node full
 messages.
 
