@@ -28,6 +28,7 @@ about maturity level and spec status.
         - [Ed25519](#ed25519)
         - [Secp256k1](#secp256k1)
         - [ECDSA](#ecdsa)
+        - [ML-DSA](#ml-dsa)
 - [Peer Ids](#peer-ids)
     - [String representation](#string-representation)
         - [Encoding](#encoding)
@@ -63,6 +64,7 @@ enum KeyType {
 	Ed25519 = 1;
 	Secp256k1 = 2;
 	ECDSA = 3;
+	MLDSA = 4;
 }
 
 message PublicKey {
@@ -110,16 +112,17 @@ The second is for generating peer ids; this is discussed in the section below.
 
 ### Key Types
 
-Four key types are supported:
+Five key types are supported:
  - RSA
  - Ed25519
  - Secp256k1
  - ECDSA
+ - ML-DSA
 
 Implementations MUST support Ed25519. Implementations SHOULD support RSA if they wish to
 interoperate with the mainline IPFS DHT and the default IPFS bootstrap nodes. Implementations MAY
-support Secp256k1 and ECDSA, but nodes using those keys may not be able to connect to all other
-nodes.
+support Secp256k1, ECDSA, and ML-DSA, but nodes using those keys may not be able to connect to all
+other nodes.
 
 In all cases, implementation MAY allow the user to enable/disable specific key
 types via configuration. Note that disabling support for compulsory key types
@@ -185,6 +188,33 @@ To sign a message, we hash the message with SHA 256, and then sign it with the
 [ECDSA standard algorithm](https://tools.ietf.org/html/rfc6979), then we encode
 it using [DER-encoded ASN.1.](https://wiki.openssl.org/index.php/DER)
 
+#### ML-DSA
+
+For `MLDSA` keys, the serialized `Data` field includes a one-byte variant prefix
+followed by raw key bytes:
+
+```
+<variant-prefix><raw-key-bytes>
+```
+
+Variant prefixes are:
+
+- `0x01`: ML-DSA-44
+- `0x02`: ML-DSA-65
+- `0x03`: ML-DSA-87
+
+Public/private key lengths are the standard lengths for each variant:
+
+- ML-DSA-44: public key `1312` bytes, private key `2560` bytes
+- ML-DSA-65: public key `1952` bytes, private key `4032` bytes
+- ML-DSA-87: public key `2592` bytes, private key `4896` bytes
+
+Implementations MUST reject malformed key encodings (unknown variant prefix,
+missing prefix, or key length mismatch).
+
+ML-DSA signatures follow the normal ML-DSA standard. Signatures are generated
+and verified over the exact message bytes.
+
 ### Test vectors
 
 The following test vectors are hex-encoded bytes of the above described protobuf encoding.
@@ -220,6 +250,9 @@ Specifically, to compute a peer ID of a key:
    a multihash verbatim without having to condense it using a hash function.
 5. If the length is greater than 42, then hash it using the SHA256
    multihash.
+
+Because ML-DSA public keys are larger than 42 bytes, ML-DSA peer IDs always use
+the SHA256 multihash.
 
 ### String representation
 
