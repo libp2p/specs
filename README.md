@@ -60,6 +60,8 @@ These specs define abstractions and data types that form the "core" of libp2p
 and are used throughout the system.
 
 - [Addressing][spec_addressing] - Working with addresses in libp2p.
+  - [Address Manager][spec_address_manager] - How a node discovers, confirms
+    and announces its own addresses.
 - [Connections and Upgrading][spec_connections] - Establishing secure,
   multiplexed connections between peers, possibly over insecure, single stream transports.
 - [Peer Ids and Keys][spec_peerids] - Public key types & encodings, peer id calculation, and
@@ -136,6 +138,7 @@ you feel an issue isn't the appropriate place for your topic, please join our
 [spec_connections]: ./connections/README.md
 [spec_plaintext]: ./plaintext/README.md
 [spec_addressing]: ./addressing/README.md
+[spec_address_manager]: ./addressing/address-manager.md
 [spec_noise]: ./noise/README.md
 [spec_mdns]: ./discovery/mdns.md
 [spec_autonat]: ./autonat/README.md
