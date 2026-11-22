@@ -139,7 +139,7 @@ To write data to a stream, one must send a message with the flag `MessageReceive
 
 Mplex supports half-closed streams. Closing a stream closes it for writing and closes the remote end for reading but allows writing in the other direction.
 
-To close a stream, send a message with a zero length body and a `CloseReceiver` (3) or `CloseInitiator` (4) flag (depending on whether or not the closer is the one initiaing the stream). Writing to a stream after it has been closed is a protocol violation. Reading from a remote-closed stream should return all data sent before closing the stream and then EOF thereafter.
+To close a stream, send a message with a zero length body and a `CloseReceiver` (3) or `CloseInitiator` (4) flag (depending on whether or not the closer is the one initiating the stream). Writing to a stream after it has been closed is a protocol violation. Reading from a remote-closed stream should return all data sent before closing the stream and then EOF thereafter.
 
 ### Resetting a stream
 
