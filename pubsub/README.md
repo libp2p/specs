@@ -33,7 +33,7 @@ and spec status.
     - [The RPC](#the-rpc)
     - [The Message](#the-message)
     - [Message Signing](#message-signing)
-      - [Signature Policy](#signature-policy)
+      - [Signature Policy Options](#signature-policy-options)
     - [Message Identification](#message-identification)
     - [The Topic Descriptor](#the-topic-descriptor)
         - [AuthOpts](#authopts)
@@ -193,7 +193,7 @@ inputs may benefit performance.
 > Reference: [#116](https://github.com/libp2p/specs/issues/116).
 
 **Note that the availability of these fields on the `Message` object will depend
-on the [signature policy](#signature-policy) configured for the topic.**
+on the [signature policy](#signature-policy-options) configured for the topic.**
 
 Whichever the choice, it is crucial that **all peers** participating in a topic
 implement identical message ID calculation logic, or the topic will malfunction.
