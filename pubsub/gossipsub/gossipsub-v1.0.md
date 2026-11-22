@@ -261,7 +261,7 @@ The message cache supports the following operations:
 
 We also keep a `seen` cache, which is a timed least-recently-used cache of
 message IDs that we have observed recently. The value of "recently" is
-determined by the [parameter](#parameter) `seen_ttl`, with a reasonable default
+determined by the [parameter](#parameters) `seen_ttl`, with a reasonable default
 of two minutes. This value should be chosen to approximate the propagation delay
 in the overlay, within a healthy margin.
 
