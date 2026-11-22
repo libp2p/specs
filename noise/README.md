@@ -341,8 +341,8 @@ spec][npf-message-format], which has a maximum length of 65535 bytes.
 
 During the handshake phase, `noise_message` will be a Noise handshake message.
 Noise handshake messages may contain encrypted payloads. If so, they will have
-the structure described in the [Encrypted Payloads
-section](#encrypted-payloads).
+the structure described in the [libp2p Data in Handshake Messages
+section](#libp2p-data-in-handshake-messages).
 
 After the handshake completes, `noise_message` will be a Noise transport
 message, which is defined as an AEAD ciphertext consisting of an encrypted
@@ -358,7 +358,7 @@ Alice and Bob exchange handshake messages, during which they [authenticate each
 other's static Noise keys](#static-key-authentication). Handshake messages are
 framed as described in the [Wire Format section](#wire-format), and if a
 handshake message contains a payload, it will have the structure described in
-[Encrypted Payloads](#encrypted-payloads).
+[libp2p Data in Handshake Messages](#libp2p-data-in-handshake-messages).
 
 Following a successful handshake, each peer will possess two Noise
 [`CipherState` objects][npf-cipher-state]. One is used to encrypt outgoing
