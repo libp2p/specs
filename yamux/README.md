@@ -132,12 +132,12 @@ Alternatively, if an error occurs, the RST flag can be used to hard close a stre
 
 #### Flow Control
 
-When Yamux is initially starts each stream with a 256KiB window size.
+Yamux starts each stream with a 256KiB window size.
 There is no window size for the session.
 
 To prevent the streams from stalling, window update frames should be sent regularly.
 Yamux can be configured to provide a larger limit for windows sizes.
-Both sides assume the initial 256KB window, but can immediately send a window update as part of the SYN/ACK indicating a larger window.
+Both sides assume the initial 256KiB window, but can immediately send a window update as part of the SYN/ACK indicating a larger window.
 
 Both sides should track the number of bytes sent in Data frames only, as only they are tracked as part of the window size.
 
@@ -162,7 +162,7 @@ A peer must read from the socket and decode the frames to make progress on exist
 But any frame could also open yet another stream.
 
 The ACK backlog is defined as the number of streams that a peer has opened which have not yet been acknowledged.
-To support a basic form of backpressure, implementions:
+To support a basic form of backpressure, implementations:
 
 - SHOULD at most allow an ACK backlog of 256 streams.
 - MAY buffer unacknowledged inbound streams instead of resetting them when the application currently cannot handle any more streams.
