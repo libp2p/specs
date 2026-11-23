@@ -63,6 +63,9 @@ enum KeyType {
 	Ed25519 = 1;
 	Secp256k1 = 2;
 	ECDSA = 3;
+	
+	PKIX = 0x40;
+	PKCS8 = 0x41;
 }
 
 message PublicKey {
@@ -110,11 +113,13 @@ The second is for generating peer ids; this is discussed in the section below.
 
 ### Key Types
 
-Four key types are supported:
+The following key types are supported:
  - RSA
  - Ed25519
  - Secp256k1
  - ECDSA
+ - PKIX Encoded Public Keys
+ - PKCS#8 Encoded Private Keys
 
 Implementations MUST support Ed25519. Implementations SHOULD support RSA if they wish to
 interoperate with the mainline IPFS DHT and the default IPFS bootstrap nodes. Implementations MAY
@@ -184,6 +189,27 @@ We encode the private key using DER-encoded PKIX.
 To sign a message, we hash the message with SHA 256, and then sign it with the
 [ECDSA standard algorithm](https://tools.ietf.org/html/rfc6979), then we encode
 it using [DER-encoded ASN.1.](https://wiki.openssl.org/index.php/DER)
+
+#### PKIX Public Keys
+
+The PKIX key type only encodes public keys. The Data field is the [PKIX
+encoding](https://www.rfc-editor.org/rfc/rfc5280) of the public key. The public
+key and algorithm are identified by the [Subject Public Key
+Info](https://www.rfc-editor.org/rfc/rfc5280#section-4.1.2.7) field.
+
+Signature Verification is defined by the key algorithm used.
+
+For backwards compatibility, if a key algorithm has a prior libp2p specific encoding, implementers SHOULD prefer that.
+
+#### PKCS#8 Private Keys
+
+The PKCS8 key type primarily encodes private keys, but may include the
+corresponding public key. The Data field is the [PKCS#8
+encoding](https://www.rfc-editor.org/rfc/rfc5958.html) of the private key.
+
+Signing is defined by the key algorithm used.
+
+For backwards compatibility, if a key algorithm has a prior libp2p specific encoding, implementers SHOULD prefer that.
 
 ### Test vectors
 
