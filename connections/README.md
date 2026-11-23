@@ -29,6 +29,10 @@ and spec status.
         - [multistream-select](#multistream-select)
     - [Upgrading Connections](#upgrading-connections)
     - [Opening New Streams Over a Connection](#opening-new-streams-over-a-connection)
+    - [Stream Behaviour](#stream-behaviour)
+      - [States](#states)
+      - [Resets](#resets)
+      - [State transition diagram](#state-transition-diagram)
     - [Practical Considerations](#practical-considerations)
         - [Interoperability](#interoperability)
         - [State Management](#state-management)
@@ -73,7 +77,7 @@ verifiable by the other peer.
 libp2p connection. They must support backpressure, which prevents receivers from
 being flooded by data from eager senders. They can also be "half closed",
 meaning that a stream can be closed for writing data but still open to receiving
-data and vice versa.
+data and vice versa. See [Stream Behaviour](#stream-behaviour) for details.
 
 Support for multiple streams ensures that a single connection between peers can
 support a wide variety of interactions, each with their own protocol. This is
@@ -268,6 +272,49 @@ When registering protocol handlers, it's possible to use a custom predicate or
 indicating whether the handler supports the protocol. This allows more flexible
 behavior than exact literal matching, which is the default behavior if no match
 function is provided.
+
+## Stream Behaviour
+
+This section specifies the expected behaviour of a libp2p stream.
+
+### States
+
+A libp2p stream can be in one of four states:
+
+- Open for reading and writing
+- Open for reading only
+- Open for writing only
+- Closed
+
+The default state after opening a new stream is "Open for reading and writing".
+Either party can at any point close the reading or writing side.
+
+The "Closed" state is the product of both halfs (read and write) of the stream being closed.
+This can happen because one party closes both halfs but also as a combination
+of both parties closing their write-half (which automatically closes other's read-half).
+
+Writing to a write-closed stream SHOULD fail with an error clearly signalling the closed state.
+
+Reading from a read-closed stream SHOULD succeed by reading 0 bytes.
+This allows for a robust "read to end"-behaviour.
+Layers on top of the stream MAY fail with an unexpected EOF error in case more data was expected.
+
+### Resets
+
+A stream reset is an abrupt termination of the stream.
+Implementations SHOULD reset a stream to signal a non-graceful close.
+Typically, this is during a resource cleanup like garbage-collection for streams
+which have not been closed properly (see [States](#states) above).
+
+Upon receiving a stream reset, any buffered data in the stream MAY be discarded.
+
+Reading and writing to a reset stream SHOULD fail with an error clearly signalling the reset.
+
+### State transition diagram
+
+The following diagram illustrates the state transitions:
+
+![https://www.planttext.com/?text=VP8nRy8m48Nt-nKd690gUUZAK14wT6ibEZ04XXGV4CdOw7mHwh_d70XDIDB5ikzzx-xPyY9AmLAT782KuWY_XQauePQ58ku3urc1Nym0yfSj6lE6NsVo06b5m-NXAFdqnrMqLMdDfT2x2v7i79UuIxk8brJj6WvCv7kEh75e1ditEDgt1gnKwFNlqO_kRJmRYfDFcMmY6sf5aGJWppZAT94cu72uBlk8Dn8DMe_oFrytVw97azoQFz73rmSVX71Yz6onOD91MeyRR_0ZXQbheM8C5ztlf0o-5fSwkzRagBekz-ypYmqrmIBYvol0WhpLVtS5](https://www.planttext.com/api/plantuml/svg/VP8nRy8m48Nt-nKd690gUUZAK14wT6ibEZ04XXGV4CdOw7mHwh_d70XDIDB5ikzzx-xPyY9AmLAT782KuWY_XQauePQ58ku3urc1Nym0yfSj6lE6NsVo06b5m-NXAFdqnrMqLMdDfT2x2v7i79UuIxk8brJj6WvCv7kEh75e1ditEDgt1gnKwFNlqO_kRJmRYfDFcMmY6sf5aGJWppZAT94cu72uBlk8Dn8DMe_oFrytVw97azoQFz73rmSVX71Yz6onOD91MeyRR_0ZXQbheM8C5ztlf0o-5fSwkzRagBekz-ypYmqrmIBYvol0WhpLVtS5)
 
 ## Practical Considerations
 
