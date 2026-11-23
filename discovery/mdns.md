@@ -118,10 +118,6 @@ Many existing tools ignore the Additional Records, and always send individual qu
 - `<host-name> A`
 - `<host-name> AAAA`
 
-## Issues
-
-[ ] mDNS requires link-local addresses. Loopback and "NAT busting" addresses should not sent and must be ignored on receipt?
-
 ## References
 
 - [RFC 1035 - Domain Names (DNS)](https://tools.ietf.org/html/rfc1035)
