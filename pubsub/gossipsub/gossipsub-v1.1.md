@@ -149,7 +149,7 @@ the topic to which they're publishing. A peer can also publish to topics they ar
 to, in which case they will select peers from their fanout map.
 
 In gossipsub v1.1 publishing is (optionally) done by publishing the message to all connected peers
-with a score above a publish threshold (see [Peer Scoring](#peer-scoring) below). This applies
+with a score at or above the publish threshold (see [Peer Scoring](#peer-scoring) below). This applies
 regardless of whether the publisher is subscribed to the topic. With flood publishing enabled, the
 mesh is used when propagating messages from other peers, but a peer's own messages will always be
 published to all known peers in the topic.
