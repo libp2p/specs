@@ -39,7 +39,6 @@ and spec status.
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [Overview](#overview)
 - [Negotiation](#negotiation)
 - [The Noise Handshake](#the-noise-handshake)
@@ -48,6 +47,7 @@ and spec status.
     - [The libp2p Handshake Payload](#the-libp2p-handshake-payload)
   - [Handshake Pattern](#handshake-pattern)
     - [XX](#xx)
+  - [Noise Extensions](#noise-extensions)
 - [Cryptographic Primitives](#cryptographic-primitives)
 - [Noise Protocol Name](#noise-protocol-name)
 - [Wire Format](#wire-format)
@@ -61,6 +61,9 @@ and spec status.
 - [Changelog](#changelog)
   - [r1 - 2020-01-20](#r1---2020-01-20)
   - [r2 - 2020-03-30](#r2---2020-03-30)
+  - [r3 - 2022-09-20](#r3---2022-09-20)
+  - [r4 - 2022-09-22](#r4---2022-09-22)
+  - [r5 - 2024-03-05](#r5---2024-03-05)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -221,6 +224,7 @@ syntax = "proto2";
 message NoiseExtensions {
     repeated bytes webtransport_certhashes = 1;
     repeated string stream_muxers = 2;
+    boolean webtransport_message_framing = 3;
 }
 
 message NoiseHandshakePayload {
@@ -460,6 +464,10 @@ unsupported types like RSA.
 ### r4 - 2022-09-22
 
 - Add Noise extension registry
+
+### r5 - 2024-03-05
+
+- Add WebTransport message framing to extension registry
 
 
 [peer-id-spec]: ../peer-ids/peer-ids.md
