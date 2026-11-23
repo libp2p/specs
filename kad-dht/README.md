@@ -518,6 +518,53 @@ multiaddrs are stored in the node's peerbook.
 
 ---
 
+## Practical Examples
+<details>
+  <summary>Searching the <b>IPFS</b> Kad DHT for a Peer's Public Key</summary><blockquote>
+  
+  &nbsp;
+  ##### Lets find the Public Key for the IPFS Bootstrap node with the PeerID "QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
+  1. Derive the key to search the DHT for
+     1. We're searching for a public key record therefore we're going to use the `/pk/` namespace
+     2. And we want the public key associated with the PeerID `QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ`
+     3. Putting these together we get `/pk/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ`
+     4. But we need to turn this into it's raw byte representation
+     5. For the namespace and forward slashes we just convert the utf8 string into bytes
+     6. For the PeerID we need to remember that this is a [base58btc encoding](peer-ids.md#decoding) 
+      ---
+
+      | String | / | pk | / |  Qm | aCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ |
+      |--------|---|----|---|-----|----------------------------------------------|
+      | Part | slash | namespace | slash | Multihash prefix | Multihash digest | 
+      | Encoding | utf8 | utf8 | utf8 | base58btc | base58btc | 
+      | Bytes (UInt8) | 47 | 112, 107 | 47 | 18, 32 | 176, 74, 87, 212, 14, 202, 19, 136, 9, 241, 57, 167, 107, 18, 4, 67, 51, 195, 116, 3, 145, 201, 191, 28, 233, 216, 226, 26, 121, 33, 11, 253 | 
+
+      ---
+      7. Key = [47, 112, 107, 47, 18, 32, 176, 74, 87, 212, 14, 202, 19, 136, 9, 241, 57, 167, 107, 18, 4, 67, 51, 195, 116, 3, 145, 201, 191, 28, 233, 216, 226, 26, 121, 33, 11, 253]
+  
+  2. Prepare an [RPCMessage](#rpc-messages) with the `type` set to `GET_VALUE` and the `key` set to the above bytes
+
+  3. In this example, if we send this message directly to the bootstrap node (at `/ip4/104.131.131.82/tcp/4001/p2p/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ`), we should get a response that has the `record` parameter set with the following data   
+  ```protobuf 
+  message Record {
+    // The values Key (note that it matches the key we searched for)
+    bytes key = [47, 112, 107, 47, 18, 32, 176, 74, 87, 212, 14, 202, 19, 136, 9, 241, 57, 167, 107, 18, 4, 67, 51, 195, 116, 3, 145, 201, 191, 28, 233, 216, 226, 26, 121, 33, 11, 253];
+
+    // The Marshaled Public Key
+    bytes value = [8, 0, 18, 166, 4, 48, 130, 2, 34, 48, 13, 6, 9, 42, 134, 72, 134, 247, 13, 1, 1, 1, 5, 0, 3, 130, 2, 15, 0, 48, 130, 2, 10, 2, 130, 2, 1, 0, 161, 245, 192, 231, 192, 213, 229, 86, 175, 192, 232, 69, 102, 248, 197, 101, 119, 58, 219, 84, 141, 220, 33, 156, 169, 104, 134, 19, 160, 9, 108, 45, 253, 6, 152, 4, 200, 73, 104, 84, 91, 156, 157, 241, 157, 209, 49, 204, 132, 8, 183, 120, 29, 247, 221, 250, 242, 8, 164, 42, 130, 21, 35, 206, 3, 149, 81, 100, 166, 45, 202, 182, 189, 16, 221, 38, 248, 80, 117, 23, 86, 124, 161, 40, 240, 10, 5, 109, 134, 54, 185, 84, 157, 219, 89, 202, 114, 118, 40, 119, 92, 144, 189, 145, 214, 37, 26, 219, 223, 211, 107, 246, 138, 9, 195, 191, 230, 158, 27, 21, 135, 232, 243, 26, 75, 85, 175, 200, 9, 94, 123, 111, 102, 131, 22, 95, 156, 14, 240, 173, 27, 34, 216, 183, 55, 73, 238, 2, 170, 70, 86, 108, 213, 247, 169, 255, 110, 177, 9, 159, 227, 107, 54, 58, 189, 78, 18, 147, 16, 138, 109, 71, 58, 52, 158, 119, 172, 161, 94, 73, 178, 15, 254, 97, 180, 34, 46, 179, 166, 52, 232, 72, 29, 113, 167, 253, 206, 234, 136, 162, 4, 79, 165, 206, 221, 225, 222, 227, 20, 226, 120, 128, 188, 113, 60, 165, 120, 129, 70, 132, 232, 94, 13, 33, 207, 244, 14, 35, 195, 65, 241, 62, 225, 160, 100, 82, 242, 132, 102, 73, 153, 134, 41, 115, 229, 29, 105, 43, 87, 140, 217, 183, 222, 137, 215, 134, 173, 107, 174, 188, 248, 223, 195, 67, 219, 142, 218, 67, 74, 21, 146, 149, 145, 145, 124, 82, 191, 22, 116, 19, 89, 20, 157, 14, 112, 146, 188, 145, 153, 40, 241, 213, 178, 92, 180, 139, 15, 144, 167, 160, 91, 14, 178, 154, 220, 169, 147, 248, 147, 198, 251, 19, 122, 83, 165, 196, 112, 168, 163, 9, 181, 116, 187, 79, 216, 8, 121, 189, 231, 220, 194, 55, 234, 242, 206, 154, 23, 185, 25, 48, 50, 223, 153, 200, 191, 85, 25, 135, 86, 30, 226, 100, 160, 151, 48, 249, 2, 150, 16, 87, 22, 37, 224, 208, 225, 226, 167, 249, 4, 105, 166, 164, 128, 237, 8, 207, 155, 76, 58, 240, 86, 123, 254, 154, 191, 71, 0, 121, 216, 204, 125, 127, 34, 239, 200, 53, 152, 248, 108, 158, 6, 120, 202, 247, 158, 34, 153, 169, 156, 71, 200, 208, 87, 231, 243, 184, 175, 64, 24, 92, 141, 212, 153, 161, 193, 103, 195, 88, 215, 171, 131, 175, 101, 129, 148, 76, 224, 184, 182, 189, 44, 254, 75, 248, 12, 140, 158, 127, 97, 254, 148, 129, 109, 247, 158, 18, 174, 94, 130, 197, 136, 248, 148, 184, 111, 213, 153, 218, 89, 18, 248, 117, 77, 226, 162, 63, 45, 21, 41, 132, 90, 85, 112, 167, 45, 141, 133, 55, 50, 91, 149, 221, 60, 105, 217, 202, 48, 184, 24, 108, 32, 23, 13, 16, 149, 91, 125, 162, 22, 130, 44, 115, 2, 3, 1, 0, 1];
+
+    // The time at which the record was received
+    string timeReceived = "2022-11-05T12:57:46.346597716Z";
+  }
+  ```
+  4. The Record's `value` is the Marshaled Public Key belonging to the Peer with ID `QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ`.
+
+  5. Important! When querying the DHT for values you should follow the [value retrieval](#value-retrieval) algorithm stated above.
+</blockquote>
+</details>
+
+---
+
 ## References
 
 [0]: Maymounkov, P., & Mazières, D. (2002). Kademlia: A Peer-to-Peer Information System Based on the XOR Metric. In P. Druschel, F. Kaashoek, & A. Rowstron (Eds.), Peer-to-Peer Systems (pp. 53–65). Berlin, Heidelberg: Springer Berlin Heidelberg. https://doi.org/10.1007/3-540-45748-8_5
