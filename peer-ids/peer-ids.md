@@ -84,7 +84,7 @@ Each key type has its own serialization format within the `Data` field,
 
 Finally, libp2p places a stronger requirement on the protobuf encoder than the
 protobuf spec: encoding must be deterministic. To achieve this, libp2p imposes
-two additional requirements:
+four additional requirements:
 
 1. Fields must be minimally encoded. That is, varints must use the minimal
    representation (fewest bytes that can encode the given number).
