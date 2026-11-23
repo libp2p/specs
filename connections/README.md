@@ -27,6 +27,7 @@ and spec status.
     - [Definitions](#definitions)
     - [Protocol Negotiation](#protocol-negotiation)
         - [multistream-select](#multistream-select)
+        - [Optimistic Protocol Negotiation](#optimistic-protocol-negotiation)
     - [Upgrading Connections](#upgrading-connections)
     - [Opening New Streams Over a Connection](#opening-new-streams-over-a-connection)
     - [Practical Considerations](#practical-considerations)
@@ -182,6 +183,15 @@ traffic over the channel will adhere to the rules of the agreed-upon protocol.
 
 If a peer receives a `"na"` response to a proposed protocol id, they can either
 try again with a different protocol id or close the channel.
+
+### Optimistic Protocol Negotiation
+
+When the dialer has prior knowledge that the responder supports a given
+protocol (e.g., via the [identify protocol][identify/push]), it can use an
+optimistic variant of multistream-select that saves one round trip by sending
+the protocol proposal and application data without waiting for the responder's
+echo. For details, see the [Optimistic Protocol Negotiation][optimistic-ms]
+specification.
 
 
 ## Upgrading Connections
@@ -427,3 +437,4 @@ updated to incorporate the changes.
 [resource-manager-issue]: https://github.com/libp2p/go-libp2p/issues/635
 [hole-punching]: ./hole-punching.md
 [inlined-muxer-selection]: ./inlined-muxer-negotiation.md
+[optimistic-ms]: ./optimistic-multistream.md
