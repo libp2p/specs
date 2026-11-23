@@ -158,7 +158,7 @@ connections across the various permutations of the two dimensions.
 
 [TURN]: https://en.wikipedia.org/wiki/Traversal_Using_Relays_around_NAT
 [STUN]: https://en.wikipedia.org/wiki/STUN
-[AutoNAT]: https://github.com/libp2p/specs/issues/180
+[AutoNAT]: ../autonat/README.md
 [Identify]: ../identify/README.md
 [SDP]: https://en.wikipedia.org/wiki/Session_Description_Protocol
 [circuit-relay-v2]: https://github.com/libp2p/specs/blob/master/relay/circuit-v2.md
