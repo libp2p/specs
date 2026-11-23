@@ -87,6 +87,10 @@ to read data.
 All communication between peers happens in the form of exchanging protobuf RPC
 messages between participating peers.
 
+A stream carries a sequence of RPC messages. Each RPC message is prefixed with
+its length in bytes, encoded as an unsigned variable length integer as defined by
+the [multiformats unsigned-varint spec](https://github.com/multiformats/unsigned-varint).
+
 The `RPC` protobuf is as follows:
 
 ```protobuf
